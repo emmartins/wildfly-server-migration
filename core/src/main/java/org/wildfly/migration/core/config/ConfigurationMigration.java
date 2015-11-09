@@ -17,7 +17,7 @@ package org.wildfly.migration.core.config;
 
 import org.wildfly.migration.core.MigrationContext;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
-import org.wildfly.migration.core.target.TargetServer;
+import org.wildfly.migration.core.server.TargetServer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,7 +48,7 @@ public class ConfigurationMigration {
     }
 
     private static void copyFileToTargetServer(Path source, MigrationContext context) throws IOException {
-        // check if target file exists
+        // check if server file exists
         final Path target = context.getTargetServerFactory().getServerPaths().getStandaloneConfigurationDir().resolve(source.getFileName());
         ServerMigrationLogger.ROOT_LOGGER.debugf("Source server configuration file is %s", source);
         ServerMigrationLogger.ROOT_LOGGER.debugf("Target server configuration file is %s", target);
@@ -64,10 +64,10 @@ public class ConfigurationMigration {
 
     private static TargetServer startEmbeddedServer(Path source, MigrationContext context) throws IOException {
         final String config = source.getFileName().toString();
-        ServerMigrationLogger.ROOT_LOGGER.infof("Starting target server configuration %s", config);
+        ServerMigrationLogger.ROOT_LOGGER.infof("Starting server server configuration %s", config);
         final TargetServer targetServer = context.getTargetServerFactory().newStandaloneTargetServer(config);
         targetServer.start();
-        ServerMigrationLogger.ROOT_LOGGER.infof("Started target server configuration %s", config);
+        ServerMigrationLogger.ROOT_LOGGER.infof("Started server server configuration %s", config);
         return targetServer;
     }
 

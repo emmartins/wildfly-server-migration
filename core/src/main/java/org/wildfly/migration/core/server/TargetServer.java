@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.core;
-
-import org.wildfly.migration.core.server.TargetServerFactory;
+package org.wildfly.migration.core.server;
 
 /**
  * @author emmartins
  */
-public interface MigrationContext {
-    Prompt getPrompt();
-    TargetServerFactory getTargetServerFactory();
+public interface TargetServer {
+    void start();
+    void stop();
+    TargetServerManagement getManagementClient();
 }

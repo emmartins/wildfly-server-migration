@@ -16,8 +16,8 @@
 package org.wildfly.migration.core;
 
 import org.wildfly.migration.core.config.ConfigurationMigration;
-import org.wildfly.migration.core.target.TargetServerFactory;
-import org.wildfly.migration.core.target.embedded.EmbeddedTargetServerFactory;
+import org.wildfly.migration.core.server.TargetServerFactory;
+import org.wildfly.migration.core.server.embedded.EmbeddedTargetServerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public class ServerMigration {
             throw new IllegalStateException("Migration source not set");
         }
         if (to == null) {
-            throw new IllegalStateException("Migration target not set");
+            throw new IllegalStateException("Migration server not set");
         }
         if (Files.isDirectory(from)) {
             // TODO find and migrate all configs

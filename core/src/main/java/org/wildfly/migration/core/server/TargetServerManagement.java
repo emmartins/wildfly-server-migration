@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.core;
+package org.wildfly.migration.core.server;
 
-import org.wildfly.migration.core.server.TargetServerFactory;
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * @author emmartins
  */
-public interface MigrationContext {
-    Prompt getPrompt();
-    TargetServerFactory getTargetServerFactory();
+public interface TargetServerManagement {
+    Set<String> getExtensions() throws IOException;
+    Set<String> getSubsystems() throws IOException;
+    void removeSubsystem(String subsystem) throws IOException;
+    void removeExtension(String extension) throws IOException;
+    void migrateSubsystem(String subsystem) throws IOException;
 }
