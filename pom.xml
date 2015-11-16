@@ -80,6 +80,7 @@
     <modules>
         <module>core</module>
         <module>cli</module>
+        <module>build</module>
         <!--
         <module>testsuite</module>
         -->
@@ -193,7 +194,13 @@
         <dependencies>
 
             <!-- Modules in this project -->
-
+            
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-server-migration-build</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-server-migration-core</artifactId>
@@ -205,6 +212,8 @@
                 <artifactId>wildfly-server-migration-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            
+            
             <!--
                         <dependency>
                             <groupId>${project.groupId}</groupId>
