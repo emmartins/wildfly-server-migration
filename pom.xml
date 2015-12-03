@@ -78,12 +78,12 @@
     </properties>
 
     <modules>
-        <module>core</module>
-        <module>cli</module>
         <module>build</module>
-        <!--
-        <module>testsuite</module>
-        -->
+        <module>cli</module>
+        <module>core</module>
+        <module>eap6</module>
+        <module>eap7</module>
+        <module>wildfly10</module>
     </modules>
 
     <build>
@@ -194,13 +194,13 @@
         <dependencies>
 
             <!-- Modules in this project -->
-            
+
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-server-migration-build</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-server-migration-core</artifactId>
@@ -212,15 +212,25 @@
                 <artifactId>wildfly-server-migration-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
-            
-            <!--
-                        <dependency>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>wildfly-server-migration-testsuite</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                        -->
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-server-migration-eap6</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-server-migration-eap7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-server-migration-wildfly10</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- External Dependencies -->
 
             <dependency>

@@ -66,6 +66,12 @@
       <outputDirectory>lib</outputDirectory>
       <includes>
         <include>org.wildfly.migration:wildfly-server-migration-cli</include>
+<!--
+        <include>org.wildfly.migration:wildfly-server-migration-core</include>
+-->        
+        <include>org.wildfly.migration:wildfly-server-migration-eap6</include>
+        <include>org.wildfly.migration:wildfly-server-migration-eap7</include>                
+        <include>org.wildfly.migration:wildfly-server-migration-wildfly10</include>
       </includes>
     </dependencySet>
   </dependencySets>

@@ -15,12 +15,11 @@
  */
 package org.wildfly.migration.core;
 
-import org.wildfly.migration.core.config.ConfigurationMigration;
-import org.wildfly.migration.core.server.TargetServerFactory;
-import org.wildfly.migration.core.server.embedded.EmbeddedTargetServerFactory;
+import org.wildfly.migration.core.console.ConsoleWrapper;
+import org.wildfly.migration.core.console.JavaConsole;
+import org.wildfly.migration.core.logger.ServerMigrationLogger;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -30,6 +29,7 @@ public class ServerMigration {
 
     private Path from;
     private Path to;
+    private boolean interactive = true;
 
     public ServerMigration from(Path path) {
         this.from = path;
@@ -41,37 +41,69 @@ public class ServerMigration {
         return this;
     }
 
-    public void run() throws IOException {
-        if (from == null) {
-            throw new IllegalStateException("Migration source not set");
-        }
-        if (to == null) {
-            throw new IllegalStateException("Migration server not set");
-        }
-        if (Files.isDirectory(from)) {
-            // TODO find and migrate all configs
-            throw new IllegalArgumentException("single config file is currently the only supported source");
-        } else {
-            ConfigurationMigration.run(from, new MigrationContextImpl(to));
-        }
+    public ServerMigration interactive(boolean interactive) {
+        this.interactive = interactive;
+        return this;
     }
 
-    private static class MigrationContextImpl implements MigrationContext {
+    public void run() throws IOException {
+        if (from == null) {
+            throw new IllegalStateException("Migration source server base dir not set");
+        }
+        if (to == null) {
+            throw new IllegalStateException("Migration target server base dir not set");
+        }
 
-        private final TargetServerFactory targetServerFactory;
+        final ConsoleWrapper console = new JavaConsole();
 
-        private MigrationContextImpl(Path baseDir) {
-            targetServerFactory = new EmbeddedTargetServerFactory(baseDir);
+        console.printf("%n");
+        console.printf("----------------------------------------------------------%n");
+        console.printf("----  JBoss Server Migration Tool  -----------------------%n");
+        console.printf("----------------------------------------------------------%n");
+        console.printf("%n");
+
+        console.printf("Retrieving servers...%n");
+        final Server sourceServer = getServer("SOURCE", from);
+        final Server targetServer = getServer("TARGET", to);
+
+        console.printf("%n");
+        console.printf("----------------------------------------------------------%n");
+        console.printf("----------------------------------------------------------%n");
+        console.printf("%n");
+
+        targetServer.migrate(sourceServer, new ServerMigrationContextImpl(console, true));
+    }
+
+    protected Server getServer(String name, Path baseDir) {
+        ServerMigrationLogger.ROOT_LOGGER.infof("Processing %s server's base dir %s", name, baseDir);
+        final Server server = Servers.getServer(baseDir);
+        if (server == null) {
+            // TODO fallback to manual selection
+            throw new IllegalArgumentException("Failed to identify "+name+" server.");
+        } else {
+            ServerMigrationLogger.ROOT_LOGGER.infof("%s server %s", name, server.getProductInfo());
+        }
+        return server;
+    }
+
+    private static class ServerMigrationContextImpl implements ServerMigrationContext {
+
+        private final ConsoleWrapper consoleWrapper;
+        private final boolean interactive;
+
+        private ServerMigrationContextImpl(ConsoleWrapper consoleWrapper, boolean interactive) {
+            this.consoleWrapper = consoleWrapper;
+            this.interactive = interactive;
         }
 
         @Override
-        public Prompt getPrompt() {
-            throw new UnsupportedOperationException();
+        public ConsoleWrapper getConsoleWrapper() {
+            return consoleWrapper;
         }
 
         @Override
-        public TargetServerFactory getTargetServerFactory() {
-            return targetServerFactory;
+        public boolean isInteractive() {
+            return interactive;
         }
     }
 }

@@ -36,10 +36,32 @@
     </properties>
 
     <dependencies>
+<!--
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-core</artifactId>
+        </dependency>       
+-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wildfly-server-migration-cli</artifactId>
         </dependency>       
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-eap6</artifactId>
+        </dependency>       
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-eap7</artifactId>
+        </dependency>           
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-wildfly10</artifactId>
+        </dependency>       
+
     </dependencies>
 
     <build>

@@ -33,7 +33,7 @@ public interface CommandLineMigrationLogger extends BasicLogger {
      *
      * @return the message.
      */
-    @Message(id = Message.NONE, value = "Path to the source server configuration file to migrate from.")
+    @Message(id = Message.NONE, value = "Path to the base dir of the server to migrate from.")
     String argSource();
 
     /**

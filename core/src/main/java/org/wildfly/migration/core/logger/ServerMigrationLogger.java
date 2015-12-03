@@ -28,6 +28,79 @@ public interface ServerMigrationLogger extends BasicLogger {
 
     ServerMigrationLogger ROOT_LOGGER = Logger.getMessageLogger(ServerMigrationLogger.class, ServerMigrationLogger.class.getPackage().getName());
 
-    @Message("Cannot parse artifact spec %s")
-    RuntimeException cannotParseArtifact(String artifact);
+    /**
+     * Creates an exception indicating that no java.io.Console is available.
+     *
+     * @return a {@link IllegalStateException} for the error.
+     */
+    @Message(id = 1, value = "No java.io.Console available to interact with user.")
+    IllegalStateException noConsoleAvailable();
+
+    /**
+     * The long value a user would enter to indicate 'yes'
+     *
+     * This String should be the lower case representation in the respective locale.
+     *
+     * @return The value a user would enter to indicate 'yes'.
+     */
+    @Message(id = Message.NONE, value = "yes")
+    String yes();
+
+    /**
+     * The short value a user would enter to indicate 'yes'
+     *
+     * If no short value is available for a specific translation then only the long value will be accepted.
+     *
+     * This String should be the lower case representation in the respective locale.
+     *
+     * @return The short value a user would enter to indicate 'yes'.
+     */
+    @Message(id = Message.NONE, value = "y")
+    String shortYes();
+
+    /**
+     * The long value a user would enter to indicate 'no'
+     *
+     * This String should be the lower case representation in the respective locale.
+     *
+     * @return The value a user would enter to indicate 'no'.
+     */
+    @Message(id = Message.NONE, value = "no")
+    String no();
+
+    /**
+     * The short value a user would enter to indicate 'no'
+     *
+     * If no short value is available for a specific translation then only the long value will be accepted.
+     *
+     * This String should be the lower case representation in the respective locale.
+     *
+     * @return The short value a user would enter to indicate 'no'.
+     */
+    @Message(id = Message.NONE, value = "n")
+    String shortNo();
+
+    /**
+     * The error message if the confirmation response is invalid.
+     *
+     * @return a {@link String} for the message.
+     */
+    @Message(id = 2, value = "Invalid response. (Valid responses are %s and %s)")
+    String invalidConfirmationResponse(String firstValues, String secondValues);
+
+    /**
+     * The error message header.
+     *
+     * @return a {@link String} for the message.
+     */
+    @Message(id = Message.NONE, value = "Error")
+    String errorHeader();
+
+    /**
+     * Simple yes/no prompt.
+     *
+     * @return a {@link String} for the message.
+     */
+    @Message(id = Message.NONE, value = "yes/no?")
+    String yesNo();
 }
