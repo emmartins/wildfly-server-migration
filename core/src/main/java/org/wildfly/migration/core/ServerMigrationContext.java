@@ -16,12 +16,13 @@
 package org.wildfly.migration.core;
 
 import org.wildfly.migration.core.console.ConsoleWrapper;
+import org.wildfly.migration.core.util.MigrationFiles;
 
 /**
  * @author emmartins
  */
 public interface ServerMigrationContext {
     ConsoleWrapper getConsoleWrapper();
-
+    MigrationFiles getMigrationFiles();
     boolean isInteractive();
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.wildfly;
+package org.wildfly.migration.wildfly.full;
 
 import org.wildfly.migration.core.AbstractServerProvider;
 import org.wildfly.migration.core.ManifestProductInfo;

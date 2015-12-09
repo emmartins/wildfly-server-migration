@@ -16,7 +16,7 @@
 package org.wildfly.migration.eap;
 
 import org.wildfly.migration.core.ProductInfo;
-import org.wildfly.migration.wildfly.WildFly10FullServer;
+import org.wildfly.migration.wildfly.full.WildFly10FullServer;
 
 import java.nio.file.Path;
 

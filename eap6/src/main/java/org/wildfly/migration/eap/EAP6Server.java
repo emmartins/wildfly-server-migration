@@ -33,13 +33,13 @@ public class EAP6Server extends AbstractServer {
         super(productInfo, baseDir);
     }
 
-    public Collection<Path> getStandaloneConfigPaths() {
+    public Collection<EAP6StandaloneConfig> getStandaloneConfigs() {
         // FIXME scan the config dir instead
-        List<Path> paths = new ArrayList<>();
+        List<EAP6StandaloneConfig> standaloneConfigs = new ArrayList<>();
         final Path standaloneConfigurationDir = getStandaloneConfigurationDir();
-        paths.add(standaloneConfigurationDir.resolve("standalone.xml"));
-        paths.add(standaloneConfigurationDir.resolve("standalone-full.xml"));
-        return Collections.unmodifiableList(paths);
+        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone.xml"), this));
+        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-full.xml"), this));
+        return Collections.unmodifiableList(standaloneConfigs);
     }
 
     public Path getStandaloneDir() {

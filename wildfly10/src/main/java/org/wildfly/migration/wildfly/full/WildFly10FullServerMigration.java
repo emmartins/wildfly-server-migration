@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.wildfly;
+package org.wildfly.migration.wildfly.full;
 
-import org.wildfly.migration.core.Server;
-import org.wildfly.migration.core.ServerMigrationContext;
-
-import java.io.IOException;
+import org.wildfly.migration.wildfly.WildFly10ServerMigration;
 
 /**
  * @author emmartins
  */
-public interface WildFly10FullMigration {
-    void migrate(Server source, WildFly10FullServer target, ServerMigrationContext context) throws IOException;
+public interface WildFly10FullServerMigration extends WildFly10ServerMigration {
 }

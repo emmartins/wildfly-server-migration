@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.wildfly.server.embedded;
+package org.wildfly.migration.wildfly.standalone;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.wildfly.core.embedded.EmbeddedServerFactory;
+import org.wildfly.core.embedded.ServerStartException;
 import org.wildfly.core.embedded.StandaloneServer;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
-import org.wildfly.migration.wildfly.server.TargetServerManagement;
+import org.wildfly.migration.wildfly.WildFly10Server;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -33,12 +38,43 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-class EmbeddedTargetServerManagement implements TargetServerManagement {
+public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneServer {
 
-    private final StandaloneServer standaloneServer;
+    private final String config;
+    private StandaloneServer standaloneServer;
+    private final WildFly10Server server;
 
-    EmbeddedTargetServerManagement(StandaloneServer standaloneServer) {
-        this.standaloneServer = standaloneServer;
+    public EmbeddedWildFly10StandaloneServer(String config, WildFly10Server server) {
+        this.config = config;
+        this.server = server;
+    }
+
+    @Override
+    public synchronized void start() {
+        if (isStarted()) {
+            throw new IllegalStateException("server started");
+        }
+        final String[] cmds = {"--server-config="+config,"--admin-only"};
+        standaloneServer = EmbeddedServerFactory.create(server.getBaseDir().toString(), null, null, cmds);
+        try {
+            standaloneServer.start();
+        } catch (ServerStartException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public synchronized void stop() {
+        if (!isStarted()) {
+            throw new IllegalStateException("server not started");
+        }
+        standaloneServer.stop();
+        standaloneServer = null;
+    }
+
+    @Override
+    public boolean isStarted() {
+        return standaloneServer != null;
     }
 
     @Override
@@ -56,6 +92,11 @@ class EmbeddedTargetServerManagement implements TargetServerManagement {
     }
 
     @Override
+    public WildFly10Server getServer() {
+        return server;
+    }
+
+    @Override
     public Set<String> getSubsystems() throws IOException {
         final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, null);
         op.get(CHILD_TYPE).set(SUBSYSTEM);
@@ -70,6 +111,17 @@ class EmbeddedTargetServerManagement implements TargetServerManagement {
     }
 
     @Override
+    public List<ModelNode> getSecurityRealms() throws IOException {
+        final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_RESOURCES_OPERATION, pathAddress(pathElement(CORE_SERVICE, MANAGEMENT)));
+        op.get(CHILD_TYPE).set(SECURITY_REALM);
+        op.get(RECURSIVE).set(true);
+        final ModelNode opResult = standaloneServer.getModelControllerClient().execute(op);
+        processResult(opResult);
+        ServerMigrationLogger.ROOT_LOGGER.debugf("Get security realms Op result %s", opResult.toString());
+        return opResult.get(RESULT).asList();
+    }
+
+    @Override
     public void removeSubsystem(String subsystem) throws IOException {
         final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem));
         final ModelNode op = Util.createRemoveOperation(address);
@@ -81,6 +133,21 @@ class EmbeddedTargetServerManagement implements TargetServerManagement {
         final PathAddress address = pathAddress(pathElement(EXTENSION, extension));
         final ModelNode op = Util.createRemoveOperation(address);
         processResult(standaloneServer.getModelControllerClient().execute(op));
+    }
+
+    @Override
+    public Path resolvePath(String pathName) throws IOException {
+        final PathAddress address = pathAddress(pathElement(PATH, pathName));
+        final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
+        final ModelNode opResult = standaloneServer.getModelControllerClient().execute(op);
+        ServerMigrationLogger.ROOT_LOGGER.debugf("Resolve path Op result %s", opResult.toString());
+        processResult(opResult);
+        String path = opResult.get(RESULT).get(PATH).asString();
+        if (!opResult.get(RESULT).hasDefined(RELATIVE_TO)) {
+            return Paths.get(path);
+        } else {
+            return resolvePath(opResult.get(RESULT).get(RELATIVE_TO).asString()).resolve(path);
+        }
     }
 
     @Override

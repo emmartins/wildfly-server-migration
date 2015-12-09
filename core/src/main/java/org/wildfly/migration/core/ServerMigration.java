@@ -18,6 +18,7 @@ package org.wildfly.migration.core;
 import org.wildfly.migration.core.console.ConsoleWrapper;
 import org.wildfly.migration.core.console.JavaConsole;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
+import org.wildfly.migration.core.util.MigrationFiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -75,6 +76,7 @@ public class ServerMigration {
     }
 
     protected Server getServer(String name, Path baseDir) {
+        baseDir = baseDir.normalize();
         ServerMigrationLogger.ROOT_LOGGER.infof("Processing %s server's base dir %s", name, baseDir);
         final Server server = Servers.getServer(baseDir);
         if (server == null) {
@@ -90,15 +92,22 @@ public class ServerMigration {
 
         private final ConsoleWrapper consoleWrapper;
         private final boolean interactive;
+        private final MigrationFiles migrationFiles;
 
         private ServerMigrationContextImpl(ConsoleWrapper consoleWrapper, boolean interactive) {
             this.consoleWrapper = consoleWrapper;
             this.interactive = interactive;
+            this.migrationFiles = new MigrationFiles();
         }
 
         @Override
         public ConsoleWrapper getConsoleWrapper() {
             return consoleWrapper;
+        }
+
+        @Override
+        public MigrationFiles getMigrationFiles() {
+            return migrationFiles;
         }
 
         @Override

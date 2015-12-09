@@ -13,18 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.wildfly.server;
+package org.wildfly.migration.wildfly.standalone.config;
 
-import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author emmartins
  */
-public interface TargetServerManagement {
-    Set<String> getExtensions() throws IOException;
-    Set<String> getSubsystems() throws IOException;
-    void removeSubsystem(String subsystem) throws IOException;
-    void removeExtension(String extension) throws IOException;
-    void migrateSubsystem(String subsystem) throws IOException;
+public class Subsystems {
+
+    public static final List<Subsystem> SUPPORTED = initSupported();
+
+    private static List<Subsystem> initSupported() {
+        List<Subsystem> supported = new ArrayList<>();
+        for (Extension extension : Extensions.SUPPORTED) {
+            supported.addAll(extension.getSubsystems());
+        }
+        return Collections.unmodifiableList(supported);
+    }
+
+    private Subsystems() {
+    }
+
 }

@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.wildfly.server;
+package org.wildfly.migration.wildfly.full;
+
+import org.wildfly.migration.core.Server;
+import org.wildfly.migration.eap.EAP6Server;
+import org.wildfly.migration.wildfly.full.from.eap6.WildFly10FullFromEAP6ServerMigration;
 
 /**
  * @author emmartins
  */
-public interface TargetServer {
-    void start();
-    void stop();
-    TargetServerManagement getManagementClient();
+public class WildFly10FullMigrations {
+
+    private WildFly10FullMigrations() {
+    }
+
+    static WildFly10FullServerMigration getMigrationFrom(Server sourceServer) {
+        // FIXME use service loader
+        if (sourceServer instanceof EAP6Server) {
+            return new WildFly10FullFromEAP6ServerMigration();
+        }
+        return null;
+    }
 }
