@@ -46,11 +46,13 @@ public class EJb3WildFly10Extension extends WildFly10Extension {
             super.migrate(server, context);
             final ModelNode config = server.getSubsystem(getName());
             processConfig(config, server, context);
-            // TODO fix clustering attr
         }
 
         protected void processConfig(ModelNode config, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystem %s config after migration: %s", getName(), config.asString());
+            if (!config.hasDefined("default-clustered-sfsb-cache")) {
+                return;
+            }
+            ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s config after migration defines unsupported attr default-clustered-sfsb-cache (WFLY-5520): %s", getName(), config);
             ((EmbeddedWildFly10StandaloneServer)server).wfly5520Workaround();
         }
     }
