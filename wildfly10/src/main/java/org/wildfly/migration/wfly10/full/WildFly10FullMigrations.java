@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.eap;
+package org.wildfly.migration.wfly10.full;
 
-import org.wildfly.migration.core.ProductInfo;
-import org.wildfly.migration.wfly10.full.WildFly10FullServer;
-
-import java.nio.file.Path;
+import org.wildfly.migration.core.Server;
+import org.wildfly.migration.eap.EAP6Server;
+import org.wildfly.migration.wfly10.full.from.eap6.WildFly10FullFromEAP6ServerMigration;
 
 /**
  * @author emmartins
  */
-public class EAP7Server extends WildFly10FullServer {
-    public EAP7Server(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
+public class WildFly10FullMigrations {
+
+    private WildFly10FullMigrations() {
+    }
+
+    static WildFly10FullServerMigration getMigrationFrom(Server sourceServer) {
+        // FIXME use service loader
+        if (sourceServer instanceof EAP6Server) {
+            return new WildFly10FullFromEAP6ServerMigration();
+        }
+        return null;
     }
 }

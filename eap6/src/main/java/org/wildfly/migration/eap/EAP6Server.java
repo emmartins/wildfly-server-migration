@@ -38,7 +38,9 @@ public class EAP6Server extends AbstractServer {
         List<EAP6StandaloneConfig> standaloneConfigs = new ArrayList<>();
         final Path standaloneConfigurationDir = getStandaloneConfigurationDir();
         standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone.xml"), this));
+        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-ha.xml"), this));
         standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-full.xml"), this));
+        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-full-ha.xml"), this));
         return Collections.unmodifiableList(standaloneConfigs);
     }
 

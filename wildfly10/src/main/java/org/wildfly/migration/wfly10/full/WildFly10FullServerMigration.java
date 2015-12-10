@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.eap;
+package org.wildfly.migration.wfly10.full;
 
-import org.wildfly.migration.core.ProductInfo;
-import org.wildfly.migration.wfly10.full.WildFly10FullServer;
-
-import java.nio.file.Path;
+import org.wildfly.migration.wfly10.WildFly10ServerMigration;
 
 /**
  * @author emmartins
  */
-public class EAP7Server extends WildFly10FullServer {
-    public EAP7Server(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
-    }
+public interface WildFly10FullServerMigration extends WildFly10ServerMigration {
 }
