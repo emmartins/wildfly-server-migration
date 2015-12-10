@@ -50,7 +50,7 @@ public class EJb3WildFly10Extension extends WildFly10Extension {
         }
 
         protected void processConfig(ModelNode config, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-            ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s config after migration: %s", getName(), config.asString());
+            ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystem %s config after migration: %s", getName(), config.asString());
             ((EmbeddedWildFly10StandaloneServer)server).wfly5520Workaround();
         }
     }
