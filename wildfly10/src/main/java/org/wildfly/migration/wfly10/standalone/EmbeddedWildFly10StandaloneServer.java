@@ -180,7 +180,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
     public void wfly5520Workaround() throws IOException {
         /*
         /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
-        /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=distributable)
+        /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=clustered)
         /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=simple)
          */
         PathAddress address = pathAddress(pathElement(SUBSYSTEM, EJb3WildFly10Extension.Ejb3WildFly10Subsystem.INSTANCE.getName()));
@@ -192,7 +192,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
         address = pathAddress(pathElement(SUBSYSTEM, EJb3WildFly10Extension.Ejb3WildFly10Subsystem.INSTANCE.getName()));
         op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
         op.get(NAME).set("default-sfsb-cache");
-        op.get(VALUE).set("distributable");
+        op.get(VALUE).set("clustered");
         result = standaloneServer.getModelControllerClient().execute(op);
         processResult(result);
 
