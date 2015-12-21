@@ -90,9 +90,9 @@ public class WildFly10FromEAP6StandaloneConfigFileSubsystemsMigration {
 
     protected void migrateExtensions(WildFly10StandaloneServer wildFly10StandaloneServer, Set<String> extensions, ServerMigrationContext context) throws IOException {
         for (WildFly10Extension supportedExtension : supportedExtensions) {
-            if (extensions.contains(supportedExtension.getName())) {
+            //if (extensions.contains(supportedExtension.getName())) {
                 supportedExtension.migrate(wildFly10StandaloneServer, context);
-            }
+            //}
         }
     }
 }

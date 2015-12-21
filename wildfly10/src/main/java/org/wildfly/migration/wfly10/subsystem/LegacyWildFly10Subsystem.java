@@ -24,22 +24,27 @@ import java.io.IOException;
 /**
  * @author emmartins
  */
-public class LegacyWildFlySubsystem extends BasicWildFly10Subsystem {
+public class LegacyWildFly10Subsystem extends BasicWildFly10Subsystem {
 
-    public LegacyWildFlySubsystem(String name, WildFly10Extension extension) {
+    public LegacyWildFly10Subsystem(String name, WildFly10Extension extension) {
         super(name, extension);
     }
 
     @Override
     public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
         super.migrate(server, context);
+        if (!server.getSubsystems().contains(getName())) {
+            return;
+        }
+        ServerMigrationLogger.ROOT_LOGGER.debugf("Migrating subsystem %s...", getName());
         server.migrateSubsystem(getName());
         postMigrate(server, context);
+        ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s migrated.", getName());
         // FIXME tmp workaround for legacy subsystems which do not remove itself
         if (server.getSubsystems().contains(getName())) {
             // remove itself after migration
             server.removeSubsystem(getName());
-            ServerMigrationLogger.ROOT_LOGGER.infof("Legacy subsystem %s removed since still existed after migration.", getName());
+            ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystem %s removed after migration.", getName());
         }
     }
 

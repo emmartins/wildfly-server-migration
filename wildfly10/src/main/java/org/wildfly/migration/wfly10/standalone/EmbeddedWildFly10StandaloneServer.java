@@ -23,7 +23,6 @@ import org.wildfly.core.embedded.ServerStartException;
 import org.wildfly.core.embedded.StandaloneServer;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
 import org.wildfly.migration.wfly10.WildFly10Server;
-import org.wildfly.migration.wfly10.subsystem.EJb3WildFly10Extension;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -82,8 +81,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
     public Set<String> getExtensions() throws IOException {
         final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, null);
         op.get(CHILD_TYPE).set(EXTENSION);
-        final ModelNode opResult = standaloneServer.getModelControllerClient().execute(op);
-        processResult(opResult);
+        final ModelNode opResult = executeManagementOperation(op);
         ServerMigrationLogger.ROOT_LOGGER.debugf("Get Extensions Op result %s", opResult.toString());
         Set<String> result = new HashSet<>();
         for (ModelNode resultNode : opResult.get(RESULT).asList()) {
@@ -102,8 +100,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
         final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem));
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
         op.get(RECURSIVE).set(true);
-        final ModelNode result = standaloneServer.getModelControllerClient().execute(op);
-        processResult(result);
+        final ModelNode result = executeManagementOperation(op);
         ServerMigrationLogger.ROOT_LOGGER.debugf("Op result %s", result.toString());
         return result.get(RESULT);
     }
@@ -112,8 +109,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
     public Set<String> getSubsystems() throws IOException {
         final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, null);
         op.get(CHILD_TYPE).set(SUBSYSTEM);
-        final ModelNode opResult = standaloneServer.getModelControllerClient().execute(op);
-        processResult(opResult);
+        final ModelNode opResult = executeManagementOperation(op);
         ServerMigrationLogger.ROOT_LOGGER.debugf("Get subsystems Op result %s", opResult.toString());
         Set<String> result = new HashSet<>();
         for (ModelNode resultNode : opResult.get(RESULT).asList()) {
@@ -127,8 +123,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
         final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_RESOURCES_OPERATION, pathAddress(pathElement(CORE_SERVICE, MANAGEMENT)));
         op.get(CHILD_TYPE).set(SECURITY_REALM);
         op.get(RECURSIVE).set(true);
-        final ModelNode opResult = standaloneServer.getModelControllerClient().execute(op);
-        processResult(opResult);
+        final ModelNode opResult = executeManagementOperation(op);
         ServerMigrationLogger.ROOT_LOGGER.debugf("Get security realms Op result %s", opResult.toString());
         return opResult.get(RESULT).asList();
     }
@@ -137,23 +132,22 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
     public void removeSubsystem(String subsystem) throws IOException {
         final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem));
         final ModelNode op = Util.createRemoveOperation(address);
-        processResult(standaloneServer.getModelControllerClient().execute(op));
+        executeManagementOperation(op);
     }
 
     @Override
     public void removeExtension(String extension) throws IOException {
         final PathAddress address = pathAddress(pathElement(EXTENSION, extension));
         final ModelNode op = Util.createRemoveOperation(address);
-        processResult(standaloneServer.getModelControllerClient().execute(op));
+        executeManagementOperation(op);
     }
 
     @Override
     public Path resolvePath(String pathName) throws IOException {
         final PathAddress address = pathAddress(pathElement(PATH, pathName));
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
-        final ModelNode opResult = standaloneServer.getModelControllerClient().execute(op);
+        final ModelNode opResult = executeManagementOperation(op);
         ServerMigrationLogger.ROOT_LOGGER.debugf("Resolve path Op result %s", opResult.toString());
-        processResult(opResult);
         String path = opResult.get(RESULT).get(PATH).asString();
         if (!opResult.get(RESULT).hasDefined(RELATIVE_TO)) {
             return Paths.get(path);
@@ -166,9 +160,7 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
     public void migrateSubsystem(String subsystem) throws IOException {
         final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem));
         final ModelNode op = Util.createEmptyOperation("migrate", address);
-        final ModelNode result = standaloneServer.getModelControllerClient().execute(op);
-        //processResult(result);
-        ServerMigrationLogger.ROOT_LOGGER.debugf("Op result %s", result.toString());
+        executeManagementOperation(op);
     }
 
     private void processResult(ModelNode result) {
@@ -177,30 +169,11 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
         }
     }
 
-    public void wfly5520Workaround() throws IOException {
-        /*
-        /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
-        /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=clustered)
-        /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=simple)
-         */
-        PathAddress address = pathAddress(pathElement(SUBSYSTEM, EJb3WildFly10Extension.Ejb3WildFly10Subsystem.INSTANCE.getName()));
-        ModelNode op = Util.createEmptyOperation(UNDEFINE_ATTRIBUTE_OPERATION, address);
-        op.get(NAME).set("default-clustered-sfsb-cache");
-        ModelNode result = standaloneServer.getModelControllerClient().execute(op);
+    @Override
+    public ModelNode executeManagementOperation(ModelNode operation) throws IOException {
+        final ModelNode result = standaloneServer.getModelControllerClient().execute(operation);
+        //ServerMigrationLogger.ROOT_LOGGER.infof("Op result %s", result.toString());
         processResult(result);
-
-        address = pathAddress(pathElement(SUBSYSTEM, EJb3WildFly10Extension.Ejb3WildFly10Subsystem.INSTANCE.getName()));
-        op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-        op.get(NAME).set("default-sfsb-cache");
-        op.get(VALUE).set("clustered");
-        result = standaloneServer.getModelControllerClient().execute(op);
-        processResult(result);
-
-        address = pathAddress(pathElement(SUBSYSTEM, EJb3WildFly10Extension.Ejb3WildFly10Subsystem.INSTANCE.getName()));
-        op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-        op.get(NAME).set("default-sfsb-passivation-disabled-cache");
-        op.get(VALUE).set("simple");
-        result = standaloneServer.getModelControllerClient().execute(op);
-        processResult(result);
+        return  result;
     }
 }

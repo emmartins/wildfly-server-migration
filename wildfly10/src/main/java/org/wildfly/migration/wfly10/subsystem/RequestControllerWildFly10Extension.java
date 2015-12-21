@@ -15,7 +15,6 @@
  */
 package org.wildfly.migration.wfly10.subsystem;
 
-import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.wildfly.migration.core.ServerMigrationContext;
@@ -31,18 +30,18 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public class EJb3WildFly10Extension extends WildFly10Extension {
+public class RequestControllerWildFly10Extension extends WildFly10Extension {
 
-    public static final EJb3WildFly10Extension INSTANCE = new EJb3WildFly10Extension();
+    public static final RequestControllerWildFly10Extension INSTANCE = new RequestControllerWildFly10Extension();
 
-    private EJb3WildFly10Extension() {
-        super("org.jboss.as.ejb3");
-        subsystems.add(new Ejb3WildFly10Subsystem(this));
+    private RequestControllerWildFly10Extension() {
+        super("org.wildfly.extension.request-controller");
+        subsystems.add(new RequestControllerWildFly10Subsystem(this));
     }
 
-    private static class Ejb3WildFly10Subsystem extends BasicWildFly10Subsystem {
-        private Ejb3WildFly10Subsystem(EJb3WildFly10Extension extension) {
-            super("ejb3", extension);
+    private static class RequestControllerWildFly10Subsystem extends BasicWildFly10Subsystem {
+        private RequestControllerWildFly10Subsystem(RequestControllerWildFly10Extension extension) {
+            super("request-controller", extension);
         }
 
         @Override
@@ -53,27 +52,21 @@ public class EJb3WildFly10Extension extends WildFly10Extension {
         }
 
         protected void migrateConfig(ModelNode config, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-            if (config == null || !config.hasDefined("default-clustered-sfsb-cache")) {
+            if (config != null) {
                 return;
             }
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystem %s config after migration defines unsupported attr default-clustered-sfsb-cache (WFLY-5520): %s", getName(), config);
-            // /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
-            final PathAddress address = pathAddress(pathElement(SUBSYSTEM, getName()));
-            ModelNode op = Util.createEmptyOperation(UNDEFINE_ATTRIBUTE_OPERATION, address);
-            op.get(NAME).set("default-clustered-sfsb-cache");
+            final String extensionName = getExtension().getName();
+            if (!server.getExtensions().contains(extensionName)) {
+                ServerMigrationLogger.ROOT_LOGGER.debugf("Adding Extension %s...", extensionName);
+                final ModelNode op = Util.createAddOperation(pathAddress(pathElement(EXTENSION, extensionName)));
+                op.get(MODULE).set(extensionName);
+                server.executeManagementOperation(op);
+                ServerMigrationLogger.ROOT_LOGGER.infof("Extension %s added.",extensionName);
+            }
+            ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", getName());
+            final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, getName())));
             server.executeManagementOperation(op);
-
-            // /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=clustered)
-            op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-            op.get(NAME).set("default-sfsb-cache");
-            op.get(VALUE).set("clustered");
-            server.executeManagementOperation(op);
-
-            // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=simple)
-            op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-            op.get(NAME).set("default-sfsb-passivation-disabled-cache");
-            op.get(VALUE).set("simple");
-            server.executeManagementOperation(op);
+            ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", getName());
         }
     }
 }

@@ -24,13 +24,16 @@ public class BasicWildFly10Extension extends WildFly10Extension {
         super(extensionName);
     }
 
-    protected BasicWildFly10Extension addBasicSubsystem(String subsystemName) {
-        subsystems.add(new BasicWildFly10Subsystem(subsystemName, this));
+    private BasicWildFly10Extension addSubsystem(WildFly10Subsystem subsystem) {
+        subsystems.add(subsystem);
         return this;
     }
 
-    protected BasicWildFly10Extension addLegacySubsystem(String subsystemName) {
-        subsystems.add(new LegacyWildFlySubsystem(subsystemName, this));
-        return this;
+    public BasicWildFly10Extension addBasicSubsystem(String subsystemName) {
+        return addSubsystem(new BasicWildFly10Subsystem(subsystemName, this));
+    }
+
+    public BasicWildFly10Extension addLegacySubsystem(String subsystemName) {
+        return addSubsystem(new LegacyWildFly10Subsystem(subsystemName, this));
     }
 }

@@ -16,7 +16,6 @@
 package org.wildfly.migration.wfly10.subsystem;
 
 import org.wildfly.migration.core.ServerMigrationContext;
-import org.wildfly.migration.core.logger.ServerMigrationLogger;
 import org.wildfly.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import java.io.IOException;
@@ -50,13 +49,9 @@ public class WildFly10Extension {
     }
 
     public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        ServerMigrationLogger.ROOT_LOGGER.infof("Migrating extension %s...", getName());
         for (WildFly10Subsystem subsystem : subsystems) {
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Migrating subsystem %s...", subsystem.getName());
             subsystem.migrate(server, context);
-            ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s migrated.", subsystem.getName());
         }
-        ServerMigrationLogger.ROOT_LOGGER.infof("Extension %s migrated.", getName());
     }
 
     @Override

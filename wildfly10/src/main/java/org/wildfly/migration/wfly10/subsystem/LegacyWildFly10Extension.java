@@ -37,7 +37,7 @@ public class LegacyWildFly10Extension extends BasicWildFly10Extension {
         if (server.getExtensions().contains(getName())) {
             // remove itself after migration
             server.removeExtension(getName());
-            ServerMigrationLogger.ROOT_LOGGER.infof("Legacy extension %s removed since still existed after migration.", getName());
+            ServerMigrationLogger.ROOT_LOGGER.debugf("Extension %s removed after migration.", getName());
         }
     }
 }

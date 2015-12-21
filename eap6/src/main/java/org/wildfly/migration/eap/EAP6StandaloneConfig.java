@@ -22,4 +22,9 @@ public class EAP6StandaloneConfig {
     public EAP6Server getServer() {
         return server;
     }
+
+    @Override
+    public String toString() {
+        return path.toString();
+    }
 }

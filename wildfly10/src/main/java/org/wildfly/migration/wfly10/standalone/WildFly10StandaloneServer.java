@@ -39,4 +39,5 @@ public interface WildFly10StandaloneServer {
     void removeExtension(String extension) throws IOException;
     Path resolvePath(String path)  throws IOException;
     void migrateSubsystem(String subsystem) throws IOException;
+    ModelNode executeManagementOperation(ModelNode operation) throws IOException;
 }

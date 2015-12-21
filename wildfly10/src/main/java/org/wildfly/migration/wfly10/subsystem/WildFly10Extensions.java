@@ -32,7 +32,7 @@ public class WildFly10Extensions {
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.clustering.jgroups").addBasicSubsystem("jgroups"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.connector").addBasicSubsystem("jca").addBasicSubsystem("resource-adapters").addBasicSubsystem("datasources"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.deployment-scanner").addBasicSubsystem("deployment-scanner"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.ee").addBasicSubsystem("ee"));
+        supportedExtensions.add(EEWildFly10Extension.INSTANCE);
         supportedExtensions.add(EJb3WildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.jaxrs").addBasicSubsystem("jaxrs"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.jdr").addBasicSubsystem("jdr"));
@@ -51,12 +51,12 @@ public class WildFly10Extensions {
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.transactions").addBasicSubsystem("transactions"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.webservices").addBasicSubsystem("webservices"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.weld").addBasicSubsystem("weld"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.batch.jberet").addBasicSubsystem("batch-jberet"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.bean-validation").addBasicSubsystem("bean-validation"));
+        supportedExtensions.add(BatchJBeretWildFly10Extension.INSTANCE);
+        supportedExtensions.add(BeanValidationWildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.clustering.singleton").addBasicSubsystem("singleton"));
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.io").addBasicSubsystem("io"));
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.messaging-activemq").addBasicSubsystem("messaging-activemq"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.request-controller").addBasicSubsystem("request-controller"));
+        supportedExtensions.add(RequestControllerWildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.security.manager").addBasicSubsystem("security-manager"));
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.undertow").addBasicSubsystem("undertow"));
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.iiop-openjdk").addBasicSubsystem("iiop-openjdk"));

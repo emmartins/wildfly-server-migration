@@ -24,8 +24,12 @@ public class WildFly10FromEAP6StandaloneMigration {
     }
 
     public void run(final EAP6Server source, final WildFly10Server target, final ServerMigrationContext context) throws IOException {
-        ROOT_LOGGER.infof("Processing standalone server configurations...");
+        ROOT_LOGGER.infof("Scanning for standalone server configurations...");
+        for (EAP6StandaloneConfig standaloneConfig : source.getStandaloneConfigs()) {
+            ROOT_LOGGER.infof("%s", standaloneConfig);
+        }
         context.getConsoleWrapper().printf("%n");
+
         if (context.isInteractive()) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
