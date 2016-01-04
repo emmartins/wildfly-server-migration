@@ -1,1 +1,1 @@
-wfly10.full.WildFly10FullServerProvider
+org.wildfly.migration.wfly10.full.WildFly10FullServerProvider
