@@ -30,6 +30,11 @@ public class EAP7ServerProvider extends EAP6ServerProvider {
     }
 
     @Override
+    protected String getProductNameRegex() {
+        return "("+super.getProductNameRegex() + ")|(JBoss EAP)";
+    }
+
+    @Override
     protected Server constructServer(ProductInfo productInfo, Path baseDir) {
         return new EAP7Server(productInfo, baseDir);
     }
