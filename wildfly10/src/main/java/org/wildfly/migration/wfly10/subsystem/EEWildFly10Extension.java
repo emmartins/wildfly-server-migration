@@ -48,6 +48,9 @@ public class EEWildFly10Extension extends WildFly10Extension {
         private static final String DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME = "java:jboss/ee/concurrency/factory/default";
         private static final String DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME = "java:jboss/ee/concurrency/executor/default";
         private static final String DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME = "java:jboss/ee/concurrency/scheduler/default";
+        // TODO move both to migration context properties
+        private static final String DEFAULT_DATASOURCE_NAME = "ExampleDS";
+        private static final String DEFAULT_JMS_CONNECTION_FACTORY_NAME = "hornetq-ra";
 
         private EEWildFly10Subsystem(EEWildFly10Extension extension) {
             super("ee", extension);
@@ -56,8 +59,7 @@ public class EEWildFly10Extension extends WildFly10Extension {
         @Override
         public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
             super.migrate(server, context);
-            final ModelNode config = server.getSubsystems().contains(getName()) ? server.getSubsystem(getName()) : null;
-            migrateConfig(config, server, context);
+            migrateConfig(server.getSubsystem(getName()), server, context);
         }
 
         protected void migrateConfig(ModelNode config, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
@@ -173,8 +175,50 @@ public class EEWildFly10Extension extends WildFly10Extension {
             addOp.get("managed-executor-service").set(DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
             addOp.get("managed-scheduled-executor-service").set(DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
             addOp.get("managed-thread-factory").set(DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+            setupDefaultDatasource(addOp, server);
+            setupDefaultJMSConnectionFactory(addOp, server);
             server.executeManagementOperation(addOp);
-            ServerMigrationLogger.ROOT_LOGGER.infof("EE Default Bindings added.");
+            ServerMigrationLogger.ROOT_LOGGER.infof("Java EE Default Bindings configured.");
+        }
+
+        private void setupDefaultJMSConnectionFactory(ModelNode addOp, WildFly10StandaloneServer server) throws IOException {
+            // if the subsystem config defines expected default resource then use it
+            final String subsystemName = MessagingActiveMQWildFly10Extension.INSTANCE.getMessagingActiveMQSubsystem().getName();
+            final ModelNode subsystemConfig = server.getSubsystem(subsystemName);
+            if (subsystemConfig == null) {
+                return;
+            }
+            final ModelNode defaultJmsConnectionFactory;
+            if (subsystemConfig.hasDefined("server", "default", "pooled-connection-factory", DEFAULT_JMS_CONNECTION_FACTORY_NAME)) {
+                defaultJmsConnectionFactory = subsystemConfig.get("server", "default", "pooled-connection-factory", DEFAULT_JMS_CONNECTION_FACTORY_NAME);
+            } else {
+                // TODO ask user to select from list of all jms connection factories configured
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory not found.");
+                return;
+            }
+            final String defaultJmsConnectionFactoryJndiName = defaultJmsConnectionFactory.get("entries").asList().get(0).asString();
+            addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
+            ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory found (%s).", defaultJmsConnectionFactoryJndiName);
+        }
+
+        private void setupDefaultDatasource(ModelNode addOp, WildFly10StandaloneServer server) throws IOException {
+            // if the subsystem config defines expected default resource then use it
+            final String subsystemName = ConnectorWildFly10Extension.INSTANCE.getDatasourceSubsystem().getName();
+            final ModelNode subsystemConfig = server.getSubsystem(subsystemName);
+            if (subsystemConfig == null) {
+                return;
+            }
+            final ModelNode defaultDatasource;
+            if (subsystemConfig.hasDefined("data-source", DEFAULT_DATASOURCE_NAME)) {
+                defaultDatasource = subsystemConfig.get("data-source", DEFAULT_DATASOURCE_NAME);
+            } else {
+                // TODO ask user to select from list of all datasources configured
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource not found.");
+                return;
+            }
+            final String defaultDatasourceJndiName = defaultDatasource.get("jndi-name").asString();
+            addOp.get("datasource").set(defaultDatasourceJndiName);
+            ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource found (%s).", defaultDatasourceJndiName);
         }
     }
 }

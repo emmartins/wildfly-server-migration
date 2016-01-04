@@ -28,9 +28,15 @@ public class WildFly10Extensions {
 
     private static List<WildFly10Extension> initSupportedExtensions() {
         List<WildFly10Extension> supportedExtensions = new ArrayList<>();
+        // note: order may be relevant since extension/subsystem migration process order follows it
+        // add legacy extensions
+        supportedExtensions.add(new LegacyWildFly10Extension("org.jboss.as.jacorb").addLegacySubsystem("jacorb"));
+        supportedExtensions.add(new LegacyWildFly10Extension("org.jboss.as.web").addLegacySubsystem("web"));
+        supportedExtensions.add(new LegacyWildFly10Extension("org.jboss.as.messaging").addLegacySubsystem("messaging"));
+        // add remaining supported extensions
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.clustering.infinispan").addBasicSubsystem("infinispan"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.clustering.jgroups").addBasicSubsystem("jgroups"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.connector").addBasicSubsystem("jca").addBasicSubsystem("resource-adapters").addBasicSubsystem("datasources"));
+        supportedExtensions.add(ConnectorWildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.deployment-scanner").addBasicSubsystem("deployment-scanner"));
         supportedExtensions.add(EEWildFly10Extension.INSTANCE);
         supportedExtensions.add(EJb3WildFly10Extension.INSTANCE);
@@ -45,7 +51,7 @@ public class WildFly10Extensions {
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.modcluster").addBasicSubsystem("modcluster"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.naming").addBasicSubsystem("naming"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.pojo").addBasicSubsystem("pojo"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.remoting").addBasicSubsystem("remoting"));
+        supportedExtensions.add(RemotingWildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.sar").addBasicSubsystem("sar"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.security").addBasicSubsystem("security"));
         supportedExtensions.add(new BasicWildFly10Extension("org.jboss.as.transactions").addBasicSubsystem("transactions"));
@@ -55,15 +61,11 @@ public class WildFly10Extensions {
         supportedExtensions.add(BeanValidationWildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.clustering.singleton").addBasicSubsystem("singleton"));
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.io").addBasicSubsystem("io"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.messaging-activemq").addBasicSubsystem("messaging-activemq"));
+        supportedExtensions.add(MessagingActiveMQWildFly10Extension.INSTANCE);
         supportedExtensions.add(RequestControllerWildFly10Extension.INSTANCE);
-        supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.security.manager").addBasicSubsystem("security-manager"));
-        supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.extension.undertow").addBasicSubsystem("undertow"));
+        supportedExtensions.add(SecurityManagerWildFly10Extension.INSTANCE);
+        supportedExtensions.add(UndertowWildFly10Extension.INSTANCE);
         supportedExtensions.add(new BasicWildFly10Extension("org.wildfly.iiop-openjdk").addBasicSubsystem("iiop-openjdk"));
-        // add legacy extensions
-        supportedExtensions.add(new LegacyWildFly10Extension("org.jboss.as.jacorb").addLegacySubsystem("jacorb"));
-        supportedExtensions.add(new LegacyWildFly10Extension("org.jboss.as.web").addLegacySubsystem("web"));
-        supportedExtensions.add(new LegacyWildFly10Extension("org.jboss.as.messaging").addLegacySubsystem("messaging"));
         return Collections.unmodifiableList(supportedExtensions);
     }
 

@@ -48,12 +48,19 @@ public class EJb3WildFly10Extension extends WildFly10Extension {
         @Override
         public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
             super.migrate(server, context);
-            final ModelNode config = server.getSubsystems().contains(getName()) ? server.getSubsystem(getName()) : null;
-            migrateConfig(config, server, context);
+            migrateConfig(server.getSubsystem(getName()), server, context);
         }
 
         protected void migrateConfig(ModelNode config, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-            if (config == null || !config.hasDefined("default-clustered-sfsb-cache")) {
+            if (config == null) {
+                return;
+            }
+            fixWFLY5520(config, server);
+            migrateRemoteConfig(config, server);
+        }
+
+        private void fixWFLY5520(ModelNode config, WildFly10StandaloneServer server) throws IOException {
+            if (!config.hasDefined("default-clustered-sfsb-cache")) {
                 return;
             }
             ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystem %s config after migration defines unsupported attr default-clustered-sfsb-cache (WFLY-5520): %s", getName(), config);
@@ -74,6 +81,18 @@ public class EJb3WildFly10Extension extends WildFly10Extension {
             op.get(NAME).set("default-sfsb-passivation-disabled-cache");
             op.get(VALUE).set("simple");
             server.executeManagementOperation(op);
+        }
+
+        private void migrateRemoteConfig(ModelNode config, WildFly10StandaloneServer server) throws IOException {
+            if (!config.hasDefined(SERVICE,"remote")) {
+                return;
+            }
+            // /subsystem=ejb3/service=remote:write-attribute(name=connector-ref,value=http-remoting-connector)
+            final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress(pathElement(SUBSYSTEM, getName()), pathElement(SERVICE,"remote")));
+            op.get(NAME).set("connector-ref");
+            op.get(VALUE).set("http-remoting-connector");
+            server.executeManagementOperation(op);
+            ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's remote service configured to use HTTP Remoting connector.");
         }
     }
 }

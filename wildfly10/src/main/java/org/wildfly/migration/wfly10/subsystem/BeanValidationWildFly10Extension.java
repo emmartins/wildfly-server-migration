@@ -47,8 +47,7 @@ public class BeanValidationWildFly10Extension extends WildFly10Extension {
         @Override
         public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
             super.migrate(server, context);
-            final ModelNode config = server.getSubsystems().contains(getName()) ? server.getSubsystem(getName()) : null;
-            migrateConfig(config, server, context);
+            migrateConfig(server.getSubsystem(getName()), server, context);
         }
 
         protected void migrateConfig(ModelNode config, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {

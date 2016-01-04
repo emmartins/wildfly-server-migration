@@ -18,22 +18,19 @@ package org.wildfly.migration.wfly10.subsystem;
 /**
  * @author emmartins
  */
-public class BasicWildFly10Extension extends WildFly10Extension {
+public class MessagingActiveMQWildFly10Extension extends WildFly10Extension {
 
-    public BasicWildFly10Extension(String extensionName) {
-        super(extensionName);
+    public static final MessagingActiveMQWildFly10Extension INSTANCE = new MessagingActiveMQWildFly10Extension();
+
+    private final WildFly10Subsystem messagingActiveMQSubsystem;
+
+    private MessagingActiveMQWildFly10Extension() {
+        super("org.wildfly.extension.messaging-activemq");
+        messagingActiveMQSubsystem = new BasicWildFly10Subsystem("messaging-activemq", this);
+        subsystems.add(messagingActiveMQSubsystem);
     }
 
-    protected BasicWildFly10Extension addSubsystem(WildFly10Subsystem subsystem) {
-        subsystems.add(subsystem);
-        return this;
-    }
-
-    public BasicWildFly10Extension addBasicSubsystem(String subsystemName) {
-        return addSubsystem(new BasicWildFly10Subsystem(subsystemName, this));
-    }
-
-    public BasicWildFly10Extension addLegacySubsystem(String subsystemName) {
-        return addSubsystem(new LegacyWildFly10Subsystem(subsystemName, this));
+    public WildFly10Subsystem getMessagingActiveMQSubsystem() {
+        return messagingActiveMQSubsystem;
     }
 }

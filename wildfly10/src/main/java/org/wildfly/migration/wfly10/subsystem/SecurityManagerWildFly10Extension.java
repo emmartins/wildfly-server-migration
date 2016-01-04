@@ -15,6 +15,7 @@
  */
 package org.wildfly.migration.wfly10.subsystem;
 
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.wildfly.migration.core.ServerMigrationContext;
@@ -30,20 +31,26 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public class RequestControllerWildFly10Extension extends WildFly10Extension {
+public class SecurityManagerWildFly10Extension extends WildFly10Extension {
 
-    private static final String EXTENSION_NAME = "org.wildfly.extension.request-controller";
-    public static final RequestControllerWildFly10Extension INSTANCE = new RequestControllerWildFly10Extension();
+    private static final String EXTENSION_NAME = "org.wildfly.extension.security.manager";
+    public static final SecurityManagerWildFly10Extension INSTANCE = new SecurityManagerWildFly10Extension();
 
-    private RequestControllerWildFly10Extension() {
+    private SecurityManagerWildFly10Extension() {
         super(EXTENSION_NAME);
-        subsystems.add(new RequestControllerWildFly10Subsystem(this));
+        subsystems.add(new SecurityManagerWildFly10Subsystem(this));
     }
 
-    private static class RequestControllerWildFly10Subsystem extends BasicWildFly10Subsystem {
-        private static final String SUBSYSTEM_NAME = "request-controller";
+    private static class SecurityManagerWildFly10Subsystem extends BasicWildFly10Subsystem {
 
-        private RequestControllerWildFly10Subsystem(RequestControllerWildFly10Extension extension) {
+        private static final String SUBSYSTEM_NAME = "security-manager";
+        private static final String DEPLOYMENT_PERMISSIONS = "deployment-permissions";
+        private static final String DEPLOYMENT_PERMISSIONS_NAME = "default";
+        private static final String MAXIMUM_PERMISSIONS = "maximum-permissions";
+        private static final String CLASS_ATTR_NAME = "class";
+        private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
+
+        private SecurityManagerWildFly10Subsystem(SecurityManagerWildFly10Extension extension) {
             super(SUBSYSTEM_NAME, extension);
         }
 
@@ -66,8 +73,26 @@ public class RequestControllerWildFly10Extension extends WildFly10Extension {
                 ServerMigrationLogger.ROOT_LOGGER.infof("Extension %s added.",extensionName);
             }
             ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", getName());
-            final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, getName())));
-            server.executeManagementOperation(op);
+            // add subsystem with default config
+            /*
+            <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
+                <deployment-permissions>
+                    <maximum-set>
+                        <permission class="java.security.AllPermission"/>
+                    </maximum-set>
+                </deployment-permissions>
+            </subsystem>
+             */
+            final PathAddress subsystemPathAddress = pathAddress(pathElement(SUBSYSTEM, getName()));
+            final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
+            server.executeManagementOperation(subsystemAddOperation);
+            // add default deployment permissions
+            final PathAddress deploymentPermissionsPathAddress = subsystemPathAddress.append(DEPLOYMENT_PERMISSIONS, DEPLOYMENT_PERMISSIONS_NAME);
+            final ModelNode deploymentPermissionsAddOperation = Util.createAddOperation(deploymentPermissionsPathAddress);
+            final ModelNode maximumPermissions = new ModelNode();
+            maximumPermissions.get(CLASS_ATTR_NAME).set(CLASS_ATTR_VALUE);
+            deploymentPermissionsAddOperation.get(MAXIMUM_PERMISSIONS).add(maximumPermissions);
+            server.executeManagementOperation(deploymentPermissionsAddOperation);
             ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", getName());
         }
     }
