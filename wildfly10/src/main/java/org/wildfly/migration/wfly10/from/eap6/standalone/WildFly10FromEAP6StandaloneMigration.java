@@ -13,7 +13,7 @@ import java.io.IOException;
 import static org.wildfly.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
 
 /**
- * Created by emmartins on 08/12/15.
+ * @author emmartins
  */
 public class WildFly10FromEAP6StandaloneMigration {
 

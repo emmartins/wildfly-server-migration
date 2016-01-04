@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by emmartins on 08/12/15.
+ * @author emmartins
  */
 public class WildFly10FromEAP6StandaloneConfigFileSubsystemsMigration {
 
@@ -35,6 +35,8 @@ public class WildFly10FromEAP6StandaloneConfigFileSubsystemsMigration {
     }
 
     public void run(EAP6StandaloneConfig source, WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
+        context.getConsoleWrapper().printf("%n%n");
+        ServerMigrationLogger.ROOT_LOGGER.infof("Migrating subsystems...");
         final boolean targetStarted = target.isStarted();
         if (!targetStarted) {
             target.start();
@@ -53,6 +55,7 @@ public class WildFly10FromEAP6StandaloneConfigFileSubsystemsMigration {
             if (!targetStarted) {
                 target.stop();
             }
+            ServerMigrationLogger.ROOT_LOGGER.info("Subsystems migration done.");
         }
     }
 

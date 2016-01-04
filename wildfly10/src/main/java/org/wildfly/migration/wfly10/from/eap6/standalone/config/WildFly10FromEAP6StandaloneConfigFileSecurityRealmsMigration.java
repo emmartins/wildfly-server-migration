@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
- * Created by emmartins on 08/12/15.
+ * @author emmartins
  */
 public class WildFly10FromEAP6StandaloneConfigFileSecurityRealmsMigration {
 
@@ -34,8 +34,8 @@ public class WildFly10FromEAP6StandaloneConfigFileSecurityRealmsMigration {
             if (!targetStarted) {
                 target.stop();
             }
+            ServerMigrationLogger.ROOT_LOGGER.info("Security realms migration done.");
         }
-        ServerMigrationLogger.ROOT_LOGGER.info("Security realms migration done.");
     }
 
     private void migrateSecurityRealm(ModelNode securityRealm, EAP6StandaloneConfig source, WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {

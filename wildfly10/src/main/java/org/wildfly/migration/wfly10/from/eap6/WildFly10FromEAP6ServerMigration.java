@@ -11,7 +11,7 @@ import org.wildfly.migration.wfly10.from.eap6.standalone.WildFly10FromEAP6Standa
 import java.io.IOException;
 
 /**
- * Created by emmartins on 08/12/15.
+ * @author emmartins
  */
 public class WildFly10FromEAP6ServerMigration implements WildFly10ServerMigration {
 

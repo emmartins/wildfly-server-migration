@@ -97,6 +97,9 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
 
     @Override
     public ModelNode getSubsystem(String subsystem) throws IOException {
+        if (!getSubsystems().contains(subsystem)) {
+            return null;
+        }
         final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem));
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
         op.get(RECURSIVE).set(true);
