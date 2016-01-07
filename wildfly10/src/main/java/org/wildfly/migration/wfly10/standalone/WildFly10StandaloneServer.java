@@ -15,6 +15,7 @@
  */
 package org.wildfly.migration.wfly10.standalone;
 
+import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.dmr.ModelNode;
 import org.wildfly.migration.wfly10.WildFly10Server;
 
@@ -38,6 +39,6 @@ public interface WildFly10StandaloneServer {
     void removeSubsystem(String subsystem) throws IOException;
     void removeExtension(String extension) throws IOException;
     Path resolvePath(String path)  throws IOException;
-    void migrateSubsystem(String subsystem) throws IOException;
     ModelNode executeManagementOperation(ModelNode operation) throws IOException;
+    ModelControllerClient getModelControllerClient();
 }

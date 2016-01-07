@@ -16,6 +16,7 @@
 package org.wildfly.migration.wfly10.standalone;
 
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.wildfly.core.embedded.EmbeddedServerFactory;
@@ -159,16 +160,9 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
         }
     }
 
-    @Override
-    public void migrateSubsystem(String subsystem) throws IOException {
-        final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem));
-        final ModelNode op = Util.createEmptyOperation("migrate", address);
-        executeManagementOperation(op);
-    }
-
     private void processResult(ModelNode result) {
-        if(!"success".equals(result.get("outcome").asString())) {
-            throw new RuntimeException(result.get("failure-description").asString());
+        if(!SUCCESS.equals(result.get(OUTCOME).asString())) {
+            throw new RuntimeException(result.get(FAILURE_DESCRIPTION).asString());
         }
     }
 
@@ -178,5 +172,10 @@ public class EmbeddedWildFly10StandaloneServer implements WildFly10StandaloneSer
         //ServerMigrationLogger.ROOT_LOGGER.infof("Op result %s", result.toString());
         processResult(result);
         return  result;
+    }
+
+    @Override
+    public ModelControllerClient getModelControllerClient() {
+        return standaloneServer.getModelControllerClient();
     }
 }
