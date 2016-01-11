@@ -81,12 +81,30 @@ public interface ServerMigrationLogger extends BasicLogger {
     String shortNo();
 
     /**
+     * The option a user would choose to indicate an option not listed
+     *
+     * This String should be the lower case representation in the respective locale.
+     *
+     * @return the option a user would choose to indicate an option not listed.
+     */
+    @Message(id = Message.NONE, value = "other")
+    String other();
+
+    /**
      * The error message if the confirmation response is invalid.
      *
      * @return a {@link String} for the message.
      */
     @Message(id = 2, value = "Invalid response. (Valid responses are %s and %s)")
-    String invalidConfirmationResponse(String firstValues, String secondValues);
+    String invalidResponse(String firstValues, String secondValues);
+
+    /**
+     * The error message if the confirmation response is invalid.
+     *
+     * @return a {@link String} for the message.
+     */
+    @Message(id = 3, value = "Invalid empty response.")
+    String invalidEmptyResponse();
 
     /**
      * The error message header.
@@ -103,4 +121,12 @@ public interface ServerMigrationLogger extends BasicLogger {
      */
     @Message(id = Message.NONE, value = "yes/no?")
     String yesNo();
+
+    /**
+     * Prompt reading an other choice.
+     *
+     * @return a {@link String} for the message.
+     */
+    @Message(id = Message.NONE, value = "Other choice?")
+    String otherChoice();
 }

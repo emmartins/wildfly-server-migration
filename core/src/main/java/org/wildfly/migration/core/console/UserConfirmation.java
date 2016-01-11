@@ -91,7 +91,7 @@ public class UserConfirmation {
                     sb.append(", ");
                     sb.append(acceptedValues.get(i));
                 }
-                new ReportError(theConsole, ROOT_LOGGER.invalidConfirmationResponse(sb.toString(), acceptedValues.get(acceptedValues.size() - 1))).execute();
+                new ReportError(theConsole, ROOT_LOGGER.invalidResponse(sb.toString(), acceptedValues.get(acceptedValues.size() - 1))).execute();
                 resultHandler.onError();
             }
         }

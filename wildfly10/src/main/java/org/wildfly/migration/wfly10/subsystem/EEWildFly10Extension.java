@@ -20,6 +20,7 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.wildfly.migration.core.ServerMigrationContext;
+import org.wildfly.migration.core.console.UserChoiceWithOtherOption;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
 import org.wildfly.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -175,7 +176,7 @@ public class EEWildFly10Extension extends WildFly10Extension {
             addOp.get("managed-executor-service").set(DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
             addOp.get("managed-scheduled-executor-service").set(DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
             addOp.get("managed-thread-factory").set(DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
-            setupDefaultDatasource(addOp, server);
+            setupDefaultDatasource(addOp, server, context);
             setupDefaultJMSConnectionFactory(addOp, server);
             server.executeManagementOperation(addOp);
             ServerMigrationLogger.ROOT_LOGGER.infof("Java EE Default Bindings configured.");
@@ -201,24 +202,40 @@ public class EEWildFly10Extension extends WildFly10Extension {
             ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory found (%s).", defaultJmsConnectionFactoryJndiName);
         }
 
-        private void setupDefaultDatasource(ModelNode addOp, WildFly10StandaloneServer server) throws IOException {
+        private void setupDefaultDatasource(final ModelNode addOp, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
             // if the subsystem config defines expected default resource then use it
             final String subsystemName = ConnectorWildFly10Extension.INSTANCE.getDatasourceSubsystem().getName();
             final ModelNode subsystemConfig = server.getSubsystem(subsystemName);
             if (subsystemConfig == null) {
                 return;
             }
-            final ModelNode defaultDatasource;
             if (subsystemConfig.hasDefined("data-source", DEFAULT_DATASOURCE_NAME)) {
-                defaultDatasource = subsystemConfig.get("data-source", DEFAULT_DATASOURCE_NAME);
+                // eap 6.4 default standalone config's example datasource found, use it
+                final ModelNode defaultDatasource = subsystemConfig.get("data-source", DEFAULT_DATASOURCE_NAME);
+                final String defaultDatasourceJndiName = defaultDatasource.get("jndi-name").asString();
+                addOp.get("datasource").set(defaultDatasourceJndiName);
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource found (%s).", defaultDatasourceJndiName);
             } else {
                 // TODO ask user to select from list of all datasources configured
                 ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource not found.");
-                return;
+                final UserChoiceWithOtherOption.ResultHandler resultHandler = new UserChoiceWithOtherOption.ResultHandler() {
+                    @Override
+                    public void onChoice(String choice) {
+                        final String jndiName = subsystemConfig.get("data-source", choice).get("jndi-name").asString();
+                        addOp.get("datasource").set(jndiName);
+                        ServerMigrationLogger.ROOT_LOGGER.infof("Datasource set as Java EE Default Datasource (%s).", choice);
+                    }
+                    @Override
+                    public void onError() {
+                    }
+                    @Override
+                    public void onOther(String otherChoice) {
+                        addOp.get("datasource").set(otherChoice);
+                        ServerMigrationLogger.ROOT_LOGGER.infof("Java EE Default Datasource configured with JNDI name %s.", otherChoice);
+                    }
+                };
+                new UserChoiceWithOtherOption(context.getConsoleWrapper(), (String[]) null, subsystemConfig.get("data-source").keys().toArray(new String[]{}), "Unconfigured data source, I want to enter the JNDI name...", "Please select Java EE's Default Datasource: ", resultHandler).execute();
             }
-            final String defaultDatasourceJndiName = defaultDatasource.get("jndi-name").asString();
-            addOp.get("datasource").set(defaultDatasourceJndiName);
-            ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource found (%s).", defaultDatasourceJndiName);
         }
     }
 }
