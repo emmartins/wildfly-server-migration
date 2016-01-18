@@ -21,6 +21,9 @@ import java.nio.file.Path;
 import java.util.ServiceLoader;
 
 /**
+ * Provides the {@link Server}s for migration.
+ *
+ * Each, through
  * @author emmartins
  */
 public final class Servers {
