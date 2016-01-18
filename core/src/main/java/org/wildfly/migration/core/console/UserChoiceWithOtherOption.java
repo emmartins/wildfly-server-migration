@@ -38,8 +38,8 @@ public class UserChoiceWithOtherOption extends UserChoice {
         super(theConsole, messageLines, addOtherToOptions(options, otherOption), prompt, new ResultHandlerWrapper(theConsole, resultHandler, otherOption));
     }
 
-    public UserChoiceWithOtherOption(ConsoleWrapper theConsole, final String message, final String[] options, final String otherOption, final String prompt, final ResultHandler resultHandler) {
-        this(theConsole, message == null ? (String[]) null : new String[] { message }, options, otherOption, prompt, resultHandler);
+    public UserChoiceWithOtherOption(ConsoleWrapper theConsole, final String messageLine, final String[] options, final String otherOption, final String prompt, final ResultHandler resultHandler) {
+        this(theConsole, new String[] { messageLine }, options, otherOption, prompt, resultHandler);
     }
 
     public UserChoiceWithOtherOption(ConsoleWrapper theConsole, final String[] options, final String otherOption, final String prompt, final ResultHandler resultHandler) {

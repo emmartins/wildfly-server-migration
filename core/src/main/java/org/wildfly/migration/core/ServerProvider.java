@@ -19,9 +19,21 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * The provider for a {@link Server}.
  * @author emmartins
  */
 public interface ServerProvider {
+    /**
+     * Retrieves a server from its base directory.
+     * @param baseDir the server's base directory.
+     * @return null if the specified base directory is not the base directory of the provider's server.
+     * @throws IOException if the server failed to retrieve.
+     */
     Server getServer(Path baseDir) throws IOException;
+
+    /**
+     * Retrieves the provider's name.
+     * @return the provider's name
+     */
     String getName();
 }

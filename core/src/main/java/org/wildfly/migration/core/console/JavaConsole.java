@@ -22,7 +22,7 @@ import java.util.IllegalFormatException;
 import static org.wildfly.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
 
 /**
- * Describe the purpose
+ * {@link ConsoleWrapper} for Java System's console.
  *
  * @author <a href="mailto:flemming.harms@gmail.com">Flemming Harms</a>
  */

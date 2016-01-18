@@ -32,7 +32,7 @@ public abstract class AbstractServerProvider implements ServerProvider {
         return isProviderFor(productInfo) ? constructServer(productInfo, baseDir) : null;
     }
 
-    protected abstract ProductInfo getProductInfo(Path baseDir) throws IllegalArgumentException, IOException;
+    protected abstract ProductInfo getProductInfo(Path baseDir) throws IOException;
 
     protected boolean isProviderFor(ProductInfo productInfo) {
         if (productInfo == null) {

@@ -15,6 +15,8 @@
  */
 package org.wildfly.migration.core;
 
+import org.wildfly.migration.core.logger.ServerMigrationLogger;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -42,7 +44,6 @@ public abstract class AbstractServer implements Server {
 
     @Override
     public void migrate(Server source, ServerMigrationContext context) throws IOException {
-        // FIXME
-        throw new UnsupportedOperationException();
+        throw ServerMigrationLogger.ROOT_LOGGER.doesNotSupportsMigration(productInfo.getName(), productInfo.getVersion(), source.getProductInfo().getName(), source.getProductInfo().getVersion());
     }
 }

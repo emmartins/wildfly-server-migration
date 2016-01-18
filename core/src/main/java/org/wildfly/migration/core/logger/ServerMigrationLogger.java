@@ -129,4 +129,12 @@ public interface ServerMigrationLogger extends BasicLogger {
      */
     @Message(id = Message.NONE, value = "Other choice?")
     String otherChoice();
+
+    /**
+     * Creates an exception indicating that the target server does not supports migration from the source server.
+     *
+     * @return a {@link IllegalArgumentException} for the error.
+     */
+    @Message(id = 4, value = "Server name = %s, version = %s does not support migration from server name = %s, version = %s.")
+    IllegalArgumentException doesNotSupportsMigration(String targetName, String targetVersion, String sourceName, String sourceVersion);
 }

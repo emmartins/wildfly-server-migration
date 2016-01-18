@@ -47,6 +47,10 @@ public class UserChoice {
         this(theConsole, new String[] { message }, options, prompt, resultHandler);
     }
 
+    public UserChoice(ConsoleWrapper theConsole, final String[] options, final String prompt, final ResultHandler resultHandler) {
+        this(theConsole, (String[]) null, options, prompt, resultHandler);
+    }
+
     public void execute() {
         if (messageLines != null) {
             for (String message : messageLines) {
@@ -55,8 +59,8 @@ public class UserChoice {
             }
         }
 
-        for (int i=0; i < options.length; i++) {
-            theConsole.printf(i+". "+options[i]);
+        for (int i = 0; i < options.length; i++) {
+            theConsole.printf(i+". "+ options[i]);
             theConsole.printf(NEW_LINE);
         }
 
@@ -83,7 +87,7 @@ public class UserChoice {
             } else {
                 // invalid
                 List<String> acceptedValues = new ArrayList<String>(4);
-                for (int i=0; i < options.length; i++) {
+                for (int i = 0; i < options.length; i++) {
                     acceptedValues.add(String.valueOf(i));
                 }
                 StringBuilder sb = new StringBuilder(acceptedValues.get(0));

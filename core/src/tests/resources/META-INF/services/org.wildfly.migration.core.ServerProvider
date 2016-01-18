@@ -1,0 +1,2 @@
+org.wildfly.migration.core.ts.TestSourceServerProvider
+org.wildfly.migration.core.ts.TestTargetServerProvider

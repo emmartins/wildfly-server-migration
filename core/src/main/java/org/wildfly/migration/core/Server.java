@@ -19,10 +19,29 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * A migration source and/or target server.
  * @author emmartins
  */
 public interface Server {
+
+    /**
+     * Retrieves the server's base directory.
+     * @return the server's base directory
+     */
     Path getBaseDir();
+
+    /**
+     * Retrieves the server's product info.
+     * @return the server's product info
+     */
     ProductInfo getProductInfo();
-    void migrate(Server source, ServerMigrationContext context) throws IOException;
+
+    /**
+     * Migrates the specified source server.
+     * @param source the server to migrate from
+     * @param context the migration context
+     * @throws IllegalArgumentException if migration from the source server is not supported
+     * @throws IOException if the migration is supported but fails to complete
+     */
+    void migrate(Server source, ServerMigrationContext context) throws IllegalArgumentException, IOException;
 }

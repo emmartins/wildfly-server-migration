@@ -18,12 +18,14 @@ package org.wildfly.migration.core;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * Provides the {@link Server}s for migration.
+ * The {@link Server}s for migration.
  *
- * Each, through
+ * Each supported {@link Server} is provided by a {@link ServerProvider}, which is loaded through the {@link ServiceLoader} framework.
  * @author emmartins
  */
 public final class Servers {
@@ -33,7 +35,12 @@ public final class Servers {
     private Servers() {
     }
 
-    public static Server getServer(Path baseDir) throws ServerProviderNotFound {
+    /**
+     * Retrieves a {@link Server} from its base directory {@link Path}
+     * @param baseDir the {@link Server}'s base directory {@link Path}
+     * @return the {@link Server} retrieved from its base directory {@link Path}; null if no {@link ServerProvider} was able to retrieve a {@link Server} from the specified base directory {@link Path}
+     */
+    public static Server getServer(Path baseDir) {
         ServerMigrationLogger.ROOT_LOGGER.debugf("Retrieving server from base dir %s", baseDir);
         for (ServerProvider serverProvider : SERVER_PROVIDERS_LOADER) {
             try {
@@ -47,6 +54,18 @@ public final class Servers {
             }
         }
         ServerMigrationLogger.ROOT_LOGGER.debugf("%s not recognized as valid server base dir", baseDir);
-        throw new ServerProviderNotFound(baseDir.toString());
+        return null;
+    }
+
+    /**
+     * Retrieves the supported {@link Server} names.
+     * @return a list containing the supported {@link Server} names.
+     */
+    public static List<String> getServerNames() {
+        final List<String> serverNames = new ArrayList<>();
+        for (ServerProvider serverProvider : SERVER_PROVIDERS_LOADER) {
+            serverNames.add(serverProvider.getName());
+        }
+        return serverNames;
     }
 }
