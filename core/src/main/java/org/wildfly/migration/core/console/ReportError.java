@@ -33,7 +33,7 @@ public class ReportError {
     }
 
     public void execute() {
-        boolean direct = theConsole.hasConsole();
+        boolean direct = !theConsole.hasConsole();
         // Errors should be output in all modes.
         printf(NEW_LINE, direct);
         printf(" * ", direct);
