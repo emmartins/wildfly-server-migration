@@ -17,15 +17,25 @@ package org.wildfly.migration.core.logger;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.wildfly.migration.core.ProductInfo;
+
+import java.nio.file.Path;
+
+import static org.jboss.logging.Logger.Level.INFO;
 
 /**
+ * The server migration's core logger.
  * @author emmartins
  */
-@MessageLogger(projectCode = "WFMIGR") //todo: proper project code?
+@MessageLogger(projectCode = "WFCMTOOL")
 public interface ServerMigrationLogger extends BasicLogger {
 
+    /**
+     * the root logger instance
+     */
     ServerMigrationLogger ROOT_LOGGER = Logger.getMessageLogger(ServerMigrationLogger.class, ServerMigrationLogger.class.getPackage().getName());
 
     /**
@@ -137,4 +147,57 @@ public interface ServerMigrationLogger extends BasicLogger {
      */
     @Message(id = 4, value = "Server name = %s, version = %s does not support migration from server name = %s, version = %s.")
     IllegalArgumentException doesNotSupportsMigration(String targetName, String targetVersion, String sourceName, String sourceVersion);
+
+    /**
+     * Creates an exception indicating that a server base dir is not set.
+     *
+     * @return a {@link IllegalStateException} for the error.
+     */
+    @Message(id = 5, value = "Migration %s server base dir not set.")
+    IllegalStateException serverBaseDirNotSet(String serverName);
+
+    /**
+     * Creates an exception indicating that no server was retrieved from a base dir.
+     *
+     * @return a {@link IllegalArgumentException} for the error.
+     */
+    @Message(id = 6, value = "Failed to retrieve server %s, from base dir %s.")
+    IllegalArgumentException failedToRetrieveServerFromBaseDir(String serverName, String baseDir);
+
+    /**
+     * Logs a msg with the server's product info.
+     */
+    @LogMessage(level = INFO)
+    @Message(id = Message.NONE, value = "%s server %s.")
+    void serverProductInfo(String name, ProductInfo productInfo);
+
+    /**
+     * Creates an exception indicating that a file copy's source does not exists.
+     *
+     * @return a {@link IllegalArgumentException} for the error.
+     */
+    @Message(id = 7, value = "Copy's source file %s does not exists.")
+    IllegalArgumentException sourceFileDoesNotExists(Path sourcePath);
+
+    /**
+     * Creates an exception indicating that the target file was previously copied, and source file was different.
+     *
+     * @return a {@link IllegalStateException} for the error.
+     */
+    @Message(id = 8, value = "Target file %s previously copied from different source.")
+    IllegalStateException targetPreviouslyCopiedFromDifferentSource(Path targetPath);
+
+    /**
+     * Logs a msg indicating the backup of an existent file copy's target, by renaming it.
+     */
+    @LogMessage(level = INFO)
+    @Message(id = Message.NONE, value = "File %s exists on target, renaming to %s.beforeMigration.")
+    void targetFileRenamed(Path targetPath, String targetFileName);
+
+    /**
+     * Logs a msg indicating the copy of a file.
+     */
+    @LogMessage(level = INFO)
+    @Message(id = Message.NONE, value = "File %s copied to %s.")
+    void fileCopied(Path source, Path target);
 }

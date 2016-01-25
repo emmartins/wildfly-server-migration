@@ -16,6 +16,7 @@
 package org.wildfly.migration.core;
 
 /**
+ * The product info that identifies a {@link Server}.
  * @author emmartins
  */
 public class ProductInfo {
@@ -27,10 +28,18 @@ public class ProductInfo {
         this.version = version;
     }
 
+    /**
+     * Retrieves the product's version.
+     * @return the product's version
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * Retrieves the product's name.
+     * @return the product's name
+     */
     public String getName() {
         return name;
     }

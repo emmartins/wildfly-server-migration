@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.jar.Manifest;
 
 /**
+ * The {@link ProductInfo} obtained from a Manifest file.
  * @author emmartins
  */
 public class ManifestProductInfo extends ProductInfo {
@@ -29,6 +30,12 @@ public class ManifestProductInfo extends ProductInfo {
         super(name, version);
     }
 
+    /**
+     * Retrieves the product info from the specified's manifest inputstream.
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
     public static ManifestProductInfo from(InputStream inputStream) throws IOException {
         final Manifest manifest = new Manifest(inputStream);
         final String productName = manifest.getMainAttributes().getValue("JBoss-Product-Release-Name");
@@ -42,6 +49,12 @@ public class ManifestProductInfo extends ProductInfo {
         return new ManifestProductInfo(productName.trim(), productVersion.trim());
     }
 
+    /**
+     * Retrieves the product info from the specified's manifest file path.
+     * @param path
+     * @return
+     * @throws IOException
+     */
     public static ManifestProductInfo from(Path path) throws IOException {
         if (!Files.isRegularFile(path)) {
             return null;

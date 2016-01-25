@@ -19,10 +19,24 @@ import org.wildfly.migration.core.console.ConsoleWrapper;
 import org.wildfly.migration.core.util.MigrationFiles;
 
 /**
+ * The server migration execution's context.
  * @author emmartins
  */
 public interface ServerMigrationContext {
+    /**
+     * Retrieves the migration's console.
+     * @return the migration's console
+     */
     ConsoleWrapper getConsoleWrapper();
+    /**
+     *
+     * @return the migration's console
+     */
     MigrationFiles getMigrationFiles();
+
+    /**
+     * Indicates if the migration is interactive.
+     * @return true if the migration is interactive, false otherwise
+     */
     boolean isInteractive();
 }

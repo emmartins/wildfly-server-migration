@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * An abstract {@link Server} impl, which is usable only as migration source.
  * @author emmartins
  */
 public abstract class AbstractServer implements Server {

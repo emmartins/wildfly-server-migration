@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * Created by emmartins on 18/01/16.
+ * @author emmartins
  */
 public abstract class AbstractTestServerProvider extends AbstractServerProvider {
 

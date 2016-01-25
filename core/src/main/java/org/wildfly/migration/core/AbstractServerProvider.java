@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 /**
+ * Abstract {@link ServerProvider} impl that uses regex patterns to check if a product info, obtained from based dir, matches a provided server.
  * @author emmartins
  */
 public abstract class AbstractServerProvider implements ServerProvider {
@@ -32,6 +33,12 @@ public abstract class AbstractServerProvider implements ServerProvider {
         return isProviderFor(productInfo) ? constructServer(productInfo, baseDir) : null;
     }
 
+    /**
+     * Retrieves the {@link ProductInfo} from the specified base dir.
+     * @param baseDir the server's base dir
+     * @return
+     * @throws IOException if the product's info failed to be retrieved.
+     */
     protected abstract ProductInfo getProductInfo(Path baseDir) throws IOException;
 
     protected boolean isProviderFor(ProductInfo productInfo) {
@@ -51,9 +58,23 @@ public abstract class AbstractServerProvider implements ServerProvider {
         return true;
     }
 
+    /**
+     * Retrieves the pattern to match product's name.
+     * @return
+     */
     protected abstract String getProductNameRegex();
 
+    /**
+     * Retrieves the pattern to match product's version.
+     * @return
+     */
     protected abstract String getProductVersionRegex();
 
+    /**
+     * Constructs the server, from specified product info and base dir's path.
+     * @param productInfo the server's product info
+     * @param baseDir the server's base dir
+     * @return the contructed server
+     */
     protected abstract Server constructServer(ProductInfo productInfo, Path baseDir);
 }

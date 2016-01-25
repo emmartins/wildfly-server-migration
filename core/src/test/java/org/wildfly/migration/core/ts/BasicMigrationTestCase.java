@@ -21,7 +21,7 @@ import org.wildfly.migration.core.ServerMigration;
 import java.io.IOException;
 
 /**
- * Created by emmartins on 18/01/16.
+ * @author emmartins
  */
 public class BasicMigrationTestCase {
 

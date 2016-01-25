@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 /**
- * Created by emmartins on 18/01/16.
+ * @author emmartins
  */
 public class TestServer extends AbstractServer {
 
