@@ -15,7 +15,6 @@
  */
 package org.wildfly.migration.wfly10.subsystem;
 
-import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.wildfly.migration.core.ServerMigrationContext;
@@ -55,32 +54,7 @@ public class EJb3WildFly10Extension extends WildFly10Extension {
             if (config == null) {
                 return;
             }
-            fixWFLY5520(config, server);
             migrateRemoteConfig(config, server);
-        }
-
-        private void fixWFLY5520(ModelNode config, WildFly10StandaloneServer server) throws IOException {
-            if (!config.hasDefined("default-clustered-sfsb-cache")) {
-                return;
-            }
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystem %s config after migration defines unsupported attr default-clustered-sfsb-cache (WFLY-5520): %s", getName(), config);
-            // /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
-            final PathAddress address = pathAddress(pathElement(SUBSYSTEM, getName()));
-            ModelNode op = Util.createEmptyOperation(UNDEFINE_ATTRIBUTE_OPERATION, address);
-            op.get(NAME).set("default-clustered-sfsb-cache");
-            server.executeManagementOperation(op);
-
-            // /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=clustered)
-            op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-            op.get(NAME).set("default-sfsb-cache");
-            op.get(VALUE).set("clustered");
-            server.executeManagementOperation(op);
-
-            // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=simple)
-            op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-            op.get(NAME).set("default-sfsb-passivation-disabled-cache");
-            op.get(VALUE).set("simple");
-            server.executeManagementOperation(op);
         }
 
         private void migrateRemoteConfig(ModelNode config, WildFly10StandaloneServer server) throws IOException {
