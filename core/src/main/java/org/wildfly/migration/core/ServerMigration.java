@@ -40,6 +40,7 @@ public class ServerMigration {
 
     private Path from;
     private Path to;
+    private ConsoleWrapper console;
     private boolean interactive = true;
 
     /**
@@ -59,6 +60,16 @@ public class ServerMigration {
      */
     public ServerMigration to(Path path) {
         this.to = path;
+        return this;
+    }
+
+    /**
+     * Sets the {@link ConsoleWrapper} to be used during migration. Exposed only for testing.
+     * @param console
+     * @return the server migration after applying the configuration change
+     */
+    public ServerMigration console(ConsoleWrapper console) {
+        this.console = console;
         return this;
     }
 
@@ -87,7 +98,7 @@ public class ServerMigration {
             throw ROOT_LOGGER.serverBaseDirNotSet(TARGET);
         }
 
-        final ConsoleWrapper console = new JavaConsole();
+        final ConsoleWrapper console = this.console != null ? this.console : new JavaConsole();
 
         console.printf("%n");
         console.printf("----------------------------------------------------------%n");
