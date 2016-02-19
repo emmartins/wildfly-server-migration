@@ -32,6 +32,6 @@ public class WildFly10FullServer extends WildFly10Server {
     }
 
     protected WildFly10ServerMigration getMigration(Server source) {
-        return WildFly10FullMigrations.getMigrationFrom(source);
+        return WildFly10FullServerMigrations.getMigrationFrom(source);
     }
 }

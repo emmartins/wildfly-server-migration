@@ -29,7 +29,6 @@ import java.util.List;
 public class WildFly10Extension {
 
     private final String name;
-
     protected final List<WildFly10Subsystem> subsystems;
 
     public WildFly10Extension(String name) {

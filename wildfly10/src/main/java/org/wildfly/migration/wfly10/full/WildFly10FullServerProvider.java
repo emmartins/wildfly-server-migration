@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * @author emmartins
+ * The WildFly 10 Full {@link org.wildfly.migration.core.ServerProvider}.
+ *  @author emmartins
  */
 public class WildFly10FullServerProvider extends AbstractServerProvider {
 

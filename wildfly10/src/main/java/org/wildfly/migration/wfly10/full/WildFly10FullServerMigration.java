@@ -15,10 +15,12 @@
  */
 package org.wildfly.migration.wfly10.full;
 
+import org.wildfly.migration.core.Server;
 import org.wildfly.migration.wfly10.WildFly10ServerMigration;
 
 /**
+ * The interface that WildFly 10 Full server migrations must implement. Such implementations are loaded through ServiceLoader framework, thus a service descriptor must be in classpath.
  * @author emmartins
  */
-public interface WildFly10FullServerMigration extends WildFly10ServerMigration {
+public interface WildFly10FullServerMigration<S extends Server> extends WildFly10ServerMigration<S> {
 }

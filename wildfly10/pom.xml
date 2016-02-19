@@ -35,6 +35,14 @@
             <groupId>org.wildfly.migration</groupId>
             <artifactId>wildfly-server-migration-eap6</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wildfly.migration</groupId>
+            <artifactId>wildfly-server-migration-wildfly8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.migration</groupId>
+            <artifactId>wildfly-server-migration-wildfly9</artifactId>
+        </dependency>
     </dependencies>   
 
 </project>

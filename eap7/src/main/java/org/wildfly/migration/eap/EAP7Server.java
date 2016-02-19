@@ -21,6 +21,7 @@ import org.wildfly.migration.wfly10.full.WildFly10FullServer;
 import java.nio.file.Path;
 
 /**
+ * The EAP 7 {@link org.wildfly.migration.core.Server}
  * @author emmartins
  */
 public class EAP7Server extends WildFly10FullServer {

@@ -54,8 +54,33 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-eap6-to-wildfly10</artifactId>
+        </dependency>       
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>wildfly-server-migration-eap7</artifactId>
-        </dependency>           
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-wildfly8</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-wildfly8-to-wildfly10</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-wildfly9</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-server-migration-wildfly9-to-wildfly10</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>

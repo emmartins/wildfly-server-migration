@@ -17,6 +17,7 @@ package org.wildfly.migration.eap;
 
 import org.wildfly.migration.core.AbstractServer;
 import org.wildfly.migration.core.ProductInfo;
+import org.wildfly.migration.core.ServerPath;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * The EAP 6 {@link org.wildfly.migration.core.Server}
  * @author emmartins
  */
 public class EAP6Server extends AbstractServer {
@@ -33,14 +35,14 @@ public class EAP6Server extends AbstractServer {
         super(productInfo, baseDir);
     }
 
-    public Collection<EAP6StandaloneConfig> getStandaloneConfigs() {
+    public Collection<ServerPath<EAP6Server>> getStandaloneConfigs() {
         // FIXME scan the config dir instead
-        List<EAP6StandaloneConfig> standaloneConfigs = new ArrayList<>();
+        List<ServerPath<EAP6Server>> standaloneConfigs = new ArrayList<>();
         final Path standaloneConfigurationDir = getStandaloneConfigurationDir();
-        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone.xml"), this));
-        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-ha.xml"), this));
-        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-full.xml"), this));
-        standaloneConfigs.add(new EAP6StandaloneConfig(standaloneConfigurationDir.resolve("standalone-full-ha.xml"), this));
+        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone.xml"), this));
+        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone-ha.xml"), this));
+        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone-full.xml"), this));
+        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone-full-ha.xml"), this));
         return Collections.unmodifiableList(standaloneConfigs);
     }
 

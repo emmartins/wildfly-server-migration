@@ -21,6 +21,7 @@ import org.wildfly.migration.core.Server;
 import java.nio.file.Path;
 
 /**
+ * The EAP 7 {@link org.wildfly.migration.core.ServerProvider}.
  * @author emmartins
  */
 public class EAP7ServerProvider extends EAP6ServerProvider {

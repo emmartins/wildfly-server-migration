@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * The EAP 6 {@link org.wildfly.migration.core.ServerProvider}.
  * @author emmartins
  */
 public class EAP6ServerProvider extends AbstractServerProvider {

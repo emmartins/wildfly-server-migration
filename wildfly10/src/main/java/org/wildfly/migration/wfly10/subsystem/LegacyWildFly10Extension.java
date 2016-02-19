@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * @author emmartins
  */
-public class LegacyWildFly10Extension extends BasicWildFly10Extension {
+public class LegacyWildFly10Extension extends WildFly10Extension {
 
     public LegacyWildFly10Extension(String name) {
         super(name);

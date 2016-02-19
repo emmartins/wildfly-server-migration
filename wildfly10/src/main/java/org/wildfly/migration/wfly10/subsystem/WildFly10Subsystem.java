@@ -15,16 +15,60 @@
  */
 package org.wildfly.migration.wfly10.subsystem;
 
+import org.jboss.dmr.ModelNode;
 import org.wildfly.migration.core.ServerMigrationContext;
 import org.wildfly.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author emmartins
  */
-public interface WildFly10Subsystem {
-    WildFly10Extension getExtension();
-    String getName();
-    void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException;
+public class WildFly10Subsystem {
+
+    private final String name;
+    private final WildFly10Extension extension;
+    protected final List<WildFly10SubsystemMigrationTask> subsystemMigrationTasks;
+
+    public WildFly10Subsystem(String name, List<WildFly10SubsystemMigrationTask> subsystemMigrationTasks, WildFly10Extension extension) {
+        this.name = name;
+        this.extension = extension;
+        this.subsystemMigrationTasks = subsystemMigrationTasks;
+    }
+
+    public WildFly10Extension getExtension() {
+        return extension;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
+        if (subsystemMigrationTasks != null && !subsystemMigrationTasks.isEmpty()) {
+            final ModelNode subsystemConfig = server.getSubsystem(getName());
+            for (WildFly10SubsystemMigrationTask configMigrationTask : subsystemMigrationTasks) {
+                configMigrationTask.execute(subsystemConfig, this, server, context);
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final WildFly10Subsystem subsystem = (WildFly10Subsystem) o;
+        return name.equals(subsystem.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
