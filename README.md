@@ -1,7 +1,13 @@
 Server Migration Tool
 =================
 
-A tool to migrate WildFly/EAP servers.
+A tool to migrate WildFly/EAP (standalone) servers.
+
+Currently the following migrations are supported:
+
+* EAP 6.4+ to WildFly 10 / EAP 7
+* WildFly 8 to WildFly 10 / EAP 7
+* WildFly 9 to WildFly 10 / EAP 7
 
 Build
 ======
