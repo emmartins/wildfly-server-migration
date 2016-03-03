@@ -19,6 +19,7 @@ import org.wildfly.migration.core.ServerMigrationContext;
 import org.wildfly.migration.core.ServerPath;
 import org.wildfly.migration.eap.EAP6Server;
 import org.wildfly.migration.wfly10.standalone.WildFly10StandaloneServer;
+import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileDeploymentsMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileSecurityRealmsMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileSubsystemsMigration;
@@ -286,5 +287,6 @@ public class EAP6ToWildFly10FullStandaloneConfigFileMigration extends WildFly10S
         new WildFly10StandaloneConfigFileSecurityRealmsMigration().run(sourceConfig, standaloneServer, context);
         new EAP6ToWildFly10StandaloneConfigFileManagementInterfacesMigration().run(standaloneServer, context);
         new EAP6ToWildFly10StandaloneConfigFileSocketBindingsMigration().run(standaloneServer, context);
+        new WildFly10StandaloneConfigFileDeploymentsMigration().run(sourceConfig, standaloneServer, context);
     }
 }

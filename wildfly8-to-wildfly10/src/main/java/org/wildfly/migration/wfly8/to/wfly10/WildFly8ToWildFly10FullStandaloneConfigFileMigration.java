@@ -18,6 +18,7 @@ package org.wildfly.migration.wfly8.to.wfly10;
 import org.wildfly.migration.core.ServerMigrationContext;
 import org.wildfly.migration.core.ServerPath;
 import org.wildfly.migration.wfly10.standalone.WildFly10StandaloneServer;
+import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileDeploymentsMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileSecurityRealmsMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileSubsystemsMigration;
@@ -267,5 +268,6 @@ public class WildFly8ToWildFly10FullStandaloneConfigFileMigration extends WildFl
     protected void run(ServerPath<WildFly8Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationContext context) throws IOException {
         new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).run(sourceConfig, standaloneServer, context);
         new WildFly10StandaloneConfigFileSecurityRealmsMigration().run(sourceConfig, standaloneServer, context);
+        new WildFly10StandaloneConfigFileDeploymentsMigration().run(sourceConfig, standaloneServer, context);
     }
 }
