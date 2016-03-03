@@ -17,7 +17,6 @@ package org.wildfly.migration.wfly8;
 
 import org.wildfly.migration.core.AbstractServer;
 import org.wildfly.migration.core.ProductInfo;
-import org.wildfly.migration.core.Server;
 import org.wildfly.migration.core.ServerPath;
 
 import java.nio.file.Path;
