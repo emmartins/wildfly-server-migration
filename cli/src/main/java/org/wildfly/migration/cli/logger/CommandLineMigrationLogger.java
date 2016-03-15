@@ -29,6 +29,22 @@ public interface CommandLineMigrationLogger extends BasicLogger {
     CommandLineMigrationLogger ROOT_LOGGER = Logger.getMessageLogger(CommandLineMigrationLogger.class, CommandLineMigrationLogger.class.getPackage().getName());
 
     /**
+     * Instructions for the {@link org.wildfly.migration.cli.CommandLineConstants#ENVIRONMENT} command line arguments.
+     *
+     * @return the message.
+     */
+    @Message(id = Message.NONE, value = "Path to the properties file containing the user environment.")
+    String argEnvironment();
+
+    /**
+     * Instructions for the {@link org.wildfly.migration.cli.CommandLineConstants#INTERACTIVE} command line arguments.
+     *
+     * @return the message.
+     */
+    @Message(id = Message.NONE, value = "Indicates if the migration tool should interact (or not) with the user. Value should either be true or false.")
+    String argInteractive();
+
+    /**
      * Instructions for the {@link org.wildfly.migration.cli.CommandLineConstants#SOURCE} command line arguments.
      *
      * @return the message.

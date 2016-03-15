@@ -19,7 +19,9 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.wildfly.migration.core.Server;
 import org.wildfly.migration.core.ServerMigrationContext;
+import org.wildfly.migration.core.ServerMigrationFailedException;
 import org.wildfly.migration.core.ServerPath;
+import org.wildfly.migration.core.console.UserConfirmation;
 import org.wildfly.migration.core.logger.ServerMigrationLogger;
 import org.wildfly.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -28,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.wildfly.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
 
 /**
  * Migration of security realms fully compatible with WildFly 10.
@@ -35,7 +38,39 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Server> {
 
-    public void run(ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
+    public void run(final ServerPath<S> source, final WildFly10StandaloneServer target, final ServerMigrationContext context) throws IOException {
+        if (context.isInteractive()) {
+            final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
+                @Override
+                public void onNo() {
+                    ServerMigrationLogger.ROOT_LOGGER.info("Security realms migration skipped by user.");
+                }
+                @Override
+                public void onYes() {
+                    try {
+                        migrateSecurityRealms(source, target, context);
+                    } catch (IOException e) {
+                        throw new ServerMigrationFailedException(e);
+                    }
+                }
+                @Override
+                public void onError() {
+                    // repeat
+                    try {
+                        run(source, target, context);
+                    } catch (IOException e) {
+                        throw new ServerMigrationFailedException(e);
+                    }
+                }
+            };
+            new UserConfirmation(context.getConsoleWrapper(), "Migrate security realms?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+        } else {
+            // by default security realms are migrated
+            migrateSecurityRealms(source, target, context);
+        }
+    }
+
+    protected void migrateSecurityRealms(ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
         context.getConsoleWrapper().printf("%n%n");
         ServerMigrationLogger.ROOT_LOGGER.infof("Migrating security realms...");
         final boolean targetStarted = target.isStarted();

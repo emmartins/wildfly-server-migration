@@ -26,6 +26,12 @@ public class CommandLineArgumentUsageImpl extends CommandLineArgumentUsage {
 
     public static void init(){
 
+        addArguments(CommandLineConstants.ENVIRONMENT + " <value>");
+        instructions.add(CommandLineMigrationLogger.ROOT_LOGGER.argEnvironment());
+
+        addArguments(CommandLineConstants.INTERACTIVE + " <value>");
+        instructions.add(CommandLineMigrationLogger.ROOT_LOGGER.argInteractive());
+
         addArguments(CommandLineConstants.SOURCE + " <value>");
         instructions.add(CommandLineMigrationLogger.ROOT_LOGGER.argSource());
 

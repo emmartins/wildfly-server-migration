@@ -21,6 +21,7 @@ import org.wildfly.migration.core.util.MigrationFiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Properties;
 
 import static org.wildfly.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
 
@@ -42,6 +43,7 @@ public class ServerMigration {
     private Path to;
     private ConsoleWrapper console;
     private boolean interactive = true;
+    private Properties userEnvironment;
 
     /**
      * Sets the migration source's base dir.
@@ -85,6 +87,16 @@ public class ServerMigration {
     }
 
     /**
+     * Sets the user environment, used to customize the migration process.
+     * @param userEnvironment
+     * @return the server migration after applying the configuration change
+     */
+    public ServerMigration userEnvironment(Properties userEnvironment) {
+        this.userEnvironment = userEnvironment;
+        return this;
+    }
+
+    /**
      * Executes the configured server migration, i.e. retrieves the source and target {@link Server}s, from base dirs, creates the migration context, and then delegates the migration to the target {@link Server}.
      * @throws IllegalArgumentException if a server was not retrieved from configured base dir.
      * @throws IllegalStateException if the source and/or target base dir is not configured
@@ -115,7 +127,7 @@ public class ServerMigration {
         console.printf("----------------------------------------------------------%n");
         console.printf("%n");
 
-        targetServer.migrate(sourceServer, new ServerMigrationContextImpl(console, interactive));
+        targetServer.migrate(sourceServer, new ServerMigrationContextImpl(console, interactive, userEnvironment != null ? userEnvironment : new Properties()));
     }
 
     /**
@@ -143,10 +155,12 @@ public class ServerMigration {
         private final ConsoleWrapper consoleWrapper;
         private final boolean interactive;
         private final MigrationFiles migrationFiles;
+        private final Properties userEnvironment;
 
-        private ServerMigrationContextImpl(ConsoleWrapper consoleWrapper, boolean interactive) {
+        private ServerMigrationContextImpl(ConsoleWrapper consoleWrapper, boolean interactive, Properties userEnvironment) {
             this.consoleWrapper = consoleWrapper;
             this.interactive = interactive;
+            this.userEnvironment = userEnvironment;
             this.migrationFiles = new MigrationFiles();
         }
 
@@ -163,6 +177,11 @@ public class ServerMigration {
         @Override
         public boolean isInteractive() {
             return interactive;
+        }
+
+        @Override
+        public Properties getUserEnvironment() {
+            return userEnvironment;
         }
     }
 }

@@ -18,10 +18,13 @@ package org.wildfly.migration.cli;
 import org.wildfly.migration.core.ServerMigration;
 import org.wildfly.security.manager.WildFlySecurityManager;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
 /**
  * The command line tool to migrate a WildFly server.
@@ -47,15 +50,35 @@ public class CommandLineServerMigration {
      */
     public static void main(String[] args) {
         try {
-            if(args.length != 4) {
+            if(args.length < 4) {
                 usage();
                 abort(null);
             }
             Path source = null;
             Path target = null;
+            Path environment = null;
+            Boolean interactive = null;
             for(int i = 0; i < args.length; ++i) {
                 String arg = args[i];
                 switch (arg) {
+                    case CommandLineConstants.ENVIRONMENT: {
+                        ++i;
+                        if(i == args.length || environment != null) {
+                            usage();
+                            abort(null);
+                        }
+                        environment = resolvePath(args[i]);
+                        break;
+                    }
+                    case CommandLineConstants.INTERACTIVE: {
+                        ++i;
+                        if(i == args.length || interactive != null) {
+                            usage();
+                            abort(null);
+                        }
+                        interactive = Boolean.valueOf(args[i]);
+                        break;
+                    }
                     case CommandLineConstants.SOURCE: {
                         ++i;
                         if(i == args.length || source != null) {
@@ -76,10 +99,22 @@ public class CommandLineServerMigration {
                     }
                 }
             }
+            if (interactive == null) {
+                interactive = true;
+            }
+            Properties userEnvironment = null;
+            if (environment != null) {
+                try (InputStream inputStream = Files.newInputStream(environment)) {
+                    userEnvironment = new Properties();
+                    userEnvironment.load(inputStream);
+                }
+            }
             WildFlySecurityManager.setPropertyPrivileged("java.util.logging.manager", "org.jboss.logmanager.LogManager");
             new ServerMigration()
                     .from(source)
                     .to(target)
+                    .interactive(interactive)
+                    .userEnvironment(userEnvironment)
                     .run();
         } catch (Throwable t) {
             abort(t);
@@ -96,9 +131,14 @@ public class CommandLineServerMigration {
         }
     }
 
-    private static Path resolvePath(String s) {
+    private static Path resolvePath(String s) throws IllegalArgumentException {
         final FileSystem fileSystem = FileSystems.getDefault();
         Path path = fileSystem.getPath(s).normalize();
-        return path.isAbsolute() ? path : fileSystem.getPath(System.getProperty("user.dir")).resolve(path);
+        Path absolutePath = path.isAbsolute() ? path : fileSystem.getPath(System.getProperty("user.dir")).resolve(path);
+        if (!Files.exists(absolutePath)) {
+            throw new IllegalArgumentException("File "+absolutePath+" does not exists.");
+        } else {
+            return absolutePath;
+        }
     }
 }

@@ -78,7 +78,6 @@ public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
         } else {
             migrateAllStandaloneConfigs(sourceConfigs, target, context);
         }
-
     }
 
     protected void migrateAllStandaloneConfigs(Collection<ServerPath<S>> standaloneConfigs, WildFly10Server target, ServerMigrationContext context) throws IOException {

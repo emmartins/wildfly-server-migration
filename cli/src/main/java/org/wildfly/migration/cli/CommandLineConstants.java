@@ -19,6 +19,8 @@ package org.wildfly.migration.cli;
  * @author emmartins
  */
 public interface CommandLineConstants {
+    String ENVIRONMENT = "--environment";
+    String INTERACTIVE = "--interactive";
     String SOURCE = "--source";
     String TARGET = "--target";
 }

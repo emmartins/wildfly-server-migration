@@ -18,6 +18,8 @@ package org.wildfly.migration.core;
 import org.wildfly.migration.core.console.ConsoleWrapper;
 import org.wildfly.migration.core.util.MigrationFiles;
 
+import java.util.Properties;
+
 /**
  * The server migration execution's context.
  * @author emmartins
@@ -39,4 +41,10 @@ public interface ServerMigrationContext {
      * @return true if the migration is interactive, false otherwise
      */
     boolean isInteractive();
+
+    /**
+     * Retrieves the user's environment, used to customize the migration process.
+     * @return
+     */
+    Properties getUserEnvironment();
 }

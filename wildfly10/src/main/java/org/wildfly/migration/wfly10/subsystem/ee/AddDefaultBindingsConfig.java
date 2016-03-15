@@ -86,7 +86,13 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
             addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
             ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory %s found and set as the Java EE Default JMS Connection Factory.", DEFAULT_JMS_CONNECTION_FACTORY_NAME);
         } else {
-            ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory not found");
+            if (context.isInteractive()) {
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory not found");
+            } else {
+                // not interactive, skip it
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default JMS Connection Factory not found, skipping its configuration due to non interactive mode");
+                return;
+            }
             // retrieve the names of configured datasources
             final Map<String, ConfiguredJmsConnectionFactory> factoryNamesMap = new HashMap<>();
             if (subsystemConfig.hasDefined(SERVER)) {
@@ -147,7 +153,13 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
             addOp.get("datasource").set(defaultDatasourceJndiName);
             ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource %s found and set as the Java EE Default Datasource.", DEFAULT_DATASOURCE_NAME);
         } else {
-            ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource not found.");
+            if (context.isInteractive()) {
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource not found.");
+            } else {
+                // not interactive, skip it
+                ServerMigrationLogger.ROOT_LOGGER.infof("Default datasource not found, skipping its configuration due to non interactive mode");
+                return;
+            }
             // retrieve the names of configured datasources
             final String[] dataSourceNames;
             if (subsystemConfig.hasDefined(DATA_SOURCE)) {
