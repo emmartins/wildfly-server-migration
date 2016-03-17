@@ -34,6 +34,7 @@ import org.wildfly.migration.wfly10.subsystem.ee.AddConcurrencyUtilitiesDefaultC
 import org.wildfly.migration.wfly10.subsystem.ee.AddDefaultBindingsConfig;
 import org.wildfly.migration.wfly10.subsystem.ejb3.RefHttpRemotingConnectorInEJB3Remote;
 import org.wildfly.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
+import org.wildfly.migration.wfly10.subsystem.messaging.AddHttpAcceptorsAndConnectors;
 import org.wildfly.migration.wfly10.subsystem.remoting.AddHttpConnectorIfMissing;
 import org.wildfly.migration.wfly10.subsystem.securitymanager.AddSecurityManagerSubsystem;
 import org.wildfly.migration.wfly10.subsystem.undertow.AddBufferCache;
@@ -245,12 +246,6 @@ public class EAP6ToWildFly10FullStandaloneConfigFileMigration extends WildFly10S
                 .build()
         );
 
-        supportedExtensions.add(new WildFly10ExtensionBuilder()
-                .setName(WildFly10ExtensionNames.MESSAGING_ACTIVEMQ)
-                .addSubsystem(WildFly10SubsystemNames.MESSAGING_ACTIVEMQ)
-                .build()
-        );
-
         // request-controller did not exist in source server, need tasks to create extension and subsystem default config
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.REQUEST_CONTROLLER)
@@ -269,6 +264,13 @@ public class EAP6ToWildFly10FullStandaloneConfigFileMigration extends WildFly10S
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.UNDERTOW)
                 .addSubsystem(WildFly10SubsystemNames.UNDERTOW, AddBufferCache.INSTANCE, MigrateHttpListener.INSTANCE, AddWebsockets.INSTANCE)
+                .build()
+        );
+
+        // add default http-acceptors and http-connectors to messaging
+        supportedExtensions.add(new WildFly10ExtensionBuilder()
+                .setName(WildFly10ExtensionNames.MESSAGING_ACTIVEMQ)
+                .addSubsystem(WildFly10SubsystemNames.MESSAGING_ACTIVEMQ, AddHttpAcceptorsAndConnectors.INSTANCE)
                 .build()
         );
 
