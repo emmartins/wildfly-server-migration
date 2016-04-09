@@ -70,7 +70,7 @@
         <include>org.wildfly.migration:wildfly-server-migration-core</include>
 -->        
         <include>org.wildfly.migration:wildfly-server-migration-eap6</include>
-        <include>org.wildfly.migration:wildfly-server-migration-eap6-to-wildfly10</include>        
+        <include>org.wildfly.migration:wildfly-server-migration-eap6-to-eap7</include>        
         <include>org.wildfly.migration:wildfly-server-migration-eap7</include>
         <include>org.wildfly.migration:wildfly-server-migration-wildfly8</include>
         <include>org.wildfly.migration:wildfly-server-migration-wildfly8-to-wildfly10</include>

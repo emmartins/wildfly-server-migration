@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.eap6.to.wildfly10;
+package org.wildfly.migration.eap6.to.eap7;
 
 import org.wildfly.migration.core.ServerMigrationContext;
 import org.wildfly.migration.core.ServerPath;
@@ -47,10 +47,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Standalone config file migration, from EAP 6 to WildFly 10
+ * Standalone config file migration, from EAP 6 to EAP 7
  * @author emmartins
  */
-public class EAP6ToWildFly10FullStandaloneConfigFileMigration extends WildFly10StandaloneConfigFileMigration<EAP6Server> {
+public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10StandaloneConfigFileMigration<EAP6Server> {
 
     private static final List<WildFly10Extension> SUPPORTED_EXTENSIONS = initSupportedExtensions();
 
@@ -287,8 +287,8 @@ public class EAP6ToWildFly10FullStandaloneConfigFileMigration extends WildFly10S
     protected void run(ServerPath<EAP6Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationContext context) throws IOException {
         new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).run(sourceConfig, standaloneServer, context);
         new WildFly10StandaloneConfigFileSecurityRealmsMigration().run(sourceConfig, standaloneServer, context);
-        new EAP6ToWildFly10StandaloneConfigFileManagementInterfacesMigration().run(standaloneServer, context);
-        new EAP6ToWildFly10StandaloneConfigFileSocketBindingsMigration().run(standaloneServer, context);
+        new EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration().run(standaloneServer, context);
+        new EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration().run(standaloneServer, context);
         new WildFly10StandaloneConfigFileDeploymentsMigration().run(sourceConfig, standaloneServer, context);
     }
 }

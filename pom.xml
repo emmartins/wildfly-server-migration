@@ -82,7 +82,7 @@
         <module>cli</module>
         <module>core</module>
         <module>eap6</module>
-        <module>eap6-to-wildfly10</module>
+        <module>eap6-to-eap7</module>
         <module>eap7</module>
         <module>wildfly8</module>
         <module>wildfly8-to-wildfly10</module>        
@@ -226,7 +226,7 @@
             
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>wildfly-server-migration-eap6-to-wildfly10</artifactId>
+                <artifactId>wildfly-server-migration-eap6-to-eap7</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

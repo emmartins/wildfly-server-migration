@@ -13,37 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.eap6.to.wildfly10;
+package org.wildfly.migration.eap6.to.eap7;
 
 import org.wildfly.migration.core.ServerMigrationContext;
 import org.wildfly.migration.eap.EAP6Server;
 import org.wildfly.migration.wfly10.WildFly10Server;
-import org.wildfly.migration.wfly10.full.WildFly10FullServerMigration;
 import org.wildfly.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
 
 import java.io.IOException;
 
 /**
- * Server migration, from EAP 6 to WildFly 10.
+ * Migration of a standalone server, from EAP 6 to EAP 7.
  * @author emmartins
  */
-public class EAP6ToWildFly10FullServerMigration implements WildFly10FullServerMigration<EAP6Server> {
+public class EAP6ToEAP7StandaloneMigration {
 
-    private final EAP6ToWildFly10FullStandaloneMigration standaloneMigration;
+    private final WildFly10StandaloneConfigFilesMigration<EAP6Server> configFilesMigration;
 
-    public EAP6ToWildFly10FullServerMigration() {
-        standaloneMigration = new EAP6ToWildFly10FullStandaloneMigration(new WildFly10StandaloneConfigFilesMigration<EAP6Server>(new EAP6ToWildFly10FullStandaloneConfigFileMigration()));
+    public EAP6ToEAP7StandaloneMigration(WildFly10StandaloneConfigFilesMigration<EAP6Server> configFilesMigration) {
+        this.configFilesMigration = configFilesMigration;
     }
 
-    @Override
     public void run(EAP6Server source, WildFly10Server target, ServerMigrationContext context) throws IOException {
-        context.getConsoleWrapper().printf("Server migration starting...%n");
-        standaloneMigration.run(source, target, context);
-        context.getConsoleWrapper().printf("Server migration done.%n");
-    }
-
-    @Override
-    public Class<EAP6Server> getSourceType() {
-        return EAP6Server.class;
+        configFilesMigration.run(source.getStandaloneConfigs(), target, context);
     }
 }
