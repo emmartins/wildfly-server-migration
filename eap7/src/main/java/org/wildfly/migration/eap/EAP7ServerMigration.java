@@ -15,28 +15,12 @@
  */
 package org.wildfly.migration.eap;
 
-import org.wildfly.migration.core.ProductInfo;
 import org.wildfly.migration.core.Server;
 import org.wildfly.migration.wfly10.WildFly10ServerMigration;
-import org.wildfly.migration.wfly10.full.WildFly10FullServer;
-
-import java.nio.file.Path;
 
 /**
- * The EAP 7 {@link org.wildfly.migration.core.Server}
+ * The interface that EAP 7 migrations must implement. Such implementations are loaded through ServiceLoader framework, thus a service descriptor must be in classpath.
  * @author emmartins
  */
-public class EAP7Server extends WildFly10FullServer {
-    public EAP7Server(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
-    }
-
-    @Override
-    protected WildFly10ServerMigration getMigration(Server source) {
-        WildFly10ServerMigration serverMigration = EAP7ServerMigrations.getMigrationFrom(source);
-        if (serverMigration == null) {
-            serverMigration = super.getMigration(source);
-        }
-        return serverMigration;
-    }
+public interface EAP7ServerMigration<S extends Server> extends WildFly10ServerMigration<S> {
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.eap6.to.wildfly10;
+package org.wildfly.migration.eap6.to.eap7;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
@@ -30,10 +30,10 @@ import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
- * Migration of http socket bindings to use same port as WildFly 10 defaults.
+ * Migration of http socket bindings to use same port as EAP 7 defaults.
  * @author emmartins
  */
-public class EAP6ToWildFly10StandaloneConfigFileSocketBindingsMigration {
+public class EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration {
 
     public void run(WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
         context.getConsoleWrapper().printf("%n%n");

@@ -54,7 +54,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-eap6-to-wildfly10</artifactId>
+            <artifactId>wildfly-server-migration-eap6-to-eap7</artifactId>
         </dependency>       
 
         <dependency>

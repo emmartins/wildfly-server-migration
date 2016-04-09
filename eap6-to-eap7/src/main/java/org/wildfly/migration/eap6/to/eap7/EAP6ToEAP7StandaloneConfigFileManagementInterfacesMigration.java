@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.migration.eap6.to.wildfly10;
+package org.wildfly.migration.eap6.to.eap7;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
@@ -32,7 +32,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Migration of management interfaces, turning on http upgrade.
  *  @author emmartins
  */
-public class EAP6ToWildFly10StandaloneConfigFileManagementInterfacesMigration {
+public class EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration {
 
     public void run(WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
         context.getConsoleWrapper().printf("%n%n");

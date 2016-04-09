@@ -26,14 +26,18 @@
         <version>1.0.0.Alpha1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>wildfly-server-migration-eap6-to-wildfly10</artifactId>
+    <artifactId>wildfly-server-migration-eap6-to-eap7</artifactId>
 
-    <name>WildFly Server Migration: EAP 6 to WildFly 10</name>
+    <name>WildFly Server Migration: EAP 6 to EAP 7</name>
 
     <dependencies>   
         <dependency>
             <groupId>org.wildfly.migration</groupId>
             <artifactId>wildfly-server-migration-eap6</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.migration</groupId>
+            <artifactId>wildfly-server-migration-eap7</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wildfly.migration</groupId>
