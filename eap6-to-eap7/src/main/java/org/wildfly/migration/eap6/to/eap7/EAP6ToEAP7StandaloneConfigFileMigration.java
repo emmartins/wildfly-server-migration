@@ -32,6 +32,7 @@ import org.wildfly.migration.wfly10.subsystem.WildFly10LegacyExtensionBuilder;
 import org.wildfly.migration.wfly10.subsystem.WildFly10SubsystemNames;
 import org.wildfly.migration.wfly10.subsystem.ee.AddConcurrencyUtilitiesDefaultConfig;
 import org.wildfly.migration.wfly10.subsystem.ee.AddDefaultBindingsConfig;
+import org.wildfly.migration.wfly10.subsystem.ejb3.DefinePassivationDisabledCacheRef;
 import org.wildfly.migration.wfly10.subsystem.ejb3.RefHttpRemotingConnectorInEJB3Remote;
 import org.wildfly.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.wildfly.migration.wfly10.subsystem.messaging.AddHttpAcceptorsAndConnectors;
@@ -114,7 +115,7 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
         // set ejb3 remote to http remoting
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.EJB3)
-                .addSubsystem(WildFly10SubsystemNames.EJB3, RefHttpRemotingConnectorInEJB3Remote.INSTANCE)
+                .addSubsystem(WildFly10SubsystemNames.EJB3, RefHttpRemotingConnectorInEJB3Remote.INSTANCE, DefinePassivationDisabledCacheRef.INSTANCE)
                 .build()
         );
 

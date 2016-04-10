@@ -30,26 +30,30 @@ import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
- * A task which changes EJB3 remote service, if presence in config, to ref the HTTP Remoting Conector.
+ * A task which defines EJB3 subsystem's 'passivation-disabled-cache-ref' attribute .
  * @author emmartins
  */
-public class RefHttpRemotingConnectorInEJB3Remote implements WildFly10SubsystemMigrationTask {
+public class DefinePassivationDisabledCacheRef implements WildFly10SubsystemMigrationTask {
 
-    public static final RefHttpRemotingConnectorInEJB3Remote INSTANCE = new RefHttpRemotingConnectorInEJB3Remote();
+    public static final DefinePassivationDisabledCacheRef INSTANCE = new DefinePassivationDisabledCacheRef();
 
-    private RefHttpRemotingConnectorInEJB3Remote() {
+    private DefinePassivationDisabledCacheRef() {
     }
+
+    private static final String DEFAULT_SFSB_CACHE_ATTR_NAME = "default-sfsb-cache";
+    private static final String DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME = "default-sfsb-passivation-disabled-cache";
 
     @Override
     public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (config == null || !config.hasDefined(SERVICE,"remote")) {
+        if (config == null || !config.hasDefined(DEFAULT_SFSB_CACHE_ATTR_NAME) || config.hasDefined(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME)) {
             return;
         }
-        // /subsystem=ejb3/service=remote:write-attribute(name=connector-ref,value=http-remoting-connector)
-        final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(SERVICE,"remote")));
-        op.get(NAME).set("connector-ref");
-        op.get(VALUE).set("http-remoting-connector");
+        // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=defaultSFSBCache)
+        final String defaultSFSBCache = config.get(DEFAULT_SFSB_CACHE_ATTR_NAME).asString();
+        final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
+        op.get(NAME).set(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME);
+        op.get(VALUE).set(defaultSFSBCache);
         server.executeManagementOperation(op);
-        ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's remote service configured to use HTTP Remoting connector.");
+        ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
     }
 }
