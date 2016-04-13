@@ -35,6 +35,7 @@ import org.wildfly.migration.wfly10.subsystem.ee.AddDefaultBindingsConfig;
 import org.wildfly.migration.wfly10.subsystem.ejb3.AddInfinispanPassivationStoreAndDistributableCache;
 import org.wildfly.migration.wfly10.subsystem.ejb3.DefinePassivationDisabledCacheRef;
 import org.wildfly.migration.wfly10.subsystem.ejb3.RefHttpRemotingConnectorInEJB3Remote;
+import org.wildfly.migration.wfly10.subsystem.ejb3.WorkaroundForWFLY5520;
 import org.wildfly.migration.wfly10.subsystem.infinispan.AddEjbCache;
 import org.wildfly.migration.wfly10.subsystem.infinispan.AddServerCache;
 import org.wildfly.migration.wfly10.subsystem.infinispan.FixHibernateCacheModuleName;
@@ -120,7 +121,7 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
         // set ejb3 remote to http remoting
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.EJB3)
-                .addSubsystem(WildFly10SubsystemNames.EJB3, RefHttpRemotingConnectorInEJB3Remote.INSTANCE, DefinePassivationDisabledCacheRef.INSTANCE, AddInfinispanPassivationStoreAndDistributableCache.INSTANCE)
+                .addSubsystem(WildFly10SubsystemNames.EJB3, RefHttpRemotingConnectorInEJB3Remote.INSTANCE, DefinePassivationDisabledCacheRef.INSTANCE, AddInfinispanPassivationStoreAndDistributableCache.INSTANCE, WorkaroundForWFLY5520.INSTANCE)
                 .build()
         );
 
