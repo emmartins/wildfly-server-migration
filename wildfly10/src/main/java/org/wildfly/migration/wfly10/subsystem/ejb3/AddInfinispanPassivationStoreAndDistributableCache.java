@@ -41,6 +41,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
     private AddInfinispanPassivationStoreAndDistributableCache() {
     }
 
+    private static final String CLUSTER_PASSIVATION_STORE = "cluster-passivation-store";
     private static final String FILE_PASSIVATION_STORE = "file-passivation-store";
     private static final String FILE_PASSIVATION_STORE_NAME = "file";
     private static final String PASSIVATION_STORE = "passivation-store";
@@ -53,8 +54,9 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
     private static final String CACHE = "cache";
     private static final String CACHE_NAME_DISTRIBUTABLE = "distributable";
     private static final String CACHE_NAME_PASSIVATING = "passivating";
+    private static final String CACHE_NAME_CLUSTERED = "clustered";
     private static final String ALIASES_ATTR_NAME = "aliases";
-    private static final String[] ALIASES_ATTR_VALUE = {"passivating","clustered"};
+    private static final String[] ALIASES_ATTR_VALUE = {CACHE_NAME_PASSIVATING, CACHE_NAME_CLUSTERED};
 
     @Override
     public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
@@ -62,14 +64,22 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
             return;
         }
         if (!config.hasDefined(PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
+            // replace all passivation stores with WFLY 10 default one
             // remove file-passivation-store
             if (config.hasDefined(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME)) {
                 final PathAddress filePassivationStorePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME));
                 final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
                 server.executeManagementOperation(filePassivationStoreRemoveperation);
-                ServerMigrationLogger.ROOT_LOGGER.infof("File passivation store removed from EJB3 subsystem configuration.");
+                ServerMigrationLogger.ROOT_LOGGER.infof("Legacy file passivation store removed from EJB3 subsystem configuration.");
             }
-            // add infinispan passivation store
+            // remove cluster-passivation-store infinispan
+            if (config.hasDefined(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
+                final PathAddress filePassivationStorePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME));
+                final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
+                server.executeManagementOperation(filePassivationStoreRemoveperation);
+                ServerMigrationLogger.ROOT_LOGGER.infof("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
+            }
+            // add default wfly 10 / eap 7 infinispan passivation store
             final PathAddress passivationStorePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(PASSIVATION_STORE, PASSIVATION_STORE_NAME));
             final ModelNode passivationStoreAddOperation = Util.createAddOperation(passivationStorePathAddress);
             passivationStoreAddOperation.get(CACHE_CONTAINER_ATTR_NAME).set(CACHE_CONTAINER_ATTR_VALUE);
@@ -78,14 +88,21 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
             ServerMigrationLogger.ROOT_LOGGER.infof("Infinispan passivation store added to EJB3 subsystem configuration.");
         }
         if (!config.hasDefined(CACHE, CACHE_NAME_DISTRIBUTABLE)) {
-            // remove passivating cache
+            // remove legacy passivating cache
             if (config.hasDefined(CACHE, CACHE_NAME_PASSIVATING)) {
                 final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE, CACHE_NAME_PASSIVATING));
                 final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
                 server.executeManagementOperation(cacheRemoveOperation);
-                ServerMigrationLogger.ROOT_LOGGER.infof("Passivating cache removed from EJB3 subsystem configuration.");
+                ServerMigrationLogger.ROOT_LOGGER.infof("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
             }
-            // add distributable cache
+            // remove legacy clustered cache
+            if (config.hasDefined(CACHE, CACHE_NAME_CLUSTERED)) {
+                final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE, CACHE_NAME_CLUSTERED));
+                final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
+                server.executeManagementOperation(cacheRemoveOperation);
+                ServerMigrationLogger.ROOT_LOGGER.infof("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
+            }
+            // add wfly 10 / eap 7 default distributable cache
             final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE, CACHE_NAME_DISTRIBUTABLE));
             final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
             cacheAddOperation.get(PASSIVATION_STORE).set(PASSIVATION_STORE_NAME);
