@@ -34,6 +34,7 @@ import org.wildfly.migration.wfly10.subsystem.ee.AddConcurrencyUtilitiesDefaultC
 import org.wildfly.migration.wfly10.subsystem.ee.AddDefaultBindingsConfig;
 import org.wildfly.migration.wfly10.subsystem.ejb3.DefinePassivationDisabledCacheRef;
 import org.wildfly.migration.wfly10.subsystem.ejb3.RefHttpRemotingConnectorInEJB3Remote;
+import org.wildfly.migration.wfly10.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.wildfly.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.wildfly.migration.wfly10.subsystem.messaging.AddHttpAcceptorsAndConnectors;
 import org.wildfly.migration.wfly10.subsystem.remoting.AddHttpConnectorIfMissing;
@@ -83,7 +84,7 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
 
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.INFINISPAN)
-                .addSubsystem(WildFly10SubsystemNames.INFINISPAN)
+                .addSubsystem(WildFly10SubsystemNames.INFINISPAN, FixHibernateCacheModuleName.INSTANCE)
                 .build()
         );
         supportedExtensions.add(new WildFly10ExtensionBuilder()
