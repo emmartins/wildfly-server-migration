@@ -41,6 +41,7 @@ import org.wildfly.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.wildfly.migration.wfly10.subsystem.messaging.AddHttpAcceptorsAndConnectors;
 import org.wildfly.migration.wfly10.subsystem.remoting.AddHttpConnectorIfMissing;
 import org.wildfly.migration.wfly10.subsystem.securitymanager.AddSecurityManagerSubsystem;
+import org.wildfly.migration.wfly10.subsystem.singleton.AddSingletonSubsystem;
 import org.wildfly.migration.wfly10.subsystem.undertow.AddBufferCache;
 import org.wildfly.migration.wfly10.subsystem.undertow.AddWebsockets;
 import org.wildfly.migration.wfly10.subsystem.undertow.MigrateHttpListener;
@@ -238,9 +239,10 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
                 .build()
         );
 
+        // singleton did not exist in source server, need tasks to create extension and subsystem default config
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.SINGLETON)
-                .addSubsystem(WildFly10SubsystemNames.SINGLETON)
+                .addSubsystem(WildFly10SubsystemNames.SINGLETON, AddExtension.INSTANCE, AddSingletonSubsystem.INSTANCE)
                 .build()
         );
 

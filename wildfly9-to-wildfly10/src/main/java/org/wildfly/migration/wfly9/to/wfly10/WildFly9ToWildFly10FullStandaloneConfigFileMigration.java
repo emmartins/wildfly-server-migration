@@ -29,6 +29,7 @@ import org.wildfly.migration.wfly10.subsystem.WildFly10ExtensionNames;
 import org.wildfly.migration.wfly10.subsystem.WildFly10LegacyExtensionBuilder;
 import org.wildfly.migration.wfly10.subsystem.WildFly10SubsystemNames;
 import org.wildfly.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
+import org.wildfly.migration.wfly10.subsystem.singleton.AddSingletonSubsystem;
 import org.wildfly.migration.wfly9.WildFly9Server;
 
 import java.io.IOException;
@@ -207,9 +208,10 @@ public class WildFly9ToWildFly10FullStandaloneConfigFileMigration extends WildFl
                 .build()
         );
 
+        // singleton did not exist in source server, need tasks to create extension and subsystem default config
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.SINGLETON)
-                .addSubsystem(WildFly10SubsystemNames.SINGLETON)
+                .addSubsystem(WildFly10SubsystemNames.SINGLETON, AddExtension.INSTANCE, AddSingletonSubsystem.INSTANCE)
                 .build()
         );
 
