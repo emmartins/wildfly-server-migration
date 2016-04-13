@@ -29,6 +29,7 @@ import org.wildfly.migration.wfly10.subsystem.WildFly10ExtensionBuilder;
 import org.wildfly.migration.wfly10.subsystem.WildFly10ExtensionNames;
 import org.wildfly.migration.wfly10.subsystem.WildFly10LegacyExtensionBuilder;
 import org.wildfly.migration.wfly10.subsystem.WildFly10SubsystemNames;
+import org.wildfly.migration.wfly10.subsystem.infinispan.AddServerCache;
 import org.wildfly.migration.wfly10.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.wildfly.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.wildfly.migration.wfly10.subsystem.securitymanager.AddSecurityManagerSubsystem;
@@ -69,7 +70,7 @@ public class WildFly8ToWildFly10FullStandaloneConfigFileMigration extends WildFl
 
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.INFINISPAN)
-                .addSubsystem(WildFly10SubsystemNames.INFINISPAN, FixHibernateCacheModuleName.INSTANCE)
+                .addSubsystem(WildFly10SubsystemNames.INFINISPAN, AddServerCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE)
                 .build()
         );
         supportedExtensions.add(new WildFly10ExtensionBuilder()
