@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The WildFly 8 {@link Server}.
+ * The WildFly 8 {@link org.wildfly.migration.core.Server}.
  * @author emmartins
  */
 public class WildFly8Server extends AbstractServer {
