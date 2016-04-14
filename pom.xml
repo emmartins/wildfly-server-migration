@@ -27,7 +27,7 @@
 
     <groupId>org.wildfly.migration</groupId>
     <artifactId>wildfly-server-migration-parent</artifactId>
-    <version>1.0.0.Alpha1-SNAPSHOT</version>
+    <version>1.0.0.Alpha1</version>
 
     <name>Wildfly Server Migration</name>
     <description>A tool used for migrating a WildFly server.</description>

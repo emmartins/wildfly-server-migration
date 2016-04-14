@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.wildfly.migration</groupId>
         <artifactId>wildfly-server-migration-parent</artifactId>
-        <version>1.0.0.Alpha1-SNAPSHOT</version>
+        <version>1.0.0.Alpha1</version>
     </parent>
 
     <artifactId>wildfly-server-migration-wildfly9-to-wildfly10</artifactId>
