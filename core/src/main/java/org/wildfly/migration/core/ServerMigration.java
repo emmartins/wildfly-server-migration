@@ -47,7 +47,7 @@ public class ServerMigration {
 
     /**
      * Sets the migration source's base dir.
-     * @param path
+     * @param path the source server base dir
      * @return the server migration after applying the configuration change
      */
     public ServerMigration from(Path path) {
@@ -57,7 +57,7 @@ public class ServerMigration {
 
     /**
      * Sets the migration target's base dir.
-     * @param path
+     * @param path the target server base dir
      * @return the server migration after applying the configuration change
      */
     public ServerMigration to(Path path) {
@@ -67,7 +67,7 @@ public class ServerMigration {
 
     /**
      * Sets the {@link ConsoleWrapper} to be used during migration. Exposed only for testing.
-     * @param console
+     * @param console the console to use
      * @return the server migration after applying the configuration change
      */
     public ServerMigration console(ConsoleWrapper console) {
@@ -78,7 +78,7 @@ public class ServerMigration {
     /**
      * Specifies if the server migration execution may interact with the user.
      * By default user interaction is on.
-     * @param interactive
+     * @param interactive true if the server migration execution may interact with the user, false otherwise
      * @return the server migration after applying the configuration change
      */
     public ServerMigration interactive(boolean interactive) {
@@ -88,7 +88,7 @@ public class ServerMigration {
 
     /**
      * Sets the user environment, used to customize the migration process.
-     * @param userEnvironment
+     * @param userEnvironment the user's environment
      * @return the server migration after applying the configuration change
      */
     public ServerMigration userEnvironment(Properties userEnvironment) {
@@ -134,7 +134,7 @@ public class ServerMigration {
      * Retrieves a {@link Server} from its base dir.
      * @param name a server name, for logging purposes
      * @param baseDir the base dir of the server to retrieve
-     * @return
+     * @return the {@link Server} from its base dir.
      * @throws IllegalArgumentException if no server was retrieved
      */
     protected Server getServer(String name, Path baseDir) throws IllegalArgumentException {

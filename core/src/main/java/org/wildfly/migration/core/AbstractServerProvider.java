@@ -36,7 +36,7 @@ public abstract class AbstractServerProvider implements ServerProvider {
     /**
      * Retrieves the {@link ProductInfo} from the specified base dir.
      * @param baseDir the server's base dir
-     * @return
+     * @return the {@link ProductInfo} from the specified base dir
      * @throws IOException if the product's info failed to be retrieved.
      */
     protected abstract ProductInfo getProductInfo(Path baseDir) throws IOException;
@@ -60,13 +60,13 @@ public abstract class AbstractServerProvider implements ServerProvider {
 
     /**
      * Retrieves the pattern to match product's name.
-     * @return
+     * @return the pattern to match product's name
      */
     protected abstract String getProductNameRegex();
 
     /**
      * Retrieves the pattern to match product's version.
-     * @return
+     * @return the pattern to match product's version
      */
     protected abstract String getProductVersionRegex();
 

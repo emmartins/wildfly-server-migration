@@ -31,8 +31,8 @@ public interface ServerMigrationContext {
      */
     ConsoleWrapper getConsoleWrapper();
     /**
-     *
-     * @return the migration's console
+     * Retreives the migration files
+     * @return the migration files
      */
     MigrationFiles getMigrationFiles();
 
@@ -44,7 +44,7 @@ public interface ServerMigrationContext {
 
     /**
      * Retrieves the user's environment, used to customize the migration process.
-     * @return
+     * @return the user's environment
      */
     Properties getUserEnvironment();
 }

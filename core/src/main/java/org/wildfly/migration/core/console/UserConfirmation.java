@@ -25,7 +25,6 @@ import static org.wildfly.migration.core.logger.ServerMigrationLogger.ROOT_LOGGE
 
 /**
  * State to display a message to the user with option to confirm a choice.
- * <p/>
  * This state handles either a yes or no outcome and will loop with an error
  * on invalid input.
  * @author emmartins

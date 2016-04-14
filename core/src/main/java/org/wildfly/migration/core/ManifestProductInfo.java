@@ -32,9 +32,9 @@ public class ManifestProductInfo extends ProductInfo {
 
     /**
      * Retrieves the product info from the specified's manifest inputstream.
-     * @param inputStream
-     * @return
-     * @throws IOException
+     * @param inputStream the inputstream to read the manifest file
+     * @return the product info from the specified's manifest inputstream
+     * @throws IOException if there is an error reading the manifest input stream
      */
     public static ManifestProductInfo from(InputStream inputStream) throws IOException {
         final Manifest manifest = new Manifest(inputStream);
@@ -51,9 +51,9 @@ public class ManifestProductInfo extends ProductInfo {
 
     /**
      * Retrieves the product info from the specified's manifest file path.
-     * @param path
-     * @return
-     * @throws IOException
+     * @param path the path pointing to the manifest file
+     * @return the product info from the specified's manifest file path
+     * @throws IOException if there is an error reading the manifest file
      */
     public static ManifestProductInfo from(Path path) throws IOException {
         if (!Files.isRegularFile(path)) {
