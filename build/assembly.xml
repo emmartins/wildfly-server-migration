@@ -33,7 +33,7 @@
   <!--
   <includeBaseDirectory>false</includeBaseDirectory>
   -->
-  <baseDirectory>wildfly-server-migration</baseDirectory>
+  <baseDirectory>jboss-server-migration</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
@@ -65,18 +65,18 @@
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>org.wildfly.migration:wildfly-server-migration-cli</include>
+        <include>org.jboss.migration:jboss-server-migration-cli</include>
 <!--
-        <include>org.wildfly.migration:wildfly-server-migration-core</include>
+        <include>org.jboss.migration:jboss-server-migration-core</include>
 -->        
-        <include>org.wildfly.migration:wildfly-server-migration-eap6</include>
-        <include>org.wildfly.migration:wildfly-server-migration-eap6-to-eap7</include>        
-        <include>org.wildfly.migration:wildfly-server-migration-eap7</include>
-        <include>org.wildfly.migration:wildfly-server-migration-wildfly8</include>
-        <include>org.wildfly.migration:wildfly-server-migration-wildfly8-to-wildfly10</include>
-        <include>org.wildfly.migration:wildfly-server-migration-wildfly9</include>
-        <include>org.wildfly.migration:wildfly-server-migration-wildfly9-to-wildfly10</include>
-        <include>org.wildfly.migration:wildfly-server-migration-wildfly10</include>
+        <include>org.jboss.migration:jboss-server-migration-eap6</include>
+        <include>org.jboss.migration:jboss-server-migration-eap6-to-eap7</include>
+        <include>org.jboss.migration:jboss-server-migration-eap7</include>
+        <include>org.jboss.migration:jboss-server-migration-wildfly8</include>
+        <include>org.jboss.migration:jboss-server-migration-wildfly8-to-wildfly10</include>
+        <include>org.jboss.migration:jboss-server-migration-wildfly9</include>
+        <include>org.jboss.migration:jboss-server-migration-wildfly9-to-wildfly10</include>
+        <include>org.jboss.migration:jboss-server-migration-wildfly10</include>
       </includes>
     </dependencySet>
   </dependencySets>

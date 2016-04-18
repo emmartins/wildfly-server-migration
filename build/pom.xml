@@ -21,70 +21,70 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.wildfly.migration</groupId>
-        <artifactId>wildfly-server-migration-parent</artifactId>
+        <groupId>org.jboss.migration</groupId>
+        <artifactId>jboss-server-migration-parent</artifactId>
         <version>1.0.0.Alpha1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>wildfly-server-migration-build</artifactId>
+    <artifactId>jboss-server-migration-build</artifactId>
 
-    <name>WildFly Server Migration: Build</name>
+    <name>JBoss Server Migration: Build</name>
     <packaging>pom</packaging>
 
     <properties>
-        <assemblyInputDirectory>${project.build.directory}/wildfly-server-migration</assemblyInputDirectory>
+        <assemblyInputDirectory>${project.build.directory}/jboss-server-migration</assemblyInputDirectory>
     </properties>
 
     <dependencies>
 <!--
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-core</artifactId>
+            <artifactId>jboss-server-migration-core</artifactId>
         </dependency>       
 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-cli</artifactId>
+            <artifactId>jboss-server-migration-cli</artifactId>
         </dependency>       
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-eap6</artifactId>
+            <artifactId>jboss-server-migration-eap6</artifactId>
         </dependency>       
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-eap6-to-eap7</artifactId>
+            <artifactId>jboss-server-migration-eap6-to-eap7</artifactId>
         </dependency>       
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-eap7</artifactId>
+            <artifactId>jboss-server-migration-eap7</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-wildfly8</artifactId>
+            <artifactId>jboss-server-migration-wildfly8</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-wildfly8-to-wildfly10</artifactId>
+            <artifactId>jboss-server-migration-wildfly8-to-wildfly10</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-wildfly9</artifactId>
+            <artifactId>jboss-server-migration-wildfly9</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-wildfly9-to-wildfly10</artifactId>
+            <artifactId>jboss-server-migration-wildfly9-to-wildfly10</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-server-migration-wildfly10</artifactId>
+            <artifactId>jboss-server-migration-wildfly10</artifactId>
         </dependency>       
 
     </dependencies>
@@ -112,7 +112,7 @@
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
-                            <finalName>wildfly-server-migration-${project.version}</finalName>
+                            <finalName>jboss-server-migration-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
