@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Server Migration Tool
+# JBoss Server Migration Tool
 #
 # A simple tool for migrating servers.
 #
@@ -50,5 +50,5 @@ fi
 
 eval \"$JAVA\" $JAVA_OPTS \
     -cp \""$BASE_DIR"/lib/*\" \
-    org.wildfly.migration.cli.CommandLineServerMigration \
+    org.jboss.migration.cli.CommandLineServerMigration \
     '"$@"'

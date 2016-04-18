@@ -12,5 +12,5 @@ bin
 dependency-reduced-pom.xml
 hotspot.log
 .DS_Store
-wildfly-server-migration
+jboss-server-migration
 migration.log

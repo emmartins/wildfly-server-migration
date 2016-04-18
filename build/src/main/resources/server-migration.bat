@@ -1,6 +1,6 @@
 @echo off
 rem -------------------------------------------------------------------------
-rem Server Migration Tool for Windows
+rem JBoss Server Migration Tool for Windows
 rem -------------------------------------------------------------------------
 rem
 rem A simple tool for migrating servers.
@@ -37,12 +37,12 @@ if errorlevel == 1 (
 if "x%LOGGING_CONFIG%" == "x" (
   "%JAVA%" %JAVA_OPTS% ^
       -cp "%BASE_DIR%\lib\*" ^
-       org.wildfly.migration.cli.CommandLineServerMigration ^
+       org.jboss.migration.cli.CommandLineServerMigration ^
          %*
 ) else (
   "%JAVA%" %JAVA_OPTS% "%LOGGING_CONFIG%" ^
       -cp "%BASE_DIR%\lib\*" ^
-       org.wildfly.migration.cli.CommandLineServerMigration ^
+       org.jboss.migration.cli.CommandLineServerMigration ^
        %*
 )
 

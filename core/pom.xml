@@ -21,14 +21,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.wildfly.migration</groupId>
-        <artifactId>wildfly-server-migration-parent</artifactId>
+        <groupId>org.jboss.migration</groupId>
+        <artifactId>jboss-server-migration-parent</artifactId>
         <version>1.0.0.Alpha1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>wildfly-server-migration-core</artifactId>
+    <artifactId>jboss-server-migration-core</artifactId>
 
-    <name>WildFly Server Migration: Core</name>
+    <name>JBoss Server Migration: Core</name>
 
     <dependencies>
        <!--
