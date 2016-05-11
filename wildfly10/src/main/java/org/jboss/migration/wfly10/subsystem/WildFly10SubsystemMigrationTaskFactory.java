@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10;
+package org.jboss.migration.wfly10.subsystem;
 
-import org.jboss.migration.core.Server;
+import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 /**
+ * The factory of a task which is part of a subsystem's migration logic.
  * @author emmartins
  */
-public interface WildFly10ServerMigration<S extends Server> {
-
+public interface WildFly10SubsystemMigrationTaskFactory {
     /**
-     * Retrieves the task to execute the server Migration
-     * @param source
-     * @param target
-     */
-    ServerMigrationTask getServerMigrationTask(S source, WildFly10Server target);
-
-    /**
-     * Retrieves the type of the supported source server.
+     * Retrieves the server migration task's runnable.
+     * @param config the subsystem configuration
+     * @param subsystem the subsystem
+     * @param server the target server
      * @return
      */
-    Class<S> getSourceType();
+    ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server);
 }

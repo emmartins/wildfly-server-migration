@@ -16,10 +16,12 @@
 package org.jboss.migration.wfly10.subsystem;
 
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,12 +31,17 @@ public class WildFly10Subsystem {
 
     private final String name;
     private final WildFly10Extension extension;
-    protected final List<WildFly10SubsystemMigrationTask> subsystemMigrationTasks;
+    protected final List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks;
+    protected final ServerMigrationTaskId serverMigrationTaskId;
 
-    public WildFly10Subsystem(String name, List<WildFly10SubsystemMigrationTask> subsystemMigrationTasks, WildFly10Extension extension) {
+    public WildFly10Subsystem(String name, List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks, WildFly10Extension extension) {
         this.name = name;
         this.extension = extension;
         this.subsystemMigrationTasks = subsystemMigrationTasks;
+        this.serverMigrationTaskId = new ServerMigrationTaskId.Builder()
+                .setName("Subsystem Config")
+                .addAttribute("name", getName())
+                .build();
     }
 
     public WildFly10Extension getExtension() {
@@ -43,15 +50,6 @@ public class WildFly10Subsystem {
 
     public String getName() {
         return name;
-    }
-
-    public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (subsystemMigrationTasks != null && !subsystemMigrationTasks.isEmpty()) {
-            final ModelNode subsystemConfig = server.getSubsystem(getName());
-            for (WildFly10SubsystemMigrationTask configMigrationTask : subsystemMigrationTasks) {
-                configMigrationTask.execute(subsystemConfig, this, server, context);
-            }
-        }
     }
 
     @Override
@@ -70,5 +68,24 @@ public class WildFly10Subsystem {
     @Override
     public String toString() {
         return name;
+    }
+
+    public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer server) {
+        return new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return serverMigrationTaskId;
+            }
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                if (subsystemMigrationTasks != null && !subsystemMigrationTasks.isEmpty()) {
+                    final ModelNode subsystemConfig = server.getSubsystem(getName());
+                    for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
+                        context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, server));
+                    }
+                }
+                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+            }
+        };
     }
 }

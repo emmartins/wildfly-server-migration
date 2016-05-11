@@ -17,11 +17,12 @@ package org.jboss.migration.wfly10.subsystem;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
-
-import java.io.IOException;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -32,21 +33,36 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MOD
  * A task which creates an extension if its missing from the server's config.
  * @author emmartins
  */
-public class AddExtension implements WildFly10SubsystemMigrationTask {
+public class AddExtension implements WildFly10SubsystemMigrationTaskFactory {
     public static final AddExtension INSTANCE = new AddExtension();
 
     private AddExtension() {
     }
 
     @Override
-    public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        final String extensionName = subsystem.getExtension().getName();
-        if (!server.getExtensions().contains(extensionName)) {
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Adding Extension %s...", extensionName);
-            final ModelNode op = Util.createAddOperation(pathAddress(pathElement(EXTENSION, extensionName)));
-            op.get(MODULE).set(extensionName);
-            server.executeManagementOperation(op);
-            ServerMigrationLogger.ROOT_LOGGER.infof("Extension %s added.",extensionName);
-        }
+    public ServerMigrationTask getServerMigrationTask(final ModelNode config, final WildFly10Subsystem subsystem, final WildFly10StandaloneServer server) {
+        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+
+            private final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName("Add Extension").addAttribute("name", subsystem.getExtension().getName()).build();
+
+            @Override
+            public ServerMigrationTaskId getId() {
+                return taskId;
+            }
+
+            @Override
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+                final String extensionName = subsystem.getExtension().getName();
+                if (!server.getExtensions().contains(extensionName)) {
+                    ServerMigrationLogger.ROOT_LOGGER.debugf("Adding Extension %s...", extensionName);
+                    final ModelNode op = Util.createAddOperation(pathAddress(pathElement(EXTENSION, extensionName)));
+                    op.get(MODULE).set(extensionName);
+                    server.executeManagementOperation(op);
+                    ServerMigrationLogger.ROOT_LOGGER.infof("Extension %s added.",extensionName);
+                    return ServerMigrationTaskResult.SUCCESS;
+                }
+                return ServerMigrationTaskResult.SKIPPED;
+            }
+        };
     }
 }

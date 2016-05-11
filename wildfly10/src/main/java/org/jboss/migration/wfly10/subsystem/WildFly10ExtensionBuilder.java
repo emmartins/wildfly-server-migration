@@ -36,10 +36,10 @@ public class WildFly10ExtensionBuilder {
         return this;
     }
 
-    public WildFly10ExtensionBuilder addSubsystem(String subsystemName, WildFly10SubsystemMigrationTask... tasks) {
+    public WildFly10ExtensionBuilder addSubsystem(String subsystemName, WildFly10SubsystemMigrationTaskFactory... tasks) {
         final WildFly10SubsystemBuilder subsystemBuilder = new WildFly10SubsystemBuilder().setName(subsystemName);
         if (tasks != null) {
-            for (WildFly10SubsystemMigrationTask task : tasks) {
+            for (WildFly10SubsystemMigrationTaskFactory task : tasks) {
                 subsystemBuilder.addTask(task);
             }
         }

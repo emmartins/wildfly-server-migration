@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly10.subsystem;
 
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -31,7 +31,7 @@ public class LegacyWildFly10Extension extends WildFly10Extension {
     }
 
     @Override
-    public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
+    public void migrate(WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws IOException {
         super.migrate(server, context);
         // FIXME tmp workaround for legacy extensions which do not remove itself
         if (server.getExtensions().contains(getName())) {

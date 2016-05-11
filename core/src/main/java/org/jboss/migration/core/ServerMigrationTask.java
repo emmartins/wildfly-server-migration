@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10;
-
-import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTask;
+package org.jboss.migration.core;
 
 /**
+ * The server migration task.
  * @author emmartins
  */
-public interface WildFly10ServerMigration<S extends Server> {
+public interface ServerMigrationTask {
 
     /**
-     * Retrieves the task to execute the server Migration
-     * @param source
-     * @param target
+     * Retrieves the task id.
+     * @return the task id
      */
-    ServerMigrationTask getServerMigrationTask(S source, WildFly10Server target);
+    ServerMigrationTaskId getId();
 
     /**
-     * Retrieves the type of the supported source server.
-     * @return
+     * Runs the task.
+     * @param context the task context
+     * @return the task result.
+     * @throws Exception if the task failed to run
      */
-    Class<S> getSourceType();
+    ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception;
 }

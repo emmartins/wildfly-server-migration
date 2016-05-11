@@ -15,18 +15,21 @@
  */
 package org.jboss.migration.eap6.to.eap7;
 
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServerMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Migration of a standalone server, from EAP 6 to EAP 7.
  * @author emmartins
  */
-public class EAP6ToEAP7StandaloneMigration {
+public class EAP6ToEAP7StandaloneMigration extends WildFly10StandaloneServerMigration<EAP6Server> {
 
     private final WildFly10StandaloneConfigFilesMigration<EAP6Server> configFilesMigration;
 
@@ -34,7 +37,10 @@ public class EAP6ToEAP7StandaloneMigration {
         this.configFilesMigration = configFilesMigration;
     }
 
-    public void run(EAP6Server source, WildFly10Server target, ServerMigrationContext context) throws IOException {
-        configFilesMigration.run(source.getStandaloneConfigs(), target, context);
+    @Override
+    protected List<ServerMigrationTask> getSubtasks(EAP6Server source, WildFly10Server target, ServerMigrationTaskContext context) {
+        List<ServerMigrationTask> subtasks = new ArrayList<>();
+        subtasks.add(configFilesMigration.getServerMigrationTask(source.getStandaloneConfigs(), target));
+        return subtasks;
     }
 }

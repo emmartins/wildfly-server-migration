@@ -19,13 +19,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
-
-import java.io.IOException;
+import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTaskFactory;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -35,9 +37,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * A task which adds the 'ejb' cache, present on EAP 7 default configs, to Infinispan subsystem configuration.
  * @author emmartins
  */
-public class AddEjbCache implements WildFly10SubsystemMigrationTask {
+public class AddEjbCache implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final AddEjbCache INSTANCE = new AddEjbCache();
+
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add EJB Cache").build();
 
     private AddEjbCache() {
     }
@@ -69,18 +73,25 @@ public class AddEjbCache implements WildFly10SubsystemMigrationTask {
     private static final String PURGE_ATTR_NAME = "purge";
 
     @Override
-    public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (config == null) {
-            return;
-        }
-        if (!config.hasDefined(CACHE_CONTAINER)) {
-            ServerMigrationLogger.ROOT_LOGGER.infof("No Cache container");
-            return;
-        }
-        if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
-            return;
-        }
-        /*
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+            @Override
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+                if (config == null) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                if (!config.hasDefined(CACHE_CONTAINER)) {
+                    ServerMigrationLogger.ROOT_LOGGER.infof("No Cache container");
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                /*
         <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                 <local-cache name="passivation">
                     <locking isolation="REPEATABLE_READ"/>
@@ -94,19 +105,22 @@ public class AddEjbCache implements WildFly10SubsystemMigrationTask {
                 </local-cache>
             </cache-container>
          */
-        final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE_CONTAINER, CACHE_NAME));
-        final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
-        for (String alias : ALIASES_ATTR_VALUE) {
-            cacheAddOperation.get(ALIASES_ATTR_NAME).add(alias);
-        }
-        cacheAddOperation.get(DEFAULT_CACHE_ATTR_NAME).set(DEFAULT_CACHE_ATTR_VALUE);
-        cacheAddOperation.get(MODULE_ATTR_NAME).set(MODULE_ATTR_VALUE);
-        compositeOperationBuilder.addStep(cacheAddOperation);
-        addLocalCachePassivation(compositeOperationBuilder, cachePathAddress);
-        addLocalCachePersistent(compositeOperationBuilder, cachePathAddress);
-        server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-        ServerMigrationLogger.ROOT_LOGGER.infof("Ejb cache added to Infinispan subsystem configuration.");
+                final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+                final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE_CONTAINER, CACHE_NAME));
+                final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
+                for (String alias : ALIASES_ATTR_VALUE) {
+                    cacheAddOperation.get(ALIASES_ATTR_NAME).add(alias);
+                }
+                cacheAddOperation.get(DEFAULT_CACHE_ATTR_NAME).set(DEFAULT_CACHE_ATTR_VALUE);
+                cacheAddOperation.get(MODULE_ATTR_NAME).set(MODULE_ATTR_VALUE);
+                compositeOperationBuilder.addStep(cacheAddOperation);
+                addLocalCachePassivation(compositeOperationBuilder, cachePathAddress);
+                addLocalCachePersistent(compositeOperationBuilder, cachePathAddress);
+                server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
+                ServerMigrationLogger.ROOT_LOGGER.infof("Ejb cache added to Infinispan subsystem configuration.");
+                return ServerMigrationTaskResult.SUCCESS;
+            }
+        };
     }
 
     private static void addLocalCachePassivation(Operations.CompositeOperationBuilder compositeOperationBuilder, PathAddress cachePathAddress) {

@@ -15,13 +15,12 @@
  */
 package org.jboss.migration.wfly8.to.wfly10;
 
-import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.wfly8.WildFly8Server;
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFly10ServerMigrationTask;
 import org.jboss.migration.wfly10.full.WildFly10FullServerMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
-
-import java.io.IOException;
+import org.jboss.migration.wfly8.WildFly8Server;
 
 /**
  * Server migration, from WildFly 8 to WildFly 10.
@@ -36,10 +35,8 @@ public class WildFly8ToWildFly10FullServerMigration implements WildFly10FullServ
     }
 
     @Override
-    public void run(WildFly8Server source, WildFly10Server target, ServerMigrationContext context) throws IOException {
-        context.getConsoleWrapper().printf("Server migration starting...%n");
-        standaloneMigration.run(source, target, context);
-        context.getConsoleWrapper().printf("Server migration done.%n");
+    public ServerMigrationTask getServerMigrationTask(final WildFly8Server source, final WildFly10Server target) {
+        return new WildFly10ServerMigrationTask(source, target, standaloneMigration);
     }
 
     @Override

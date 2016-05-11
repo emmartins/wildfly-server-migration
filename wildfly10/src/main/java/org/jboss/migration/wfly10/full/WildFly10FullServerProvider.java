@@ -52,6 +52,6 @@ public class WildFly10FullServerProvider extends AbstractServerProvider {
 
     @Override
     public String getName() {
-        return "WildFly Full 10.x";
+        return "WildFly 10";
     }
 }

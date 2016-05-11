@@ -19,13 +19,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
-
-import java.io.IOException;
+import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTaskFactory;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -35,9 +37,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * A task which adds the default Batch JBeret subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddBatchJBeretSubsystem implements WildFly10SubsystemMigrationTask {
+public class AddBatchJBeretSubsystem implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final AddBatchJBeretSubsystem INSTANCE = new AddBatchJBeretSubsystem();
+
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Subsystem").build();
 
     private AddBatchJBeretSubsystem() {
     }
@@ -59,12 +63,19 @@ public class AddBatchJBeretSubsystem implements WildFly10SubsystemMigrationTask 
     private static final String KEEPALIVE_TIME_UNIT_ATTR_VALUE = "seconds";
 
     @Override
-    public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (config != null) {
-            return;
-        }
-        ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", subsystem.getName());
-        // add subsystem with default config
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+            @Override
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+                if (config != null) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", subsystem.getName());
+                // add subsystem with default config
             /*
             <subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">
                 <default-job-repository name="in-memory"/>
@@ -78,26 +89,29 @@ public class AddBatchJBeretSubsystem implements WildFly10SubsystemMigrationTask 
                 </thread-pool>
             </subsystem>
              */
-        final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()));
-        final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
-        subsystemAddOperation.get(DEFAULT_JOB_REPOSITORY_ATTR_NAME).set(DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
-        subsystemAddOperation.get(DEFAULT_THREAD_POOL_ATTR_NAME).set(DEFAULT_THREAD_POOL_ATTR_VALUE);
-        compositeOperationBuilder.addStep(subsystemAddOperation);
-        // add default job repository
-        final PathAddress jobReporsitoryPathAddress = subsystemPathAddress.append(IN_MEMORY_JOB_REPOSITORY, DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
-        final ModelNode jobReporsitoryAddOperation = Util.createAddOperation(jobReporsitoryPathAddress);
-        compositeOperationBuilder.addStep(jobReporsitoryAddOperation);
-        // add default thread pool
-        final PathAddress threadPoolPathAddress = subsystemPathAddress.append(THREAD_POOL, DEFAULT_THREAD_POOL_ATTR_VALUE);
-        final ModelNode threadPoolAddOperation = Util.createAddOperation(threadPoolPathAddress);
-        threadPoolAddOperation.get(MAX_THREADS).set(MAX_THREADS_VALUE);
-        final ModelNode keepAliveTime = new ModelNode();
-        keepAliveTime.get(KEEPALIVE_TIME_TIME_ATTR_NAME).set(KEEPALIVE_TIME_TIME_ATTR_VALUE);
-        keepAliveTime.get(KEEPALIVE_TIME_UNIT_ATTR_NAME).set(KEEPALIVE_TIME_UNIT_ATTR_VALUE);
-        threadPoolAddOperation.get(KEEPALIVE_TIME).set(keepAliveTime);
-        compositeOperationBuilder.addStep(threadPoolAddOperation);
-        server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-        ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", subsystem.getName());
+                final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+                final PathAddress subsystemPathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()));
+                final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
+                subsystemAddOperation.get(DEFAULT_JOB_REPOSITORY_ATTR_NAME).set(DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
+                subsystemAddOperation.get(DEFAULT_THREAD_POOL_ATTR_NAME).set(DEFAULT_THREAD_POOL_ATTR_VALUE);
+                compositeOperationBuilder.addStep(subsystemAddOperation);
+                // add default job repository
+                final PathAddress jobReporsitoryPathAddress = subsystemPathAddress.append(IN_MEMORY_JOB_REPOSITORY, DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
+                final ModelNode jobReporsitoryAddOperation = Util.createAddOperation(jobReporsitoryPathAddress);
+                compositeOperationBuilder.addStep(jobReporsitoryAddOperation);
+                // add default thread pool
+                final PathAddress threadPoolPathAddress = subsystemPathAddress.append(THREAD_POOL, DEFAULT_THREAD_POOL_ATTR_VALUE);
+                final ModelNode threadPoolAddOperation = Util.createAddOperation(threadPoolPathAddress);
+                threadPoolAddOperation.get(MAX_THREADS).set(MAX_THREADS_VALUE);
+                final ModelNode keepAliveTime = new ModelNode();
+                keepAliveTime.get(KEEPALIVE_TIME_TIME_ATTR_NAME).set(KEEPALIVE_TIME_TIME_ATTR_VALUE);
+                keepAliveTime.get(KEEPALIVE_TIME_UNIT_ATTR_NAME).set(KEEPALIVE_TIME_UNIT_ATTR_VALUE);
+                threadPoolAddOperation.get(KEEPALIVE_TIME).set(keepAliveTime);
+                compositeOperationBuilder.addStep(threadPoolAddOperation);
+                server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
+                ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", subsystem.getName());
+                return ServerMigrationTaskResult.SUCCESS;
+            }
+        };
     }
 }
