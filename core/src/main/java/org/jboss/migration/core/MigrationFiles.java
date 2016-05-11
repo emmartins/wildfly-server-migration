@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * The migration files.
- * @author emmartins
+ * @a
  */
 public class MigrationFiles {
 

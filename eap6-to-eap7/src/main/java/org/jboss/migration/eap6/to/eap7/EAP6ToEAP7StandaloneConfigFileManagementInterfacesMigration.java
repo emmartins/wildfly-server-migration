@@ -22,7 +22,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -35,7 +34,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Management Interfaces Migration").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("management-interfaces-migration").build();
 
     public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer target) {
         return new ServerMigrationTask() {
@@ -63,7 +62,7 @@ public class EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration {
                             writeAttrOp.get(NAME).set("http-upgrade-enabled");
                             writeAttrOp.get(VALUE).set(true);
                             target.executeManagementOperation(writeAttrOp);
-                            ServerMigrationLogger.ROOT_LOGGER.infof("Activated HTTP Management Interface's support for HTTP Upgrade.");
+                            context.getLogger().infof("Activated HTTP Management Interface's support for HTTP Upgrade.");
                             // TODO use a subtask per http interface migrated
                             return ServerMigrationTaskResult.SUCCESS;
                         }

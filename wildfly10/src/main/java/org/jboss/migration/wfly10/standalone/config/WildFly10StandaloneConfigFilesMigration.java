@@ -36,7 +36,7 @@ import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
  */
 public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Config Files").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("config-files-migration").build();
 
     private final WildFly10StandaloneConfigFileMigration configFileMigration;
 
@@ -67,9 +67,9 @@ public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
     }
 
     protected void run(final Collection<ServerPath<S>> sourceConfigs, final WildFly10Server target, final ServerMigrationTaskContext taskContext) throws Exception {
-        ROOT_LOGGER.infof("Scanning for standalone server configurations...");
+        taskContext.getLogger().infof("Retrieving source's standalone server config files...");
         for (ServerPath standaloneConfig : sourceConfigs) {
-            ROOT_LOGGER.infof("%s", standaloneConfig);
+            taskContext.getLogger().infof("%s", standaloneConfig);
         }
         final ServerMigrationContext serverMigrationContext = taskContext.getServerMigrationContext();
         final ConsoleWrapper consoleWrapper = serverMigrationContext.getConsoleWrapper();

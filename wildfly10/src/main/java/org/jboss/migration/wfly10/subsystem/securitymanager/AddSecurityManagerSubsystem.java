@@ -22,7 +22,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -40,8 +39,6 @@ public class AddSecurityManagerSubsystem implements WildFly10SubsystemMigrationT
 
     public static final AddSecurityManagerSubsystem INSTANCE = new AddSecurityManagerSubsystem();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Subsystem").build();
-
     private AddSecurityManagerSubsystem() {
     }
 
@@ -52,18 +49,19 @@ public class AddSecurityManagerSubsystem implements WildFly10SubsystemMigrationT
     private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, final WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
             public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+                return new ServerMigrationTaskId.Builder().setName("add-subsystem").addAttribute("name", subsystem.getName()).build();
+
             }
             @Override
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
                 if (config != null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", subsystem.getName());
+                context.getLogger().debugf("Adding subsystem %s...", subsystem.getName());
                 // add subsystem with default config
             /*
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
@@ -84,7 +82,7 @@ public class AddSecurityManagerSubsystem implements WildFly10SubsystemMigrationT
                 maximumPermissions.get(CLASS_ATTR_NAME).set(CLASS_ATTR_VALUE);
                 deploymentPermissionsAddOperation.get(MAXIMUM_PERMISSIONS).add(maximumPermissions);
                 server.executeManagementOperation(deploymentPermissionsAddOperation);
-                ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", subsystem.getName());
+                context.getLogger().infof("Subsystem %s added.", subsystem.getName());
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

@@ -36,7 +36,7 @@ public class WildFly10ServerMigrationTask<S extends Server> implements ServerMig
     public WildFly10ServerMigrationTask(S source, WildFly10Server target, WildFly10StandaloneServerMigration standaloneServerMigration) {
         this.source = source;
         this.target = target;
-        this.taskId = new ServerMigrationTaskId.Builder().setName("Migrate Server")
+        this.taskId = new ServerMigrationTaskId.Builder().setName("server-migration")
                 .addAttribute("source", source.getProductInfo().toString())
                 .addAttribute("target",target.getProductInfo().toString())
                 .build();
@@ -51,11 +51,9 @@ public class WildFly10ServerMigrationTask<S extends Server> implements ServerMig
     @Override
     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
         context.getServerMigrationContext().getConsoleWrapper().printf("Server migration starting...%n");
-        try {
-            return run(source, target, context);
-        } finally {
-            context.getServerMigrationContext().getConsoleWrapper().printf("Server migration done.%n");
-        }
+        ServerMigrationTaskResult result = run(source, target, context);
+        context.getServerMigrationContext().getConsoleWrapper().printf("Server migration done.%n");
+        return result;
     }
 
     /**

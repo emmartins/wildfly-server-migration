@@ -30,7 +30,7 @@ import java.util.List;
  */
 public abstract class WildFly10StandaloneServerMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Standalone Server").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("standalone-server-migration").build();
 
     /**
      *

@@ -55,19 +55,19 @@ public class ServerMigrationTaskId {
     public String toString() {
         StringBuilder sb = new StringBuilder(name);
         if (!attributes.isEmpty()) {
-            sb.append(" [");
+            sb.append("(");
             boolean first = true;
             for (Map.Entry<String, String> entry : attributes.entrySet()) {
                 if (first) {
                     first = false;
                 } else {
-                    sb.append(", ");
+                    sb.append(",");
                 }
                 sb.append(entry.getKey());
                 sb.append('=');
                 sb.append(entry.getValue());
             }
-            sb.append(']');
+            sb.append(")");
         }
         return sb.toString();
     }

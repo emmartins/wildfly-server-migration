@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -39,7 +38,7 @@ public class RefHttpRemotingConnectorInEJB3Remote implements WildFly10SubsystemM
 
     public static final RefHttpRemotingConnectorInEJB3Remote INSTANCE = new RefHttpRemotingConnectorInEJB3Remote();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Use Http Remoting").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("activate-ejb3-remoting-http-connector").build();
 
     private RefHttpRemotingConnectorInEJB3Remote() {
     }
@@ -61,7 +60,7 @@ public class RefHttpRemotingConnectorInEJB3Remote implements WildFly10SubsystemM
                 op.get(NAME).set("connector-ref");
                 op.get(VALUE).set("http-remoting-connector");
                 server.executeManagementOperation(op);
-                ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's remote service configured to use HTTP Remoting connector.");
+                context.getLogger().infof("EJB3 subsystem's remote service configured to use HTTP Remoting connector.");
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

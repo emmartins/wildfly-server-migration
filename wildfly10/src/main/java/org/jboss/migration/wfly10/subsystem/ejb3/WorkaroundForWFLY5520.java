@@ -22,7 +22,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -40,7 +39,7 @@ public class WorkaroundForWFLY5520 implements WildFly10SubsystemMigrationTaskFac
 
     public static final WorkaroundForWFLY5520 INSTANCE = new WorkaroundForWFLY5520();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Apply WFLY-5520 fix").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("apply-wfly-5520-fix").build();
 
     private WorkaroundForWFLY5520() {
     }
@@ -78,7 +77,7 @@ public class WorkaroundForWFLY5520 implements WildFly10SubsystemMigrationTaskFac
                 op.get(NAME).set("default-sfsb-passivation-disabled-cache");
                 op.get(VALUE).set("simple");
                 server.executeManagementOperation(op);
-                ServerMigrationLogger.ROOT_LOGGER.infof("Target server does not includes fix for WFLY-5520, workaround applied into EJB3 subsystem configuration.");
+                context.getLogger().infof("Target server does not includes fix for WFLY-5520, workaround applied into EJB3 subsystem configuration.");
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

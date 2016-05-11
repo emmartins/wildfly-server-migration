@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -42,7 +41,7 @@ public class AddBufferCache implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final AddBufferCache INSTANCE = new AddBufferCache();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add default Buffer Cache").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("add-undertow-default-buffer-cache").build();
 
     private AddBufferCache() {
     }
@@ -66,7 +65,7 @@ public class AddBufferCache implements WildFly10SubsystemMigrationTaskFactory {
                     final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), PathElement.pathElement(BUFFER_CACHE, BUFFER_CACHE_NAME));
                     final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
                     server.executeManagementOperation(addOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Undertow's default buffer cache added.");
+                    context.getLogger().infof("Undertow's default buffer cache added.");
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {
                     return ServerMigrationTaskResult.SKIPPED;

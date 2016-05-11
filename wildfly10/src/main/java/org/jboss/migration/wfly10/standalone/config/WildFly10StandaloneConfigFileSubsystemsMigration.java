@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Extension;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
@@ -38,9 +37,9 @@ import java.util.Set;
  */
 public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Subsystems").build();
-    public static final String SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_SUBSYSTEM = "Remove Unsupported Subsystem";
-    public static final String SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_EXTENSION = "Remove Unsupported Extension";
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("subsystems-migration").build();
+    public static final String SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_SUBSYSTEM = "remove-unsupported-subsystem";
+    public static final String SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_EXTENSION = "remove-unsupported-extension";
     public static final String SERVER_MIGRATION_TASK_ID_ATTRIBUTE_NAME = "name";
 
     private final List<WildFly10Extension> supportedExtensions;
@@ -77,18 +76,18 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
                 context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-                ServerMigrationLogger.ROOT_LOGGER.infof("Migrating subsystems...");
+                context.getLogger().infof("Migrating subsystems...");
                 final boolean targetStarted = target.isStarted();
                 if (!targetStarted) {
                     target.start();
                 }
                 try {
                     final Set<String> subsystems = target.getSubsystems();
-                    ServerMigrationLogger.ROOT_LOGGER.debugf("Subsystems found: %s", subsystems);
+                    context.getLogger().debugf("Subsystems found: %s", subsystems);
                     // delete subsystems/extensions not supported
                     removeUnsupportedSubsystems(target, subsystems, context);
                     final Set<String> extensions = target.getExtensions();
-                    ServerMigrationLogger.ROOT_LOGGER.debugf("Extensions found: %s", target.getExtensions());
+                    context.getLogger().debugf("Extensions found: %s", target.getExtensions());
                     removeUnsupportedExtensions(target, extensions, context);
                     // migrate extensions/subsystems
                     migrateExtensions(target, extensions, context);
@@ -96,7 +95,6 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
                     if (!targetStarted) {
                         target.stop();
                     }
-                    ServerMigrationLogger.ROOT_LOGGER.info("Subsystems migration done.");
                 }
                 return ServerMigrationTaskResult.SUCCESS;
             }
@@ -122,7 +120,7 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
                     @Override
                     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
                         wildFly10StandaloneServer.removeSubsystem(subsystem);
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Unsupported subsystem %s removed.", subsystem);
+                        context.getLogger().infof("Unsupported subsystem %s removed.", subsystem);
                         return ServerMigrationTaskResult.SUCCESS;
                     }
                 };
@@ -150,7 +148,7 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
                     @Override
                     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
                         wildFly10StandaloneServer.removeExtension(extension);
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Unsupported extension %s removed.", extension);
+                        context.getLogger().infof("Unsupported extension %s removed.", extension);
                         return ServerMigrationTaskResult.SUCCESS;
                     }
                 };

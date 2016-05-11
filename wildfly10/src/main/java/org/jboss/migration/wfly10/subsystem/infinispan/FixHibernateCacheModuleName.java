@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -39,7 +38,7 @@ public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationT
 
     public static final FixHibernateCacheModuleName INSTANCE = new FixHibernateCacheModuleName();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Fix Hibernate Cache's module name").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("fix-hibernate-cache-module-name").build();
 
     private FixHibernateCacheModuleName() {
     }
@@ -63,7 +62,7 @@ public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationT
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 if (!config.hasDefined(CACHE_CONTAINER)) {
-                    ServerMigrationLogger.ROOT_LOGGER.infof("No Cache container");
+                    context.getLogger().infof("No Cache container");
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 boolean configUpdated = false;
@@ -76,7 +75,7 @@ public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationT
                         op.get(VALUE).set(MODULE_ATTR_NEW_VALUE);
                         server.executeManagementOperation(op);
                         configUpdated = true;
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Infinispan subsystem's cache %s 'module' attribute updated to %s.", cacheName, MODULE_ATTR_NEW_VALUE);
+                        context.getLogger().infof("Infinispan subsystem's cache %s 'module' attribute updated to %s.", cacheName, MODULE_ATTR_NEW_VALUE);
                     }
                 }
                 return configUpdated ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;

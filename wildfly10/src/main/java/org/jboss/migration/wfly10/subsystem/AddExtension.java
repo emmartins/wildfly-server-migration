@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -43,7 +42,7 @@ public class AddExtension implements WildFly10SubsystemMigrationTaskFactory {
     public ServerMigrationTask getServerMigrationTask(final ModelNode config, final WildFly10Subsystem subsystem, final WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
 
-            private final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName("Add Extension").addAttribute("name", subsystem.getExtension().getName()).build();
+            private final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName("add-extension").addAttribute("name", subsystem.getExtension().getName()).build();
 
             @Override
             public ServerMigrationTaskId getId() {
@@ -54,11 +53,11 @@ public class AddExtension implements WildFly10SubsystemMigrationTaskFactory {
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
                 final String extensionName = subsystem.getExtension().getName();
                 if (!server.getExtensions().contains(extensionName)) {
-                    ServerMigrationLogger.ROOT_LOGGER.debugf("Adding Extension %s...", extensionName);
+                    context.getLogger().debugf("Adding Extension %s...", extensionName);
                     final ModelNode op = Util.createAddOperation(pathAddress(pathElement(EXTENSION, extensionName)));
                     op.get(MODULE).set(extensionName);
                     server.executeManagementOperation(op);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Extension %s added.",extensionName);
+                    context.getLogger().infof("Extension %s added.",extensionName);
                     return ServerMigrationTaskResult.SUCCESS;
                 }
                 return ServerMigrationTaskResult.SKIPPED;
