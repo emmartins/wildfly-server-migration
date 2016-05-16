@@ -27,10 +27,16 @@ if "x%JAVA_HOME%" == "x" (
   set "JAVA=%JAVA_HOME%\bin\java"
 )
 
+# determine the default output dir, if not set
+if "x%JBOSS_SERVER_MIGRATION_OUTPUT_DIR%" == "x" (
+  set "JBOSS_SERVER_MIGRATION_OUTPUT_DIR=%BASE_DIR%\output"
+  set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.output.dir=%JBOSS_SERVER_MIGRATION_OUTPUT_DIR%"
+)
+
 set LOGGING_CONFIG=
 echo "%JAVA_OPTS%" | findstr /I "logging.configuration" > nul
 if errorlevel == 1 (
-  set "LOGGING_CONFIG=-Dlogging.configuration=file:%BASE_DIR%\config\logging.properties"
+  set "LOGGING_CONFIG=-Dlogging.configuration=file:%BASE_DIR%\config\logging.properties -Djboss.server.migration.logfile=%JBOSS_SERVER_MIGRATION_OUTPUT_DIR%\migration.log"
 ) else (
   echo logging.configuration already set in JAVA_OPTS
 )
