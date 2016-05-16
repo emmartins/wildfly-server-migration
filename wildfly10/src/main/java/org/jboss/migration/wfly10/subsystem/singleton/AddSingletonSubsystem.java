@@ -19,14 +19,10 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
+import org.jboss.migration.wfly10.subsystem.AddSubsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
-import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
-import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTaskFactory;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -36,7 +32,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * A task which adds the default Singleton subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddSingletonSubsystem implements WildFly10SubsystemMigrationTaskFactory {
+public class AddSingletonSubsystem extends AddSubsystem {
 
     public static final AddSingletonSubsystem INSTANCE = new AddSingletonSubsystem();
 
@@ -54,20 +50,8 @@ public class AddSingletonSubsystem implements WildFly10SubsystemMigrationTaskFac
     private static final String ELECTION_POLICY_NAME = "simple";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, final WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
-            @Override
-            public ServerMigrationTaskId getId() {
-                return new ServerMigrationTaskId.Builder().setName("add-subsystem").addAttribute("name", subsystem.getName()).build();
-
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
-                if (config != null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                context.getLogger().debugf("Adding subsystem %s...", subsystem.getName());
-                // add subsystem with default config
+    protected void addSubsystem(WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+        // add subsystem with default config
                 /*
             <subsystem xmlns="urn:jboss:domain:singleton:1.0">
             <singleton-policies default="default">
@@ -77,24 +61,20 @@ public class AddSingletonSubsystem implements WildFly10SubsystemMigrationTaskFac
             </singleton-policies>
             </subsystem>
             */
-                final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-                final PathAddress subsystemPathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()));
-                final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
-                subsystemAddOperation.get(DEFAULT_ATTR_NAME).set(DEFAULT_ATTR_VALUE);
-                compositeOperationBuilder.addStep(subsystemAddOperation);
-                // add default policy
-                final PathAddress singletonPolicyPathAddress = subsystemPathAddress.append(SINGLETON_POLICY, DEFAULT_ATTR_VALUE);
-                final ModelNode singletonPolicyAddOperation = Util.createAddOperation(singletonPolicyPathAddress);
-                singletonPolicyAddOperation.get(CACHE_CONTAINER_ATTR_NAME).set(CACHE_CONTAINER_ATTR_VALUE);
-                compositeOperationBuilder.addStep(singletonPolicyAddOperation);
-                // add election policy
-                final PathAddress electionPolicyPathAddress = singletonPolicyPathAddress.append(ELECTION_POLICY, ELECTION_POLICY_NAME);
-                final ModelNode electionPolicyAddOperation = Util.createAddOperation(electionPolicyPathAddress);
-                compositeOperationBuilder.addStep(electionPolicyAddOperation);
-                server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-                context.getLogger().infof("Subsystem %s added.", subsystem.getName());
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
+        final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+        final PathAddress subsystemPathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()));
+        final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
+        subsystemAddOperation.get(DEFAULT_ATTR_NAME).set(DEFAULT_ATTR_VALUE);
+        compositeOperationBuilder.addStep(subsystemAddOperation);
+        // add default policy
+        final PathAddress singletonPolicyPathAddress = subsystemPathAddress.append(SINGLETON_POLICY, DEFAULT_ATTR_VALUE);
+        final ModelNode singletonPolicyAddOperation = Util.createAddOperation(singletonPolicyPathAddress);
+        singletonPolicyAddOperation.get(CACHE_CONTAINER_ATTR_NAME).set(CACHE_CONTAINER_ATTR_VALUE);
+        compositeOperationBuilder.addStep(singletonPolicyAddOperation);
+        // add election policy
+        final PathAddress electionPolicyPathAddress = singletonPolicyPathAddress.append(ELECTION_POLICY, ELECTION_POLICY_NAME);
+        final ModelNode electionPolicyAddOperation = Util.createAddOperation(electionPolicyPathAddress);
+        compositeOperationBuilder.addStep(electionPolicyAddOperation);
+        server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
     }
 }

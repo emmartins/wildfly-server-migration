@@ -31,8 +31,8 @@ public class WildFly10LegacyExtensionBuilder {
         return this;
     }
 
-    public WildFly10LegacyExtensionBuilder addSubsystem(String subsystemName) {
-        subsystems.add(new WildFly10SubsystemBuilder().setName(subsystemName).addTask(MigrateLegacySubsystem.INSTANCE));
+    public WildFly10LegacyExtensionBuilder addMigratedSubsystem(String subsystemName) {
+        subsystems.add(new WildFly10SubsystemBuilder().setName(subsystemName).setTaskName("migrate-subsystem").addTask(MigrateLegacySubsystem.INSTANCE));
         return this;
     }
 

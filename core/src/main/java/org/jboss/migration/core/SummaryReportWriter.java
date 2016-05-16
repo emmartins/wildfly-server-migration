@@ -29,7 +29,11 @@ public class SummaryReportWriter {
     private static final int MIN_SEPARATOR_LENGTH = 3;
 
     public String toString(MigrationData migrationData) {
-        final List<SummaryTaskEntry> summaryTaskEntries = getSummaryTaskEntries(migrationData);
+        return toString(migrationData, 5);
+    }
+
+    public String toString(MigrationData migrationData, int maxTaskDepth) {
+        final List<SummaryTaskEntry> summaryTaskEntries = getSummaryTaskEntries(migrationData, maxTaskDepth);
         final int taskIdAndSeparatorLength = getTaskIdAndSeparatorLength(summaryTaskEntries);
         final String lineSeparator = getLineSeparator(taskIdAndSeparatorLength);
         final StringBuilder sb = new StringBuilder();
@@ -46,21 +50,26 @@ public class SummaryReportWriter {
         return sb.toString();
     }
 
-    protected List<SummaryTaskEntry> getSummaryTaskEntries(MigrationData migrationData) {
+    protected List<SummaryTaskEntry> getSummaryTaskEntries(MigrationData migrationData, int maxTaskDepth) {
         final List<SummaryTaskEntry> summaryTaskEntries = new ArrayList<>();
-        getSummaryTaskEntry(migrationData.getRootTask(), " ", summaryTaskEntries);
+        int taskDepth = 0;
+        getSummaryTaskEntry(migrationData.getRootTask(), " ", summaryTaskEntries, taskDepth, maxTaskDepth);
         return  summaryTaskEntries;
     }
 
-    protected void getSummaryTaskEntry(ServerMigrationTaskExecution task, String prefix, List<SummaryTaskEntry> summaryTaskEntries) {
+    protected void getSummaryTaskEntry(ServerMigrationTaskExecution task, String prefix, List<SummaryTaskEntry> summaryTaskEntries, int taskDepth, int maxTaskDepth) {
         if (task.getResult().getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
             return;
         }
         String taskIdWithPrefix = prefix+task.getTaskId().toString();
         summaryTaskEntries.add(new SummaryTaskEntry(taskIdWithPrefix, task.getResult()));
         String subtaskPrefix = TASK_ID_LEVEL_INDENT + prefix;
+        taskDepth++;
+        if (taskDepth > maxTaskDepth) {
+            return;
+        }
         for (ServerMigrationTaskExecution subtask : task.getSubtasks()) {
-            getSummaryTaskEntry(subtask, subtaskPrefix, summaryTaskEntries);
+            getSummaryTaskEntry(subtask, subtaskPrefix, summaryTaskEntries, taskDepth, maxTaskDepth);
         }
     }
 
