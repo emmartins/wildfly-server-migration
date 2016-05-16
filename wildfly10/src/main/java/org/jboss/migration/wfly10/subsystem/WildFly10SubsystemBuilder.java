@@ -27,6 +27,7 @@ public class WildFly10SubsystemBuilder {
     private final List<WildFly10SubsystemMigrationTaskFactory> tasks = new ArrayList<>();
     private WildFly10Extension extension;
     private String name;
+    private String taskName;
 
     /**
      * Sets the subsystem extension.
@@ -49,6 +50,16 @@ public class WildFly10SubsystemBuilder {
     }
 
     /**
+     * Sets the subsystem migration task name.
+     * @param taskName
+     * @return
+     */
+    public WildFly10SubsystemBuilder setTaskName(String taskName) {
+        this.taskName = taskName;
+        return this;
+    }
+
+    /**
      * Adds a config migration task to the subsystem.
      * @param configMigrationTask
      * @return
@@ -63,6 +74,6 @@ public class WildFly10SubsystemBuilder {
      * @return
      */
     WildFly10Subsystem build() {
-        return new WildFly10Subsystem(name, tasks, extension);
+        return new WildFly10Subsystem(name, taskName, tasks, extension);
     }
 }

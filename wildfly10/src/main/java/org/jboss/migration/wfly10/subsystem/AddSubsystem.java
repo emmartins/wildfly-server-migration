@@ -31,11 +31,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * A task which creates a subsystem if its missing from the server's config.
  * @author emmartins
  */
-public class AddSubsystemWithoutConfig implements WildFly10SubsystemMigrationTaskFactory {
+public class AddSubsystem implements WildFly10SubsystemMigrationTaskFactory {
 
-    public static final AddSubsystemWithoutConfig INSTANCE = new AddSubsystemWithoutConfig();
+    public static final AddSubsystem INSTANCE = new AddSubsystem();
 
-    private AddSubsystemWithoutConfig() {
+    protected AddSubsystem() {
     }
 
     @Override
@@ -45,18 +45,21 @@ public class AddSubsystemWithoutConfig implements WildFly10SubsystemMigrationTas
             public ServerMigrationTaskId getId() {
                 return new ServerMigrationTaskId.Builder().setName("add-subsystem").addAttribute("name", subsystem.getName()).build();
             }
-
             @Override
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
                 if (config != null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 context.getLogger().debugf("Adding subsystem %s...", subsystem.getName());
-                final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
-                server.executeManagementOperation(op);
+                addSubsystem(subsystem, server, context);
                 context.getLogger().infof("Subsystem %s added.", subsystem.getName());
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
+    }
+
+    protected void addSubsystem(WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+        final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
+        server.executeManagementOperation(op);
     }
 }

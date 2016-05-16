@@ -24,6 +24,7 @@ import java.util.List;
 public class WildFly10ExtensionBuilder {
 
     private final List<WildFly10SubsystemBuilder> subsystems = new ArrayList<>();
+
     private String name;
 
     public WildFly10ExtensionBuilder setName(String name) {
@@ -36,8 +37,22 @@ public class WildFly10ExtensionBuilder {
         return this;
     }
 
-    public WildFly10ExtensionBuilder addSubsystem(String subsystemName, WildFly10SubsystemMigrationTaskFactory... tasks) {
-        final WildFly10SubsystemBuilder subsystemBuilder = new WildFly10SubsystemBuilder().setName(subsystemName);
+    public WildFly10ExtensionBuilder addSupportedSubsystem(String subsystemName) {
+        return addSubsystem(subsystemName, "supported-subsystem", null);
+    }
+
+    public WildFly10ExtensionBuilder addUpdatedSubsystem(String subsystemName, WildFly10SubsystemMigrationTaskFactory... tasks) {
+        return addSubsystem(subsystemName, "update-subsystem", tasks);
+    }
+
+    public WildFly10ExtensionBuilder addNewSubsystem(String subsystemName, AddSubsystem addSubsystem) {
+        return addSubsystem(subsystemName, "add-subsystem", AddExtension.INSTANCE, addSubsystem);
+    }
+
+    public WildFly10ExtensionBuilder addSubsystem(String subsystemName, String taskName, WildFly10SubsystemMigrationTaskFactory... tasks) {
+        final WildFly10SubsystemBuilder subsystemBuilder = new WildFly10SubsystemBuilder()
+                .setName(subsystemName)
+                .setTaskName(taskName);
         if (tasks != null) {
             for (WildFly10SubsystemMigrationTaskFactory task : tasks) {
                 subsystemBuilder.addTask(task);
@@ -46,8 +61,8 @@ public class WildFly10ExtensionBuilder {
         return addSubsystem(subsystemBuilder);
     }
 
-    public WildFly10ExtensionBuilder addLegacySubsystem(String subsystemName) {
-        return addSubsystem(new WildFly10SubsystemBuilder().setName(subsystemName).addTask(MigrateLegacySubsystem.INSTANCE));
+    public WildFly10ExtensionBuilder addMigratedSubsystem(String subsystemName) {
+        return addSubsystem(subsystemName, "migrate-subsystem", MigrateLegacySubsystem.INSTANCE);
     }
 
     public WildFly10Extension build() {

@@ -34,12 +34,12 @@ public class WildFly10Subsystem {
     protected final List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks;
     protected final ServerMigrationTaskId serverMigrationTaskId;
 
-    public WildFly10Subsystem(String name, List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks, WildFly10Extension extension) {
+    public WildFly10Subsystem(String name, String taskName, List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks, WildFly10Extension extension) {
         this.name = name;
         this.extension = extension;
         this.subsystemMigrationTasks = subsystemMigrationTasks;
         this.serverMigrationTaskId = new ServerMigrationTaskId.Builder()
-                .setName("subsystem-config-update")
+                .setName(taskName)
                 .addAttribute("name", getName())
                 .build();
     }
