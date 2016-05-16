@@ -19,7 +19,10 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
@@ -37,24 +40,38 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileDeploymentsMigration<S extends Server> {
 
-    public void run(ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
-        context.getConsoleWrapper().printf("%n%n");
-        // remove all deployments, TODO add (user optional) functionality that copies deployment files.
-        ServerMigrationLogger.ROOT_LOGGER.debug("Migrating deployments...");
-        final boolean targetStarted = target.isStarted();
-        if (!targetStarted) {
-            target.start();
-        }
-        try {
-            for (ModelNode deployment : getDeployments(target)) {
-                migrateDeployment(deployment, source, target, context);
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Deployments").build();
+    public static final String MIGRATION_REPORT_TASK_REMOVE_DEPLOYMENT_NAME_PREFIX = "Remove Deployment";
+
+    public ServerMigrationTask getServerMigrationTask(final ServerPath<S> source, final WildFly10StandaloneServer target) {
+        return new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
             }
-        } finally {
-            if (!targetStarted) {
-                target.stop();
+
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                // remove all deployments, TODO add (user optional) functionality that copies deployment files.
+                ServerMigrationLogger.ROOT_LOGGER.debug("Migrating deployments...");
+                final boolean targetStarted = target.isStarted();
+                if (!targetStarted) {
+                    target.start();
+                }
+                try {
+                    for (ModelNode deployment : getDeployments(target)) {
+                        migrateDeployment(deployment, source, target, context);
+                    }
+                } finally {
+                    if (!targetStarted) {
+                        target.stop();
+                    }
+                    ServerMigrationLogger.ROOT_LOGGER.info("Deployments migration done.");
+                }
+                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
-            ServerMigrationLogger.ROOT_LOGGER.info("Deployments migration done.");
-        }
+        };
     }
 
     private List<ModelNode> getDeployments(WildFly10StandaloneServer target) throws IOException {
@@ -69,11 +86,23 @@ public class WildFly10StandaloneConfigFileDeploymentsMigration<S extends Server>
         return result.get(RESULT).asList();
     }
 
-    protected void migrateDeployment(ModelNode deployment, ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
+    protected void migrateDeployment(final ModelNode deployment, final ServerPath<S> source, final WildFly10StandaloneServer target, final ServerMigrationTaskContext context) throws IOException {
         final Property deploymentAsProperty = deployment.asProperty();
         final String deploymentName = deploymentAsProperty.getName();
-        final ModelNode op = Util.createRemoveOperation( pathAddress(pathElement(DEPLOYMENT,deploymentName)));
-        target.executeManagementOperation(op);
-        ServerMigrationLogger.ROOT_LOGGER.infof("Removed deployment %s", deploymentName);
+        final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName(MIGRATION_REPORT_TASK_REMOVE_DEPLOYMENT_NAME_PREFIX).addAttribute("name", deploymentName).build();
+        final ServerMigrationTask task = new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return taskId;
+            }
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                final ModelNode op = Util.createRemoveOperation( pathAddress(pathElement(DEPLOYMENT,deploymentName)));
+                target.executeManagementOperation(op);
+                ServerMigrationLogger.ROOT_LOGGER.infof("Removed deployment %s", deploymentName);
+                return ServerMigrationTaskResult.SUCCESS;
+            }
+        };
+        context.execute(task);
     }
 }

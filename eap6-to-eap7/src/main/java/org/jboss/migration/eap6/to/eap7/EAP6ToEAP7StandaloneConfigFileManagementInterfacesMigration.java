@@ -18,11 +18,12 @@ package org.jboss.migration.eap6.to.eap7;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
-
-import java.io.IOException;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -34,34 +35,46 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration {
 
-    public void run(WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
-        context.getConsoleWrapper().printf("%n%n");
-        ServerMigrationLogger.ROOT_LOGGER.infof("Migrating management interfaces...");
-        final boolean targetStarted = target.isStarted();
-        if (!targetStarted) {
-            target.start();
-        }
-        try {
-            final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, pathAddress(pathElement(CORE_SERVICE, MANAGEMENT)));
-            op.get(CHILD_TYPE).set(MANAGEMENT_INTERFACE);
-            final ModelNode opResult = target.executeManagementOperation(op);
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Get management interfaces Op result %s", opResult.toString());
-            for (ModelNode resultItem : opResult.get(RESULT).asList()) {
-                if (resultItem.asString().equals("http-interface")) {
-                    // http interface found, turn on http upgrade
-                    final PathAddress pathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT), pathElement(MANAGEMENT_INTERFACE, "http-interface"));
-                    final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                    writeAttrOp.get(NAME).set("http-upgrade-enabled");
-                    writeAttrOp.get(VALUE).set(true);
-                    target.executeManagementOperation(writeAttrOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Activated HTTP Management Interface's support for HTTP Upgrade.");
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Management Interfaces Migration").build();
+
+    public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer target) {
+        return new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                final boolean targetStarted = target.isStarted();
+                if (!targetStarted) {
+                    target.start();
                 }
+                try {
+                    final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, pathAddress(pathElement(CORE_SERVICE, MANAGEMENT)));
+                    op.get(CHILD_TYPE).set(MANAGEMENT_INTERFACE);
+                    final ModelNode opResult = target.executeManagementOperation(op);
+                    for (ModelNode resultItem : opResult.get(RESULT).asList()) {
+                        if (resultItem.asString().equals("http-interface")) {
+                            // http interface found, turn on http upgrade
+                            final PathAddress pathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT), pathElement(MANAGEMENT_INTERFACE, "http-interface"));
+                            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                            writeAttrOp.get(NAME).set("http-upgrade-enabled");
+                            writeAttrOp.get(VALUE).set(true);
+                            target.executeManagementOperation(writeAttrOp);
+                            ServerMigrationLogger.ROOT_LOGGER.infof("Activated HTTP Management Interface's support for HTTP Upgrade.");
+                            // TODO use a subtask per http interface migrated
+                            return ServerMigrationTaskResult.SUCCESS;
+                        }
+                    }
+                } finally {
+                    if (!targetStarted) {
+                        target.stop();
+                    }
+                }
+                return ServerMigrationTaskResult.SKIPPED;
             }
-        } finally {
-            if (!targetStarted) {
-                target.stop();
-            }
-            ServerMigrationLogger.ROOT_LOGGER.info("Management interfaces migration done.");
-        }
+        };
     }
 }

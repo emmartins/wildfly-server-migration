@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileDeploymentsMigration;
@@ -33,7 +33,6 @@ import org.jboss.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly9.WildFly9Server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -256,9 +255,9 @@ public class WildFly9ToWildFly10FullStandaloneConfigFileMigration extends WildFl
     }
 
     @Override
-    protected void run(ServerPath<WildFly9Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationContext context) throws IOException {
-        new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).run(sourceConfig, standaloneServer, context);
-        new WildFly10StandaloneConfigFileSecurityRealmsMigration().run(sourceConfig, standaloneServer, context);
-        new WildFly10StandaloneConfigFileDeploymentsMigration().run(sourceConfig, standaloneServer, context);
+    protected void run(ServerPath<WildFly9Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationTaskContext context) {
+        context.execute(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getServerMigrationTask(sourceConfig, standaloneServer));
+        context.execute(new WildFly10StandaloneConfigFileSecurityRealmsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+        context.execute(new WildFly10StandaloneConfigFileDeploymentsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
     }
 }

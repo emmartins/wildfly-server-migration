@@ -15,19 +15,18 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.wfly9.WildFly9Server;
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFly10ServerMigrationTask;
 import org.jboss.migration.wfly10.full.WildFly10FullServerMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
-
-import java.io.IOException;
+import org.jboss.migration.wfly9.WildFly9Server;
 
 /**
  * Server migration, from WildFly 9 to WildFly 10.
  * @author emmartins
  */
-public class WildFly9ToWildFly10FullServerMigration implements WildFly10FullServerMigration<WildFly9Server> {
+public class  WildFly9ToWildFly10FullServerMigration implements WildFly10FullServerMigration<WildFly9Server> {
 
     private final WildFly9ToWildFly10FullStandaloneMigration standaloneMigration;
 
@@ -36,10 +35,8 @@ public class WildFly9ToWildFly10FullServerMigration implements WildFly10FullServ
     }
 
     @Override
-    public void run(WildFly9Server source, WildFly10Server target, ServerMigrationContext context) throws IOException {
-        context.getConsoleWrapper().printf("Server migration starting...%n");
-        standaloneMigration.run(source, target, context);
-        context.getConsoleWrapper().printf("Server migration done.%n");
+    public ServerMigrationTask getServerMigrationTask(WildFly9Server source, WildFly10Server target) {
+        return new WildFly10ServerMigrationTask(source, target, standaloneMigration);
     }
 
     @Override

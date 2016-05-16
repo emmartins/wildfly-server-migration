@@ -17,12 +17,15 @@ package org.jboss.migration.wfly10.standalone.config;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmation;
 import org.jboss.migration.wfly10.WildFly10Server;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
@@ -33,89 +36,96 @@ import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
  */
 public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
 
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Config Files").build();
+
     private final WildFly10StandaloneConfigFileMigration configFileMigration;
 
     public WildFly10StandaloneConfigFilesMigration(WildFly10StandaloneConfigFileMigration configFileMigration) {
         this.configFileMigration = configFileMigration;
     }
 
-    public void run(final Collection<ServerPath<S>> sourceConfigs, final WildFly10Server target, final ServerMigrationContext context) throws IOException {
+    public ServerMigrationTask getServerMigrationTask(final Collection<ServerPath<S>> sourceConfigs, final WildFly10Server target) {
+        return new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return getServerMigrationTaskId();
+            }
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                WildFly10StandaloneConfigFilesMigration.this.run(sourceConfigs, target, context);
+                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+            }
+        };
+    }
+
+    /**
+     *
+     * @return
+     */
+    protected ServerMigrationTaskId getServerMigrationTaskId() {
+        return SERVER_MIGRATION_TASK_ID;
+    }
+
+    protected void run(final Collection<ServerPath<S>> sourceConfigs, final WildFly10Server target, final ServerMigrationTaskContext taskContext) throws Exception {
         ROOT_LOGGER.infof("Scanning for standalone server configurations...");
         for (ServerPath standaloneConfig : sourceConfigs) {
             ROOT_LOGGER.infof("%s", standaloneConfig);
         }
-        context.getConsoleWrapper().printf("%n");
-
-        if (context.isInteractive()) {
+        final ServerMigrationContext serverMigrationContext = taskContext.getServerMigrationContext();
+        final ConsoleWrapper consoleWrapper = serverMigrationContext.getConsoleWrapper();
+        consoleWrapper.printf("%n");
+        if (serverMigrationContext.isInteractive()) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
-                public void onNo() {
-                    try {
-                        confirmAllStandaloneConfigs(sourceConfigs, target, context);
-                    } catch (IOException e) {
-                        throw new ServerMigrationFailedException(e);
-                    }
+                public void onNo() throws Exception {
+                    confirmAllStandaloneConfigs(sourceConfigs, target, taskContext);
                 }
                 @Override
-                public void onYes() {
-                    try {
-                        migrateAllStandaloneConfigs(sourceConfigs, target, context);
-                    } catch (IOException e) {
-                        throw new ServerMigrationFailedException(e);
-                    }
+                public void onYes() throws Exception {
+                    migrateAllStandaloneConfigs(sourceConfigs, target, taskContext);
                 }
                 @Override
-                public void onError() {
+                public void onError() throws Exception {
                     // repeat
-                    try {
-                        run(sourceConfigs, target, context);
-                    } catch (IOException e) {
-                        throw new ServerMigrationFailedException(e);
-                    }
+                    run(sourceConfigs, target, taskContext);
+
                 }
             };
-            new UserConfirmation(context.getConsoleWrapper(), "Migrate all configurations?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+            new UserConfirmation(consoleWrapper, "Migrate all configurations?", ROOT_LOGGER.yesNo(), resultHandler).execute();
         } else {
-            migrateAllStandaloneConfigs(sourceConfigs, target, context);
+            migrateAllStandaloneConfigs(sourceConfigs, target, taskContext);
         }
     }
 
-    protected void migrateAllStandaloneConfigs(Collection<ServerPath<S>> standaloneConfigs, WildFly10Server target, ServerMigrationContext context) throws IOException {
+    protected void migrateAllStandaloneConfigs(Collection<ServerPath<S>> standaloneConfigs, WildFly10Server target, final ServerMigrationTaskContext taskContext) throws Exception {
         for (ServerPath<S> sourceStandaloneConfig : standaloneConfigs) {
-            configFileMigration.run(sourceStandaloneConfig, target, context);
+            taskContext.execute(configFileMigration.getServerMigrationTask(sourceStandaloneConfig, target));
         }
     }
 
-    protected void confirmAllStandaloneConfigs(Collection<ServerPath<S>> standaloneConfigs, WildFly10Server target, ServerMigrationContext context) throws IOException {
+    protected void confirmAllStandaloneConfigs(Collection<ServerPath<S>> standaloneConfigs, WildFly10Server target, final ServerMigrationTaskContext taskContext) throws Exception {
         for (ServerPath<S> sourceStandaloneConfig : standaloneConfigs) {
-            confirmStandaloneConfig(sourceStandaloneConfig, target, context);
+            confirmStandaloneConfig(sourceStandaloneConfig, target, taskContext);
         }
     }
 
-    protected void confirmStandaloneConfig(final ServerPath<S> source, final WildFly10Server target, final ServerMigrationContext context) throws IOException {
+    protected void confirmStandaloneConfig(final ServerPath<S> source, final WildFly10Server target, final ServerMigrationTaskContext taskContext) throws Exception {
         final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
             @Override
-            public void onNo() {
+            public void onNo() throws Exception {
             }
             @Override
-            public void onYes() {
-                try {
-                    configFileMigration.run(source, target, context);
-                } catch (IOException e) {
-                    throw new ServerMigrationFailedException(e);
-                }
+            public void onYes() throws Exception {
+                taskContext.execute(configFileMigration.getServerMigrationTask(source, target));
             }
             @Override
-            public void onError() {
+            public void onError() throws Exception {
                 // repeat
-                try {
-                    confirmStandaloneConfig(source, target, context);
-                } catch (IOException e) {
-                    throw new ServerMigrationFailedException(e);
-                }
+                confirmStandaloneConfig(source, target, taskContext);
             }
         };
-        context.getConsoleWrapper().printf("%n");
-        new UserConfirmation(context.getConsoleWrapper(), "Migrate configuration "+source.getPath()+" ?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+        final ConsoleWrapper consoleWrapper = taskContext.getServerMigrationContext().getConsoleWrapper();
+        consoleWrapper.printf("%n");
+        new UserConfirmation(consoleWrapper, "Migrate configuration "+source.getPath()+" ?", ROOT_LOGGER.yesNo(), resultHandler).execute();
     }
 }

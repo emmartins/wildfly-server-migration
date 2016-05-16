@@ -17,13 +17,15 @@ package org.jboss.migration.wfly10.subsystem.ejb3;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
-
-import java.io.IOException;
+import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTaskFactory;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -33,9 +35,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * A task which defines EJB3 subsystem's 'passivation-disabled-cache-ref' attribute .
  * @author emmartins
  */
-public class DefinePassivationDisabledCacheRef implements WildFly10SubsystemMigrationTask {
+public class DefinePassivationDisabledCacheRef implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final DefinePassivationDisabledCacheRef INSTANCE = new DefinePassivationDisabledCacheRef();
+
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Configure default-sfsb-passivation-disabled-cache").build();
 
     private DefinePassivationDisabledCacheRef() {
     }
@@ -44,16 +48,26 @@ public class DefinePassivationDisabledCacheRef implements WildFly10SubsystemMigr
     private static final String DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME = "default-sfsb-passivation-disabled-cache";
 
     @Override
-    public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (config == null || !config.hasDefined(DEFAULT_SFSB_CACHE_ATTR_NAME) || config.hasDefined(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME)) {
-            return;
-        }
-        // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=defaultSFSBCache)
-        final String defaultSFSBCache = config.get(DEFAULT_SFSB_CACHE_ATTR_NAME).asString();
-        final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
-        op.get(NAME).set(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME);
-        op.get(VALUE).set(defaultSFSBCache);
-        server.executeManagementOperation(op);
-        ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+            @Override
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+                if (config == null || !config.hasDefined(DEFAULT_SFSB_CACHE_ATTR_NAME) || config.hasDefined(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME)) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=defaultSFSBCache)
+                final String defaultSFSBCache = config.get(DEFAULT_SFSB_CACHE_ATTR_NAME).asString();
+                final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
+                op.get(NAME).set(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME);
+                op.get(VALUE).set(defaultSFSBCache);
+                server.executeManagementOperation(op);
+                ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
+                return ServerMigrationTaskResult.SUCCESS;
+            }
+        };
     }
 }

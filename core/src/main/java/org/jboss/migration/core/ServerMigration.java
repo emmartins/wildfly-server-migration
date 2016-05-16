@@ -18,9 +18,7 @@ package org.jboss.migration.core;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.JavaConsole;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
-import org.jboss.migration.core.util.MigrationFiles;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -99,9 +97,9 @@ public class ServerMigration {
      * Executes the configured server migration, i.e. retrieves the source and target {@link Server}s, from base dirs, creates the migration context, and then delegates the migration to the target {@link Server}.
      * @throws IllegalArgumentException if a server was not retrieved from configured base dir.
      * @throws IllegalStateException if the source and/or target base dir is not configured
-     * @throws IOException if the execution fails
+     * @throws ServerMigrationFailedException if the execution fails
      */
-    public void run() throws IllegalArgumentException, IllegalStateException, IOException {
+    public void run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailedException {
         if (from == null) {
             throw ServerMigrationLogger.ROOT_LOGGER.serverBaseDirNotSet(SOURCE);
         }
@@ -126,7 +124,12 @@ public class ServerMigration {
         console.printf("----------------------------------------------------------%n");
         console.printf("%n");
 
-        targetServer.migrate(sourceServer, new ServerMigrationContextImpl(console, interactive, userEnvironment != null ? userEnvironment : new Properties()));
+        final ServerMigrationTask serverMigrationTask = targetServer.getServerMigrationTask(sourceServer);
+        final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, userEnvironment != null ? userEnvironment : new Properties());
+        final ServerMigrationTaskExecution serverMigrationTaskExecution = new ServerMigrationTaskExecution(serverMigrationTask, serverMigrationContext);
+        final long startTime = System.currentTimeMillis();
+        serverMigrationTaskExecution.run();
+        final MigrationReport migrationReport = new MigrationReport(sourceServer, targetServer, startTime, serverMigrationTaskExecution);
     }
 
     /**
@@ -149,38 +152,4 @@ public class ServerMigration {
         return server;
     }
 
-    private static class ServerMigrationContextImpl implements ServerMigrationContext {
-
-        private final ConsoleWrapper consoleWrapper;
-        private final boolean interactive;
-        private final MigrationFiles migrationFiles;
-        private final Properties userEnvironment;
-
-        private ServerMigrationContextImpl(ConsoleWrapper consoleWrapper, boolean interactive, Properties userEnvironment) {
-            this.consoleWrapper = consoleWrapper;
-            this.interactive = interactive;
-            this.userEnvironment = userEnvironment;
-            this.migrationFiles = new MigrationFiles();
-        }
-
-        @Override
-        public ConsoleWrapper getConsoleWrapper() {
-            return consoleWrapper;
-        }
-
-        @Override
-        public MigrationFiles getMigrationFiles() {
-            return migrationFiles;
-        }
-
-        @Override
-        public boolean isInteractive() {
-            return interactive;
-        }
-
-        @Override
-        public Properties getUserEnvironment() {
-            return userEnvironment;
-        }
-    }
 }

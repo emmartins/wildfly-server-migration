@@ -17,11 +17,12 @@ package org.jboss.migration.wfly10.subsystem;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
-
-import java.io.IOException;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -31,20 +32,34 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * A task which creates a subsystem if its missing from the server's config.
  * @author emmartins
  */
-public class AddSubsystemWithoutConfig implements WildFly10SubsystemMigrationTask {
+public class AddSubsystemWithoutConfig implements WildFly10SubsystemMigrationTaskFactory {
+
     public static final AddSubsystemWithoutConfig INSTANCE = new AddSubsystemWithoutConfig();
+
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Subsystem").build();
 
     private AddSubsystemWithoutConfig() {
     }
 
     @Override
-    public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (config != null) {
-            return;
-        }
-        ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", subsystem.getName());
-        final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
-        server.executeManagementOperation(op);
-        ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", subsystem.getName());
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+
+            @Override
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+                if (config != null) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", subsystem.getName());
+                final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
+                server.executeManagementOperation(op);
+                ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", subsystem.getName());
+                return ServerMigrationTaskResult.SUCCESS;
+            }
+        };
     }
 }

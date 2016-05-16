@@ -19,11 +19,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
-
-import java.io.IOException;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -35,36 +36,49 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration {
 
-    public void run(WildFly10StandaloneServer target, ServerMigrationContext context) throws IOException {
-        context.getConsoleWrapper().printf("%n%n");
-        ServerMigrationLogger.ROOT_LOGGER.infof("Migrating socket bindings...");
-        final boolean targetStarted = target.isStarted();
-        if (!targetStarted) {
-            target.start();
-        }
-        try {
-            final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_RESOURCES_OPERATION, pathAddress(pathElement(SOCKET_BINDING_GROUP, "standard-sockets")));
-            op.get(CHILD_TYPE).set(SOCKET_BINDING);
-            op.get(RECURSIVE).set(true);
-            final ModelNode opResult = target.executeManagementOperation(op);
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Get socket bindings Op result %s", opResult.toString());
-            for (ModelNode resultItem : opResult.get(RESULT).asList()) {
-                final Property socketBinding = resultItem.asProperty();
-                if (socketBinding.getName().equals("management-https")) {
-                    // http interface found, turn on http upgrade
-                    final PathAddress pathAddress = pathAddress(pathElement(SOCKET_BINDING_GROUP, "standard-sockets"), pathElement(SOCKET_BINDING, "management-https"));
-                    final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                    writeAttrOp.get(NAME).set("port");
-                    writeAttrOp.get(VALUE).set("${jboss.management.https.port:9993}");
-                    target.executeManagementOperation(writeAttrOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Socket binding 'management-https' default port set to 9993.");
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Socket Bindings").build();
+
+    public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer target) {
+        return new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                ServerMigrationLogger.ROOT_LOGGER.infof("Migrating socket bindings...");
+                final boolean targetStarted = target.isStarted();
+                if (!targetStarted) {
+                    target.start();
                 }
+                try {
+                    final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_RESOURCES_OPERATION, pathAddress(pathElement(SOCKET_BINDING_GROUP, "standard-sockets")));
+                    op.get(CHILD_TYPE).set(SOCKET_BINDING);
+                    op.get(RECURSIVE).set(true);
+                    final ModelNode opResult = target.executeManagementOperation(op);
+                    ServerMigrationLogger.ROOT_LOGGER.debugf("Get socket bindings Op result %s", opResult.toString());
+                    for (ModelNode resultItem : opResult.get(RESULT).asList()) {
+                        final Property socketBinding = resultItem.asProperty();
+                        if (socketBinding.getName().equals("management-https")) {
+                            // http interface found, turn on http upgrade
+                            final PathAddress pathAddress = pathAddress(pathElement(SOCKET_BINDING_GROUP, "standard-sockets"), pathElement(SOCKET_BINDING, "management-https"));
+                            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                            writeAttrOp.get(NAME).set("port");
+                            writeAttrOp.get(VALUE).set("${jboss.management.https.port:9993}");
+                            target.executeManagementOperation(writeAttrOp);
+                            ServerMigrationLogger.ROOT_LOGGER.infof("Socket binding 'management-https' default port set to 9993.");
+                        }
+                    }
+                } finally {
+                    if (!targetStarted) {
+                        target.stop();
+                    }
+                    ServerMigrationLogger.ROOT_LOGGER.info("Socket bindings migration done.");
+                }
+                return ServerMigrationTaskResult.SUCCESS;
             }
-        } finally {
-            if (!targetStarted) {
-                target.stop();
-            }
-            ServerMigrationLogger.ROOT_LOGGER.info("Socket bindings migration done.");
-        }
+        };
     }
 }

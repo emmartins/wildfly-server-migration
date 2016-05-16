@@ -53,6 +53,6 @@ public class EAP6ServerProvider extends AbstractServerProvider {
 
     @Override
     public String getName() {
-        return "EAP 6.x";
+        return "JBoss EAP 6";
     }
 }

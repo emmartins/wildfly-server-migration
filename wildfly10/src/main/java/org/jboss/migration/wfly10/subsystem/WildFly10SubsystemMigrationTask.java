@@ -16,24 +16,31 @@
 package org.jboss.migration.wfly10.subsystem;
 
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
-import java.io.IOException;
-
 /**
- * A task which is part of a subsystem's migration logic.
+ * Abstract implementation for a subsystem config migration task.
  * @author emmartins
  */
-public interface WildFly10SubsystemMigrationTask {
+public abstract class WildFly10SubsystemMigrationTask implements ServerMigrationTask {
 
-    /**
-     * Executes the task.
-     * @param config the subsystem configuration
-     * @param subsystem the subsystem
-     * @param server the target server
-     * @param context the migration context
-     * @throws IOException
-     */
-    void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException;
+    private final ModelNode config;
+    private final WildFly10Subsystem subsystem;
+    private final WildFly10StandaloneServer server;
+
+    protected WildFly10SubsystemMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+        this.config = config;
+        this.subsystem = subsystem;
+        this.server = server;
+    }
+
+    @Override
+    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+        return run(config, subsystem, server, context);
+    }
+
+    protected abstract ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception;
 }

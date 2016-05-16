@@ -55,7 +55,7 @@ public class UserConfirmation {
         this(theConsole, new String[] { message }, prompt, resultHandler);
     }
 
-    public void execute() {
+    public void execute() throws Exception {
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);
@@ -110,8 +110,8 @@ public class UserConfirmation {
     }
 
     public interface ResultHandler {
-        void onNo();
-        void onYes();
-        void onError();
+        void onNo() throws Exception;
+        void onYes() throws Exception;
+        void onError() throws Exception;
     }
 }

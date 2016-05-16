@@ -15,7 +15,6 @@
  */
 package org.jboss.migration.core;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -37,11 +36,10 @@ public interface Server {
     ProductInfo getProductInfo();
 
     /**
-     * Migrates the specified source server.
+     * Retrieves the task to migrate from the specified source server.
      * @param source the server to migrate from
-     * @param context the migration context
-     * @throws IllegalArgumentException if migration from the source server is not supported
-     * @throws IOException if the migration is supported but fails to complete
+     * @return the task to migrate from the specified source server
+     * @throws IllegalArgumentException if the server is not able to migrate from the specified source
      */
-    void migrate(Server source, ServerMigrationContext context) throws IllegalArgumentException, IOException;
+    ServerMigrationTask getServerMigrationTask(Server source) throws IllegalArgumentException;
 }

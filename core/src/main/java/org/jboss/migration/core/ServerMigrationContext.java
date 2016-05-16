@@ -16,7 +16,6 @@
 package org.jboss.migration.core;
 
 import org.jboss.migration.core.console.ConsoleWrapper;
-import org.jboss.migration.core.util.MigrationFiles;
 
 import java.util.Properties;
 
@@ -24,27 +23,49 @@ import java.util.Properties;
  * The server migration execution's context.
  * @author emmartins
  */
-public interface ServerMigrationContext {
+public class ServerMigrationContext {
+
+    private final ConsoleWrapper consoleWrapper;
+    private final boolean interactive;
+    private final MigrationFiles migrationFiles;
+    private final Properties userEnvironment;
+
+    ServerMigrationContext(ConsoleWrapper consoleWrapper, boolean interactive, Properties userEnvironment) {
+        this.consoleWrapper = consoleWrapper;
+        this.interactive = interactive;
+        this.userEnvironment = userEnvironment;
+        this.migrationFiles = new MigrationFiles();
+    }
+
     /**
      * Retrieves the migration's console.
      * @return the migration's console
      */
-    ConsoleWrapper getConsoleWrapper();
+    public ConsoleWrapper getConsoleWrapper() {
+        return consoleWrapper;
+    }
+
     /**
      * Retreives the migration files
      * @return the migration files
      */
-    MigrationFiles getMigrationFiles();
+    public MigrationFiles getMigrationFiles() {
+        return migrationFiles;
+    }
 
     /**
      * Indicates if the migration is interactive.
      * @return true if the migration is interactive, false otherwise
      */
-    boolean isInteractive();
+    public boolean isInteractive() {
+        return interactive;
+    }
 
     /**
      * Retrieves the user's environment, used to customize the migration process.
      * @return the user's environment
      */
-    Properties getUserEnvironment();
+    public Properties getUserEnvironment() {
+        return userEnvironment;
+    }
 }

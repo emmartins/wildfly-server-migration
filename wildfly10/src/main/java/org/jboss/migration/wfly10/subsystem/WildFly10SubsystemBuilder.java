@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class WildFly10SubsystemBuilder {
 
-    private final List<WildFly10SubsystemMigrationTask> tasks = new ArrayList<>();
+    private final List<WildFly10SubsystemMigrationTaskFactory> tasks = new ArrayList<>();
     private WildFly10Extension extension;
     private String name;
 
@@ -53,7 +53,7 @@ public class WildFly10SubsystemBuilder {
      * @param configMigrationTask
      * @return
      */
-    public WildFly10SubsystemBuilder addTask(WildFly10SubsystemMigrationTask configMigrationTask) {
+    public WildFly10SubsystemBuilder addTask(WildFly10SubsystemMigrationTaskFactory configMigrationTask) {
         tasks.add(configMigrationTask);
         return this;
     }

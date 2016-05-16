@@ -15,18 +15,21 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServerMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
 import org.jboss.migration.wfly9.WildFly9Server;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Migration of a standalone server, from WildFly 9 to WildFly 10.
  * @author emmartins
  */
-public class WildFly9ToWildFly10FullStandaloneMigration {
+public class WildFly9ToWildFly10FullStandaloneMigration extends WildFly10StandaloneServerMigration<WildFly9Server> {
 
     private final WildFly10StandaloneConfigFilesMigration<WildFly9Server> configFilesMigration;
 
@@ -34,7 +37,10 @@ public class WildFly9ToWildFly10FullStandaloneMigration {
         this.configFilesMigration = configFilesMigration;
     }
 
-    public void run(WildFly9Server source, WildFly10Server target, ServerMigrationContext context) throws IOException {
-        configFilesMigration.run(source.getStandaloneConfigs(), target, context);
+    @Override
+    protected List<ServerMigrationTask> getSubtasks(WildFly9Server source, WildFly10Server target, ServerMigrationTaskContext context) {
+        List<ServerMigrationTask> subtasks = new ArrayList<>();
+        subtasks.add(configFilesMigration.getServerMigrationTask(source.getStandaloneConfigs(), target));
+        return subtasks;
     }
 }

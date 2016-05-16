@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.eap6.to.eap7;
 
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
@@ -48,7 +48,6 @@ import org.jboss.migration.wfly10.subsystem.undertow.AddBufferCache;
 import org.jboss.migration.wfly10.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.subsystem.undertow.MigrateHttpListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -292,11 +291,11 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
     }
 
     @Override
-    protected void run(ServerPath<EAP6Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationContext context) throws IOException {
-        new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).run(sourceConfig, standaloneServer, context);
-        new WildFly10StandaloneConfigFileSecurityRealmsMigration().run(sourceConfig, standaloneServer, context);
-        new EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration().run(standaloneServer, context);
-        new EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration().run(standaloneServer, context);
-        new WildFly10StandaloneConfigFileDeploymentsMigration().run(sourceConfig, standaloneServer, context);
+    protected void run(ServerPath<EAP6Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationTaskContext context) {
+        context.execute(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getServerMigrationTask(sourceConfig, standaloneServer));
+        context.execute(new WildFly10StandaloneConfigFileSecurityRealmsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+        context.execute(new EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration().getServerMigrationTask(standaloneServer));
+        context.execute(new EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration().getServerMigrationTask(standaloneServer));
+        context.execute(new WildFly10StandaloneConfigFileDeploymentsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
     }
 }

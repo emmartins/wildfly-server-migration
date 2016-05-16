@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly10.subsystem;
 
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import java.io.IOException;
@@ -47,9 +47,9 @@ public class WildFly10Extension {
         return Collections.unmodifiableList(subsystems);
     }
 
-    public void migrate(WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
+    public void migrate(WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws IOException {
         for (WildFly10Subsystem subsystem : subsystems) {
-            subsystem.migrate(server, context);
+            context.execute(subsystem.getServerMigrationTask(server));
         }
     }
 

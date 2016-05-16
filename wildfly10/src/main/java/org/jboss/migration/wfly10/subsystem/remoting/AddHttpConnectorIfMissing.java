@@ -19,13 +19,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
-
-import java.io.IOException;
+import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTaskFactory;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -36,9 +38,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * A task which adds the default http connector, if missing from the remote subsystem config.
  * @author emmartins
  */
-public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTask {
+public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final AddHttpConnectorIfMissing INSTANCE = new AddHttpConnectorIfMissing();
+
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Remoting's Http Connector").build();
 
     private AddHttpConnectorIfMissing() {
     }
@@ -51,19 +55,31 @@ public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTas
     private static final String SECURITY_REALM_ATTR_VALUE = "ApplicationRealm";
 
     @Override
-    public void execute(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationContext context) throws IOException {
-        if (config == null) {
-            return;
-        }
-        final PathElement subsystemPathElement = pathElement(SUBSYSTEM, subsystem.getName());
-        // if not defined add http connector
-        if (!config.hasDefined(HTTP_CONNECTOR, HTTP_CONNECTOR_NAME)) {
-            final PathAddress httpRemotingConnectorPathAddress = pathAddress(subsystemPathElement, PathElement.pathElement(HTTP_CONNECTOR, HTTP_CONNECTOR_NAME));
-            final ModelNode httpRemotingConnectorAddOp = Util.createEmptyOperation(ADD, httpRemotingConnectorPathAddress);
-            httpRemotingConnectorAddOp.get(CONNECTOR_REF_ATTR_NAME).set(CONNECTOR_REF_ATTR_VALUE);
-            httpRemotingConnectorAddOp.get(SECURITY_REALM_ATTR_NAME).set(SECURITY_REALM_ATTR_VALUE);
-            server.executeManagementOperation(httpRemotingConnectorAddOp);
-            ServerMigrationLogger.ROOT_LOGGER.infof("Http connector %s added to Remoting subsystem configuration.", HTTP_CONNECTOR_NAME);
-        }
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return SERVER_MIGRATION_TASK_ID;
+            }
+            @Override
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+                if (config == null) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                final PathElement subsystemPathElement = pathElement(SUBSYSTEM, subsystem.getName());
+                // if not defined add http connector
+                if (!config.hasDefined(HTTP_CONNECTOR, HTTP_CONNECTOR_NAME)) {
+                    final PathAddress httpRemotingConnectorPathAddress = pathAddress(subsystemPathElement, PathElement.pathElement(HTTP_CONNECTOR, HTTP_CONNECTOR_NAME));
+                    final ModelNode httpRemotingConnectorAddOp = Util.createEmptyOperation(ADD, httpRemotingConnectorPathAddress);
+                    httpRemotingConnectorAddOp.get(CONNECTOR_REF_ATTR_NAME).set(CONNECTOR_REF_ATTR_VALUE);
+                    httpRemotingConnectorAddOp.get(SECURITY_REALM_ATTR_NAME).set(SECURITY_REALM_ATTR_VALUE);
+                    server.executeManagementOperation(httpRemotingConnectorAddOp);
+                    ServerMigrationLogger.ROOT_LOGGER.infof("Http connector %s added to Remoting subsystem configuration.", HTTP_CONNECTOR_NAME);
+                    return ServerMigrationTaskResult.SUCCESS;
+                } else {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+            }
+        };
     }
 }
