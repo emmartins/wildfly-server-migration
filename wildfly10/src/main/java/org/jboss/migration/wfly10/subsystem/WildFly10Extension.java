@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.wfly10.subsystem;
 
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -49,7 +50,10 @@ public class WildFly10Extension {
 
     public void migrate(WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws IOException {
         for (WildFly10Subsystem subsystem : subsystems) {
-            context.execute(subsystem.getServerMigrationTask(server));
+            ServerMigrationTask subsystemTask = subsystem.getServerMigrationTask(server);
+            if (subsystemTask != null) {
+                context.execute(subsystemTask);
+            }
         }
     }
 

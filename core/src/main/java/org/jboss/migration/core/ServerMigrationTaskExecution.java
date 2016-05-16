@@ -83,6 +83,14 @@ public class ServerMigrationTaskExecution {
     }
 
     /**
+     * Retrieves the task execution start time in milliseconds.
+     * @return
+     */
+    public long getStartTime() {
+        return startTime;
+    }
+
+    /**
      * Retrieves the absolute task id
      * @return a list with all the task ids
      */
@@ -141,7 +149,7 @@ public class ServerMigrationTaskExecution {
 
     synchronized void run() throws IllegalStateException, ServerMigrationFailedException {
         if (this.result != null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Task "+absoluteServerMigrationTaskId+" already run");
         }
         startTime = System.currentTimeMillis();
         logger.debugf("Task %s execution starting...", absoluteServerMigrationTaskId);
@@ -150,9 +158,10 @@ public class ServerMigrationTaskExecution {
         } catch (ServerMigrationFailedException e) {
             result = ServerMigrationTaskResult.fail(e);
             throw e;
-        } catch (Throwable e) {
+        } catch (Throwable t) {
+            final ServerMigrationFailedException e = new ServerMigrationFailedException(t);
             result = ServerMigrationTaskResult.fail(e);
-            throw new ServerMigrationFailedException(e);
+            throw e;
         } finally {
             logger.debugf("Task %s execution completed with result status... %s", absoluteServerMigrationTaskId, result);
         }

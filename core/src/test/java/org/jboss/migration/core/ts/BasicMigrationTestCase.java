@@ -16,9 +16,8 @@
 package org.jboss.migration.core.ts;
 
 import org.jboss.migration.core.ServerMigration;
+import org.jboss.migration.core.ServerMigrationFailedException;
 import org.junit.Test;
-
-import java.io.IOException;
 
 /**
  * @author emmartins
@@ -26,15 +25,15 @@ import java.io.IOException;
 public class BasicMigrationTestCase {
 
     @Test
-    public void testSupportedMigration() throws IOException {
+    public void testSupportedMigration() {
         new ServerMigration().from(TestSourceServerProvider.SERVER.getBaseDir()).to(TestTargetServerProvider.SERVER.getBaseDir()).run();
     }
 
     @Test
-    public void testUnsupportedMigration() throws IOException {
+    public void testUnsupportedMigration() {
         try {
             new ServerMigration().to(TestSourceServerProvider.SERVER.getBaseDir()).from(TestTargetServerProvider.SERVER.getBaseDir()).run();
-        } catch (IllegalArgumentException e) {
+        } catch (ServerMigrationFailedException e) {
             // expected
         }
     }

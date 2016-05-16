@@ -42,7 +42,7 @@ public class ServerMigrationTaskResult {
      * @param failReason the fail reason
      * @return a fail result with the specified reason, and no attributes
      */
-    public static ServerMigrationTaskResult fail(Throwable failReason) {
+    public static ServerMigrationTaskResult fail(ServerMigrationFailedException failReason) {
         return new ServerMigrationTaskResult(Status.FAIL, failReason, null);
     }
 
@@ -52,10 +52,10 @@ public class ServerMigrationTaskResult {
     public enum Status { FAIL, SUCCESS, SKIPPED};
 
     private final Status status;
-    private final Throwable failReason;
+    private final ServerMigrationFailedException failReason;
     private final Map<String, String> attributes;
 
-    private ServerMigrationTaskResult(final Status status, Throwable failReason, Map<String, String> attributes) {
+    private ServerMigrationTaskResult(final Status status, ServerMigrationFailedException failReason, Map<String, String> attributes) {
         this.status = status;
         if (status == null) {
             throw new IllegalArgumentException("null status");
@@ -84,7 +84,7 @@ public class ServerMigrationTaskResult {
      * Retrieves the fail reason.
      * @return the fail reason
      */
-    public Throwable getFailReason() {
+    public ServerMigrationFailedException getFailReason() {
         return failReason;
     }
 
@@ -98,7 +98,7 @@ public class ServerMigrationTaskResult {
      */
     public static class Builder {
         private Status status;
-        private Throwable failReason;
+        private ServerMigrationFailedException failReason;
         private Map<String, String> attributes;
 
         /**
@@ -125,7 +125,7 @@ public class ServerMigrationTaskResult {
          * Sets the status as fail, with the specified reason.
          * @return the builder
          */
-        public Builder fail(Throwable failReason) {
+        public Builder fail(ServerMigrationFailedException failReason) {
             status = Status.FAIL;
             this.failReason = failReason;
             return this;

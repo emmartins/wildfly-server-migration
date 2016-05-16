@@ -18,7 +18,8 @@ package org.jboss.migration.wfly10;
 import org.jboss.migration.core.AbstractServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 
 import java.nio.file.Path;
 
@@ -32,10 +33,10 @@ public abstract class WildFly10Server extends AbstractServer {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(Server source) throws IllegalArgumentException {
+    public ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException {
         final WildFly10ServerMigration migration = getMigration(source);
         if (migration != null) {
-            return migration.getServerMigrationTask(source, this);
+            return migration.run(source, this, context);
         } else {
             throw new IllegalArgumentException("Source server migration to WildFly 10 not supported: "+source.getProductInfo());
         }

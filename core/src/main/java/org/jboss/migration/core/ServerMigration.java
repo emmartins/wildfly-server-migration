@@ -124,12 +124,34 @@ public class ServerMigration {
         console.printf("----------------------------------------------------------%n");
         console.printf("%n");
 
-        final ServerMigrationTask serverMigrationTask = targetServer.getServerMigrationTask(sourceServer);
         final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, userEnvironment != null ? userEnvironment : new Properties());
+        final ServerMigrationTaskId serverMigrationTaskId = new ServerMigrationTaskId.Builder()
+                .setName("server-migration")
+                .addAttribute("source", sourceServer.getProductInfo().getName()+" "+sourceServer.getProductInfo().getVersion())
+                .addAttribute("target", targetServer.getProductInfo().getName()+" "+targetServer.getProductInfo().getVersion())
+                .build();
+        final ServerMigrationTask serverMigrationTask = new ServerMigrationTask() {
+            @Override
+            public ServerMigrationTaskId getId() {
+                return serverMigrationTaskId;
+            }
+
+            @Override
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                context.getServerMigrationContext().getConsoleWrapper().printf("Server migration starting...%n");
+                final ServerMigrationTaskResult result = targetServer.migrate(sourceServer, context);
+                context.getServerMigrationContext().getConsoleWrapper().printf("%nServer migration done.%n%n");
+                return result;
+            }
+        };
         final ServerMigrationTaskExecution serverMigrationTaskExecution = new ServerMigrationTaskExecution(serverMigrationTask, serverMigrationContext);
-        final long startTime = System.currentTimeMillis();
-        serverMigrationTaskExecution.run();
-        final MigrationReport migrationReport = new MigrationReport(sourceServer, targetServer, startTime, serverMigrationTaskExecution);
+        try {
+            serverMigrationTaskExecution.run();
+        } finally {
+            final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution);
+            final String summaryReport = new SummaryReportWriter().toString(migrationData);
+            ServerMigrationLogger.ROOT_LOGGER.infof(summaryReport);
+        }
     }
 
     /**

@@ -71,6 +71,9 @@ public class WildFly10Subsystem {
     }
 
     public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer server) {
+        if (subsystemMigrationTasks == null || subsystemMigrationTasks.isEmpty()) {
+            return null;
+        }
         return new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskId getId() {
@@ -78,13 +81,11 @@ public class WildFly10Subsystem {
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                if (subsystemMigrationTasks != null && !subsystemMigrationTasks.isEmpty()) {
-                    final ModelNode subsystemConfig = server.getSubsystem(getName());
-                    for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
-                        context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, server));
-                    }
+                final ModelNode subsystemConfig = server.getSubsystem(getName());
+                for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
+                    context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, server));
                 }
-                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+                return ServerMigrationTaskResult.SUCCESS;
             }
         };
     }

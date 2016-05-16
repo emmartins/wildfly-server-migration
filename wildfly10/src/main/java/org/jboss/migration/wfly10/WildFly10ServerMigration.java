@@ -16,7 +16,8 @@
 package org.jboss.migration.wfly10;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 
 /**
  * @author emmartins
@@ -24,11 +25,13 @@ import org.jboss.migration.core.ServerMigrationTask;
 public interface WildFly10ServerMigration<S extends Server> {
 
     /**
-     * Retrieves the task to execute the server Migration
+     * Runs the server migration.
      * @param source
      * @param target
+     * @param context
+     * @return
      */
-    ServerMigrationTask getServerMigrationTask(S source, WildFly10Server target);
+    ServerMigrationTaskResult run(S source, WildFly10Server target, ServerMigrationTaskContext context);
 
     /**
      * Retrieves the type of the supported source server.
