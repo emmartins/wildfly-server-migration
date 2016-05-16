@@ -36,10 +36,12 @@ public interface Server {
     ProductInfo getProductInfo();
 
     /**
-     * Retrieves the task to migrate from the specified source server.
+     * Migrates from the specified source server.
      * @param source the server to migrate from
-     * @return the task to migrate from the specified source server
+     * @param context the server migration task context
+     * @return the server migration task result
      * @throws IllegalArgumentException if the server is not able to migrate from the specified source
      */
-    ServerMigrationTask getServerMigrationTask(Server source) throws IllegalArgumentException;
+    ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException;
+
 }

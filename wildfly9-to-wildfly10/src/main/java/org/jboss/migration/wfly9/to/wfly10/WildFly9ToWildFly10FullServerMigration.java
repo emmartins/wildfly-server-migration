@@ -15,9 +15,9 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.WildFly10Server;
-import org.jboss.migration.wfly10.WildFly10ServerMigrationTask;
 import org.jboss.migration.wfly10.full.WildFly10FullServerMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
 import org.jboss.migration.wfly9.WildFly9Server;
@@ -35,8 +35,9 @@ public class  WildFly9ToWildFly10FullServerMigration implements WildFly10FullSer
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(WildFly9Server source, WildFly10Server target) {
-        return new WildFly10ServerMigrationTask(source, target, standaloneMigration);
+    public ServerMigrationTaskResult run(final WildFly9Server source, final WildFly10Server target, ServerMigrationTaskContext context) {
+        context.execute(standaloneMigration.getServerMigrationTask(source, target));
+        return ServerMigrationTaskResult.SUCCESS;
     }
 
     @Override

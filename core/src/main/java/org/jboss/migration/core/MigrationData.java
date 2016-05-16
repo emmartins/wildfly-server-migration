@@ -16,21 +16,19 @@
 package org.jboss.migration.core;
 
 /**
- * The migration report.
+ * The data collected from the server migration.
  * @author emmartins
  */
-public class MigrationReport {
+public class MigrationData {
 
     private final Server source;
     private final Server target;
-    private final long startTime;
-    private final ServerMigrationTaskExecution taskExecution;
+    private final ServerMigrationTaskExecution rootTask;
 
-    MigrationReport(Server source, Server target, long startTime, ServerMigrationTaskExecution taskExecution) {
+    MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask) {
         this.source = source;
         this.target = target;
-        this.startTime = startTime;
-        this.taskExecution = taskExecution;
+        this.rootTask = rootTask;
     }
 
     /**
@@ -50,18 +48,10 @@ public class MigrationReport {
     }
 
     /**
-     * Retrieves the migration start time in milliseconds.
-     * @return the migration start time in milliseconds.
-     */
-    public long getStartTime() {
-        return startTime;
-    }
-
-    /**
      * Retrieves the root task execution.
      * @return the root task execution
      */
-    public ServerMigrationTaskExecution getTaskExecution() {
-        return taskExecution;
+    public ServerMigrationTaskExecution getRootTask() {
+        return rootTask;
     }
 }

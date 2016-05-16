@@ -43,7 +43,7 @@ public abstract class AbstractServer implements Server {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(Server source) throws IllegalArgumentException {
+    public ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException {
         throw ServerMigrationLogger.ROOT_LOGGER.doesNotSupportsMigration(productInfo.getName(), productInfo.getVersion(), source.getProductInfo().getName(), source.getProductInfo().getVersion());
     }
 }

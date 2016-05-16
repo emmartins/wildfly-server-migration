@@ -15,11 +15,11 @@
  */
 package org.jboss.migration.eap6.to.eap7;
 
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.eap.EAP7ServerMigration;
 import org.jboss.migration.wfly10.WildFly10Server;
-import org.jboss.migration.wfly10.WildFly10ServerMigrationTask;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFilesMigration;
 
 /**
@@ -35,8 +35,9 @@ public class EAP6ToEAP7ServerMigration implements EAP7ServerMigration<EAP6Server
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(final EAP6Server source, final WildFly10Server target) {
-        return new WildFly10ServerMigrationTask(source, target, standaloneMigration);
+    public ServerMigrationTaskResult run(final EAP6Server source, final WildFly10Server target, ServerMigrationTaskContext context) {
+        context.execute(standaloneMigration.getServerMigrationTask(source, target));
+        return ServerMigrationTaskResult.SUCCESS;
     }
 
     @Override

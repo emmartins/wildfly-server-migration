@@ -37,9 +37,8 @@ public abstract class WildFly10StandaloneServerMigration<S extends Server> {
      * @param source
      * @param target
      * @return
-     * @throws Exception
      */
-    public ServerMigrationTask getServerMigrationTask(final S source, final WildFly10Server target) throws Exception {
+    public ServerMigrationTask getServerMigrationTask(final S source, final WildFly10Server target) {
         return new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskId getId() {
