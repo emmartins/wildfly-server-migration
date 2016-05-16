@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -47,7 +46,7 @@ public class AddWebsockets implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final AddWebsockets INSTANCE = new AddWebsockets();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Websockets").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("add-undertow-websockets").build();
 
     private AddWebsockets() {
     }
@@ -68,7 +67,7 @@ public class AddWebsockets implements WildFly10SubsystemMigrationTaskFactory {
                     final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), PathElement.pathElement(SERVLET_CONTAINER, SERVLET_CONTAINER_NAME), PathElement.pathElement(SETTING, SETTING_NAME));
                     final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
                     server.executeManagementOperation(addOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Undertow's default Servlet Container configured to support Websockets.");
+                    context.getLogger().infof("Undertow's default Servlet Container configured to support Websockets.");
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {
                     return ServerMigrationTaskResult.SKIPPED;

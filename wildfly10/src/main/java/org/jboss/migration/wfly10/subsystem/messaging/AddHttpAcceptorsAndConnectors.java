@@ -22,7 +22,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -42,7 +41,7 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
 
     public static final AddHttpAcceptorsAndConnectors INSTANCE = new AddHttpAcceptorsAndConnectors();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add http-acceptor and http-connectors").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("add-messaging-http-acceptors-and-connectors").build();
 
     private AddHttpAcceptorsAndConnectors() {
     }
@@ -82,7 +81,7 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                     return ServerMigrationTaskResult.SKIPPED;
                 } else {
                     if (!undertowConfig.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME)) {
-                        ServerMigrationLogger.ROOT_LOGGER.debug("Skipping configuration of Messaging ActiveMQ http acceptors and connectors, Undertow's default HTTP listener not found.");
+                        context.getLogger().debug("Skipping configuration of Messaging ActiveMQ http acceptors and connectors, Undertow's default HTTP listener not found.");
                         return ServerMigrationTaskResult.SKIPPED;
                     }
                 }
@@ -96,7 +95,7 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                             addOp.get(HTTP_LISTENER).set(HTTP_LISTENER_NAME);
                             server.executeManagementOperation(addOp);
                             configUpdated = true;
-                            ServerMigrationLogger.ROOT_LOGGER.infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_NAME);
+                            context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_NAME);
                         }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, HTTP_ACCEPTOR_THROUGHPUT_NAME)) {
@@ -104,7 +103,7 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                     final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
                     addOp.get(HTTP_LISTENER).set(HTTP_LISTENER_NAME);
                     server.executeManagementOperation(addOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_THROUGHPUT_NAME);
+                    context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_THROUGHPUT_NAME);
                 }
                 */
                         if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, HTTP_CONNECTOR_NAME)) {
@@ -114,7 +113,7 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                             addOp.get(ENDPOINT).set(HTTP_ACCEPTOR_NAME);
                             server.executeManagementOperation(addOp);
                             configUpdated = true;
-                            ServerMigrationLogger.ROOT_LOGGER.infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_NAME);
+                            context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_NAME);
                         }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, HTTP_CONNECTOR_THROUGHPUT_NAME)) {
@@ -123,7 +122,7 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                     addOp.get(SOCKET_BINDING).set(SOCKET_BINDING_NAME);
                     addOp.get(ENDPOINT).set(HTTP_ACCEPTOR_NAME);
                     server.executeManagementOperation(addOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_THROUGHPUT_NAME);
+                    context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_THROUGHPUT_NAME);
                 }
                 */
                     }

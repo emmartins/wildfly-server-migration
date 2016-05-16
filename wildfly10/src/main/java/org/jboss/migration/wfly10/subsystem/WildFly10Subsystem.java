@@ -39,7 +39,7 @@ public class WildFly10Subsystem {
         this.extension = extension;
         this.subsystemMigrationTasks = subsystemMigrationTasks;
         this.serverMigrationTaskId = new ServerMigrationTaskId.Builder()
-                .setName("Subsystem Config")
+                .setName("subsystem-config-update")
                 .addAttribute("name", getName())
                 .build();
     }

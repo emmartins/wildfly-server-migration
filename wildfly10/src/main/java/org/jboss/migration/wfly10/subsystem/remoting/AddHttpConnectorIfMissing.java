@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -42,7 +41,7 @@ public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTas
 
     public static final AddHttpConnectorIfMissing INSTANCE = new AddHttpConnectorIfMissing();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Remoting's Http Connector").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("add-remoting-http-connector").build();
 
     private AddHttpConnectorIfMissing() {
     }
@@ -74,7 +73,7 @@ public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTas
                     httpRemotingConnectorAddOp.get(CONNECTOR_REF_ATTR_NAME).set(CONNECTOR_REF_ATTR_VALUE);
                     httpRemotingConnectorAddOp.get(SECURITY_REALM_ATTR_NAME).set(SECURITY_REALM_ATTR_VALUE);
                     server.executeManagementOperation(httpRemotingConnectorAddOp);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Http connector %s added to Remoting subsystem configuration.", HTTP_CONNECTOR_NAME);
+                    context.getLogger().infof("Http connector %s added to Remoting subsystem configuration.", HTTP_CONNECTOR_NAME);
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {
                     return ServerMigrationTaskResult.SKIPPED;

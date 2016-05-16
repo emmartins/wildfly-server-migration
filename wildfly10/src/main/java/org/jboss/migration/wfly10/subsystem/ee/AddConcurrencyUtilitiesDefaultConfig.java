@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -47,7 +46,7 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
 
     public static final AddConcurrencyUtilitiesDefaultConfig INSTANCE = new AddConcurrencyUtilitiesDefaultConfig();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Setup EE Concurrency Utilities default instances").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("setup-ee-concurrency-utilities").build();
 
     private AddConcurrencyUtilitiesDefaultConfig() {
     }
@@ -77,7 +76,7 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                 defaultContextServiceAddOp.get("jndi-name").set(DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
                 defaultContextServiceAddOp.get("use-transaction-setup-provider").set(true);
                 server.executeManagementOperation(defaultContextServiceAddOp);
-                ServerMigrationLogger.ROOT_LOGGER.debugf("Default ContextService added to subsystem EE configuration.");
+                context.getLogger().debugf("Default ContextService added to subsystem EE configuration.");
                 // add default managed thread factory
             /*
             "managed-thread-factory" => {"default" => {
@@ -92,7 +91,7 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                 defaultManagedThreadFactoryAddOp.get("context-service").set("default");
                 defaultManagedThreadFactoryAddOp.get("priority").set(5);
                 server.executeManagementOperation(defaultManagedThreadFactoryAddOp);
-                ServerMigrationLogger.ROOT_LOGGER.debugf("Default ManagedThreadFactory added to subsystem EE configuration.");
+                context.getLogger().debugf("Default ManagedThreadFactory added to subsystem EE configuration.");
                 // add default managed executor service
             /*
             "managed-executor-service" => {"default" => {
@@ -117,7 +116,7 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                 defaultManagedExecutorServiceAddOp.get("long-running-tasks").set(false);
                 defaultManagedExecutorServiceAddOp.get("reject-policy").set("ABORT");
                 server.executeManagementOperation(defaultManagedExecutorServiceAddOp);
-                ServerMigrationLogger.ROOT_LOGGER.debugf("Default ManagedExecutorService added to subsystem EE configuration.");
+                context.getLogger().debugf("Default ManagedExecutorService added to subsystem EE configuration.");
                 // add default managed scheduled executor service
             /*
             "managed-scheduled-executor-service" => {"default" => {
@@ -140,8 +139,8 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                 defaultManagedScheduledExecutorServiceAddOp.get("long-running-tasks").set(false);
                 defaultManagedScheduledExecutorServiceAddOp.get("reject-policy").set("ABORT");
                 server.executeManagementOperation(defaultManagedScheduledExecutorServiceAddOp);
-                ServerMigrationLogger.ROOT_LOGGER.debugf("Default ManagedScheduledExecutorService added to subsystem EE configuration.");
-                ServerMigrationLogger.ROOT_LOGGER.infof("EE Concurrency Utilities added.");
+                context.getLogger().debugf("Default ManagedScheduledExecutorService added to subsystem EE configuration.");
+                context.getLogger().infof("EE Concurrency Utilities added.");
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

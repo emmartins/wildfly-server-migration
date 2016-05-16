@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -41,7 +40,7 @@ public class AddEjbCache implements WildFly10SubsystemMigrationTaskFactory {
 
     public static final AddEjbCache INSTANCE = new AddEjbCache();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add EJB Cache").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("add-infinispan-ejb-cache").build();
 
     private AddEjbCache() {
     }
@@ -85,7 +84,7 @@ public class AddEjbCache implements WildFly10SubsystemMigrationTaskFactory {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 if (!config.hasDefined(CACHE_CONTAINER)) {
-                    ServerMigrationLogger.ROOT_LOGGER.infof("No Cache container");
+                    context.getLogger().infof("No Cache container");
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
@@ -117,7 +116,7 @@ public class AddEjbCache implements WildFly10SubsystemMigrationTaskFactory {
                 addLocalCachePassivation(compositeOperationBuilder, cachePathAddress);
                 addLocalCachePersistent(compositeOperationBuilder, cachePathAddress);
                 server.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-                ServerMigrationLogger.ROOT_LOGGER.infof("Ejb cache added to Infinispan subsystem configuration.");
+                context.getLogger().infof("Ejb cache added to Infinispan subsystem configuration.");
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

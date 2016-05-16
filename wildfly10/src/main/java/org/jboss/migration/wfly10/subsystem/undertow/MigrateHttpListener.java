@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -46,7 +45,7 @@ public class MigrateHttpListener implements WildFly10SubsystemMigrationTaskFacto
     private static final String REDIRECT_SOCKET_ATTR_NAME = "redirect-socket";
     private static final String REDIRECT_SOCKET_ATTR_VALUE = "https";
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Migrate HTTP Listener").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("migrate-undertow-http-listener").build();
 
     public static final MigrateHttpListener INSTANCE = new MigrateHttpListener();
 
@@ -72,7 +71,7 @@ public class MigrateHttpListener implements WildFly10SubsystemMigrationTaskFacto
                     op.get(NAME).set(REDIRECT_SOCKET_ATTR_NAME);
                     op.get(VALUE).set(REDIRECT_SOCKET_ATTR_VALUE);
                     server.executeManagementOperation(op);
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Undertow's default HTTP listener 'redirect-socket' set to 'https'.");
+                    context.getLogger().infof("Undertow's default HTTP listener 'redirect-socket' set to 'https'.");
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {
                     return ServerMigrationTaskResult.SKIPPED;

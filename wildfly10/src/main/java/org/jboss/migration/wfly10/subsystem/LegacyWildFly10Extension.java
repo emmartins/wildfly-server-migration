@@ -16,7 +16,6 @@
 package org.jboss.migration.wfly10.subsystem;
 
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class LegacyWildFly10Extension extends WildFly10Extension {
         if (server.getExtensions().contains(getName())) {
             // remove itself after migration
             server.removeExtension(getName());
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Extension %s removed after migration.", getName());
+            context.getLogger().debugf("Extension %s removed after migration.", getName());
         }
     }
 }

@@ -23,7 +23,6 @@ import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import java.io.IOException;
@@ -38,9 +37,9 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Security Realms").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("security-realms-migration").build();
 
-    public static final String SERVER_MIGRATION_TASK_SECURITY_REALM_NAME = "Security Realm: ";
+    public static final String SERVER_MIGRATION_TASK_SECURITY_REALM_NAME = "security-realm-migration";
     public static final String MIGRATION_REPORT_TASK_ATTR_AUTHENTICATION_PROPERTIES_SOURCE = "Authentication Properties Source: ";
     public static final String MIGRATION_REPORT_TASK_ATTR_AUTHENTICATION_PROPERTIES_TARGET = "Authentication Properties Target: ";
     public static final String MIGRATION_REPORT_TASK_ATTR_AUTHORIZATION_PROPERTIES_SOURCE = "Authorization Properties Source: ";
@@ -66,7 +65,7 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
                 public void onNo() {
-                    ServerMigrationLogger.ROOT_LOGGER.info("Security realms migration skipped by user.");
+                    context.getLogger().info("Security realms migration skipped by user.");
                 }
                 @Override
                 public void onYes() {
@@ -96,7 +95,7 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
 
     protected void migrateSecurityRealms(ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationTaskContext context) throws IOException {
         context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-        ServerMigrationLogger.ROOT_LOGGER.infof("Migrating security realms...");
+        context.getLogger().infof("Security realms migration starting...");
         final boolean targetStarted = target.isStarted();
         if (!targetStarted) {
             target.start();
@@ -105,11 +104,11 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
             for (ModelNode securityRealm : target.getSecurityRealms()) {
                 migrateSecurityRealm(securityRealm, source, target, context);
             }
+            context.getLogger().infof("Security realms migration done.");
         } finally {
             if (!targetStarted) {
                 target.stop();
             }
-            ServerMigrationLogger.ROOT_LOGGER.info("Security realms migration done.");
         }
     }
 
@@ -124,7 +123,7 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                ServerMigrationLogger.ROOT_LOGGER.infof("Migrating security realm: %s", securityRealmName);
+                context.getLogger().infof("Migrating security realm: %s", securityRealmName);
                 final ModelNode securityRealmValue = securityRealmProperty.getValue();
                 if (securityRealmValue.hasDefined(AUTHENTICATION, PROPERTIES)) {
                     copyPropertiesFile(securityRealmValue.get(AUTHENTICATION, PROPERTIES), source, target, context);
@@ -141,12 +140,12 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
     private void copyPropertiesFile(ModelNode properties, ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationTaskContext context) throws IOException {
         if (properties.hasDefined(PATH)) {
             final String path = properties.get(PATH).asString();
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Properties path: %s", path);
+            context.getLogger().debugf("Properties path: %s", path);
             String relativeTo = null;
             if (properties.hasDefined(RELATIVE_TO)) {
                 relativeTo = properties.get(RELATIVE_TO).asString();
             }
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Properties relative_to: %s", String.valueOf(relativeTo));
+            context.getLogger().debugf("Properties relative_to: %s", String.valueOf(relativeTo));
             final Path targetPath;
             if (relativeTo == null) {
                 // path is absolute
@@ -160,7 +159,7 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
                     targetPath = resolvedPath.normalize().resolve(path);
                 }
             }
-            ServerMigrationLogger.ROOT_LOGGER.debugf("Properties file path target: %s", targetPath);
+            context.getLogger().debugf("Properties file path target: %s", targetPath);
             final Path targetServerBaseDir = target.getServer().getBaseDir();
             if (targetPath.startsWith(targetServerBaseDir)) {
                 // properties file resolved to server's base dir, copy

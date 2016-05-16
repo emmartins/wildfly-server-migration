@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -39,7 +38,7 @@ public class DefinePassivationDisabledCacheRef implements WildFly10SubsystemMigr
 
     public static final DefinePassivationDisabledCacheRef INSTANCE = new DefinePassivationDisabledCacheRef();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Configure default-sfsb-passivation-disabled-cache").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("setup-default-sfsb-passivation-disabled-cache").build();
 
     private DefinePassivationDisabledCacheRef() {
     }
@@ -65,7 +64,7 @@ public class DefinePassivationDisabledCacheRef implements WildFly10SubsystemMigr
                 op.get(NAME).set(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME);
                 op.get(VALUE).set(defaultSFSBCache);
                 server.executeManagementOperation(op);
-                ServerMigrationLogger.ROOT_LOGGER.infof("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
+                context.getLogger().infof("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

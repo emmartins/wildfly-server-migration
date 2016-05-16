@@ -22,7 +22,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -40,7 +39,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
 
     public static final AddInfinispanPassivationStoreAndDistributableCache INSTANCE = new AddInfinispanPassivationStoreAndDistributableCache();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Infinispan Passivation Store and Distributable Cache").build();
+    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("add-infinispan-passivation-store-and-distributable-cache").build();
 
     private AddInfinispanPassivationStoreAndDistributableCache() {
     }
@@ -70,7 +69,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
                 return SERVER_MIGRATION_TASK_ID;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, final ServerMigrationTaskContext context) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
@@ -82,14 +81,14 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
                         final PathAddress filePassivationStorePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME));
                         final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
                         server.executeManagementOperation(filePassivationStoreRemoveperation);
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Legacy file passivation store removed from EJB3 subsystem configuration.");
+                        context.getLogger().infof("Legacy file passivation store removed from EJB3 subsystem configuration.");
                     }
                     // remove cluster-passivation-store infinispan
                     if (config.hasDefined(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
                         final PathAddress filePassivationStorePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME));
                         final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
                         server.executeManagementOperation(filePassivationStoreRemoveperation);
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
+                        context.getLogger().infof("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
                     }
                     // add default wfly 10 / eap 7 infinispan passivation store
                     final PathAddress passivationStorePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(PASSIVATION_STORE, PASSIVATION_STORE_NAME));
@@ -98,7 +97,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
                     passivationStoreAddOperation.get(MAX_SIZE_ATTR_NAME).set(MAX_SIZE_ATTR_VALUE);
                     server.executeManagementOperation(passivationStoreAddOperation);
                     configUpdated = true;
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Infinispan passivation store added to EJB3 subsystem configuration.");
+                    context.getLogger().infof("Infinispan passivation store added to EJB3 subsystem configuration.");
                 }
                 if (!config.hasDefined(CACHE, CACHE_NAME_DISTRIBUTABLE)) {
                     // remove legacy passivating cache
@@ -106,14 +105,14 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
                         final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE, CACHE_NAME_PASSIVATING));
                         final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
                         server.executeManagementOperation(cacheRemoveOperation);
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
+                        context.getLogger().infof("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
                     }
                     // remove legacy clustered cache
                     if (config.hasDefined(CACHE, CACHE_NAME_CLUSTERED)) {
                         final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE, CACHE_NAME_CLUSTERED));
                         final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
                         server.executeManagementOperation(cacheRemoveOperation);
-                        ServerMigrationLogger.ROOT_LOGGER.infof("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
+                        context.getLogger().infof("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
                     }
                     // add wfly 10 / eap 7 default distributable cache
                     final PathAddress cachePathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(CACHE, CACHE_NAME_DISTRIBUTABLE));
@@ -124,7 +123,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
                     }
                     server.executeManagementOperation(cacheAddOperation);
                     configUpdated = true;
-                    ServerMigrationLogger.ROOT_LOGGER.infof("Distributable cache added to EJB3 subsystem configuration.");
+                    context.getLogger().infof("Distributable cache added to EJB3 subsystem configuration.");
                 }
                 return configUpdated ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }

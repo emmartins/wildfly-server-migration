@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -36,17 +35,15 @@ public class AddSubsystemWithoutConfig implements WildFly10SubsystemMigrationTas
 
     public static final AddSubsystemWithoutConfig INSTANCE = new AddSubsystemWithoutConfig();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("Add Subsystem").build();
-
     private AddSubsystemWithoutConfig() {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, final WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
             public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+                return new ServerMigrationTaskId.Builder().setName("add-subsystem").addAttribute("name", subsystem.getName()).build();
             }
 
             @Override
@@ -54,10 +51,10 @@ public class AddSubsystemWithoutConfig implements WildFly10SubsystemMigrationTas
                 if (config != null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                ServerMigrationLogger.ROOT_LOGGER.debugf("Adding subsystem %s...", subsystem.getName());
+                context.getLogger().debugf("Adding subsystem %s...", subsystem.getName());
                 final ModelNode op = Util.createAddOperation(pathAddress(pathElement(SUBSYSTEM, subsystem.getName())));
                 server.executeManagementOperation(op);
-                ServerMigrationLogger.ROOT_LOGGER.infof("Subsystem %s added.", subsystem.getName());
+                context.getLogger().infof("Subsystem %s added.", subsystem.getName());
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
