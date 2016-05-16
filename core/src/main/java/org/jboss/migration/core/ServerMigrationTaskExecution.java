@@ -70,7 +70,7 @@ public class ServerMigrationTaskExecution {
      * Retrieves the task logger.
      * @return the task logger
      */
-    Logger getLogger() {
+    public Logger getLogger() {
         return logger;
     }
 

@@ -18,7 +18,11 @@ package org.jboss.migration.core;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.JavaConsole;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
+import org.jboss.migration.core.report.SummaryReportWriter;
+import org.jboss.migration.core.report.XmlReportWriter;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -127,8 +131,6 @@ public class ServerMigration {
         final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, userEnvironment != null ? userEnvironment : new Properties());
         final ServerMigrationTaskId serverMigrationTaskId = new ServerMigrationTaskId.Builder()
                 .setName("server-migration")
-                .addAttribute("source", sourceServer.getProductInfo().getName()+" "+sourceServer.getProductInfo().getVersion())
-                .addAttribute("target", targetServer.getProductInfo().getName()+" "+targetServer.getProductInfo().getVersion())
                 .build();
         final ServerMigrationTask serverMigrationTask = new ServerMigrationTask() {
             @Override
@@ -151,6 +153,14 @@ public class ServerMigration {
             final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution);
             final String summaryReport = new SummaryReportWriter().toString(migrationData);
             ServerMigrationLogger.ROOT_LOGGER.infof(summaryReport);
+            // FIXME use output dir
+            final FileSystem fileSystem = FileSystems.getDefault();
+            Path absolutePath = fileSystem.getPath(System.getProperty("user.dir")).resolve("migration-report.xml");
+            try {
+                XmlReportWriter.INSTANCE.writeContent(absolutePath.toFile(), migrationData);
+            } catch (Throwable e) {
+                ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
+            }
         }
     }
 
