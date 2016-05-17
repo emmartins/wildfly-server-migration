@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.core;
+package org.jboss.migration.core.report;
+
+import org.jboss.migration.core.MigrationData;
+import org.jboss.migration.core.ServerMigrationTaskExecution;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The summary report builder.
+ * The summary report writer.
  * @author emmartins
  */
 public class SummaryReportWriter {
