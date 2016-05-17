@@ -109,12 +109,19 @@ public class CommandLineServerMigration {
                     userEnvironment.load(inputStream);
                 }
             }
+
+            final String outputDir = System.getProperty("jboss.server.migration.output.dir");
+
+            final Path xmlReport = outputDir != null ? FileSystems.getDefault().getPath(outputDir).resolve("report.xml") : null;
+
             WildFlySecurityManager.setPropertyPrivileged("java.util.logging.manager", "org.jboss.logmanager.LogManager");
+
             new ServerMigration()
                     .from(source)
                     .to(target)
                     .interactive(interactive)
                     .userEnvironment(userEnvironment)
+                    .xmlReport(xmlReport)
                     .run();
         } catch (Throwable t) {
             abort(t);

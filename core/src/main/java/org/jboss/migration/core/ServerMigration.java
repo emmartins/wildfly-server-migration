@@ -21,8 +21,6 @@ import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.report.SummaryReportWriter;
 import org.jboss.migration.core.report.XmlReportWriter;
 
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -45,6 +43,17 @@ public class ServerMigration {
     private ConsoleWrapper console;
     private boolean interactive = true;
     private Properties userEnvironment;
+    private Path xmlReport;
+
+    /**
+     * Sets the path for xml report file.
+     * @param path the path for xml report file
+     * @return the server migration after applying the configuration change
+     */
+    public ServerMigration xmlReport(Path path) {
+        this.xmlReport = path;
+        return this;
+    }
 
     /**
      * Sets the migration source's base dir.
@@ -150,16 +159,18 @@ public class ServerMigration {
         try {
             serverMigrationTaskExecution.run();
         } finally {
+            // build migration data
             final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution);
+            // log summary report
             final String summaryReport = new SummaryReportWriter().toString(migrationData);
             ServerMigrationLogger.ROOT_LOGGER.infof(summaryReport);
-            // FIXME use output dir
-            final FileSystem fileSystem = FileSystems.getDefault();
-            Path absolutePath = fileSystem.getPath(System.getProperty("user.dir")).resolve("migration-report.xml");
-            try {
-                XmlReportWriter.INSTANCE.writeContent(absolutePath.toFile(), migrationData);
-            } catch (Throwable e) {
-                ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
+            // output xml report if requested
+            if (xmlReport != null) {
+                try {
+                    XmlReportWriter.INSTANCE.writeContent(xmlReport.toFile(), migrationData);
+                } catch (Throwable e) {
+                    ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
+                }
             }
         }
     }
