@@ -19,7 +19,6 @@ import org.jboss.logging.Logger;
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTaskExecution;
-import org.jboss.migration.core.ServerMigrationTaskId;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.util.xml.AttributeValue;
 import org.jboss.migration.core.util.xml.ElementNode;
@@ -46,6 +45,10 @@ import java.util.TimeZone;
 public class XmlReportWriter implements XMLElementWriter<MigrationData> {
 
     public static XmlReportWriter INSTANCE = new XmlReportWriter();
+
+    private XmlReportWriter() {
+
+    }
 
     public void writeContent(XMLStreamWriter streamWriter, MigrationData value) throws XMLStreamException {
         final XMLMapper mapper = XMLMapper.Factory.create();
@@ -99,29 +102,12 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
 
     protected void processTask(ServerMigrationTaskExecution task, ElementNode parentElementNode) {
         final ElementNode taskNode = new ElementNode(parentElementNode, "task");
-        processTaskId(task.getTaskId(), taskNode);
+        parentElementNode.addAttribute("number", new AttributeValue(String.valueOf(task.getTaskNumber())));
+        parentElementNode.addAttribute("name", new AttributeValue(task.getTaskName().toString()));
         processTaskLogger(task.getLogger(), taskNode);
         processTaskResult(task.getResult(), taskNode);
         processSubtasks(task.getSubtasks(), taskNode);
         parentElementNode.addChild(taskNode);
-    }
-
-    protected void processTaskId(ServerMigrationTaskId taskId, ElementNode parentElementNode) {
-        //final ElementNode taskIdNode = new ElementNode(parentElementNode, "id");
-        parentElementNode.addAttribute("id", new AttributeValue(taskId.toString()));
-        /*final Map<String, String> attributes = taskId.getAttributes();
-        if (attributes != null && !attributes.isEmpty()) {
-            final ElementNode attributesElementNode = new ElementNode(taskIdNode, "attributes");
-            for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-                final ElementNode attributeElementNode = new ElementNode(taskIdNode, "attribute");
-                attributeElementNode.addAttribute("name", new AttributeValue(attribute.getKey()));
-                attributeElementNode.addAttribute("value", new AttributeValue(attribute.getValue()));
-                attributesElementNode.addChild(attributeElementNode);
-            }
-            taskIdNode.addChild(attributesElementNode);
-        }
-        parentElementNode.addChild(taskIdNode);
-        */
     }
 
     protected void processTaskLogger(Logger logger, ElementNode taskNode) {

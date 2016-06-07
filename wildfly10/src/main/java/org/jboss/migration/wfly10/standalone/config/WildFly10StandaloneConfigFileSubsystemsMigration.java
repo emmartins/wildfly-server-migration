@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.standalone.config;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
@@ -37,10 +37,10 @@ import java.util.Set;
  */
 public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("subsystems-migration").build();
-    public static final String SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_SUBSYSTEM = "remove-unsupported-subsystem";
-    public static final String SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_EXTENSION = "remove-unsupported-extension";
-    public static final String SERVER_MIGRATION_TASK_ID_ATTRIBUTE_NAME = "name";
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("subsystems").build();
+    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_UNSUPPORTED_SUBSYSTEM = "remove-unsupported-subsystem";
+    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_UNSUPPORTED_EXTENSION = "remove-unsupported-extension";
+    public static final String SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAME = "name";
 
     private final List<WildFly10Extension> supportedExtensions;
     private final List<WildFly10Subsystem> supportedSubsystems;
@@ -62,15 +62,15 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
      *
      * @return
      */
-    protected ServerMigrationTaskId getServerMigrationTaskId() {
-        return SERVER_MIGRATION_TASK_ID;
+    protected ServerMigrationTaskName getServerMigrationTaskName() {
+        return SERVER_MIGRATION_TASK_NAME;
     }
 
     public ServerMigrationTask getServerMigrationTask(final ServerPath<S> source, final WildFly10StandaloneServer target) {
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return getServerMigrationTaskId();
+            public ServerMigrationTaskName getName() {
+                return getServerMigrationTaskName();
             }
 
             @Override
@@ -111,11 +111,11 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
                 }
             }
             if (!supported) {
-                final ServerMigrationTaskId subtaskId = new ServerMigrationTaskId.Builder().setName(SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_SUBSYSTEM).addAttribute(SERVER_MIGRATION_TASK_ID_ATTRIBUTE_NAME, subsystem).build();
+                final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder().setName(SERVER_MIGRATION_TASK_NAME_REMOVE_UNSUPPORTED_SUBSYSTEM).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAME, subsystem).build();
                 final ServerMigrationTask subtask = new ServerMigrationTask() {
                     @Override
-                    public ServerMigrationTaskId getId() {
-                        return subtaskId;
+                    public ServerMigrationTaskName getName() {
+                        return subtaskName;
                     }
                     @Override
                     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
@@ -139,11 +139,11 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
                 }
             }
             if (!supported) {
-                final ServerMigrationTaskId subtaskId = new ServerMigrationTaskId.Builder().setName(SERVER_MIGRATION_TASK_ID_NAME_REMOVE_UNSUPPORTED_EXTENSION).addAttribute(SERVER_MIGRATION_TASK_ID_ATTRIBUTE_NAME, extension).build();
+                final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder().setName(SERVER_MIGRATION_TASK_NAME_REMOVE_UNSUPPORTED_EXTENSION).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAME, extension).build();
                 final ServerMigrationTask subtask = new ServerMigrationTask() {
                     @Override
-                    public ServerMigrationTaskId getId() {
-                        return subtaskId;
+                    public ServerMigrationTaskName getName() {
+                        return subtaskName;
                     }
                     @Override
                     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {

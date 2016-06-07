@@ -15,7 +15,11 @@
  */
 package org.jboss.migration.cli;
 
+import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
+import org.jboss.migration.core.logger.ServerMigrationLogger;
+import org.jboss.migration.core.report.HtmlReportWriter;
+import org.jboss.migration.core.report.XmlReportWriter;
 import org.wildfly.security.manager.WildFlySecurityManager;
 
 import java.io.InputStream;
@@ -110,19 +114,31 @@ public class CommandLineServerMigration {
                 }
             }
 
-            final String outputDir = System.getProperty("jboss.server.migration.output.dir");
-
-            final Path xmlReport = outputDir != null ? FileSystems.getDefault().getPath(outputDir).resolve("report.xml") : null;
-
             WildFlySecurityManager.setPropertyPrivileged("java.util.logging.manager", "org.jboss.logmanager.LogManager");
 
-            new ServerMigration()
+            final MigrationData migrationData = new ServerMigration()
                     .from(source)
                     .to(target)
                     .interactive(interactive)
                     .userEnvironment(userEnvironment)
-                    .xmlReport(xmlReport)
                     .run();
+
+            final String outputDir = System.getProperty("jboss.server.migration.output.dir");
+            if (outputDir != null) {
+                final Path outputDirPath = FileSystems.getDefault().getPath(outputDir);
+                try {
+                    XmlReportWriter.INSTANCE.writeContent(outputDirPath.resolve("migration-report.xml").toFile(), migrationData);
+                } catch (Throwable e) {
+                    ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
+                }
+                try {
+                    final String configDir = System.getProperty("jboss.server.migration.config.dir");
+                    final Path configDirPath = configDir != null ? FileSystems.getDefault().getPath(configDir) : outputDirPath.getParent().resolve("config");
+                    HtmlReportWriter.INSTANCE.toPath(outputDirPath.resolve("migration-report.html"), migrationData, HtmlReportWriter.ReportTemplate.from(configDirPath.resolve("migration-report-template.html")));
+                } catch (Throwable e) {
+                    ServerMigrationLogger.ROOT_LOGGER.error("HTML Report write failed", e);
+                }
+            }
         } catch (Throwable t) {
             abort(t);
         }

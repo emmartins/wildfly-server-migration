@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.standalone.config;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.console.ConsoleWrapper;
@@ -35,15 +35,15 @@ import java.nio.file.Path;
  */
 public abstract class WildFly10StandaloneConfigFileMigration<S extends Server> {
 
-    public static final String MIGRATION_REPORT_TASK_NAME = "config-file-migration";
+    public static final String MIGRATION_REPORT_TASK_NAME = "config-file";
     public static final String MIGRATION_REPORT_TASK_ATTR_SOURCE = "source";
 
     public ServerMigrationTask getServerMigrationTask(final ServerPath<S> sourceConfig, final WildFly10Server target) {
-        final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName(MIGRATION_REPORT_TASK_NAME).addAttribute(MIGRATION_REPORT_TASK_ATTR_SOURCE, sourceConfig.getPath().toString()).build();
+        final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder().setName(MIGRATION_REPORT_TASK_NAME).addAttribute(MIGRATION_REPORT_TASK_ATTR_SOURCE, sourceConfig.getPath().toString()).build();
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return taskId;
+            public ServerMigrationTaskName getName() {
+                return taskName;
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {

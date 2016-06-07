@@ -22,10 +22,10 @@ package org.jboss.migration.core;
 public interface ServerMigrationTask {
 
     /**
-     * Retrieves the task id.
-     * @return the task id
+     * Retrieves the task name.
+     * @return the task name
      */
-    ServerMigrationTaskId getId();
+    ServerMigrationTaskName getName();
 
     /**
      * Runs the task.

@@ -21,7 +21,7 @@ import org.jboss.dmr.Property;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
@@ -39,14 +39,14 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileDeploymentsMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("deployments-migration").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("deployments").build();
     public static final String SERVER_MIGRATION_TASK_DEPLOYMENT_REMOVAL_NAME = "remove-deployment";
 
     public ServerMigrationTask getServerMigrationTask(final ServerPath<S> source, final WildFly10StandaloneServer target) {
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
 
             @Override
@@ -88,11 +88,11 @@ public class WildFly10StandaloneConfigFileDeploymentsMigration<S extends Server>
     protected void migrateDeployment(final ModelNode deployment, final ServerPath<S> source, final WildFly10StandaloneServer target, final ServerMigrationTaskContext context) throws IOException {
         final Property deploymentAsProperty = deployment.asProperty();
         final String deploymentName = deploymentAsProperty.getName();
-        final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName(SERVER_MIGRATION_TASK_DEPLOYMENT_REMOVAL_NAME).addAttribute("name", deploymentName).build();
+        final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder().setName(SERVER_MIGRATION_TASK_DEPLOYMENT_REMOVAL_NAME).addAttribute("name", deploymentName).build();
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return taskId;
+            public ServerMigrationTaskName getName() {
+                return taskName;
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {

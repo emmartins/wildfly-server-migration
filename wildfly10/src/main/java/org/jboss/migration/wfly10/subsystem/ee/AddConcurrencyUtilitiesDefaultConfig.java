@@ -21,7 +21,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
@@ -46,7 +46,7 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
 
     public static final AddConcurrencyUtilitiesDefaultConfig INSTANCE = new AddConcurrencyUtilitiesDefaultConfig();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("setup-ee-concurrency-utilities").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("setup-ee-concurrency-utilities").build();
 
     private AddConcurrencyUtilitiesDefaultConfig() {
     }
@@ -55,8 +55,8 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
     public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {

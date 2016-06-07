@@ -61,10 +61,6 @@ public class WildFly10ExtensionBuilder {
         return addSubsystem(subsystemBuilder);
     }
 
-    public WildFly10ExtensionBuilder addMigratedSubsystem(String subsystemName) {
-        return addSubsystem(subsystemName, "migrate-subsystem", MigrateLegacySubsystem.INSTANCE);
-    }
-
     public WildFly10Extension build() {
         final WildFly10Extension extension = new WildFly10Extension(name);
         for (WildFly10SubsystemBuilder subsystem : subsystems) {

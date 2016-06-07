@@ -28,7 +28,13 @@ import java.util.List;
  */
 public class SummaryReportWriter {
 
-    private static final String TASK_ID_LEVEL_INDENT = " ";
+    public static SummaryReportWriter INSTANCE = new SummaryReportWriter();
+
+    private SummaryReportWriter() {
+
+    }
+
+    private static final String TASK_NAME_LEVEL_INDENT = " ";
     private static final char SEPARATOR_CHAR = '.';
     private static final int MIN_SEPARATOR_LENGTH = 3;
 
@@ -38,15 +44,15 @@ public class SummaryReportWriter {
 
     public String toString(MigrationData migrationData, int maxTaskDepth) {
         final List<SummaryTaskEntry> summaryTaskEntries = getSummaryTaskEntries(migrationData, maxTaskDepth);
-        final int taskIdAndSeparatorLength = getTaskIdAndSeparatorLength(summaryTaskEntries);
-        final String lineSeparator = getLineSeparator(taskIdAndSeparatorLength);
+        final int taskNameAndSeparatorLength = getTaskNameAndSeparatorLength(summaryTaskEntries);
+        final String lineSeparator = getLineSeparator(taskNameAndSeparatorLength);
         final StringBuilder sb = new StringBuilder();
         sb.append('\n');
         sb.append(lineSeparator);
-        sb.append(" Migration Summary\n");
+        sb.append(" Task Summary\n");
         sb.append(lineSeparator);
         sb.append('\n');
-        appendTasks(sb, summaryTaskEntries, taskIdAndSeparatorLength);
+        appendTasks(sb, summaryTaskEntries, taskNameAndSeparatorLength);
         sb.append('\n');
         sb.append(lineSeparator);
         appendRootTaskResult(sb, migrationData);
@@ -65,9 +71,9 @@ public class SummaryReportWriter {
         if (task.getResult().getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
             return;
         }
-        String taskIdWithPrefix = prefix+task.getTaskId().toString();
-        summaryTaskEntries.add(new SummaryTaskEntry(taskIdWithPrefix, task.getResult()));
-        String subtaskPrefix = TASK_ID_LEVEL_INDENT + prefix;
+        String taskNameWithPrefix = prefix+task.getTaskName().toString();
+        summaryTaskEntries.add(new SummaryTaskEntry(taskNameWithPrefix, task.getResult()));
+        String subtaskPrefix = TASK_NAME_LEVEL_INDENT + prefix;
         taskDepth++;
         if (taskDepth > maxTaskDepth) {
             return;
@@ -77,21 +83,21 @@ public class SummaryReportWriter {
         }
     }
 
-    protected int getTaskIdAndSeparatorLength(List<SummaryTaskEntry> summaryTaskEntries) {
-        int maxTaskIdLength = 0;
+    protected int getTaskNameAndSeparatorLength(List<SummaryTaskEntry> summaryTaskEntries) {
+        int maxTaskNameLength = 0;
         for (SummaryTaskEntry summaryTaskEntry : summaryTaskEntries) {
-            if (summaryTaskEntry.taskId.length() > maxTaskIdLength) {
-                maxTaskIdLength = summaryTaskEntry.taskId.length();
+            if (summaryTaskEntry.taskName.length() > maxTaskNameLength) {
+                maxTaskNameLength = summaryTaskEntry.taskName.length();
             }
         }
-        return maxTaskIdLength + MIN_SEPARATOR_LENGTH;
+        return maxTaskNameLength + MIN_SEPARATOR_LENGTH;
     }
 
-    protected String getLineSeparator(int taskIdAndSeparatorLength) {
+    protected String getLineSeparator(int taskNameAndSeparatorLength) {
         // append header
         final StringBuilder sb = new StringBuilder();
         //sb.append(' ');
-        int headerLineLength = taskIdAndSeparatorLength + 8;
+        int headerLineLength = taskNameAndSeparatorLength + 8;
         for (int i=0; i < headerLineLength; i++) {
             sb.append('-');
         }
@@ -103,13 +109,13 @@ public class SummaryReportWriter {
         sb.append(" Migration Result: ").append(migrationData.getRootTask().getResult().getStatus()).append('\n');
     }
 
-    protected void appendTasks(StringBuilder sb, List<SummaryTaskEntry> summaryTaskEntries, int taskIdAndSeparatorLength) {
+    protected void appendTasks(StringBuilder sb, List<SummaryTaskEntry> summaryTaskEntries, int taskNameAndSeparatorLength) {
         //sb.append('\n');
         for (SummaryTaskEntry summaryTaskEntry : summaryTaskEntries) {
             // append task id
-            sb.append(summaryTaskEntry.taskId);
+            sb.append(summaryTaskEntry.taskName);
             // append separator between task id and result status
-            int suffixLength =  taskIdAndSeparatorLength - summaryTaskEntry.taskId.length();
+            int suffixLength =  taskNameAndSeparatorLength - summaryTaskEntry.taskName.length();
             sb.append(' ');
             for (int i=1; i < suffixLength; i++) {
                 sb.append(SEPARATOR_CHAR);
@@ -121,10 +127,10 @@ public class SummaryReportWriter {
     }
 
     private static class SummaryTaskEntry {
-        private final String taskId;
+        private final String taskName;
         private final ServerMigrationTaskResult taskResult;
-        private SummaryTaskEntry(String taskId, ServerMigrationTaskResult taskResult) {
-            this.taskId = taskId;
+        private SummaryTaskEntry(String taskName, ServerMigrationTaskResult taskResult) {
+            this.taskName = taskName;
             this.taskResult = taskResult;
         }
     }

@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class WildFly10LegacyExtensionBuilder {
 
-    private final List<WildFly10SubsystemBuilder> subsystems = new ArrayList<>();
+    private final List<String> subsystems = new ArrayList<>();
     private String name;
 
     public WildFly10LegacyExtensionBuilder setName(String name) {
@@ -32,14 +32,14 @@ public class WildFly10LegacyExtensionBuilder {
     }
 
     public WildFly10LegacyExtensionBuilder addMigratedSubsystem(String subsystemName) {
-        subsystems.add(new WildFly10SubsystemBuilder().setName(subsystemName).setTaskName("migrate-subsystem").addTask(MigrateLegacySubsystem.INSTANCE));
+        subsystems.add(subsystemName);
         return this;
     }
 
     public LegacyWildFly10Extension build() {
         final LegacyWildFly10Extension extension = new LegacyWildFly10Extension(name);
-        for (WildFly10SubsystemBuilder subsystem : subsystems) {
-            extension.subsystems.add(subsystem.setExtension(extension).build());
+        for (String subsystem : subsystems) {
+            extension.subsystems.add(new WildFly10LegacySubsystem(subsystem, extension));
         }
         return extension;
     }

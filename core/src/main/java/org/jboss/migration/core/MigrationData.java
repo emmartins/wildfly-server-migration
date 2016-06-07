@@ -15,6 +15,10 @@
  */
 package org.jboss.migration.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The data collected from the server migration.
  * @author emmartins
@@ -24,11 +28,13 @@ public class MigrationData {
     private final Server source;
     private final Server target;
     private final ServerMigrationTaskExecution rootTask;
+    private final List<ServerMigrationTaskExecution> tasks;
 
     MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask) {
         this.source = source;
         this.target = target;
         this.rootTask = rootTask;
+        this.tasks = initTasks();
     }
 
     /**
@@ -53,5 +59,45 @@ public class MigrationData {
      */
     public ServerMigrationTaskExecution getRootTask() {
         return rootTask;
+    }
+
+    /**
+     * Retrieves all tasks.
+     * @return all tasks
+     */
+    public List<ServerMigrationTaskExecution> getTasks() {
+        return tasks;
+    }
+
+    /**
+     * Retrieves the number of tasks with the specified status result.
+     * @param status the status result
+     * @return the number of tasks with the specified status result
+     */
+    public int getTaskCount(ServerMigrationTaskResult.Status status) {
+        int count = 0;
+        for (ServerMigrationTaskExecution task : tasks) {
+            if (task.getResult().getStatus() == status) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private List<ServerMigrationTaskExecution> initTasks() {
+        final List<ServerMigrationTaskExecution> results = new ArrayList<>();
+        results.add(getRootTask());
+        addSubTasks(getRootTask(), results);
+        return Collections.unmodifiableList(results);
+    }
+
+    private void addSubTasks(ServerMigrationTaskExecution task, List<ServerMigrationTaskExecution> tasks) {
+        final List<ServerMigrationTaskExecution> subtasks = task.getSubtasks();
+        if (subtasks != null) {
+            for (ServerMigrationTaskExecution subtask : subtasks) {
+                tasks.add(subtask);
+                addSubTasks(subtask, tasks);
+            }
+        }
     }
 }

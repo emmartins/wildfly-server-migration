@@ -19,7 +19,6 @@ import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.JavaConsole;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.report.SummaryReportWriter;
-import org.jboss.migration.core.report.XmlReportWriter;
 
 import java.nio.file.Path;
 import java.util.Properties;
@@ -43,17 +42,6 @@ public class ServerMigration {
     private ConsoleWrapper console;
     private boolean interactive = true;
     private Properties userEnvironment;
-    private Path xmlReport;
-
-    /**
-     * Sets the path for xml report file.
-     * @param path the path for xml report file
-     * @return the server migration after applying the configuration change
-     */
-    public ServerMigration xmlReport(Path path) {
-        this.xmlReport = path;
-        return this;
-    }
 
     /**
      * Sets the migration source's base dir.
@@ -110,9 +98,9 @@ public class ServerMigration {
      * Executes the configured server migration, i.e. retrieves the source and target {@link Server}s, from base dirs, creates the migration context, and then delegates the migration to the target {@link Server}.
      * @throws IllegalArgumentException if a server was not retrieved from configured base dir.
      * @throws IllegalStateException if the source and/or target base dir is not configured
-     * @throws ServerMigrationFailedException if the execution fails
+     * @return the migration data
      */
-    public void run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailedException {
+    public MigrationData run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailedException {
         if (from == null) {
             throw ServerMigrationLogger.ROOT_LOGGER.serverBaseDirNotSet(SOURCE);
         }
@@ -138,13 +126,13 @@ public class ServerMigration {
         console.printf("%n");
 
         final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, userEnvironment != null ? userEnvironment : new Properties());
-        final ServerMigrationTaskId serverMigrationTaskId = new ServerMigrationTaskId.Builder()
-                .setName("server-migration")
+        final ServerMigrationTaskName serverMigrationTaskName = new ServerMigrationTaskName.Builder()
+                .setName("server")
                 .build();
         final ServerMigrationTask serverMigrationTask = new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return serverMigrationTaskId;
+            public ServerMigrationTaskName getName() {
+                return serverMigrationTaskName;
             }
 
             @Override
@@ -158,21 +146,15 @@ public class ServerMigration {
         final ServerMigrationTaskExecution serverMigrationTaskExecution = new ServerMigrationTaskExecution(serverMigrationTask, serverMigrationContext);
         try {
             serverMigrationTaskExecution.run();
-        } finally {
-            // build migration data
-            final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution);
-            // log summary report
-            final String summaryReport = new SummaryReportWriter().toString(migrationData);
-            ServerMigrationLogger.ROOT_LOGGER.infof(summaryReport);
-            // output xml report if requested
-            if (xmlReport != null) {
-                try {
-                    XmlReportWriter.INSTANCE.writeContent(xmlReport.toFile(), migrationData);
-                } catch (Throwable e) {
-                    ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
-                }
-            }
+        } catch (Throwable t) {
+            ServerMigrationLogger.ROOT_LOGGER.error("Migration failed", t);
         }
+
+        // build migration data
+        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution);
+        // log summary report
+        ServerMigrationLogger.ROOT_LOGGER.infof(SummaryReportWriter.INSTANCE.toString(migrationData));
+        return migrationData;
     }
 
     /**
