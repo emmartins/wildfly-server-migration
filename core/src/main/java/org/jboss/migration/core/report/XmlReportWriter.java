@@ -102,8 +102,8 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
 
     protected void processTask(ServerMigrationTaskExecution task, ElementNode parentElementNode) {
         final ElementNode taskNode = new ElementNode(parentElementNode, "task");
-        parentElementNode.addAttribute("number", new AttributeValue(String.valueOf(task.getTaskNumber())));
-        parentElementNode.addAttribute("name", new AttributeValue(task.getTaskName().toString()));
+        taskNode.addAttribute("number", new AttributeValue(String.valueOf(task.getTaskNumber())));
+        taskNode.addAttribute("name", new AttributeValue(task.getTaskName().toString()));
         processTaskLogger(task.getLogger(), taskNode);
         processTaskResult(task.getResult(), taskNode);
         processSubtasks(task.getSubtasks(), taskNode);
