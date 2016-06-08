@@ -20,57 +20,61 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
 
 /**
- * A task which migrates a legacy subsystem.
+ * A legacy deprecated subsystem, the server only includes support to load and migrate its configuration to the subsystem which replaces it.
  * @author emmartins
  */
-public class MigrateLegacySubsystem implements WildFly10SubsystemMigrationTaskFactory {
+public class WildFly10LegacySubsystem extends WildFly10Subsystem {
 
-    public static final MigrateLegacySubsystem INSTANCE = new MigrateLegacySubsystem();
-
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("migrate-legacy-subsystem").build();
-
-    private MigrateLegacySubsystem() {
+    public WildFly10LegacySubsystem(String name, WildFly10Extension extension) {
+        super(name, "migrate-subsystem", null, extension);
     }
 
-
-    protected ServerMigrationTaskId getServerMigrationTaskId() {
-        return SERVER_MIGRATION_TASK_ID;
+    /**
+     * Post migration processing.
+     * @param migrationWarnings the warnings that resulted from doing the migration
+     * @param server the server
+     * @param context the task context
+     * @throws Exception if there was a failure processing the warnings
+     */
+    protected void processWarnings(List<String> migrationWarnings, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
+    public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer server) {
+        final String subsystemName = getName();
+        return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return getServerMigrationTaskId();
+            public ServerMigrationTaskName getName() {
+                return serverMigrationTaskName;
             }
 
             @Override
-            public ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
-                if (!server.getSubsystems().contains(subsystem.getName())) {
+            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                final ModelNode subsystemConfig = server.getSubsystem(subsystemName);
+                if (subsystemConfig == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                context.getLogger().debugf("Migrating subsystem %s...", subsystem.getName());
-                final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()));
+                context.getLogger().debugf("Migrating subsystem %s...", subsystemName);
+                final PathAddress address = pathAddress(pathElement(SUBSYSTEM, subsystemName));
                 final ModelNode op = Util.createEmptyOperation("migrate", address);
                 final ModelNode result = server.getModelControllerClient().execute(op);
                 context.getLogger().debugf("Op result: %s", result.asString());
                 final String outcome = result.get(OUTCOME).asString();
                 if(!SUCCESS.equals(outcome)) {
-                    throw new RuntimeException("Subsystem "+subsystem.getName()+" migration failed: "+result.get("migration-error").asString());
+                    throw new RuntimeException("Subsystem "+subsystemName+" migration failed: "+result.get("migration-error").asString());
                 } else {
                     final List<String> migrateWarnings = new ArrayList<>();
                     if (result.get(RESULT).hasDefined("migration-warnings")) {
@@ -78,25 +82,21 @@ public class MigrateLegacySubsystem implements WildFly10SubsystemMigrationTaskFa
                             migrateWarnings.add(modelNode.asString());
                         }
                     }
-                    MigrateLegacySubsystem.this.postMigrate(migrateWarnings, server, context);
+                    processWarnings(migrateWarnings, server, context);
                     if (migrateWarnings.isEmpty()) {
-                        context.getLogger().infof("Subsystem %s migrated.", subsystem.getName());
+                        context.getLogger().infof("Subsystem %s migrated.", subsystemName);
                     } else {
-                        context.getLogger().infof("Subsystem %s migrated with warnings: %s", subsystem.getName(), migrateWarnings);
+                        context.getLogger().infof("Subsystem %s migrated with warnings: %s", subsystemName, migrateWarnings);
                     }
                     // FIXME tmp workaround for legacy subsystems which do not remove itself
-                    if (server.getSubsystems().contains(subsystem.getName())) {
+                    if (server.getSubsystems().contains(subsystemName)) {
                         // remove itself after migration
-                        server.removeSubsystem(subsystem.getName());
-                        context.getLogger().debugf("Subsystem %s removed after migration.", subsystem.getName());
+                        server.removeSubsystem(subsystemName);
+                        context.getLogger().debugf("Subsystem %s removed after migration.", subsystemName);
                     }
                     return ServerMigrationTaskResult.SUCCESS;
                 }
             }
         };
-    }
-
-    protected void postMigrate(List<String> migrationWarnings, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws IOException {
-
     }
 }

@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.standalone;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.WildFly10Server;
 
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public abstract class WildFly10StandaloneServerMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("standalone-server-migration").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("standalone").build();
 
     /**
      *
@@ -41,8 +41,8 @@ public abstract class WildFly10StandaloneServerMigration<S extends Server> {
     public ServerMigrationTask getServerMigrationTask(final S source, final WildFly10Server target) {
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return getServerMigrationTaskId();
+            public ServerMigrationTaskName getName() {
+                return getServerMigrationTaskName();
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
@@ -55,8 +55,8 @@ public abstract class WildFly10StandaloneServerMigration<S extends Server> {
      *
      * @return
      */
-    protected ServerMigrationTaskId getServerMigrationTaskId() {
-        return SERVER_MIGRATION_TASK_ID;
+    protected ServerMigrationTaskName getServerMigrationTaskName() {
+        return SERVER_MIGRATION_TASK_NAME;
     }
 
     /**

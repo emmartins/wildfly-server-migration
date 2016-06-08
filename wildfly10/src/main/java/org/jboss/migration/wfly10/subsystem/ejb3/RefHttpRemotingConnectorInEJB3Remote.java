@@ -19,7 +19,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
@@ -38,7 +38,7 @@ public class RefHttpRemotingConnectorInEJB3Remote implements WildFly10SubsystemM
 
     public static final RefHttpRemotingConnectorInEJB3Remote INSTANCE = new RefHttpRemotingConnectorInEJB3Remote();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("activate-ejb3-remoting-http-connector").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("activate-ejb3-remoting-http-connector").build();
 
     private RefHttpRemotingConnectorInEJB3Remote() {
     }
@@ -47,8 +47,8 @@ public class RefHttpRemotingConnectorInEJB3Remote implements WildFly10SubsystemM
     public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {

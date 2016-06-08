@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.core;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,14 +24,14 @@ import java.util.Map;
  * The server migration task id.
  * @author emmartins
  */
-public class ServerMigrationTaskId {
+public class ServerMigrationTaskName implements Serializable {
 
     private static final Map<String, String> NO_ATTRIBUTES = Collections.unmodifiableMap(new HashMap<String, String>());
 
     private final String name;
     private final Map<String, String> attributes;
 
-    private ServerMigrationTaskId(String name, Map<String, String> attributes) {
+    private ServerMigrationTaskName(String name, Map<String, String> attributes) {
         this.name = name;
         this.attributes = attributes != null ? Collections.unmodifiableMap(attributes) : NO_ATTRIBUTES;
     }
@@ -108,8 +109,8 @@ public class ServerMigrationTaskId {
          * Builds the task id.
          * @return the task id built
          */
-        public ServerMigrationTaskId build() {
-            return new ServerMigrationTaskId(name, attributes);
+        public ServerMigrationTaskName build() {
+            return new ServerMigrationTaskName(name, attributes);
         }
     }
 }

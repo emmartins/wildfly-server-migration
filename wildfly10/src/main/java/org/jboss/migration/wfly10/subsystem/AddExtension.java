@@ -19,7 +19,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -42,11 +42,11 @@ public class AddExtension implements WildFly10SubsystemMigrationTaskFactory {
     public ServerMigrationTask getServerMigrationTask(final ModelNode config, final WildFly10Subsystem subsystem, final WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
 
-            private final ServerMigrationTaskId taskId = new ServerMigrationTaskId.Builder().setName("add-extension").addAttribute("name", subsystem.getExtension().getName()).build();
+            private final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder().setName("add-extension").addAttribute("name", subsystem.getExtension().getName()).build();
 
             @Override
-            public ServerMigrationTaskId getId() {
-                return taskId;
+            public ServerMigrationTaskName getName() {
+                return taskName;
             }
 
             @Override

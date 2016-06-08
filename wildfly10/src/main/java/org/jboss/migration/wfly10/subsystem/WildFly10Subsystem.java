@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.subsystem;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -32,13 +32,13 @@ public class WildFly10Subsystem {
     private final String name;
     private final WildFly10Extension extension;
     protected final List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks;
-    protected final ServerMigrationTaskId serverMigrationTaskId;
+    protected final ServerMigrationTaskName serverMigrationTaskName;
 
     public WildFly10Subsystem(String name, String taskName, List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks, WildFly10Extension extension) {
         this.name = name;
         this.extension = extension;
         this.subsystemMigrationTasks = subsystemMigrationTasks;
-        this.serverMigrationTaskId = new ServerMigrationTaskId.Builder()
+        this.serverMigrationTaskName = new ServerMigrationTaskName.Builder()
                 .setName(taskName)
                 .addAttribute("name", getName())
                 .build();
@@ -76,12 +76,12 @@ public class WildFly10Subsystem {
         }
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return serverMigrationTaskId;
+            public ServerMigrationTaskName getName() {
+                return serverMigrationTaskName;
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                final ModelNode subsystemConfig = server.getSubsystem(getName());
+                final ModelNode subsystemConfig = server.getSubsystem(name);
                 for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
                     context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, server));
                 }

@@ -19,7 +19,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -42,17 +42,17 @@ public class AddSubsystem implements WildFly10SubsystemMigrationTaskFactory {
     public ServerMigrationTask getServerMigrationTask(ModelNode config, final WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
-            public ServerMigrationTaskId getId() {
-                return new ServerMigrationTaskId.Builder().setName("add-subsystem").addAttribute("name", subsystem.getName()).build();
+            public ServerMigrationTaskName getName() {
+                return new ServerMigrationTaskName.Builder().setName("add-subsystem-config").addAttribute("name", subsystem.getName()).build();
             }
             @Override
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
                 if (config != null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                context.getLogger().debugf("Adding subsystem %s...", subsystem.getName());
+                context.getLogger().debugf("Adding subsystem %s config...", subsystem.getName());
                 addSubsystem(subsystem, server, context);
-                context.getLogger().infof("Subsystem %s added.", subsystem.getName());
+                context.getLogger().infof("Subsystem %s config added.", subsystem.getName());
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

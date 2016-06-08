@@ -21,7 +21,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
@@ -35,13 +35,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("socket-bindings-migration").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("socket-bindings").build();
 
     public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer target) {
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
 
             @Override

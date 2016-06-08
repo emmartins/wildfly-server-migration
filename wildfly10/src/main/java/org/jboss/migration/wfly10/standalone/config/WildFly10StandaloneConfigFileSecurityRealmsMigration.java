@@ -20,7 +20,7 @@ import org.jboss.dmr.Property;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
@@ -37,9 +37,9 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("security-realms-migration").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("security-realms").build();
 
-    public static final String SERVER_MIGRATION_TASK_SECURITY_REALM_NAME = "security-realm-migration";
+    public static final String SERVER_MIGRATION_TASK_SECURITY_REALM_NAME = "security-realm";
     public static final String MIGRATION_REPORT_TASK_ATTR_AUTHENTICATION_PROPERTIES_SOURCE = "Authentication Properties Source: ";
     public static final String MIGRATION_REPORT_TASK_ATTR_AUTHENTICATION_PROPERTIES_TARGET = "Authentication Properties Target: ";
     public static final String MIGRATION_REPORT_TASK_ATTR_AUTHORIZATION_PROPERTIES_SOURCE = "Authorization Properties Source: ";
@@ -48,8 +48,8 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
     public ServerMigrationTask getServerMigrationTask(final ServerPath<S> source, final WildFly10StandaloneServer target) {
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
 
             @Override
@@ -115,11 +115,11 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
     protected void migrateSecurityRealm(final ModelNode securityRealm, final ServerPath<S> source, final WildFly10StandaloneServer target, final ServerMigrationTaskContext context) throws IOException {
         final Property securityRealmProperty = securityRealm.asProperty();
         final String securityRealmName = securityRealmProperty.getName();
-        final ServerMigrationTaskId securityRealmMigrationTaskId = new ServerMigrationTaskId.Builder().setName(SERVER_MIGRATION_TASK_SECURITY_REALM_NAME).addAttribute("name", securityRealmName).build();
+        final ServerMigrationTaskName securityRealmMigrationTaskName = new ServerMigrationTaskName.Builder().setName(SERVER_MIGRATION_TASK_SECURITY_REALM_NAME).addAttribute("name", securityRealmName).build();
         final ServerMigrationTask securityRealmMigrationTask = new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return securityRealmMigrationTaskId;
+            public ServerMigrationTaskName getName() {
+                return securityRealmMigrationTaskName;
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {

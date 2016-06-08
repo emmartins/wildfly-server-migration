@@ -38,7 +38,7 @@ public class ServerMigrationTaskExecution {
     private volatile ServerMigrationTaskResult result;
     private final Logger logger;
     private final long taskNumber;
-    private final AbsoluteServerMigrationTaskId absoluteServerMigrationTaskId;
+    private final ServerMigrationTaskPath taskPath;
 
     ServerMigrationTaskExecution(ServerMigrationTask task, ServerMigrationTaskExecution parent) {
         this(task, parent, parent.serverMigrationContext);
@@ -55,7 +55,7 @@ public class ServerMigrationTaskExecution {
         this.children = new ArrayList<>();
         taskNumber = taskCounter.incrementAndGet();
         this.logger = Logger.getLogger(ServerMigrationTask.class.getName()+'#'+String.valueOf(taskNumber));
-        this.absoluteServerMigrationTaskId = new AbsoluteServerMigrationTaskId(this);
+        this.taskPath = new ServerMigrationTaskPath(task.getName(), parent != null ? parent.getTaskPath() : null);
     }
 
     /**
@@ -67,6 +67,14 @@ public class ServerMigrationTaskExecution {
     }
 
     /**
+     * Retrieves the task number.
+     * @return the task number
+     */
+    public long getTaskNumber() {
+        return taskNumber;
+    }
+
+    /**
      * Retrieves the task logger.
      * @return the task logger
      */
@@ -75,11 +83,11 @@ public class ServerMigrationTaskExecution {
     }
 
     /**
-     * Retrieves the task id.
-     * @return the task id.
+     * Retrieves the task name.
+     * @return the task name.
      */
-    public ServerMigrationTaskId getTaskId() {
-        return task.getId();
+    public ServerMigrationTaskName getTaskName() {
+        return task.getName();
     }
 
     /**
@@ -91,11 +99,11 @@ public class ServerMigrationTaskExecution {
     }
 
     /**
-     * Retrieves the absolute task id
-     * @return a list with all the task ids
+     * Retrieves the task's path
+     * @return the task's path
      */
-    public List<ServerMigrationTaskId> getAbsoluteTaskId() {
-        return absoluteServerMigrationTaskId.taskIds;
+    public ServerMigrationTaskPath getTaskPath() {
+        return taskPath;
     }
 
     /**
@@ -149,10 +157,10 @@ public class ServerMigrationTaskExecution {
 
     synchronized void run() throws IllegalStateException, ServerMigrationFailedException {
         if (this.result != null) {
-            throw new IllegalStateException("Task "+absoluteServerMigrationTaskId+" already run");
+            throw new IllegalStateException("Task "+ taskPath +" already run");
         }
         startTime = System.currentTimeMillis();
-        logger.debugf("Task %s execution starting...", absoluteServerMigrationTaskId);
+        logger.debugf("Task %s execution starting...", taskPath);
         try {
             result = task.run(new ServerMigrationTaskContext(this));
         } catch (ServerMigrationFailedException e) {
@@ -163,33 +171,7 @@ public class ServerMigrationTaskExecution {
             result = ServerMigrationTaskResult.fail(e);
             throw e;
         } finally {
-            logger.debugf("Task %s execution completed with result status... %s", absoluteServerMigrationTaskId, result);
-        }
-    }
-
-    private static class AbsoluteServerMigrationTaskId {
-        private final List<ServerMigrationTaskId> taskIds;
-        private AbsoluteServerMigrationTaskId(ServerMigrationTaskExecution task) {
-            final ArrayList<ServerMigrationTaskId> taskIds = new ArrayList<>();
-            if (task.parent != null) {
-                taskIds.addAll(task.parent.getAbsoluteTaskId());
-            }
-            taskIds.add(task.getTaskId());
-            this.taskIds = Collections.unmodifiableList(taskIds);
-        }
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            boolean first = true;
-            for (ServerMigrationTaskId taskId : taskIds) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(":");
-                }
-                sb.append(taskId.toString());
-            }
-            return sb.toString();
+            logger.debugf("Task %s execution completed with result status... %s", taskPath, result);
         }
     }
 }

@@ -21,7 +21,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
@@ -45,7 +45,7 @@ public class MigrateHttpListener implements WildFly10SubsystemMigrationTaskFacto
     private static final String REDIRECT_SOCKET_ATTR_NAME = "redirect-socket";
     private static final String REDIRECT_SOCKET_ATTR_VALUE = "https";
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("migrate-undertow-http-listener").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("migrate-undertow-http-listener").build();
 
     public static final MigrateHttpListener INSTANCE = new MigrateHttpListener();
 
@@ -56,8 +56,8 @@ public class MigrateHttpListener implements WildFly10SubsystemMigrationTaskFacto
     public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
 
             @Override

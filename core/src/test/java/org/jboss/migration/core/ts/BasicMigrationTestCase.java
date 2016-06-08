@@ -15,8 +15,10 @@
  */
 package org.jboss.migration.core.ts;
 
+import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -26,15 +28,13 @@ public class BasicMigrationTestCase {
 
     @Test
     public void testSupportedMigration() {
-        new ServerMigration().from(TestSourceServerProvider.SERVER.getBaseDir()).to(TestTargetServerProvider.SERVER.getBaseDir()).run();
+        final MigrationData migrationData = new ServerMigration().from(TestSourceServerProvider.SERVER.getBaseDir()).to(TestTargetServerProvider.SERVER.getBaseDir()).run();
+        Assert.assertTrue(migrationData.getRootTask().getResult().getStatus() == ServerMigrationTaskResult.Status.SUCCESS);
     }
 
     @Test
     public void testUnsupportedMigration() {
-        try {
-            new ServerMigration().to(TestSourceServerProvider.SERVER.getBaseDir()).from(TestTargetServerProvider.SERVER.getBaseDir()).run();
-        } catch (ServerMigrationFailedException e) {
-            // expected
-        }
+        final MigrationData migrationData = new ServerMigration().to(TestSourceServerProvider.SERVER.getBaseDir()).from(TestTargetServerProvider.SERVER.getBaseDir()).run();
+        Assert.assertNotNull(migrationData.getRootTask().getResult().getFailReason());
     }
 }

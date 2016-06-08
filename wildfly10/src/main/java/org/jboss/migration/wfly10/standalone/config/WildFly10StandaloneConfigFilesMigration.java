@@ -19,7 +19,7 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationContext;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.console.ConsoleWrapper;
@@ -36,7 +36,7 @@ import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
  */
 public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("config-files-migration").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("config-files").build();
 
     private final WildFly10StandaloneConfigFileMigration configFileMigration;
 
@@ -47,8 +47,8 @@ public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
     public ServerMigrationTask getServerMigrationTask(final Collection<ServerPath<S>> sourceConfigs, final WildFly10Server target) {
         return new ServerMigrationTask() {
             @Override
-            public ServerMigrationTaskId getId() {
-                return getServerMigrationTaskId();
+            public ServerMigrationTaskName getName() {
+                return getServerMigrationTaskName();
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
@@ -62,8 +62,8 @@ public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
      *
      * @return
      */
-    protected ServerMigrationTaskId getServerMigrationTaskId() {
-        return SERVER_MIGRATION_TASK_ID;
+    protected ServerMigrationTaskName getServerMigrationTaskName() {
+        return SERVER_MIGRATION_TASK_NAME;
     }
 
     protected void run(final Collection<ServerPath<S>> sourceConfigs, final WildFly10Server target, final ServerMigrationTaskContext taskContext) throws Exception {

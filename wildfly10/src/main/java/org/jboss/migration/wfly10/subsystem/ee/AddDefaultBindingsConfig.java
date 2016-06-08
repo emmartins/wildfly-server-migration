@@ -20,7 +20,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskId;
+import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.UserChoiceWithOtherOption;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
@@ -45,7 +45,14 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
 
     public static final AddDefaultBindingsConfig INSTANCE = new AddDefaultBindingsConfig();
 
-    public static final ServerMigrationTaskId SERVER_MIGRATION_TASK_ID = new ServerMigrationTaskId.Builder().setName("setup-javaee7-default-bindings").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("setup-javaee7-default-bindings").build();
+
+    public static final String TASK_RESULT_ATTR_CONTEXT_SERVICE = "default-context-service";
+    public static final String TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY = "default-managed-thread-factory";
+    public static final String TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE = "default-managed-executor-service";
+    public static final String TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE = "default-managed-scheduled-executor-service";
+    public static final String TASK_RESULT_ATTR_DATA_SOURCE = "default-data-source";
+    public static final String TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY = "default-jms-connection-factory";
 
     private AddDefaultBindingsConfig() {
     }
@@ -64,30 +71,35 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
     public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
-            public ServerMigrationTaskId getId() {
-                return SERVER_MIGRATION_TASK_ID;
+            public ServerMigrationTaskName getName() {
+                return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
             protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
+                final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
                 final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement("service", "default-bindings"));
                 final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
                 addOp.get("context-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
                 addOp.get("managed-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
                 addOp.get("managed-scheduled-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
                 addOp.get("managed-thread-factory").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
-                setupDefaultDatasource(addOp, server, context);
-                setupDefaultJMSConnectionFactory(addOp, server, context);
+                setupDefaultDatasource(addOp, server, context, taskResultBuilder);
+                setupDefaultJMSConnectionFactory(addOp, server, context, taskResultBuilder);
                 server.executeManagementOperation(addOp);
                 context.getLogger().infof("Java EE Default Bindings configured.");
-                return ServerMigrationTaskResult.SUCCESS;
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+                return taskResultBuilder.sucess().build();
             }
         };
     }
 
-    private void setupDefaultJMSConnectionFactory(final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context) throws Exception {
+    private void setupDefaultJMSConnectionFactory(final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
         // if the subsystem config defines expected default resource then use it
         final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.MESSAGING_ACTIVEMQ);
         if (subsystemConfig == null) {
@@ -98,6 +110,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
             final ModelNode defaultJmsConnectionFactory = subsystemConfig.get(SERVER, DEFAULT_JMS_SERVER_NAME, POOLED_CONNECTION_FACTORY, DEFAULT_JMS_CONNECTION_FACTORY_NAME);
             final String defaultJmsConnectionFactoryJndiName = defaultJmsConnectionFactory.get("entries").asList().get(0).asString();
             addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
+            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, defaultJmsConnectionFactoryJndiName);
             context.getLogger().infof("Default JMS Connection Factory %s found and set as the Java EE Default JMS Connection Factory.", DEFAULT_JMS_CONNECTION_FACTORY_NAME);
         } else {
             if (context.getServerMigrationContext().isInteractive()) {
@@ -107,7 +120,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                 context.getLogger().infof("Default JMS Connection Factory not found, skipping its configuration due to non interactive mode");
                 return;
             }
-            // retrieve the names of configured datasources
+            // retrieve the names of configured factories
             final Map<String, ConfiguredJmsConnectionFactory> factoryNamesMap = new HashMap<>();
             if (subsystemConfig.hasDefined(SERVER)) {
                 for (String serverName : subsystemConfig.get(SERVER).keys()) {
@@ -139,6 +152,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                     final ModelNode jmsConnectionFactory = subsystemConfig.get(SERVER, configuredJmsConnectionFactory.serverName, configuredJmsConnectionFactory.factoryType, configuredJmsConnectionFactory.factoryName);
                     final String jmsConnectionFactoryJndiName = jmsConnectionFactory.get("entries").asList().get(0).asString();
                     addOp.get("jms-connection-factory").set(jmsConnectionFactoryJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, jmsConnectionFactoryJndiName);
                     context.getLogger().infof("JMS Connection Factory %s set as the Java EE Default JMS Connection Factory.", choice);
                 }
                 @Override
@@ -147,6 +161,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                 @Override
                 public void onOther(String otherChoice) throws Exception {
                     addOp.get("jms-connection-factory").set(otherChoice);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, otherChoice);
                     context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", otherChoice);
                 }
             };
@@ -154,7 +169,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
         }
     }
 
-    private void setupDefaultDatasource(final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context) throws Exception {
+    private void setupDefaultDatasource(final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
         // if the subsystem config defines expected default resource then use it
         final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.DATASOURCES);
         if (subsystemConfig == null) {
@@ -165,6 +180,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
             final ModelNode defaultDatasource = subsystemConfig.get(DATA_SOURCE, DEFAULT_DATASOURCE_NAME);
             final String defaultDatasourceJndiName = defaultDatasource.get(DATA_SOURCE_JNDI_NAME).asString();
             addOp.get("datasource").set(defaultDatasourceJndiName);
+            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, defaultDatasourceJndiName);
             context.getLogger().infof("Default datasource %s found and set as the Java EE Default Datasource.", DEFAULT_DATASOURCE_NAME);
         } else {
             if (context.getServerMigrationContext().isInteractive()) {
@@ -186,6 +202,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                 public void onChoice(String choice) throws Exception {
                     final String jndiName = subsystemConfig.get(DATA_SOURCE, choice).get(DATA_SOURCE_JNDI_NAME).asString();
                     addOp.get("datasource").set(jndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, jndiName);
                     context.getLogger().infof("Datasource %s set as the Java EE Default Datasource.", choice);
                 }
                 @Override
@@ -194,6 +211,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                 @Override
                 public void onOther(String otherChoice) throws Exception {
                     addOp.get("datasource").set(otherChoice);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, otherChoice);
                     context.getLogger().infof("Java EE Default Datasource configured with JNDI name %s.", otherChoice);
                 }
             };
