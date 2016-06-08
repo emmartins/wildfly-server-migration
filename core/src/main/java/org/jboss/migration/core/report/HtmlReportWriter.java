@@ -55,7 +55,9 @@ public class HtmlReportWriter {
         final StringBuilder sb = new StringBuilder();
         sb.append(template.header);
         appendSummary(migrationData, sb);
-        sb.append(template.summaryToTaskSummary);
+        sb.append(template.summaryToEnvironment);
+        appendEnvironment(migrationData, sb);
+        sb.append(template.environmentToTaskSummary);
         appendTaskSummary(migrationData, sb);
         sb.append(template.taskSummaryToTaskMap);
         appendTaskMap(migrationData, sb);
@@ -69,8 +71,16 @@ public class HtmlReportWriter {
         final String utcTime = sdf.format(new Date(migrationData.getRootTask().getStartTime()));
         appendProperty("Start Time", utcTime, sb);
         appendProperty("Source Server", migrationData.getSource().getProductInfo().getName() + ' ' + migrationData.getSource().getProductInfo().getVersion(), sb);
+        appendProperty("Source Path", migrationData.getSource().getBaseDir(), sb);
         appendProperty("Target Server", migrationData.getTarget().getProductInfo().getName() + ' ' + migrationData.getTarget().getProductInfo().getVersion(), sb);
+        appendProperty("Target Path", migrationData.getTarget().getBaseDir(), sb);
         appendProperty("Result", getTaskStatus(migrationData.getRootTask().getResult(), migrationData.getRootTask().getResult().getStatus()), sb);
+    }
+
+    private void appendEnvironment(MigrationData migrationData, StringBuilder sb) {
+        for (Map.Entry property : migrationData.getUserEnvironment().entrySet()) {
+            appendProperty(property.getKey().toString(), property.getValue(), sb);
+        }
     }
 
     private void appendTaskSummary(MigrationData migrationData, StringBuilder sb) {
@@ -100,7 +110,7 @@ public class HtmlReportWriter {
         sb.append("<tr>");
         // name
         sb.append("<td class=\"task-header-name\" id=\"task").append(task.getTaskNumber()).append("\">");
-        sb.append("<a class=\"task-display-toggle\" href=\"#task").append(task.getTaskNumber()).append("\" onclick=\"toggleDisplayTaskDetails('task").append(task.getTaskNumber()).append("'); return false\">").append(getTaskStatus(task.getResult(), task.getTaskName())).append("</a>");
+        sb.append("<a class=\"task-display-toggle\" href=\"#task").append(task.getTaskNumber()).append("\" title=\"Show or hide the task details\" onclick=\"toggleDisplayTaskDetails('task").append(task.getTaskNumber()).append("'); return false\">").append(getTaskStatus(task.getResult(), task.getTaskName())).append("</a>");
         sb.append("</td>");
         // subtasks toggles
         if (!task.getSubtasks().isEmpty()) {
@@ -112,14 +122,14 @@ public class HtmlReportWriter {
             } else {
                 sb.append("<td class=\"task-display-toggle\" id=\"task").append(task.getTaskNumber()).append("-subtasks-hide\">");
             }
-            sb.append("<a class=\"task-display-toggle\" href=\"#task").append(task.getTaskNumber()).append("\" onclick=\"toggleDisplayTaskSubtasks('task").append(task.getTaskNumber()).append("'); return false\">-</a>");
+            sb.append("<a class=\"task-display-toggle\" title=\"Hide subtasks\" href=\"#task").append(task.getTaskNumber()).append("\" onclick=\"hideSubtasks('task").append(task.getTaskNumber()).append("'); return false\">-</a>");
             sb.append("</td>");
             if (task.getTaskPath().size() > MAX_TASK_MAP_DEPTH) {
                 sb.append("<td class=\"task-display-toggle\" id=\"task").append(task.getTaskNumber()).append("-subtasks-show\">");
             } else {
                 sb.append("<td class=\"task-display-toggle\" style=\"display: none\" id=\"task").append(task.getTaskNumber()).append("-subtasks-show\">");
             }
-            sb.append("<a class=\"task-display-toggle\" href=\"#task").append(task.getTaskNumber()).append("\" onclick=\"toggleDisplayTaskSubtasks('task").append(task.getTaskNumber()).append("'); return false\">+</a>");
+            sb.append("<a class=\"task-display-toggle\" title=\"Show subtasks\" href=\"#task").append(task.getTaskNumber()).append("\" onclick=\"showSubtasks('task").append(task.getTaskNumber()).append("'); return false\">+</a>");
             sb.append("</td>");
             sb.append("</tr>");
             sb.append("</table>");
@@ -135,10 +145,10 @@ public class HtmlReportWriter {
         sb.append("<tr>");
         sb.append("<td id=\"task").append(task.getTaskNumber()).append("-details\" style=\"display: none\" class=\"task-map-details\"><table class=\"task-details\">");
 
-        appendTaskDetailsProperty("Number", task.getTaskNumber(), sb);
-        appendTaskDetailsProperty("Name", task.getTaskName(), sb);
-        appendTaskDetailsProperty("Path", task.getTaskPath(), sb);
-        appendTaskDetailsProperty("Logger", task.getLogger().getName(), sb);
+        appendTaskDetailsProperty("Task Number", task.getTaskNumber(), sb);
+        appendTaskDetailsProperty("Task Name", task.getTaskName(), sb);
+        appendTaskDetailsProperty("Task Path", task.getTaskPath(), sb);
+        appendTaskDetailsProperty("Logger Name", task.getLogger().getName(), sb);
 
         // result
         final ServerMigrationTaskResult result = task.getResult();
@@ -156,23 +166,25 @@ public class HtmlReportWriter {
                 } else {
                     temp.append("<br/>");
                 }
-                temp.append(attribute.getKey()).append('=').append(attribute.getValue());
+                temp.append(attribute.getKey()).append(" = ").append(attribute.getValue());
             }
             appendTaskDetailsProperty("Result Attributes", temp, sb);
         }
 
         // subtasks
-        final StringBuilder temp = new StringBuilder();
-        boolean first = true;
-        for (ServerMigrationTaskExecution subtask : task.getSubtasks()) {
-            if (first) {
-                first = false;
-            } else {
-                temp.append("<br/>");
+        if (!task.getSubtasks().isEmpty()) {
+            final StringBuilder temp = new StringBuilder();
+            boolean first = true;
+            for (ServerMigrationTaskExecution subtask : task.getSubtasks()) {
+                if (first) {
+                    first = false;
+                } else {
+                    temp.append("<br/>");
+                }
+                temp.append("<a onclick=\"showSubtasks('task").append(task.getTaskNumber()).append("'); showTaskDetails('task").append(subtask.getTaskNumber()).append("')\" href=\"#task").append(subtask.getTaskNumber()).append("\">").append(subtask.getTaskName()).append("</a>");
             }
-            temp.append("<a href=\"#task").append(subtask.getTaskNumber()).append("\">").append(subtask.getTaskName()).append("</a>");
+            appendTaskDetailsProperty("Subtasks", temp, sb);
         }
-        appendTaskDetailsProperty("Subtasks", temp, sb);
 
         sb.append("</table></td></tr>");
     }
@@ -225,13 +237,15 @@ public class HtmlReportWriter {
 
     public static class ReportTemplate {
         private final String header;
-        private final String summaryToTaskSummary;
+        private final String summaryToEnvironment;
+        private final String environmentToTaskSummary;
         private final String taskSummaryToTaskMap;
         private final String footer;
 
-        private ReportTemplate(String header, String summaryToTaskSummary, String taskSummaryToTaskMap, String footer) {
+        private ReportTemplate(String header, String summaryToEnvironment, String environmentToTaskSummary, String taskSummaryToTaskMap, String footer) {
             this.header = header;
-            this.summaryToTaskSummary = summaryToTaskSummary;
+            this.summaryToEnvironment = summaryToEnvironment;
+            this.environmentToTaskSummary = environmentToTaskSummary;
             this.taskSummaryToTaskMap = taskSummaryToTaskMap;
             this.footer = footer;
         }
@@ -242,21 +256,25 @@ public class HtmlReportWriter {
 
         public static ReportTemplate from(String string) {
             final String summaryMarker = "$SUMMARY";
+            final String environmentMarker = "$ENVIRONMENT";
             final String taskSummaryMarker = "$TASK_SUMMARY";
             final String taskMapMarker = "$TASK_MAP";
 
             final int summaryIndex = string.indexOf(summaryMarker);
             final String header = string.substring(0, summaryIndex);
 
+            final int environmentIndex = string.indexOf(environmentMarker);
+            final String summaryToEnvironment = string.substring(summaryIndex+summaryMarker.length(), environmentIndex);
+
             final int taskSummaryIndex = string.indexOf(taskSummaryMarker);
-            final String summaryToTaskSummary = string.substring(summaryIndex+summaryMarker.length(), taskSummaryIndex);
+            final String environmentToTaskSummary = string.substring(environmentIndex+environmentMarker.length(), taskSummaryIndex);
 
             final int taskMapIndex = string.indexOf(taskMapMarker);
             final String taskSummaryToTaskMap = string.substring(taskSummaryIndex+taskSummaryMarker.length(), taskMapIndex);
 
             final String footer = string.substring(taskMapIndex+taskMapMarker.length());
 
-            return new ReportTemplate(header, summaryToTaskSummary, taskSummaryToTaskMap, footer);
+            return new ReportTemplate(header, summaryToEnvironment, environmentToTaskSummary, taskSummaryToTaskMap, footer);
         }
     }
 }

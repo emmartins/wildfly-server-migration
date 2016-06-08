@@ -18,6 +18,7 @@ package org.jboss.migration.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * The data collected from the server migration.
@@ -59,6 +60,14 @@ public class MigrationData {
      */
     public ServerMigrationTaskExecution getRootTask() {
         return rootTask;
+    }
+
+    /**
+     * Retrieves the user environment.
+     * @return the user environment
+     */
+    public Properties getUserEnvironment() {
+        return rootTask.getServerMigrationContext().getUserEnvironment();
     }
 
     /**

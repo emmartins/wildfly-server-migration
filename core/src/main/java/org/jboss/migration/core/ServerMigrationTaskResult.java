@@ -137,11 +137,11 @@ public class ServerMigrationTaskResult {
          * @param value
          * @return
          */
-        public Builder addAttribute(String name, String value) {
+        public Builder addAttribute(String name, Object value) {
             if (attributes == null) {
                 attributes = new HashMap<>();
             }
-            attributes.put(name, value);
+            attributes.put(name, value.toString());
             return this;
         }
 
