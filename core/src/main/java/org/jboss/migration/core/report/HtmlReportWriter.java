@@ -38,8 +38,6 @@ public class HtmlReportWriter {
 
     public static HtmlReportWriter INSTANCE = new HtmlReportWriter();
 
-    private static final int MAX_TASK_MAP_DEPTH = 4;
-
     private HtmlReportWriter() {
 
     }
@@ -78,8 +76,8 @@ public class HtmlReportWriter {
     }
 
     private void appendEnvironment(MigrationData migrationData, StringBuilder sb) {
-        for (Map.Entry property : migrationData.getUserEnvironment().entrySet()) {
-            appendProperty(property.getKey().toString(), property.getValue(), sb);
+        for (String property : migrationData.getServerMigrationEnvironment().getPropertyNames()) {
+            appendProperty(property, migrationData.getServerMigrationEnvironment().getPropertyAsString(property), sb);
         }
     }
 
@@ -91,19 +89,20 @@ public class HtmlReportWriter {
     }
 
     private void appendTaskMap(MigrationData migrationData, StringBuilder sb) {
-        appendTask(migrationData.getRootTask(), sb);
+        final int maxTaskPathSizeToDisplaySubtasks = Integer.valueOf(migrationData.getServerMigrationEnvironment().getPropertyAsString(EnvironmentProperties.PROPERTY_MAX_TASK_PATH_SIZE_TO_DISPLAY_SUBTASKS, "4"));
+        appendTask(migrationData.getRootTask(), sb, maxTaskPathSizeToDisplaySubtasks);
     }
 
-    private void appendTask(ServerMigrationTaskExecution task, StringBuilder sb) {
+    private void appendTask(ServerMigrationTaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
         final String tableClass = (task.getTaskPath().size() % 2) == 0 ? "task-map-even" : "task-map-odd";
         sb.append("<table class=\"").append(tableClass).append("\">");
-        appendTaskHeader(task, sb);
+        appendTaskHeader(task, sb, maxTaskPathSizeToDisplaySubtasks);
         appendTaskDetails(task, sb);
-        appendTaskSubtasks(task, sb);
+        appendTaskSubtasks(task, sb, maxTaskPathSizeToDisplaySubtasks);
         sb.append("</table>");
     }
 
-    private void appendTaskHeader(ServerMigrationTaskExecution task, StringBuilder sb) {
+    private void appendTaskHeader(ServerMigrationTaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
         sb.append("<tr>");
         sb.append("<td class=\"task-map-header\">");
         sb.append("<table class=\"task-header\">");
@@ -117,14 +116,14 @@ public class HtmlReportWriter {
             sb.append("<td class=\"task-header-toggles\">");
             sb.append("<table>");
             sb.append("<tr>");
-            if (task.getTaskPath().size() > MAX_TASK_MAP_DEPTH) {
+            if (task.getTaskPath().size() > maxTaskPathSizeToDisplaySubtasks) {
                 sb.append("<td class=\"task-display-toggle\" style=\"display: none\" id=\"task").append(task.getTaskNumber()).append("-subtasks-hide\">");
             } else {
                 sb.append("<td class=\"task-display-toggle\" id=\"task").append(task.getTaskNumber()).append("-subtasks-hide\">");
             }
             sb.append("<a class=\"task-display-toggle\" title=\"Hide subtasks\" href=\"#task").append(task.getTaskNumber()).append("\" onclick=\"hideSubtasks('task").append(task.getTaskNumber()).append("'); return false\">-</a>");
             sb.append("</td>");
-            if (task.getTaskPath().size() > MAX_TASK_MAP_DEPTH) {
+            if (task.getTaskPath().size() > maxTaskPathSizeToDisplaySubtasks) {
                 sb.append("<td class=\"task-display-toggle\" id=\"task").append(task.getTaskNumber()).append("-subtasks-show\">");
             } else {
                 sb.append("<td class=\"task-display-toggle\" style=\"display: none\" id=\"task").append(task.getTaskNumber()).append("-subtasks-show\">");
@@ -189,11 +188,11 @@ public class HtmlReportWriter {
         sb.append("</table></td></tr>");
     }
 
-    private void appendTaskSubtasks(ServerMigrationTaskExecution task, StringBuilder sb) {
+    private void appendTaskSubtasks(ServerMigrationTaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
         final List<ServerMigrationTaskExecution> subtasks = task.getSubtasks();
         if (!subtasks.isEmpty()) {
             sb.append("<tr>");
-            if (task.getTaskPath().size() > MAX_TASK_MAP_DEPTH) {
+            if (task.getTaskPath().size() > maxTaskPathSizeToDisplaySubtasks) {
                 sb.append("<td class=\"task-map-subtasks\" style=\"display: none\" id=\"task").append(task.getTaskNumber()).append("-subtasks\">");
             } else {
                 sb.append("<td class=\"task-map-subtasks\" id=\"task").append(task.getTaskNumber()).append("-subtasks\">");
@@ -202,7 +201,7 @@ public class HtmlReportWriter {
             for (ServerMigrationTaskExecution subtask : subtasks) {
                 sb.append("<tr>");
                 sb.append("<td>");
-                appendTask(subtask, sb);
+                appendTask(subtask, sb, maxTaskPathSizeToDisplaySubtasks);
                 sb.append("</td>");
                 sb.append("</tr>");
             }
@@ -221,9 +220,9 @@ public class HtmlReportWriter {
     }
 
     private void appendProperty(String propertyName, Object propertyValue, StringBuilder sb) {
-        sb.append("<tr><td>")
+        sb.append("<tr><td class=\"property-name\">")
                 .append(propertyName)
-                .append(":</td><td>")
+                .append(":</td><td class=\"property-value\">")
                 .append(propertyValue)
                 .append("</td></tr>");
     }

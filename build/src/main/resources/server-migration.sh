@@ -40,16 +40,12 @@ fi
 # Sample JPDA settings for remote socket debugging
 #JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y"
 
-# determine the default output dir, if not set
-if [ "x$JBOSS_SERVER_MIGRATION_OUTPUT_DIR" = "x" ]; then
-   JBOSS_SERVER_MIGRATION_OUTPUT_DIR="$BASE_DIR"/output
-   JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.output.dir="$JBOSS_SERVER_MIGRATION_OUTPUT_DIR"\""
-fi
+JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.baseDir="$BASE_DIR"\""
 
 LOG_CONF=`echo $JAVA_OPTS | grep "logging.configuration"`
 if [ "x$LOG_CONF" = "x" ]; then
     JAVA_OPTS=""$JAVA_OPTS" \"-Dlogging.configuration=file:"$BASE_DIR"/config/logging.properties\""
-    JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.logfile="$JBOSS_SERVER_MIGRATION_OUTPUT_DIR"/migration.log\""
+    JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.logfile="$BASE_DIR"/output/migration.log\""
 else
     echo "logging.configuration already set in JAVA_OPTS"
     JAVA_OPTS="$JAVA_OPTS"
