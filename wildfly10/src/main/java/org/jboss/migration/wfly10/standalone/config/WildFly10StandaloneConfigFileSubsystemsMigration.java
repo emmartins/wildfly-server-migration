@@ -173,11 +173,8 @@ public class WildFly10StandaloneConfigFileSubsystemsMigration<S extends Server> 
     }
 
     protected void migrateExtensions(WildFly10StandaloneServer wildFly10StandaloneServer, List<WildFly10Extension> extensionsToMigrate, ServerMigrationTaskContext context) throws IOException {
-        final List<String> skippedByEnv = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(EnvironmentProperties.EXTENSIONS_SKIP);
         for (WildFly10Extension extensionToMigrate : extensionsToMigrate) {
-            if (skippedByEnv == null || !skippedByEnv.contains(extensionToMigrate.getName())) {
-                extensionToMigrate.migrate(wildFly10StandaloneServer, context);
-            }
+            extensionToMigrate.migrate(wildFly10StandaloneServer, context);
         }
     }
 }

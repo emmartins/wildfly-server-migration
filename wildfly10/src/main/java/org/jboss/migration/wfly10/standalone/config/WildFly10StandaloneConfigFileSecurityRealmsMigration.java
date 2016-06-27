@@ -37,6 +37,17 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Server> {
 
+    public interface EnvironmentProperties {
+        /**
+         * the prefix for the name of security realms related properties
+         */
+        String PROPERTIES_PREFIX = "security-realms.";
+        /**
+         * Boolean property which if true skips migration of security realms
+         */
+        String SKIP = PROPERTIES_PREFIX + "skip";
+    }
+
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("security-realms").build();
 
     public static final String SERVER_MIGRATION_TASK_SECURITY_REALM_NAME = "security-realm";
@@ -61,6 +72,9 @@ public class WildFly10StandaloneConfigFileSecurityRealmsMigration<S extends Serv
     }
 
     protected void run(ServerPath<S> source, WildFly10StandaloneServer target, ServerMigrationTaskContext context) throws IOException {
+        if (context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(EnvironmentProperties.SKIP, Boolean.FALSE)) {
+            return;
+        }
         /*if (context.isInteractive()) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override

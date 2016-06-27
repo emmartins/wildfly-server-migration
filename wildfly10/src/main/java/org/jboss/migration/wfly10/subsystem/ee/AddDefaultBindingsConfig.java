@@ -22,7 +22,10 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserChoiceWithOtherOption;
+import org.jboss.migration.core.console.UserConfirmation;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -36,9 +39,10 @@ import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
+import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
 
 /**
- * A task which adds the default EE Concurrency Utilities config to the subsystem.
+ * A task which configures the default Java EE 7 bindings.
  * @author emmartins
  */
 public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTaskFactory {
@@ -46,6 +50,17 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
     public static final AddDefaultBindingsConfig INSTANCE = new AddDefaultBindingsConfig();
 
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("setup-javaee7-default-bindings").build();
+
+    public interface EnvironmentProperties {
+        String DEFAULT_CONTEXT_SERVICE_JNDI_NAME = "defaultContextServiceJndiName";
+        String DEFAULT_DATA_SOURCE_JNDI_NAME = "defaultDataSourceJndiName";
+        String DEFAULT_DATA_SOURCE_NAME = "defaultDataSourceName";
+        String DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME = "defaultJmsConnectionFactoryJndiName";
+        String DEFAULT_JMS_CONNECTION_FACTORY_NAME = "defaultJmsConnectionFactoryName";
+        String DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME = "defaultManagedThreadFactoryJndiName";
+        String DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME = "defaultManagedExecutorServiceJndiName";
+        String DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME = "defaultManagedScheduledExecutorServiceJndiName";
+    }
 
     public static final String TASK_RESULT_ATTR_CONTEXT_SERVICE = "default-context-service";
     public static final String TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY = "default-managed-thread-factory";
@@ -62,13 +77,9 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
     private static final String POOLED_CONNECTION_FACTORY = "pooled-connection-factory";
     private static final String DATA_SOURCE = "data-source";
     private static final String DATA_SOURCE_JNDI_NAME = "jndi-name";
-    // TODO move to migration context properties
-    private static final String DEFAULT_DATASOURCE_NAME = "ExampleDS";
-    private static final String DEFAULT_JMS_CONNECTION_FACTORY_NAME = "hornetq-ra";
-    private static final String DEFAULT_JMS_SERVER_NAME = "default";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
+    public ServerMigrationTask getServerMigrationTask(final ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
         return new WildFly10SubsystemMigrationTask(config, subsystem, server) {
             @Override
             public ServerMigrationTaskName getName() {
@@ -79,144 +90,224 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
+                // read env properties
+                final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
+                final String defaultContextServiceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_CONTEXT_SERVICE_JNDI_NAME));
+                final String defaultDataSourceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME));
+                final String defaultDataSourceName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_DATA_SOURCE_NAME));
+                final String defaultJmsConnectionFactoryJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME));
+                final String defaultJmsConnectionFactoryName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_NAME));
+                final String defaultManagedThreadFactoryJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME));
+                final String defaultManagedExecutorServiceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME));
+                final String defaultManagedScheduledExecutorServiceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME));
+                // do migration
                 final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
                 final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement("service", "default-bindings"));
                 final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                addOp.get("context-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
-                addOp.get("managed-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
-                addOp.get("managed-scheduled-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
-                addOp.get("managed-thread-factory").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
-                setupDefaultDatasource(addOp, server, context, taskResultBuilder);
-                setupDefaultJMSConnectionFactory(addOp, server, context, taskResultBuilder);
+                if (defaultContextServiceJndiName != null && !defaultContextServiceJndiName.isEmpty()) {
+                    addOp.get("context-service").set(defaultContextServiceJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, defaultContextServiceJndiName);
+                }
+                if (defaultManagedExecutorServiceJndiName != null && !defaultManagedExecutorServiceJndiName.isEmpty()) {
+                    addOp.get("managed-executor-service").set(defaultManagedExecutorServiceJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, defaultManagedExecutorServiceJndiName);
+                }
+                if (defaultManagedScheduledExecutorServiceJndiName != null && !defaultManagedScheduledExecutorServiceJndiName.isEmpty()) {
+                    addOp.get("managed-scheduled-executor-service").set(defaultManagedScheduledExecutorServiceJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, defaultManagedScheduledExecutorServiceJndiName);
+                }
+                if (defaultManagedThreadFactoryJndiName != null && !defaultManagedThreadFactoryJndiName.isEmpty()) {
+                    addOp.get("managed-thread-factory").set(defaultManagedThreadFactoryJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, defaultManagedThreadFactoryJndiName);
+                }
+                setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, server, context, taskResultBuilder);
+                setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, server, context, taskResultBuilder);
                 server.executeManagementOperation(addOp);
                 context.getLogger().infof("Java EE Default Bindings configured.");
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
                 return taskResultBuilder.sucess().build();
             }
+            private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
+                // if the subsystem config defines expected default resource then use it
+                final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.MESSAGING_ACTIVEMQ);
+                if (subsystemConfig == null) {
+                    return;
+                }
+                // retrieve jndi name from env and subsystem config
+                if (defaultJmsConnectionFactoryJndiName == null) {
+                    // env does not specify a jndi name
+                    if (defaultJmsConnectionFactoryName != null && !defaultJmsConnectionFactoryName.isEmpty()) {
+                        if (subsystemConfig.hasDefined(SERVER)) {
+                            for (String serverName : subsystemConfig.get(SERVER).keys()) {
+                                ModelNode defaultJmsConnectionFactory = null;
+                                if (subsystemConfig.hasDefined(SERVER, serverName, POOLED_CONNECTION_FACTORY, defaultJmsConnectionFactoryName)) {
+                                    defaultJmsConnectionFactory = subsystemConfig.get(SERVER, serverName, POOLED_CONNECTION_FACTORY, defaultJmsConnectionFactoryName);
+                                } else if (subsystemConfig.hasDefined(SERVER, serverName, CONNECTION_FACTORY, defaultJmsConnectionFactoryName)) {
+                                    defaultJmsConnectionFactory = subsystemConfig.get(SERVER, serverName, CONNECTION_FACTORY, defaultJmsConnectionFactoryName);
+                                }
+                                if (defaultJmsConnectionFactory != null) {
+                                    defaultJmsConnectionFactoryJndiName = defaultJmsConnectionFactory.get("entries").asList().get(0).asString();
+                                }
+                            }
+                        }
+                    }
+                } else if (defaultJmsConnectionFactoryJndiName.isEmpty()) {
+                    defaultJmsConnectionFactoryJndiName = null;
+                }
+                if (defaultJmsConnectionFactoryJndiName != null) {
+                    addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, defaultJmsConnectionFactoryJndiName);
+                    context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", defaultJmsConnectionFactoryJndiName);
+                } else {
+                    if (context.getServerMigrationContext().isInteractive()) {
+                        context.getLogger().infof("Default JMS Connection Factory not found");
+                    } else {
+                        // not interactive, skip it
+                        context.getLogger().infof("Default JMS Connection Factory not found, skipping its configuration due to non interactive mode");
+                        return;
+                    }
+                    // retrieve the names of configured factories
+                    final Map<String, ConfiguredJmsConnectionFactory> factoryNamesMap = new HashMap<>();
+                    if (subsystemConfig.hasDefined(SERVER)) {
+                        for (String serverName : subsystemConfig.get(SERVER).keys()) {
+                            if (subsystemConfig.hasDefined(SERVER, serverName, CONNECTION_FACTORY)) {
+                                for (String factoryName : subsystemConfig.get(SERVER, serverName, CONNECTION_FACTORY).keys()) {
+                                    final ConfiguredJmsConnectionFactory configuredJmsConnectionFactory = new ConfiguredJmsConnectionFactory();
+                                    configuredJmsConnectionFactory.serverName = serverName;
+                                    configuredJmsConnectionFactory.factoryType = CONNECTION_FACTORY;
+                                    configuredJmsConnectionFactory.factoryName = factoryName;
+                                    factoryNamesMap.put(configuredJmsConnectionFactory.toString(), configuredJmsConnectionFactory);
+                                }
+                            }
+                            if (subsystemConfig.hasDefined(SERVER, serverName, POOLED_CONNECTION_FACTORY)) {
+                                for (String factoryName : subsystemConfig.get(SERVER, serverName, POOLED_CONNECTION_FACTORY).keys()) {
+                                    final ConfiguredJmsConnectionFactory configuredJmsConnectionFactory = new ConfiguredJmsConnectionFactory();
+                                    configuredJmsConnectionFactory.serverName = serverName;
+                                    configuredJmsConnectionFactory.factoryType = POOLED_CONNECTION_FACTORY;
+                                    configuredJmsConnectionFactory.factoryName = factoryName;
+                                    factoryNamesMap.put(configuredJmsConnectionFactory.toString(), configuredJmsConnectionFactory);
+                                }
+                            }
+                        }
+                    }
+                    final String[] factoryNames = factoryNamesMap.keySet().toArray(new String[factoryNamesMap.keySet().size()]);
+                    final UserChoiceWithOtherOption.ResultHandler resultHandler = new UserChoiceWithOtherOption.ResultHandler() {
+                        @Override
+                        public void onChoice(String choice) throws Exception {
+                            final ConfiguredJmsConnectionFactory configuredJmsConnectionFactory = factoryNamesMap.get(choice);
+                            final ModelNode jmsConnectionFactory = subsystemConfig.get(SERVER, configuredJmsConnectionFactory.serverName, configuredJmsConnectionFactory.factoryType, configuredJmsConnectionFactory.factoryName);
+                            final String jmsConnectionFactoryJndiName = jmsConnectionFactory.get("entries").asList().get(0).asString();
+                            processJmsConnectionFactoryJndiName(jmsConnectionFactoryJndiName);
+                        }
+                        @Override
+                        public void onError() throws Exception {
+                        }
+                        @Override
+                        public void onOther(String otherChoice) throws Exception {
+                            processJmsConnectionFactoryJndiName(otherChoice);
+                        }
+                        private void processJmsConnectionFactoryJndiName(final String jmsConnectionFactoryJndiName) throws Exception {
+                            addOp.get("jms-connection-factory").set(jmsConnectionFactoryJndiName);
+                            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, jmsConnectionFactoryJndiName);
+                            context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", jmsConnectionFactoryJndiName);
+                            final UserConfirmation.ResultHandler resultHandler = new org.jboss.migration.core.console.UserConfirmation.ResultHandler() {
+                                @Override
+                                public void onNo() throws Exception {
+                                }
+                                @Override
+                                public void onYes() throws Exception {
+                                    // set env property
+                                    context.getServerMigrationContext().getMigrationEnvironment().setProperty(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME), jmsConnectionFactoryJndiName);
+                                }
+                                @Override
+                                public void onError() throws Exception {
+                                    // repeat
+                                    processJmsConnectionFactoryJndiName(jmsConnectionFactoryJndiName);
+                                }
+                            };
+                            final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
+                            consoleWrapper.printf("%n");
+                            new UserConfirmation(consoleWrapper, "Save this Java EE Default JMS Connection Factory JNDI name and use it when migrating other config files?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+                        }
+                    };
+                    new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Factory, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Factory: ", resultHandler).execute();
+                }
+            }
+            private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
+                // if the subsystem config defines expected default resource then use it
+                final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.DATASOURCES);
+                if (subsystemConfig == null) {
+                    return;
+                }
+                if (defaultDataSourceJndiName == null) {
+                    if (defaultDataSourceName != null && !defaultDataSourceName.isEmpty()) {
+                        if (subsystemConfig.hasDefined(DATA_SOURCE, defaultDataSourceName)) {
+                            // default datasource found, use it
+                            final ModelNode defaultDatasource = subsystemConfig.get(DATA_SOURCE, defaultDataSourceName);
+                            defaultDataSourceJndiName = defaultDatasource.get(DATA_SOURCE_JNDI_NAME).asString();
+                        }
+                    }
+                } else if (defaultDataSourceJndiName.isEmpty()) {
+                    defaultDataSourceJndiName = null;
+                }
+                if (defaultDataSourceJndiName != null) {
+                    addOp.get("datasource").set(defaultDataSourceJndiName);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, defaultDataSourceJndiName);
+                    context.getLogger().infof("Java EE Default Datasource configured with JNDI name %s.", defaultDataSourceJndiName);
+                } else {
+                    if (context.getServerMigrationContext().isInteractive()) {
+                        context.getLogger().infof("Default datasource not found.");
+                    } else {
+                        // not interactive, skip it
+                        context.getLogger().infof("Default datasource not found, skipping its configuration due to non interactive mode");
+                        return;
+                    }
+                    // retrieve the names of configured datasources
+                    final String[] dataSourceNames;
+                    if (subsystemConfig.hasDefined(DATA_SOURCE)) {
+                        dataSourceNames =  subsystemConfig.get(DATA_SOURCE).keys().toArray(new String[]{});
+                    } else {
+                        dataSourceNames = new String[]{};
+                    }
+                    final UserChoiceWithOtherOption.ResultHandler resultHandler = new UserChoiceWithOtherOption.ResultHandler() {
+                        @Override
+                        public void onChoice(String choice) throws Exception {
+                            processDatasourceJndiName(subsystemConfig.get(DATA_SOURCE, choice).get(DATA_SOURCE_JNDI_NAME).asString());
+                        }
+                        @Override
+                        public void onError() throws Exception {
+                        }
+                        @Override
+                        public void onOther(String otherChoice) throws Exception {
+                            processDatasourceJndiName(otherChoice);
+                        }
+                        private void processDatasourceJndiName(final String datasourceJndiName) throws Exception {
+                            addOp.get("datasource").set(datasourceJndiName);
+                            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, datasourceJndiName);
+                            context.getLogger().infof("Java EE Default Datasource configured with JNDI name %s.", datasourceJndiName);
+                            final UserConfirmation.ResultHandler resultHandler = new org.jboss.migration.core.console.UserConfirmation.ResultHandler() {
+                                @Override
+                                public void onNo() throws Exception {
+                                }
+                                @Override
+                                public void onYes() throws Exception {
+                                    // set env property
+                                    context.getServerMigrationContext().getMigrationEnvironment().setProperty(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME), datasourceJndiName);
+                                }
+                                @Override
+                                public void onError() throws Exception {
+                                    // repeat
+                                    processDatasourceJndiName(datasourceJndiName);
+                                }
+                            };
+                            final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
+                            consoleWrapper.printf("%n");
+                            new UserConfirmation(consoleWrapper, "Save this Java EE Default Datasource JNDI name and use it when migrating other config files?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+                        }
+                    };
+                    new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), dataSourceNames, "Unconfigured data source, I want to enter the JNDI name...", "Please select Java EE's Default Datasource: ", resultHandler).execute();
+                }
+            }
         };
-    }
-
-    private void setupDefaultJMSConnectionFactory(final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
-        // if the subsystem config defines expected default resource then use it
-        final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.MESSAGING_ACTIVEMQ);
-        if (subsystemConfig == null) {
-            return;
-        }
-        if (subsystemConfig.hasDefined(SERVER, DEFAULT_JMS_SERVER_NAME, POOLED_CONNECTION_FACTORY, DEFAULT_JMS_CONNECTION_FACTORY_NAME)) {
-            // eap 6.4 default standalone config's example jms connection factory found, use it
-            final ModelNode defaultJmsConnectionFactory = subsystemConfig.get(SERVER, DEFAULT_JMS_SERVER_NAME, POOLED_CONNECTION_FACTORY, DEFAULT_JMS_CONNECTION_FACTORY_NAME);
-            final String defaultJmsConnectionFactoryJndiName = defaultJmsConnectionFactory.get("entries").asList().get(0).asString();
-            addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
-            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, defaultJmsConnectionFactoryJndiName);
-            context.getLogger().infof("Default JMS Connection Factory %s found and set as the Java EE Default JMS Connection Factory.", DEFAULT_JMS_CONNECTION_FACTORY_NAME);
-        } else {
-            if (context.getServerMigrationContext().isInteractive()) {
-                context.getLogger().infof("Default JMS Connection Factory not found");
-            } else {
-                // not interactive, skip it
-                context.getLogger().infof("Default JMS Connection Factory not found, skipping its configuration due to non interactive mode");
-                return;
-            }
-            // retrieve the names of configured factories
-            final Map<String, ConfiguredJmsConnectionFactory> factoryNamesMap = new HashMap<>();
-            if (subsystemConfig.hasDefined(SERVER)) {
-                for (String serverName : subsystemConfig.get(SERVER).keys()) {
-                    if (subsystemConfig.hasDefined(SERVER, serverName, CONNECTION_FACTORY)) {
-                        for (String factoryName : subsystemConfig.get(SERVER, serverName, CONNECTION_FACTORY).keys()) {
-                            final ConfiguredJmsConnectionFactory configuredJmsConnectionFactory = new ConfiguredJmsConnectionFactory();
-                            configuredJmsConnectionFactory.serverName = serverName;
-                            configuredJmsConnectionFactory.factoryType = CONNECTION_FACTORY;
-                            configuredJmsConnectionFactory.factoryName = factoryName;
-                            factoryNamesMap.put(configuredJmsConnectionFactory.toString(), configuredJmsConnectionFactory);
-                        }
-                    }
-                    if (subsystemConfig.hasDefined(SERVER, serverName, POOLED_CONNECTION_FACTORY)) {
-                        for (String factoryName : subsystemConfig.get(SERVER, serverName, POOLED_CONNECTION_FACTORY).keys()) {
-                            final ConfiguredJmsConnectionFactory configuredJmsConnectionFactory = new ConfiguredJmsConnectionFactory();
-                            configuredJmsConnectionFactory.serverName = serverName;
-                            configuredJmsConnectionFactory.factoryType = POOLED_CONNECTION_FACTORY;
-                            configuredJmsConnectionFactory.factoryName = factoryName;
-                            factoryNamesMap.put(configuredJmsConnectionFactory.toString(), configuredJmsConnectionFactory);
-                        }
-                    }
-                }
-            }
-            final String[] factoryNames = factoryNamesMap.keySet().toArray(new String[factoryNamesMap.keySet().size()]);
-            final UserChoiceWithOtherOption.ResultHandler resultHandler = new UserChoiceWithOtherOption.ResultHandler() {
-                @Override
-                public void onChoice(String choice) throws Exception {
-                    final ConfiguredJmsConnectionFactory configuredJmsConnectionFactory = factoryNamesMap.get(choice);
-                    final ModelNode jmsConnectionFactory = subsystemConfig.get(SERVER, configuredJmsConnectionFactory.serverName, configuredJmsConnectionFactory.factoryType, configuredJmsConnectionFactory.factoryName);
-                    final String jmsConnectionFactoryJndiName = jmsConnectionFactory.get("entries").asList().get(0).asString();
-                    addOp.get("jms-connection-factory").set(jmsConnectionFactoryJndiName);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, jmsConnectionFactoryJndiName);
-                    context.getLogger().infof("JMS Connection Factory %s set as the Java EE Default JMS Connection Factory.", choice);
-                }
-                @Override
-                public void onError() throws Exception {
-                }
-                @Override
-                public void onOther(String otherChoice) throws Exception {
-                    addOp.get("jms-connection-factory").set(otherChoice);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, otherChoice);
-                    context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", otherChoice);
-                }
-            };
-            new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Factory, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Factory: ", resultHandler).execute();
-        }
-    }
-
-    private void setupDefaultDatasource(final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
-        // if the subsystem config defines expected default resource then use it
-        final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.DATASOURCES);
-        if (subsystemConfig == null) {
-            return;
-        }
-        if (subsystemConfig.hasDefined(DATA_SOURCE, DEFAULT_DATASOURCE_NAME)) {
-            // eap 6.4 default standalone config's example datasource found, use it
-            final ModelNode defaultDatasource = subsystemConfig.get(DATA_SOURCE, DEFAULT_DATASOURCE_NAME);
-            final String defaultDatasourceJndiName = defaultDatasource.get(DATA_SOURCE_JNDI_NAME).asString();
-            addOp.get("datasource").set(defaultDatasourceJndiName);
-            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, defaultDatasourceJndiName);
-            context.getLogger().infof("Default datasource %s found and set as the Java EE Default Datasource.", DEFAULT_DATASOURCE_NAME);
-        } else {
-            if (context.getServerMigrationContext().isInteractive()) {
-                context.getLogger().infof("Default datasource not found.");
-            } else {
-                // not interactive, skip it
-                context.getLogger().infof("Default datasource not found, skipping its configuration due to non interactive mode");
-                return;
-            }
-            // retrieve the names of configured datasources
-            final String[] dataSourceNames;
-            if (subsystemConfig.hasDefined(DATA_SOURCE)) {
-                dataSourceNames =  subsystemConfig.get(DATA_SOURCE).keys().toArray(new String[]{});
-            } else {
-                dataSourceNames = new String[]{};
-            }
-            final UserChoiceWithOtherOption.ResultHandler resultHandler = new UserChoiceWithOtherOption.ResultHandler() {
-                @Override
-                public void onChoice(String choice) throws Exception {
-                    final String jndiName = subsystemConfig.get(DATA_SOURCE, choice).get(DATA_SOURCE_JNDI_NAME).asString();
-                    addOp.get("datasource").set(jndiName);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, jndiName);
-                    context.getLogger().infof("Datasource %s set as the Java EE Default Datasource.", choice);
-                }
-                @Override
-                public void onError() throws Exception {
-                }
-                @Override
-                public void onOther(String otherChoice) throws Exception {
-                    addOp.get("datasource").set(otherChoice);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, otherChoice);
-                    context.getLogger().infof("Java EE Default Datasource configured with JNDI name %s.", otherChoice);
-                }
-            };
-            new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), dataSourceNames, "Unconfigured data source, I want to enter the JNDI name...", "Please select Java EE's Default Datasource: ", resultHandler).execute();
-        }
     }
 
     private static class ConfiguredJmsConnectionFactory {

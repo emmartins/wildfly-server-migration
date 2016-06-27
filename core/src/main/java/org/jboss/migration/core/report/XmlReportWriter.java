@@ -20,6 +20,7 @@ import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTaskExecution;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.util.xml.AttributeValue;
 import org.jboss.migration.core.util.xml.ElementNode;
 import org.jboss.staxmapper.XMLElementWriter;
@@ -89,6 +90,7 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
         processServer(description.getSource(), serversNode, "source");
         processServer(description.getTarget(), serversNode, "target");
         rootElementNode.addChild(serversNode);
+        processEnvironment(description.getServerMigrationEnvironment(), rootElementNode);
         processTask(description.getRootTask(), rootElementNode);
     }
 
@@ -99,6 +101,18 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
         serverNode.addAttribute("base-dir", new AttributeValue(server.getBaseDir().toString()));
         parentElementNode.addChild(serverNode);
     }
+
+    protected void processEnvironment(MigrationEnvironment environment, ElementNode parentElementNode) {
+        final ElementNode environmentNode = new ElementNode(parentElementNode, "environment");
+        for (String propertyName : environment.getPropertyNamesReaded()) {
+            final ElementNode propertyNode = new ElementNode(environmentNode, "property");
+            propertyNode.addAttribute("name", new AttributeValue(propertyName));
+            propertyNode.addAttribute("value", new AttributeValue(environment.getPropertyAsString(propertyName)));
+            environmentNode.addChild(propertyNode);
+        }
+        parentElementNode.addChild(environmentNode);
+    }
+
 
     protected void processTask(ServerMigrationTaskExecution task, ElementNode parentElementNode) {
         final ElementNode taskNode = new ElementNode(parentElementNode, "task");

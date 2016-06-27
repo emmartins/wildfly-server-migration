@@ -23,6 +23,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -38,6 +39,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  * @author emmartins
  */
 public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemMigrationTaskFactory {
+
+    public interface EnvironmentProperties {
+        String ADD_DEFAULT_CONTEXT_SERVICE = "addDefaultContextService";
+        String ADD_DEFAULT_MANAGED_THREAD_FACTORY = "addDefaultManagedThreadFactory";
+        String ADD_DEFAULT_MANAGED_EXECUTOR_SERVICE = "addDefaultManagedExecutorService";
+        String ADD_DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE = "addDefaultManagedScheduledExecutorService";
+    }
 
     public static final String DEFAULT_CONTEXT_SERVICE_JNDI_NAME = "java:jboss/ee/concurrency/context/default";
     public static final String DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME = "java:jboss/ee/concurrency/factory/default";
@@ -68,7 +76,17 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
+
+                // read env properties
+                final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
+                final boolean addDefaultContextService = migrationEnvironment.getPropertyAsBoolean(getEnvironmentPropertyName(EnvironmentProperties.ADD_DEFAULT_CONTEXT_SERVICE), Boolean.FALSE);
+                final boolean addDefaultManagedThreadFactory = migrationEnvironment.getPropertyAsBoolean(getEnvironmentPropertyName(EnvironmentProperties.ADD_DEFAULT_MANAGED_THREAD_FACTORY), Boolean.FALSE);
+                final boolean addDefaultManagedExecutorService = migrationEnvironment.getPropertyAsBoolean(getEnvironmentPropertyName(EnvironmentProperties.ADD_DEFAULT_MANAGED_EXECUTOR_SERVICE), Boolean.FALSE);
+                final boolean addDefaultManagedScheduledExecutorService = migrationEnvironment.getPropertyAsBoolean(getEnvironmentPropertyName(EnvironmentProperties.ADD_DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE), Boolean.FALSE);
+
+                final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
                 final PathElement subsystemPathElement = pathElement(SUBSYSTEM, subsystem.getName());
+
                 // add default context service
             /*
             "context-service" => {"default" => {
@@ -76,14 +94,16 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                     "use-transaction-setup-provider" => true
                 }},
              */
-                final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
-                final PathAddress defaultContextServicePathAddress = pathAddress(subsystemPathElement, pathElement("context-service", "default"));
-                final ModelNode defaultContextServiceAddOp = Util.createEmptyOperation(ADD, defaultContextServicePathAddress);
-                defaultContextServiceAddOp.get("jndi-name").set(DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
-                defaultContextServiceAddOp.get("use-transaction-setup-provider").set(true);
-                server.executeManagementOperation(defaultContextServiceAddOp);
-                context.getLogger().debugf("Default ContextService added to subsystem EE configuration.");
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
+                if (addDefaultContextService) {
+                    final PathAddress defaultContextServicePathAddress = pathAddress(subsystemPathElement, pathElement("context-service", "default"));
+                    final ModelNode defaultContextServiceAddOp = Util.createEmptyOperation(ADD, defaultContextServicePathAddress);
+                    defaultContextServiceAddOp.get("jndi-name").set(DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
+                    defaultContextServiceAddOp.get("use-transaction-setup-provider").set(true);
+                    server.executeManagementOperation(defaultContextServiceAddOp);
+                    context.getLogger().debugf("Default ContextService added to subsystem EE configuration.");
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
+                }
+
                 // add default managed thread factory
             /*
             "managed-thread-factory" => {"default" => {
@@ -92,14 +112,17 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                     "priority" => 5
                 }}
              */
-                final PathAddress defaultManagedThreadFactoryPathAddress = pathAddress(subsystemPathElement, pathElement("managed-thread-factory", "default"));
-                final ModelNode defaultManagedThreadFactoryAddOp = Util.createEmptyOperation(ADD, defaultManagedThreadFactoryPathAddress);
-                defaultManagedThreadFactoryAddOp.get("jndi-name").set(DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
-                defaultManagedThreadFactoryAddOp.get("context-service").set("default");
-                defaultManagedThreadFactoryAddOp.get("priority").set(5);
-                server.executeManagementOperation(defaultManagedThreadFactoryAddOp);
-                context.getLogger().debugf("Default ManagedThreadFactory added to subsystem EE configuration.");
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+                if (addDefaultManagedThreadFactory) {
+                    final PathAddress defaultManagedThreadFactoryPathAddress = pathAddress(subsystemPathElement, pathElement("managed-thread-factory", "default"));
+                    final ModelNode defaultManagedThreadFactoryAddOp = Util.createEmptyOperation(ADD, defaultManagedThreadFactoryPathAddress);
+                    defaultManagedThreadFactoryAddOp.get("jndi-name").set(DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+                    defaultManagedThreadFactoryAddOp.get("context-service").set("default");
+                    defaultManagedThreadFactoryAddOp.get("priority").set(5);
+                    server.executeManagementOperation(defaultManagedThreadFactoryAddOp);
+                    context.getLogger().debugf("Default ManagedThreadFactory added to subsystem EE configuration.");
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+                }
+
                 // add default managed executor service
             /*
             "managed-executor-service" => {"default" => {
@@ -115,17 +138,19 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                     "thread-factory" => undefined
                 }}
              */
-                final PathAddress defaultManagedExecutorServicePathAddress = pathAddress(subsystemPathElement, pathElement("managed-executor-service", "default"));
-                final ModelNode defaultManagedExecutorServiceAddOp = Util.createEmptyOperation(ADD, defaultManagedExecutorServicePathAddress);
-                defaultManagedExecutorServiceAddOp.get("jndi-name").set(DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
-                defaultManagedExecutorServiceAddOp.get("context-service").set("default");
-                defaultManagedExecutorServiceAddOp.get("hung-task-threshold").set(60000L);
-                defaultManagedExecutorServiceAddOp.get("keepalive-time").set(5000L);
-                defaultManagedExecutorServiceAddOp.get("long-running-tasks").set(false);
-                defaultManagedExecutorServiceAddOp.get("reject-policy").set("ABORT");
-                server.executeManagementOperation(defaultManagedExecutorServiceAddOp);
-                context.getLogger().debugf("Default ManagedExecutorService added to subsystem EE configuration.");
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
+                if (addDefaultManagedExecutorService) {
+                    final PathAddress defaultManagedExecutorServicePathAddress = pathAddress(subsystemPathElement, pathElement("managed-executor-service", "default"));
+                    final ModelNode defaultManagedExecutorServiceAddOp = Util.createEmptyOperation(ADD, defaultManagedExecutorServicePathAddress);
+                    defaultManagedExecutorServiceAddOp.get("jndi-name").set(DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
+                    defaultManagedExecutorServiceAddOp.get("context-service").set("default");
+                    defaultManagedExecutorServiceAddOp.get("hung-task-threshold").set(60000L);
+                    defaultManagedExecutorServiceAddOp.get("keepalive-time").set(5000L);
+                    defaultManagedExecutorServiceAddOp.get("long-running-tasks").set(false);
+                    defaultManagedExecutorServiceAddOp.get("reject-policy").set("ABORT");
+                    server.executeManagementOperation(defaultManagedExecutorServiceAddOp);
+                    context.getLogger().debugf("Default ManagedExecutorService added to subsystem EE configuration.");
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
+                }
 
                 // add default managed scheduled executor service
             /*
@@ -140,19 +165,20 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
                     "thread-factory" => undefined
                 }}
              */
-                final PathAddress defaultManagedScheduledExecutorServicePathAddress = pathAddress(subsystemPathElement, pathElement("managed-scheduled-executor-service", "default"));
-                final ModelNode defaultManagedScheduledExecutorServiceAddOp = Util.createEmptyOperation(ADD, defaultManagedScheduledExecutorServicePathAddress);
-                defaultManagedScheduledExecutorServiceAddOp.get("jndi-name").set(DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
-                defaultManagedScheduledExecutorServiceAddOp.get("context-service").set("default");
-                defaultManagedScheduledExecutorServiceAddOp.get("hung-task-threshold").set(60000L);
-                defaultManagedScheduledExecutorServiceAddOp.get("keepalive-time").set(3000L);
-                defaultManagedScheduledExecutorServiceAddOp.get("long-running-tasks").set(false);
-                defaultManagedScheduledExecutorServiceAddOp.get("reject-policy").set("ABORT");
-                server.executeManagementOperation(defaultManagedScheduledExecutorServiceAddOp);
-                context.getLogger().debugf("Default ManagedScheduledExecutorService added to subsystem EE configuration.");
-                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
+                if (addDefaultManagedScheduledExecutorService) {
+                    final PathAddress defaultManagedScheduledExecutorServicePathAddress = pathAddress(subsystemPathElement, pathElement("managed-scheduled-executor-service", "default"));
+                    final ModelNode defaultManagedScheduledExecutorServiceAddOp = Util.createEmptyOperation(ADD, defaultManagedScheduledExecutorServicePathAddress);
+                    defaultManagedScheduledExecutorServiceAddOp.get("jndi-name").set(DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
+                    defaultManagedScheduledExecutorServiceAddOp.get("context-service").set("default");
+                    defaultManagedScheduledExecutorServiceAddOp.get("hung-task-threshold").set(60000L);
+                    defaultManagedScheduledExecutorServiceAddOp.get("keepalive-time").set(3000L);
+                    defaultManagedScheduledExecutorServiceAddOp.get("long-running-tasks").set(false);
+                    defaultManagedScheduledExecutorServiceAddOp.get("reject-policy").set("ABORT");
+                    server.executeManagementOperation(defaultManagedScheduledExecutorServiceAddOp);
+                    context.getLogger().debugf("Default ManagedScheduledExecutorService added to subsystem EE configuration.");
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
+                }
 
-                context.getLogger().infof("EE Concurrency Utilities added.");
                 return taskResultBuilder.sucess().build();
             }
         };

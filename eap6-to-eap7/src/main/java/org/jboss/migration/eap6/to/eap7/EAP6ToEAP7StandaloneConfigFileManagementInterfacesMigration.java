@@ -15,26 +15,31 @@
  */
 package org.jboss.migration.eap6.to.eap7;
 
-import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
-import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
-
 /**
- * Migration of management interfaces, turning on http upgrade.
+ * Migration of EAP 6 management interfaces config.
  *  @author emmartins
  */
 public class EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration {
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("management-interfaces").build();
+    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "management-interfaces";
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName(SERVER_MIGRATION_TASK_NAME_NAME).build();
+
+    public interface EnvironmentProperties {
+        /**
+         * the prefix for the name of management interfaces related properties
+         */
+        String PROPERTIES_PREFIX = SERVER_MIGRATION_TASK_NAME_NAME + ".";
+        /**
+         * Boolean property which if true skips migration of management interfaces
+         */
+        String SKIP = PROPERTIES_PREFIX + "skip";
+    }
 
     public ServerMigrationTask getServerMigrationTask(final WildFly10StandaloneServer target) {
         return new ServerMigrationTask() {
@@ -45,34 +50,13 @@ public class EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration {
 
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-                final boolean targetStarted = target.isStarted();
-                if (!targetStarted) {
-                    target.start();
+                if (!context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(EnvironmentProperties.SKIP, Boolean.FALSE)) {
+                    context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                    context.getLogger().infof("Migrating management interfaces...");
+                    context.execute(new EnableHttpInterfaceSupportForHttpUpgrade(target));
+                    context.getLogger().info("Management interfaces migration done.");
                 }
-                try {
-                    final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, pathAddress(pathElement(CORE_SERVICE, MANAGEMENT)));
-                    op.get(CHILD_TYPE).set(MANAGEMENT_INTERFACE);
-                    final ModelNode opResult = target.executeManagementOperation(op);
-                    for (ModelNode resultItem : opResult.get(RESULT).asList()) {
-                        if (resultItem.asString().equals("http-interface")) {
-                            // http interface found, turn on http upgrade
-                            final PathAddress pathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT), pathElement(MANAGEMENT_INTERFACE, "http-interface"));
-                            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                            writeAttrOp.get(NAME).set("http-upgrade-enabled");
-                            writeAttrOp.get(VALUE).set(true);
-                            target.executeManagementOperation(writeAttrOp);
-                            context.getLogger().infof("Activated HTTP Management Interface's support for HTTP Upgrade.");
-                            // TODO use a subtask per http interface migrated
-                            return ServerMigrationTaskResult.SUCCESS;
-                        }
-                    }
-                } finally {
-                    if (!targetStarted) {
-                        target.stop();
-                    }
-                }
-                return ServerMigrationTaskResult.SKIPPED;
+                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
     }

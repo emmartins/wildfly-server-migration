@@ -29,12 +29,12 @@ public interface EnvironmentProperties {
     /**
      * the prefix of all properties related with the XML report
      */
-    String XML_REPORT_PROPERTIES_PREFIX = REPORT_PROPERTIES_PREFIX + "XML.";
+    String XML_REPORT_PROPERTIES_PREFIX = REPORT_PROPERTIES_PREFIX + "xml.";
 
     /**
      * the prefix of all properties related with the HTML report
      */
-    String HTML_REPORT_PROPERTIES_PREFIX = REPORT_PROPERTIES_PREFIX + "HTML.";
+    String HTML_REPORT_PROPERTIES_PREFIX = REPORT_PROPERTIES_PREFIX + "html.";
 
     /**
      * The HTML report will show subtasks, if the task has a path size smaller or equal, than this property value.

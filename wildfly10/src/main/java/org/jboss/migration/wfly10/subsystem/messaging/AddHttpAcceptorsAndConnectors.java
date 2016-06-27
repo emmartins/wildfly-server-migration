@@ -22,6 +22,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -39,6 +40,14 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
  */
 public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigrationTaskFactory {
 
+    public interface EnvironmentProperties {
+        String HTTP_ACCEPTOR_NAME = "httpAcceptorName";
+        String HTTP_CONNECTOR_NAME = "httpConnectorName";
+        String SOCKET_BINDING_NAME = "socketBindingName";
+        String UNDERTOW_HTTP_LISTENER_NAME = "undertowHttpListenerName";
+        String UNDERTOW_SERVER_NAME = "undertowServerName";
+    }
+
     public static final AddHttpAcceptorsAndConnectors INSTANCE = new AddHttpAcceptorsAndConnectors();
 
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("add-messaging-http-acceptors-and-connectors").build();
@@ -47,20 +56,12 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
     }
 
     private static final String SERVER = "server";
-
-    private static final String SERVER_NAME = "default-server";
     private static final String HTTP_LISTENER = "http-listener";
-    private static final String HTTP_LISTENER_NAME = "http";
-
     private static final String HTTP_ACCEPTOR = "http-acceptor";
-    private static final String HTTP_ACCEPTOR_NAME = HTTP_ACCEPTOR;
     private static final String HTTP_ACCEPTOR_THROUGHPUT_NAME = "http-acceptor-throughput";
-
     private static final String HTTP_CONNECTOR = "http-connector";
-    private static final String HTTP_CONNECTOR_NAME = HTTP_CONNECTOR;
     private static final String HTTP_CONNECTOR_THROUGHPUT_NAME = "http-connector-throughput";
     private static final String SOCKET_BINDING = "socket-binding";
-    private static final String SOCKET_BINDING_NAME = "http";
     private static final String ENDPOINT = "endpoint";
 
     @Override
@@ -75,12 +76,19 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
+                // read env properties
+                final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
+                final String httpAcceptorName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.HTTP_ACCEPTOR_NAME), true);
+                final String httpConnectorName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.HTTP_CONNECTOR_NAME), true);
+                final String socketBindingName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.SOCKET_BINDING_NAME), true);
+                final String undertowHttpListenerName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME), true);
+                final String undertowServerName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.UNDERTOW_SERVER_NAME), true);
                 // ensure undertow's default http listener is configured
                 final ModelNode undertowConfig = server.getSubsystem(WildFly10SubsystemNames.UNDERTOW);
                 if (undertowConfig == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 } else {
-                    if (!undertowConfig.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME)) {
+                    if (!undertowConfig.hasDefined(SERVER, undertowServerName, HTTP_LISTENER, undertowHttpListenerName)) {
                         context.getLogger().debug("Skipping configuration of Messaging ActiveMQ http acceptors and connectors, Undertow's default HTTP listener not found.");
                         return ServerMigrationTaskResult.SKIPPED;
                     }
@@ -89,13 +97,13 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                 if (config.hasDefined(SERVER)) {
                     boolean configUpdated = false;
                     for (String serverName : config.get(SERVER).keys()) {
-                        if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, HTTP_ACCEPTOR_NAME)) {
-                            final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(SERVER, serverName), pathElement(HTTP_ACCEPTOR, HTTP_ACCEPTOR_NAME));
+                        if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, httpAcceptorName)) {
+                            final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(SERVER, serverName), pathElement(HTTP_ACCEPTOR, httpAcceptorName));
                             final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                            addOp.get(HTTP_LISTENER).set(HTTP_LISTENER_NAME);
+                            addOp.get(HTTP_LISTENER).set(undertowHttpListenerName);
                             server.executeManagementOperation(addOp);
                             configUpdated = true;
-                            context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_NAME);
+                            context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", httpAcceptorName);
                         }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, HTTP_ACCEPTOR_THROUGHPUT_NAME)) {
@@ -106,14 +114,14 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                     context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_THROUGHPUT_NAME);
                 }
                 */
-                        if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, HTTP_CONNECTOR_NAME)) {
-                            final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(SERVER, serverName), pathElement(HTTP_CONNECTOR, HTTP_CONNECTOR_NAME));
+                        if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, httpConnectorName)) {
+                            final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement(SERVER, serverName), pathElement(HTTP_CONNECTOR, httpConnectorName));
                             final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                            addOp.get(SOCKET_BINDING).set(SOCKET_BINDING_NAME);
-                            addOp.get(ENDPOINT).set(HTTP_ACCEPTOR_NAME);
+                            addOp.get(SOCKET_BINDING).set(socketBindingName);
+                            addOp.get(ENDPOINT).set(httpAcceptorName);
                             server.executeManagementOperation(addOp);
                             configUpdated = true;
-                            context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_NAME);
+                            context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", httpConnectorName);
                         }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, HTTP_CONNECTOR_THROUGHPUT_NAME)) {
