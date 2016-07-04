@@ -16,9 +16,11 @@
 package org.jboss.migration.wfly9;
 
 import org.jboss.migration.core.AbstractServerProvider;
+import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ManifestProductInfo;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,8 +31,8 @@ import java.nio.file.Path;
  */
 public class WildFly9ServerProvider extends AbstractServerProvider {
 
-    protected ProductInfo getProductInfo(Path baseDir) throws IllegalArgumentException, IOException {
-        final Path manifestPath = WildFly9Server.getModulesSystemLayersBaseDir(baseDir).resolve("org").resolve("jboss").resolve("as").resolve("product").resolve("wildfly-full").resolve("dir").resolve("META-INF").resolve("MANIFEST.MF");
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
+        final Path manifestPath = JBossServer.getModulesDir(baseDir).resolve("system").resolve("layers").resolve("base").resolve("org").resolve("jboss").resolve("as").resolve("product").resolve("wildfly-full").resolve("dir").resolve("META-INF").resolve("MANIFEST.MF");
         final ManifestProductInfo productInfo = ManifestProductInfo.from(manifestPath);
         return productInfo;
     }
@@ -46,8 +48,8 @@ public class WildFly9ServerProvider extends AbstractServerProvider {
     }
 
     @Override
-    protected Server constructServer(ProductInfo productInfo, Path baseDir) {
-        return new WildFly9Server(productInfo, baseDir);
+    protected Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        return new WildFly9Server(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     @Override

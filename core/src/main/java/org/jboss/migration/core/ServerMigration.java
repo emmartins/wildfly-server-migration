@@ -109,6 +109,13 @@ public class ServerMigration {
             throw ServerMigrationLogger.ROOT_LOGGER.serverBaseDirNotSet(TARGET);
         }
 
+        if (userEnvironment == null) {
+            userEnvironment = new MigrationEnvironment();
+        }
+        final MigrationEnvironment migrationEnvironment = new MigrationEnvironment();
+        migrationEnvironment.setProperties(userEnvironment);
+        migrationEnvironment.setProperties(SystemEnvironment.INSTANCE);
+
         final ConsoleWrapper console = this.console != null ? this.console : new JavaConsole();
 
         console.printf("%n");
@@ -118,22 +125,15 @@ public class ServerMigration {
         console.printf("%n");
 
         console.printf("Retrieving servers...%n");
-        final Server sourceServer = getServer(SOURCE, from);
-        final Server targetServer = getServer(TARGET, to);
+        final Server sourceServer = getServer(SOURCE, from, migrationEnvironment);
+        final Server targetServer = getServer(TARGET, to, migrationEnvironment);
 
         console.printf("%n");
         console.printf("----------------------------------------------------------%n");
         console.printf("----------------------------------------------------------%n");
         console.printf("%n");
 
-        if (userEnvironment == null) {
-            userEnvironment = new MigrationEnvironment();
-        }
-        final MigrationEnvironment serverMigrationEnvironment = new MigrationEnvironment();
-        serverMigrationEnvironment.setProperties(userEnvironment);
-        serverMigrationEnvironment.setProperties(SystemEnvironment.INSTANCE);
-
-        final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, serverMigrationEnvironment);
+        final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, migrationEnvironment);
         final ServerMigrationTaskName serverMigrationTaskName = new ServerMigrationTaskName.Builder()
                 .setName("server")
                 .build();
@@ -159,7 +159,7 @@ public class ServerMigration {
         }
 
         // build migration data
-        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution, serverMigrationEnvironment);
+        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution, migrationEnvironment);
         // log summary report
         ServerMigrationLogger.ROOT_LOGGER.infof(SummaryReportWriter.INSTANCE.toString(migrationData));
         return migrationData;
@@ -167,15 +167,16 @@ public class ServerMigration {
 
     /**
      * Retrieves a {@link Server} from its base dir.
-     * @param name a server name, for logging purposes
+     * @param name the assigned server name
      * @param baseDir the base dir of the server to retrieve
+     * @param migrationEnvironment
      * @return the {@link Server} from its base dir.
      * @throws IllegalArgumentException if no server was retrieved
      */
-    protected Server getServer(String name, Path baseDir) throws IllegalArgumentException {
+    protected Server getServer(String name, Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException {
         baseDir = baseDir.normalize();
         ServerMigrationLogger.ROOT_LOGGER.debugf("Processing %s server's base dir %s", name, baseDir);
-        final Server server = Servers.getServer(baseDir);
+        final Server server = Servers.getServer(name.toLowerCase(), baseDir, migrationEnvironment);
         if (server == null) {
             // TODO support multiple servers for a single base dir
             throw ServerMigrationLogger.ROOT_LOGGER.failedToRetrieveServerFromBaseDir(name, baseDir.toString());

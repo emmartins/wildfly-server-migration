@@ -15,21 +15,22 @@
  */
 package org.jboss.migration.wfly10;
 
-import org.jboss.migration.core.AbstractServer;
+import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.nio.file.Path;
 
 /**
  * @author emmartins
  */
-public abstract class WildFly10Server extends AbstractServer {
+public abstract class WildFly10Server extends JBossServer<WildFly10Server> {
 
-    public WildFly10Server(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
+    public WildFly10Server(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     @Override
@@ -43,28 +44,4 @@ public abstract class WildFly10Server extends AbstractServer {
     }
 
     protected abstract WildFly10ServerMigration getMigration(Server source);
-
-    public Path getStandaloneDir() {
-        return getBaseDir().resolve("standalone");
-    }
-
-    public Path getStandaloneConfigurationDir() {
-        return getStandaloneDir().resolve("configuration");
-    }
-
-    public Path getModulesDir() {
-        return getModulesDir(getBaseDir());
-    }
-
-    public Path getModulesSystemLayersBaseDir() {
-        return getModulesSystemLayersBaseDir(getBaseDir());
-    }
-
-    public static Path getModulesDir(Path baseDir) {
-        return baseDir.resolve("modules");
-    }
-
-    public static Path getModulesSystemLayersBaseDir(Path baseDir) {
-        return getModulesDir(baseDir).resolve("system").resolve("layers").resolve("base");
-    }
 }

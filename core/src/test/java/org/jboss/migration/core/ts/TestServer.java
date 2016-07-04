@@ -45,7 +45,7 @@ public class TestServer extends AbstractServer {
      * @param supportedMigrations
      */
     public TestServer(ProductInfo productInfo, Set<ProductInfo> supportedMigrations) {
-        super(productInfo, getBaseDir(productInfo));
+        super(productInfo.getName(), productInfo, getBaseDir(productInfo), null);
         this.supportedMigrations = supportedMigrations;
     }
 

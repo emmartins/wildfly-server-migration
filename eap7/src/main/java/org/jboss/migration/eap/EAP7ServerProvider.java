@@ -17,6 +17,7 @@ package org.jboss.migration.eap;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.nio.file.Path;
 
@@ -36,8 +37,8 @@ public class EAP7ServerProvider extends EAP6ServerProvider {
     }
 
     @Override
-    protected Server constructServer(ProductInfo productInfo, Path baseDir) {
-        return new EAP7Server(productInfo, baseDir);
+    protected Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        return new EAP7Server(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     @Override

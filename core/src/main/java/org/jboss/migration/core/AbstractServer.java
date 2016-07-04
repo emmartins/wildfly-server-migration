@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.core;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 
 import java.nio.file.Path;
@@ -24,12 +25,25 @@ import java.nio.file.Path;
  * @author emmartins
  */
 public abstract class AbstractServer implements Server {
+    private final String migrationName;
     private final Path baseDir;
     private final ProductInfo productInfo;
+    private final MigrationEnvironment migrationEnvironment;
 
-    public AbstractServer(ProductInfo productInfo, Path baseDir) {
+    public AbstractServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        this.migrationName = migrationName;
         this.productInfo = productInfo;
         this.baseDir = baseDir;
+        this.migrationEnvironment = migrationEnvironment;
+    }
+
+    protected MigrationEnvironment getMigrationEnvironment() {
+        return migrationEnvironment;
+    }
+
+    @Override
+    public String getMigrationName() {
+        return migrationName;
     }
 
     @Override

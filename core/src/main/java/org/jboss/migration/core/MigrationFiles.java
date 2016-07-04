@@ -60,6 +60,7 @@ public class MigrationFiles {
         if (!Files.exists(source)) {
             throw ServerMigrationLogger.ROOT_LOGGER.sourceFileDoesNotExists(source);
         }
+        Files.createDirectories(target.getParent());
         // if target file exists make a backup copy
         if (Files.exists(target)) {
             ServerMigrationLogger.ROOT_LOGGER.targetFileRenamed(target, target.getFileName().toString());

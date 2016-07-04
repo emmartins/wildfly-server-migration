@@ -18,6 +18,7 @@ package org.jboss.migration.core.ts;
 import org.jboss.migration.core.AbstractServerProvider;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,7 +35,7 @@ public abstract class AbstractTestServerProvider extends AbstractServerProvider 
     }
 
     @Override
-    protected ProductInfo getProductInfo(Path baseDir) throws IOException {
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException {
         return TestServer.getBaseDir(testServer.getProductInfo()).equals(baseDir) ? testServer.getProductInfo() : null;
     }
 
@@ -49,7 +50,7 @@ public abstract class AbstractTestServerProvider extends AbstractServerProvider 
     }
 
     @Override
-    protected Server constructServer(ProductInfo productInfo, Path baseDir) {
+    protected Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
         return testServer;
     }
 

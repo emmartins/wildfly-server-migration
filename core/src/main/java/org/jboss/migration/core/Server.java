@@ -24,6 +24,12 @@ import java.nio.file.Path;
 public interface Server {
 
     /**
+     * Retrieves the migration server's name.
+     * @return
+     */
+    String getMigrationName();
+
+    /**
      * Retrieves the server's base directory.
      * @return the server's base directory
      */
