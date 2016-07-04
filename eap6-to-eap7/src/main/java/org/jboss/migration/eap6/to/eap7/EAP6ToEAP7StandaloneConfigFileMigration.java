@@ -15,9 +15,10 @@
  */
 package org.jboss.migration.eap6.to.eap7;
 
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.eap.EAP6Server;
+import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileDeploymentsMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileMigration;
@@ -47,6 +48,7 @@ import org.jboss.migration.wfly10.subsystem.undertow.AddBufferCache;
 import org.jboss.migration.wfly10.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.subsystem.undertow.MigrateHttpListener;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -290,11 +292,20 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
     }
 
     @Override
-    protected void run(ServerPath<EAP6Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationTaskContext context) {
-        context.execute(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getServerMigrationTask(sourceConfig, standaloneServer));
-        context.execute(new WildFly10StandaloneConfigFileSecurityRealmsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
-        context.execute(new EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration().getServerMigrationTask(standaloneServer));
-        context.execute(new EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration().getServerMigrationTask(standaloneServer));
-        context.execute(new WildFly10StandaloneConfigFileDeploymentsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+    protected List<ServerMigrationTask> getXMLConfigurationSubtasks(ServerPath<EAP6Server> sourceConfig, Path targetConfigFilePath, WildFly10Server target) {
+        final List<ServerMigrationTask> tasks = new ArrayList<>();
+        tasks.add(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getXmlConfigServerMigrationTask(sourceConfig, targetConfigFilePath, target));
+        return tasks;
+    }
+
+    @Override
+    protected List<ServerMigrationTask> getManagementResourcesSubtasks(final ServerPath<EAP6Server> sourceConfig, final Path targetConfigFilePath, final WildFly10StandaloneServer standaloneServer) {
+        final List<ServerMigrationTask> tasks = new ArrayList<>();
+        tasks.add(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getManagementResourcesServerMigrationTask(targetConfigFilePath, standaloneServer));
+        tasks.add(new WildFly10StandaloneConfigFileSecurityRealmsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+        tasks.add(new EAP6ToEAP7StandaloneConfigFileManagementInterfacesMigration().getServerMigrationTask(standaloneServer));
+        tasks.add(new EAP6ToEAP7StandaloneConfigFileSocketBindingsMigration().getServerMigrationTask(standaloneServer));
+        tasks.add(new WildFly10StandaloneConfigFileDeploymentsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+        return tasks;
     }
 }

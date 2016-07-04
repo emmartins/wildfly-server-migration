@@ -15,8 +15,9 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileDeploymentsMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileMigration;
@@ -32,6 +33,7 @@ import org.jboss.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly9.WildFly9Server;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -254,9 +256,18 @@ public class WildFly9ToWildFly10FullStandaloneConfigFileMigration extends WildFl
     }
 
     @Override
-    protected void run(ServerPath<WildFly9Server> sourceConfig, WildFly10StandaloneServer standaloneServer, ServerMigrationTaskContext context) {
-        context.execute(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getServerMigrationTask(sourceConfig, standaloneServer));
-        context.execute(new WildFly10StandaloneConfigFileSecurityRealmsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
-        context.execute(new WildFly10StandaloneConfigFileDeploymentsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+    protected List<ServerMigrationTask> getXMLConfigurationSubtasks(ServerPath<WildFly9Server> sourceConfig, Path targetConfigFilePath, WildFly10Server target) {
+        final List<ServerMigrationTask> tasks = new ArrayList<>();
+        tasks.add(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getXmlConfigServerMigrationTask(sourceConfig, targetConfigFilePath, target));
+        return tasks;
+    }
+
+    @Override
+    protected List<ServerMigrationTask> getManagementResourcesSubtasks(final ServerPath<WildFly9Server> sourceConfig, final Path targetConfigFilePath, final WildFly10StandaloneServer standaloneServer) {
+        final List<ServerMigrationTask> tasks = new ArrayList<>();
+        tasks.add(new WildFly10StandaloneConfigFileSubsystemsMigration(SUPPORTED_EXTENSIONS).getManagementResourcesServerMigrationTask(targetConfigFilePath, standaloneServer));
+        tasks.add(new WildFly10StandaloneConfigFileSecurityRealmsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+        tasks.add(new WildFly10StandaloneConfigFileDeploymentsMigration().getServerMigrationTask(sourceConfig, standaloneServer));
+        return tasks;
     }
 }

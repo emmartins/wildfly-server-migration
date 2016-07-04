@@ -27,6 +27,7 @@ public class WildFly10SubsystemBuilder {
     private final List<WildFly10SubsystemMigrationTaskFactory> tasks = new ArrayList<>();
     private WildFly10Extension extension;
     private String name;
+    private String namespaceWithoutVersion;
     private String taskName;
 
     /**
@@ -46,6 +47,17 @@ public class WildFly10SubsystemBuilder {
      */
     public WildFly10SubsystemBuilder setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    /**
+     * Sets the subsystem namespace, without the version suffix, e.g. urn:jboss:domain:ee
+     * Please note that a namespace will be generated if not set, by concatenating "urn:jboss:domain:" with the subsystem name.
+     * @param namespaceWithoutVersion
+     * @return
+     */
+    public  WildFly10SubsystemBuilder setNamespaceWithoutVersion(String namespaceWithoutVersion) {
+        this.namespaceWithoutVersion = namespaceWithoutVersion;
         return this;
     }
 
@@ -74,6 +86,6 @@ public class WildFly10SubsystemBuilder {
      * @return
      */
     WildFly10Subsystem build() {
-        return new WildFly10Subsystem(name, taskName, tasks, extension);
+        return new WildFly10Subsystem(name, namespaceWithoutVersion == null ? ("urn:jboss:domain:"+name) : namespaceWithoutVersion, taskName, tasks, extension);
     }
 }

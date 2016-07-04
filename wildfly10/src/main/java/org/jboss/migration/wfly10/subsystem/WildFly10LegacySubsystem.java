@@ -38,8 +38,8 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RES
  */
 public class WildFly10LegacySubsystem extends WildFly10Subsystem {
 
-    public WildFly10LegacySubsystem(String name, WildFly10Extension extension) {
-        super(name, "migrate-subsystem", null, extension);
+    public WildFly10LegacySubsystem(String name, String namespaceWithoutVersion, WildFly10Extension extension) {
+        super(name, namespaceWithoutVersion, "migrate-subsystem", null, extension);
     }
 
     /**

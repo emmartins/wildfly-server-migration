@@ -1,0 +1,168 @@
+/*
+ * Copyright 2016 Red Hat, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jboss.migration.core.util.xml;
+
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+/**
+ * Convenience operations related to XML Files.
+ * @author emmartins
+ */
+public class XMLFiles {
+
+    /**
+     * Scans a path for XML files.
+     * @param start the starting directory path
+     * @param recursive if the scan should include sub directories
+     * @param matcher the xml file matcher
+     * @return the paths of all files matched
+     * @throws IOException if there was a failure in the scanning process
+     */
+    public static Collection<Path> scan(final Path start, final boolean recursive, final XMLFileMatcher matcher) throws IOException {
+        final SortedSet<Path> result = new TreeSet<>();
+        Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (matcher.matches(file)) {
+                    result.add(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                if (e == null) {
+                    return recursive ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
+                } else {
+                    // directory iteration failed
+                    throw e;
+                }
+            }
+        });
+        return Collections.unmodifiableSet(result);
+    }
+
+    /**
+     * Copy a XML file.
+     * @param source the source XML file
+     * @param target the target XML file
+     * @param filters the xml file content filters
+     * @throws IOException if there was a failure in the copy process
+     */
+    public static void copy(Path source, Path target, XMLFileFilter... filters) throws IOException {
+        try (InputStream inputStream = Files.newInputStream(source); OutputStream outputStream = Files.newOutputStream(target)) {
+            filter(inputStream, outputStream, filters);
+        }
+    }
+
+    /**
+     * Filters the specified XML file.
+     * @param xmlFile the xml file to filter
+     * @param filters the xml file content filters
+     * @throws IOException
+     */
+    public static void filter(Path xmlFile, XMLFileFilter... filters) throws IOException {
+        byte[] xmlFileBytes = Files.readAllBytes(xmlFile);
+        try (InputStream inputStream = new ByteArrayInputStream(xmlFileBytes); OutputStream outputStream = Files.newOutputStream(xmlFile)) {
+            filter(inputStream, outputStream, filters);
+        }
+    }
+
+    private static void filter(final InputStream inputStream, final OutputStream outputStream, XMLFileFilter... filters) throws IOException {
+        XMLEventReader xmlEventReader = null;
+        XMLEventWriter xmlEventWriter = null;
+        try {
+            xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
+            xmlEventWriter = XMLOutputFactory.newInstance().createXMLEventWriter(outputStream);
+            while (xmlEventReader.hasNext()) {
+                XMLEvent xmlEvent = xmlEventReader.nextEvent();
+                if (xmlEvent.isStartElement()) {
+                    final StartElement startElement = xmlEvent.asStartElement();
+                    XMLFileFilter.Result filterResult = XMLFileFilter.Result.NOT_APPLICABLE;
+                    if (filters != null) {
+                        for (XMLFileFilter filter : filters) {
+                            filterResult = filter.filter(startElement, xmlEventReader, xmlEventWriter);
+                            if (filterResult != XMLFileFilter.Result.NOT_APPLICABLE) {
+                                break;
+                            }
+                        }
+                    }
+                    switch (filterResult) {
+                        case REMOVE:
+                            skipTillEndElement(xmlEventReader);
+                            break;
+                        case KEEP:
+                        case NOT_APPLICABLE:
+                        default:
+                            xmlEventWriter.add(xmlEvent);
+                            break;
+                    }
+                } else {
+                    xmlEventWriter.add(xmlEvent);
+                }
+            }
+        } catch (XMLStreamException e) {
+            throw new IOException("XML file filtering failed");
+        } finally {
+            if (xmlEventReader != null) {
+                try {
+                    xmlEventReader.close();
+                } catch (XMLStreamException e) {
+                    // ignore
+                }
+            }
+            if (xmlEventWriter != null) {
+                try {
+                    xmlEventWriter.close();
+                } catch (XMLStreamException e) {
+                    // ignore
+                }
+            }
+        }
+    }
+
+    private static void skipTillEndElement(XMLEventReader xmlEventReader) throws XMLStreamException {
+        int endElementsLeft = 1;
+        do {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                endElementsLeft++;
+            }
+            else if(xmlEvent.isEndElement()){
+                endElementsLeft--;
+            }
+        } while (xmlEventReader.hasNext() && endElementsLeft > 0);
+    }
+}
