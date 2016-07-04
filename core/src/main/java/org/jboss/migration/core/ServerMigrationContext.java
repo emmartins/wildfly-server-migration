@@ -16,8 +16,7 @@
 package org.jboss.migration.core;
 
 import org.jboss.migration.core.console.ConsoleWrapper;
-
-import java.util.Properties;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
 /**
  * The server migration execution's context.
@@ -28,12 +27,12 @@ public class ServerMigrationContext {
     private final ConsoleWrapper consoleWrapper;
     private final boolean interactive;
     private final MigrationFiles migrationFiles;
-    private final Properties userEnvironment;
+    private final MigrationEnvironment migrationEnvironment;
 
-    ServerMigrationContext(ConsoleWrapper consoleWrapper, boolean interactive, Properties userEnvironment) {
+    ServerMigrationContext(ConsoleWrapper consoleWrapper, boolean interactive, MigrationEnvironment migrationEnvironment) {
         this.consoleWrapper = consoleWrapper;
         this.interactive = interactive;
-        this.userEnvironment = userEnvironment;
+        this.migrationEnvironment = migrationEnvironment;
         this.migrationFiles = new MigrationFiles();
     }
 
@@ -62,10 +61,10 @@ public class ServerMigrationContext {
     }
 
     /**
-     * Retrieves the user's environment, used to customize the migration process.
-     * @return the user's environment
+     * Retrieves the migration's environment, used to customize the migration process.
+     * @return the migrations's environment
      */
-    public Properties getUserEnvironment() {
-        return userEnvironment;
+    public MigrationEnvironment getMigrationEnvironment() {
+        return migrationEnvironment;
     }
 }

@@ -17,11 +17,12 @@ package org.jboss.migration.core;
 
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.JavaConsole;
+import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.SystemEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.report.SummaryReportWriter;
 
 import java.nio.file.Path;
-import java.util.Properties;
 
 /**
  * The core server migration's configurator and executor.
@@ -41,7 +42,7 @@ public class ServerMigration {
     private Path to;
     private ConsoleWrapper console;
     private boolean interactive = true;
-    private Properties userEnvironment;
+    private MigrationEnvironment userEnvironment;
 
     /**
      * Sets the migration source's base dir.
@@ -89,7 +90,7 @@ public class ServerMigration {
      * @param userEnvironment the user's environment
      * @return the server migration after applying the configuration change
      */
-    public ServerMigration userEnvironment(Properties userEnvironment) {
+    public ServerMigration userEnvironment(MigrationEnvironment userEnvironment) {
         this.userEnvironment = userEnvironment;
         return this;
     }
@@ -125,7 +126,14 @@ public class ServerMigration {
         console.printf("----------------------------------------------------------%n");
         console.printf("%n");
 
-        final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, userEnvironment != null ? userEnvironment : new Properties());
+        if (userEnvironment == null) {
+            userEnvironment = new MigrationEnvironment();
+        }
+        final MigrationEnvironment serverMigrationEnvironment = new MigrationEnvironment();
+        serverMigrationEnvironment.setProperties(userEnvironment);
+        serverMigrationEnvironment.setProperties(SystemEnvironment.INSTANCE);
+
+        final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, serverMigrationEnvironment);
         final ServerMigrationTaskName serverMigrationTaskName = new ServerMigrationTaskName.Builder()
                 .setName("server")
                 .build();
@@ -151,7 +159,7 @@ public class ServerMigration {
         }
 
         // build migration data
-        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution);
+        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution, userEnvironment, SystemEnvironment.INSTANCE);
         // log summary report
         ServerMigrationLogger.ROOT_LOGGER.infof(SummaryReportWriter.INSTANCE.toString(migrationData));
         return migrationData;

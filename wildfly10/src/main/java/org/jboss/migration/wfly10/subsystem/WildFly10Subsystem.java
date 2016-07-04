@@ -81,6 +81,10 @@ public class WildFly10Subsystem {
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                final List<String> skippedByEnv = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(EnvironmentProperties.SUBSYSTEMS_SKIP);
+                if (skippedByEnv != null && skippedByEnv.contains(name)) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
                 final ModelNode subsystemConfig = server.getSubsystem(name);
                 for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
                     context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, server));

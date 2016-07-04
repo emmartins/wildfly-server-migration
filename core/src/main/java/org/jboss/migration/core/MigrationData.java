@@ -15,10 +15,11 @@
  */
 package org.jboss.migration.core;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * The data collected from the server migration.
@@ -30,11 +31,15 @@ public class MigrationData {
     private final Server target;
     private final ServerMigrationTaskExecution rootTask;
     private final List<ServerMigrationTaskExecution> tasks;
+    private final MigrationEnvironment userEnvironment;
+    private final MigrationEnvironment systemEnvironment;
 
-    MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask) {
+    MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask, MigrationEnvironment userEnvironment, MigrationEnvironment systemEnvironment) {
         this.source = source;
         this.target = target;
         this.rootTask = rootTask;
+        this.userEnvironment = userEnvironment;
+        this.systemEnvironment = systemEnvironment;
         this.tasks = initTasks();
     }
 
@@ -63,11 +68,27 @@ public class MigrationData {
     }
 
     /**
+     * Retrieves the server migration environment.
+     * @return the server migration environment
+     */
+    public MigrationEnvironment getServerMigrationEnvironment() {
+        return rootTask.getServerMigrationContext().getMigrationEnvironment();
+    }
+
+    /**
      * Retrieves the user environment.
      * @return the user environment
      */
-    public Properties getUserEnvironment() {
-        return rootTask.getServerMigrationContext().getUserEnvironment();
+    public MigrationEnvironment getUserEnvironment() {
+        return userEnvironment;
+    }
+
+    /**
+     * Retrieves the system environment.
+     * @return the system environment
+     */
+    public MigrationEnvironment getSystemEnvironment() {
+        return systemEnvironment;
     }
 
     /**
