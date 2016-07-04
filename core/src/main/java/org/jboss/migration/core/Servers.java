@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.core;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 
 import java.nio.file.Path;
@@ -37,14 +38,16 @@ public final class Servers {
 
     /**
      * Retrieves a {@link Server} from its base directory {@link Path}
+     * @param migrationName the migration name assigned to the server.
      * @param baseDir the {@link Server}'s base directory {@link Path}
+     * @param migrationEnvironment
      * @return the {@link Server} retrieved from its base directory {@link Path}; null if no {@link ServerProvider} was able to retrieve a {@link Server} from the specified base directory {@link Path}
      */
-    public static Server getServer(Path baseDir) {
+    public static Server getServer(String migrationName, Path baseDir, MigrationEnvironment migrationEnvironment) {
         ServerMigrationLogger.ROOT_LOGGER.debugf("Retrieving server from base dir %s", baseDir);
         for (ServerProvider serverProvider : SERVER_PROVIDERS_LOADER) {
             try {
-                Server server = serverProvider.getServer(baseDir);
+                Server server = serverProvider.getServer(migrationName, baseDir, migrationEnvironment);
                 if (server != null) {
                     ServerMigrationLogger.ROOT_LOGGER.debugf("%s recognized as %s base dir. Server product info: %s", baseDir, serverProvider.getName(), server.getProductInfo());
                     return server;
@@ -61,7 +64,7 @@ public final class Servers {
      * Retrieves the supported {@link Server} names.
      * @return a list containing the supported {@link Server} names.
      */
-    public static List<String> getServerNames() {
+    public static List<String> getServerProviderNames() {
         final List<String> serverNames = new ArrayList<>();
         for (ServerProvider serverProvider : SERVER_PROVIDERS_LOADER) {
             serverNames.add(serverProvider.getName());

@@ -15,74 +15,19 @@
  */
 package org.jboss.migration.wfly9;
 
-import org.jboss.migration.core.AbstractServer;
+import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ProductInfo;
-import org.jboss.migration.core.ServerMigrationFailedException;
-import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.core.util.xml.SimpleXMLFileMatcher;
-import org.jboss.migration.core.util.xml.XMLFileMatcher;
-import org.jboss.migration.core.util.xml.XMLFiles;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * The WildFly 9 {@link org.jboss.migration.core.Server}.
  * @author emmartins
  */
-public class WildFly9Server extends AbstractServer {
+public class WildFly9Server extends JBossServer<WildFly9Server> {
 
-    public WildFly9Server(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
-    }
-
-    public Collection<ServerPath<WildFly9Server>> getStandaloneConfigs() {
-        try {
-            final List<ServerPath<WildFly9Server>> standaloneConfigs = new ArrayList<>();
-            final XMLFileMatcher scanMatcher = new SimpleXMLFileMatcher() {
-                @Override
-                protected boolean documentElementLocalNameMatches(String localName) {
-                    return "server".equals(localName);
-                }
-                @Override
-                protected boolean documentNamespaceURIMatches(String namespaceURI) {
-                    return namespaceURI.startsWith("urn:jboss:domain:");
-                }
-            };
-            for (Path path : XMLFiles.scan(getStandaloneConfigurationDir(), false, scanMatcher)) {
-                standaloneConfigs.add(new ServerPath<>(path, this));
-            }
-            return Collections.unmodifiableList(standaloneConfigs);
-        } catch (IOException e) {
-            throw new ServerMigrationFailedException(e);
-        }
-    }
-
-    public Path getStandaloneDir() {
-        return getBaseDir().resolve("standalone");
-    }
-
-    public Path getStandaloneConfigurationDir() {
-        return getStandaloneDir().resolve("configuration");
-    }
-
-    public Path getModulesDir() {
-        return getModulesDir(getBaseDir());
-    }
-
-    public Path getModulesSystemLayersBaseDir() {
-        return getModulesSystemLayersBaseDir(getBaseDir());
-    }
-
-    public static Path getModulesDir(Path baseDir) {
-        return baseDir.resolve("modules");
-    }
-
-    public static Path getModulesSystemLayersBaseDir(Path baseDir) {
-        return getModulesDir(baseDir).resolve("system").resolve("layers").resolve("base");
+    public WildFly9Server(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 }

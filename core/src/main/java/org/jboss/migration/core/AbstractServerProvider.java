@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.core;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 
 import java.io.IOException;
@@ -28,18 +29,19 @@ import java.util.regex.Pattern;
 public abstract class AbstractServerProvider implements ServerProvider {
 
     @Override
-    public Server getServer(Path baseDir) throws IOException {
-        final ProductInfo productInfo = getProductInfo(baseDir);
-        return isProviderFor(productInfo) ? constructServer(productInfo, baseDir) : null;
+    public Server getServer(String migrationName, Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException {
+        final ProductInfo productInfo = getProductInfo(baseDir, migrationEnvironment);
+        return isProviderFor(productInfo) ? constructServer(migrationName, productInfo, baseDir, migrationEnvironment) : null;
     }
 
     /**
      * Retrieves the {@link ProductInfo} from the specified base dir.
      * @param baseDir the server's base dir
+     * @param migrationEnvironment
      * @return the {@link ProductInfo} from the specified base dir
      * @throws IOException if the product's info failed to be retrieved.
      */
-    protected abstract ProductInfo getProductInfo(Path baseDir) throws IOException;
+    protected abstract ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException;
 
     protected boolean isProviderFor(ProductInfo productInfo) {
         if (productInfo == null) {
@@ -72,9 +74,11 @@ public abstract class AbstractServerProvider implements ServerProvider {
 
     /**
      * Constructs the server, from specified product info and base dir's path.
+     * @param migrationName the migration server's name
      * @param productInfo the server's product info
      * @param baseDir the server's base dir
+     * @param migrationEnvironment
      * @return the contructed server
      */
-    protected abstract Server constructServer(ProductInfo productInfo, Path baseDir);
+    protected abstract Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment);
 }

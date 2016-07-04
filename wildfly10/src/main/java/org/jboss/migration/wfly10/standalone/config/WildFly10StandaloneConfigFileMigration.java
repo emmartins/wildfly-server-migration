@@ -109,6 +109,7 @@ public abstract class WildFly10StandaloneConfigFileMigration<S extends Server> {
      * @throws IOException
      */
     protected void processManagementResources(ServerPath<S> sourceConfig, Path targetConfigFilePath, WildFly10Server target, ServerMigrationTaskContext context) throws IOException {
+
         final WildFly10StandaloneServer standaloneServer = startServer(sourceConfig.getPath(), target, context);
         try {
             // execute management resources subtasks

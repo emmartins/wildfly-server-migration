@@ -15,6 +15,8 @@
  */
 package org.jboss.migration.core;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -25,11 +27,13 @@ import java.nio.file.Path;
 public interface ServerProvider {
     /**
      * Retrieves a server from its base directory.
+     * @param migrationName the migration server's name
      * @param baseDir the server's base directory.
+     * @param migrationEnvironment
      * @return null if the specified base directory is not the base directory of the provider's server.
      * @throws IOException if the server failed to retrieve.
      */
-    Server getServer(Path baseDir) throws IOException;
+    Server getServer(String migrationName, Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException;
 
     /**
      * Retrieves the provider's name.

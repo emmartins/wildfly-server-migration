@@ -17,6 +17,7 @@ package org.jboss.migration.eap;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
 import org.jboss.migration.wfly10.full.WildFly10FullServer;
 
@@ -27,8 +28,8 @@ import java.nio.file.Path;
  * @author emmartins
  */
 public class EAP7Server extends WildFly10FullServer {
-    public EAP7Server(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
+    public EAP7Server(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     @Override

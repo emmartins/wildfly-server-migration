@@ -17,6 +17,7 @@ package org.jboss.migration.wfly10.full;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
 
@@ -27,8 +28,8 @@ import java.nio.file.Path;
  */
 public class WildFly10FullServer extends WildFly10Server {
 
-    public WildFly10FullServer(ProductInfo productInfo, Path baseDir) {
-        super(productInfo, baseDir);
+    public WildFly10FullServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     protected WildFly10ServerMigration getMigration(Server source) {

@@ -88,7 +88,6 @@ public class WildFly10StandaloneConfigFilesMigration<S extends Server> {
                 public void onError() throws Exception {
                     // repeat
                     run(sourceConfigs, target, taskContext);
-
                 }
             };
             new UserConfirmation(consoleWrapper, "Migrate all configurations?", ROOT_LOGGER.yesNo(), resultHandler).execute();

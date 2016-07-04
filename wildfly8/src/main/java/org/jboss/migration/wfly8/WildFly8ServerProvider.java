@@ -16,8 +16,10 @@
 package org.jboss.migration.wfly8;
 
 import org.jboss.migration.core.AbstractServerProvider;
+import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -35,8 +37,8 @@ import java.util.jar.Manifest;
 public class WildFly8ServerProvider extends AbstractServerProvider {
 
     @Override
-    protected ProductInfo getProductInfo(Path baseDir) throws IllegalArgumentException, IOException {
-        final Path versionModuleMainDirPath = WildFly8Server.getModulesSystemLayersBaseDir(baseDir).resolve("org").resolve("jboss").resolve("as").resolve("version").resolve("main");
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
+        final Path versionModuleMainDirPath = JBossServer.getModulesDir(baseDir).resolve("system").resolve("layers").resolve("base").resolve("org").resolve("jboss").resolve("as").resolve("version").resolve("main");
         if (!Files.isDirectory(versionModuleMainDirPath)) {
             return null;
         }
@@ -83,8 +85,8 @@ public class WildFly8ServerProvider extends AbstractServerProvider {
     }
 
     @Override
-    protected Server constructServer(ProductInfo productInfo, Path baseDir) {
-        return new WildFly8Server(productInfo, baseDir);
+    protected Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+        return new WildFly8Server(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     @Override
