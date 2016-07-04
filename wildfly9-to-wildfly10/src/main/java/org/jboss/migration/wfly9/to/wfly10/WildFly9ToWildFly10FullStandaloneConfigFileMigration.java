@@ -28,7 +28,6 @@ import org.jboss.migration.wfly10.subsystem.WildFly10ExtensionBuilder;
 import org.jboss.migration.wfly10.subsystem.WildFly10ExtensionNames;
 import org.jboss.migration.wfly10.subsystem.WildFly10LegacyExtensionBuilder;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemNames;
-import org.jboss.migration.wfly10.subsystem.ejb3.WorkaroundForWFLY5520;
 import org.jboss.migration.wfly10.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly9.WildFly9Server;
@@ -91,7 +90,7 @@ public class WildFly9ToWildFly10FullStandaloneConfigFileMigration extends WildFl
 
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.EJB3)
-                .addUpdatedSubsystem(WildFly10SubsystemNames.EJB3, WorkaroundForWFLY5520.INSTANCE)
+                .addSupportedSubsystem(WildFly10SubsystemNames.EJB3)
                 .build()
         );
 
