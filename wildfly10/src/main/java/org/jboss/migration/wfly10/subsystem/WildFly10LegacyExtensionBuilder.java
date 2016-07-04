@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class WildFly10LegacyExtensionBuilder {
 
-    private final List<String> subsystems = new ArrayList<>();
+    private final List<Subsystem> subsystems = new ArrayList<>();
     private String name;
 
     public WildFly10LegacyExtensionBuilder setName(String name) {
@@ -32,15 +32,28 @@ public class WildFly10LegacyExtensionBuilder {
     }
 
     public WildFly10LegacyExtensionBuilder addMigratedSubsystem(String subsystemName) {
-        subsystems.add(subsystemName);
+        return addMigratedSubsystem(subsystemName, null);
+    }
+
+    public WildFly10LegacyExtensionBuilder addMigratedSubsystem(String subsystemName, String namespaceWithoutVersion) {
+        subsystems.add(new Subsystem(subsystemName, namespaceWithoutVersion));
         return this;
     }
 
     public LegacyWildFly10Extension build() {
         final LegacyWildFly10Extension extension = new LegacyWildFly10Extension(name);
-        for (String subsystem : subsystems) {
-            extension.subsystems.add(new WildFly10LegacySubsystem(subsystem, extension));
+        for (Subsystem subsystem : subsystems) {
+            extension.subsystems.add(new WildFly10LegacySubsystem(subsystem.name, subsystem.namespaceWithoutVersion, extension));
         }
         return extension;
+    }
+
+    private static class Subsystem {
+        final String name;
+        final String namespaceWithoutVersion;
+        public Subsystem(String name, String namespaceWithoutVersion) {
+            this.name = name;
+            this.namespaceWithoutVersion = namespaceWithoutVersion == null ? ("urn:jboss:domain:"+name) : namespaceWithoutVersion;
+        }
     }
 }

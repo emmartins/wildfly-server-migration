@@ -21,7 +21,7 @@ import java.nio.file.Path;
  * A server resource's path.
  * @author emmartins
  */
-public class ServerPath<S extends Server> {
+public class ServerPath<S extends Server> implements Comparable<ServerPath> {
 
     private final Path path;
     private final S server;
@@ -42,5 +42,10 @@ public class ServerPath<S extends Server> {
     @Override
     public String toString() {
         return path.toString();
+    }
+
+    @Override
+    public int compareTo(ServerPath o) {
+        return getPath().compareTo(o.getPath());
     }
 }

@@ -17,8 +17,13 @@ package org.jboss.migration.eap;
 
 import org.jboss.migration.core.AbstractServer;
 import org.jboss.migration.core.ProductInfo;
+import org.jboss.migration.core.ServerMigrationFailedException;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.util.xml.SimpleXMLFileMatcher;
+import org.jboss.migration.core.util.xml.XMLFileMatcher;
+import org.jboss.migration.core.util.xml.XMLFiles;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,14 +41,25 @@ public class EAP6Server extends AbstractServer {
     }
 
     public Collection<ServerPath<EAP6Server>> getStandaloneConfigs() {
-        // FIXME scan the config dir instead
-        List<ServerPath<EAP6Server>> standaloneConfigs = new ArrayList<>();
-        final Path standaloneConfigurationDir = getStandaloneConfigurationDir();
-        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone.xml"), this));
-        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone-ha.xml"), this));
-        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone-full.xml"), this));
-        standaloneConfigs.add(new ServerPath<>(standaloneConfigurationDir.resolve("standalone-full-ha.xml"), this));
-        return Collections.unmodifiableList(standaloneConfigs);
+        try {
+            final List<ServerPath<EAP6Server>> standaloneConfigs = new ArrayList<>();
+            final XMLFileMatcher scanMatcher = new SimpleXMLFileMatcher() {
+                @Override
+                protected boolean documentElementLocalNameMatches(String localName) {
+                    return "server".equals(localName);
+                }
+                @Override
+                protected boolean documentNamespaceURIMatches(String namespaceURI) {
+                    return namespaceURI.startsWith("urn:jboss:domain:");
+                }
+            };
+            for (Path path : XMLFiles.scan(getStandaloneConfigurationDir(), false, scanMatcher)) {
+                standaloneConfigs.add(new ServerPath<>(path, this));
+            }
+            return Collections.unmodifiableList(standaloneConfigs);
+        } catch (IOException e) {
+            throw new ServerMigrationFailedException(e);
+        }
     }
 
     public Path getStandaloneDir() {

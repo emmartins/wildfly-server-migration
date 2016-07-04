@@ -32,12 +32,14 @@ public class WildFly10Subsystem {
     public static final String SUBSYSTEM_TASK_ENV_PROPERTY_SKIP = "skip";
 
     private final String name;
+    private final String namespaceWithoutVersion;
     private final WildFly10Extension extension;
     protected final List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks;
     protected final ServerMigrationTaskName serverMigrationTaskName;
 
-    public WildFly10Subsystem(String name, String taskName, List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks, WildFly10Extension extension) {
+    public WildFly10Subsystem(String name, String namespaceWithoutVersion, String taskName, List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks, WildFly10Extension extension) {
         this.name = name;
+        this.namespaceWithoutVersion = namespaceWithoutVersion;
         this.extension = extension;
         this.subsystemMigrationTasks = subsystemMigrationTasks;
         this.serverMigrationTaskName = new ServerMigrationTaskName.Builder()
@@ -52,6 +54,10 @@ public class WildFly10Subsystem {
 
     public String getName() {
         return name;
+    }
+
+    public String getNamespaceWithoutVersion() {
+        return namespaceWithoutVersion;
     }
 
     @Override
