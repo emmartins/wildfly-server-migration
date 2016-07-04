@@ -147,7 +147,12 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
                     context.getLogger().infof("Distributable cache added to EJB3 subsystem configuration.");
                     distributableCacheAdded = true;
                 }
-                return taskResultBuilder.sucess().addAttribute(TASK_RESULT_ATTR_LEGACY_FILE_PASSIVATION_STORE_REMOVED, legacyFilePassivationStoreRemoved)
+                if (configUpdated) {
+                    taskResultBuilder.sucess();
+                } else {
+                    taskResultBuilder.skipped();
+                }
+                return taskResultBuilder.addAttribute(TASK_RESULT_ATTR_LEGACY_FILE_PASSIVATION_STORE_REMOVED, legacyFilePassivationStoreRemoved)
                         .addAttribute(TASK_RESULT_ATTR_LEGACY_CLUSTERED_PASSIVATION_STORE_REMOVED, legacyClusteredPassivationStoreRemoved)
                         .addAttribute(TASK_RESULT_ATTR_INFINISPAN_PASSIVATION_STORE_ADDED, infinispanPassivationStoreAdded)
                         .addAttribute(TASK_RESULT_ATTR_LEGACY_PASSIVATING_CACHE_REMOVED, legacyPassivatingCacheRemoved)
