@@ -15,11 +15,12 @@
  */
 package org.jboss.migration.core.env;
 
+import org.jboss.migration.core.ServerMigrationFailedException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -36,7 +37,7 @@ public class MigrationEnvironment {
 
     public Boolean getPropertyAsBoolean(String propertyName) {
         final String propertyValue  = getPropertyAsString(propertyName);
-        if (propertyValue == null) {
+        if (propertyValue == null || propertyValue.isEmpty()) {
             return null;
         }
         return Boolean.parseBoolean(propertyValue);
@@ -52,7 +53,7 @@ public class MigrationEnvironment {
         if (propertyValue == null) {
             return null;
         }
-        return  propertyValue.getStringValue();
+        return propertyValue.getStringValue();
     }
 
     public String getPropertyAsString(String propertyName, String defaultValue) {
@@ -68,6 +69,33 @@ public class MigrationEnvironment {
         return propertyValue.getListValue();
     }
 
+    public Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailedException {
+        final Boolean propertyValue = getPropertyAsBoolean(propertyName);
+        if (propertyValue == null) {
+            throw new ServerMigrationFailedException("Environment property "+propertyName+" is required.");
+        } else {
+            return propertyValue;
+        }
+    }
+
+    public String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException {
+        final String propertyValue = getPropertyAsString(propertyName);
+        if (propertyValue == null || (failIfEmpty && propertyValue.isEmpty())) {
+            throw new ServerMigrationFailedException("Environment property "+propertyName+" is required.");
+        } else {
+            return propertyValue;
+        }
+    }
+
+    public List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException {
+        final List<String> propertyValue = getPropertyAsList(propertyName);
+        if (propertyValue == null || (failIfEmpty && propertyValue.isEmpty())) {
+            throw new ServerMigrationFailedException("Environment property "+propertyName+" is required.");
+        } else {
+            return propertyValue;
+        }
+    }
+
     public String setProperty(String propertyName, String propertyValue) {
         final PropertyValue old = properties.put(propertyName, new PropertyValue(propertyValue));
         return old != null ? old.getStringValue() : null;
@@ -80,27 +108,39 @@ public class MigrationEnvironment {
     }
 
     public void setProperties(MigrationEnvironment migrationEnvironment) {
-        for (String propertyName : migrationEnvironment.getPropertyNames()) {
-            setProperty(propertyName, migrationEnvironment.getPropertyAsString(propertyName));
-        }
+        properties.putAll(migrationEnvironment.properties);
     }
 
-    public Set<String> getPropertyNames() {
-        return Collections.unmodifiableSet(properties.keySet());
+    public List<String> getPropertyNames() {
+        return Collections.unmodifiableList(new ArrayList<>(properties.keySet()));
+    }
+
+    public List<String> getPropertyNamesReaded() {
+        final List<String> result = new ArrayList<>();
+        for (String propertyName : properties.keySet()) {
+            final PropertyValue propertyValue = properties.get(propertyName);
+            if (propertyValue.isReaded()) {
+                result.add(propertyName);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     private static class PropertyValue {
         private final String stringValue;
         private List<String> listValue;
+        private boolean readed;
         private PropertyValue(String stringValue) {
             this.stringValue = stringValue;
         }
 
         public String getStringValue() {
+            readed = true;
             return stringValue;
         }
 
         public List<String> getListValue() {
+            readed = true;
             if (listValue == null) {
                 final List<String> list = new ArrayList<>();
                 for (String s : stringValue.split(",")) {
@@ -112,6 +152,10 @@ public class MigrationEnvironment {
                 listValue = list;
             }
             return listValue;
+        }
+
+        public boolean isReaded() {
+            return readed;
         }
     }
 }

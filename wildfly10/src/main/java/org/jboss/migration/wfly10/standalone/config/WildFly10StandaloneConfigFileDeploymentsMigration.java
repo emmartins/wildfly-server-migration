@@ -39,6 +39,17 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class WildFly10StandaloneConfigFileDeploymentsMigration<S extends Server> {
 
+    public interface EnvironmentProperties {
+        /**
+         * the prefix for the name of deployments related properties
+         */
+        String PROPERTIES_PREFIX = "deployments.";
+        /**
+         * Boolean property which if true skips migration of deployments
+         */
+        String SKIP = PROPERTIES_PREFIX + "skip";
+    }
+
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("deployments").build();
     public static final String SERVER_MIGRATION_TASK_DEPLOYMENT_REMOVAL_NAME = "remove-deployment";
 
@@ -51,21 +62,23 @@ public class WildFly10StandaloneConfigFileDeploymentsMigration<S extends Server>
 
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-                // remove all deployments, TODO add (user optional) functionality that copies deployment files.
-                context.getLogger().info("Deployments migration starting...");
-                final boolean targetStarted = target.isStarted();
-                if (!targetStarted) {
-                    target.start();
-                }
-                try {
-                    for (ModelNode deployment : getDeployments(target, context)) {
-                        migrateDeployment(deployment, source, target, context);
-                    }
-                    context.getLogger().info("Deployments migration done.");
-                } finally {
+                if (!context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(EnvironmentProperties.SKIP, Boolean.FALSE)) {
+                    context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                    // remove all deployments, TODO add (user optional) functionality that copies deployment files.
+                    context.getLogger().info("Deployments migration starting...");
+                    final boolean targetStarted = target.isStarted();
                     if (!targetStarted) {
-                        target.stop();
+                        target.start();
+                    }
+                    try {
+                        for (ModelNode deployment : getDeployments(target, context)) {
+                            migrateDeployment(deployment, source, target, context);
+                        }
+                        context.getLogger().info("Deployments migration done.");
+                    } finally {
+                        if (!targetStarted) {
+                            target.stop();
+                        }
                     }
                 }
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;

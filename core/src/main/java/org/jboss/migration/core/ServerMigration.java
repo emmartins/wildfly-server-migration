@@ -159,7 +159,7 @@ public class ServerMigration {
         }
 
         // build migration data
-        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution, userEnvironment, SystemEnvironment.INSTANCE);
+        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution, serverMigrationEnvironment);
         // log summary report
         ServerMigrationLogger.ROOT_LOGGER.infof(SummaryReportWriter.INSTANCE.toString(migrationData));
         return migrationData;

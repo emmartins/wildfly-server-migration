@@ -31,15 +31,13 @@ public class MigrationData {
     private final Server target;
     private final ServerMigrationTaskExecution rootTask;
     private final List<ServerMigrationTaskExecution> tasks;
-    private final MigrationEnvironment userEnvironment;
-    private final MigrationEnvironment systemEnvironment;
+    private final MigrationEnvironment migrationEnvironment;
 
-    MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask, MigrationEnvironment userEnvironment, MigrationEnvironment systemEnvironment) {
+    MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask, MigrationEnvironment migrationEnvironment) {
         this.source = source;
         this.target = target;
         this.rootTask = rootTask;
-        this.userEnvironment = userEnvironment;
-        this.systemEnvironment = systemEnvironment;
+        this.migrationEnvironment = migrationEnvironment;
         this.tasks = initTasks();
     }
 
@@ -76,19 +74,11 @@ public class MigrationData {
     }
 
     /**
-     * Retrieves the user environment.
-     * @return the user environment
+     * Retrieves the migration environment.
+     * @return the migration environment
      */
-    public MigrationEnvironment getUserEnvironment() {
-        return userEnvironment;
-    }
-
-    /**
-     * Retrieves the system environment.
-     * @return the system environment
-     */
-    public MigrationEnvironment getSystemEnvironment() {
-        return systemEnvironment;
+    public MigrationEnvironment getMigrationEnvironment() {
+        return migrationEnvironment;
     }
 
     /**

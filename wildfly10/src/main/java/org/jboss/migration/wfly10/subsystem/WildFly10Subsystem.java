@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class WildFly10Subsystem {
 
+    public static final String SUBSYSTEM_TASK_ENV_PROPERTY_SKIP = "skip";
+
     private final String name;
     private final WildFly10Extension extension;
     protected final List<WildFly10SubsystemMigrationTaskFactory> subsystemMigrationTasks;
@@ -81,8 +83,7 @@ public class WildFly10Subsystem {
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                final List<String> skippedByEnv = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(EnvironmentProperties.SUBSYSTEMS_SKIP);
-                if (skippedByEnv != null && skippedByEnv.contains(name)) {
+                if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 final ModelNode subsystemConfig = server.getSubsystem(name);
@@ -93,4 +94,9 @@ public class WildFly10Subsystem {
             }
         };
     }
+
+    protected boolean skipExecution(ServerMigrationTaskContext context) {
+        return context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(EnvironmentProperties.getSubsystemTaskPropertiesPrefix(name) + SUBSYSTEM_TASK_ENV_PROPERTY_SKIP, Boolean.FALSE);
+    }
+
 }

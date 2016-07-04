@@ -16,6 +16,7 @@
 package org.jboss.migration.cli;
 
 import org.jboss.migration.core.MigrationData;
+import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.ServerMigration;
 import org.jboss.migration.core.env.SystemEnvironment;
@@ -156,6 +157,9 @@ public class CommandLineServerMigration {
                 } catch (Throwable e) {
                     ServerMigrationLogger.ROOT_LOGGER.error("HTML Report write failed", e);
                 }
+            }
+            if (migrationData.getRootTask().getResult().getStatus() == ServerMigrationTaskResult.Status.FAIL) {
+                System.exit(1);
             }
         } catch (Throwable t) {
             abort(t);

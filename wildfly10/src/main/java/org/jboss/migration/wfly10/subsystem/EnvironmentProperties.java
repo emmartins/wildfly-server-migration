@@ -19,35 +19,44 @@ package org.jboss.migration.wfly10.subsystem;
  * Environment properties related to extensions and their subsystems.
  * @author emmartins
  */
-public interface EnvironmentProperties {
+public class EnvironmentProperties {
 
     /**
      * the prefix for the name of extensions related properties
      */
-    String EXTENSIONS_PROPERTIES_PREFIX = "extensions.";
+    public static final String EXTENSIONS_PROPERTIES_PREFIX = "extensions.";
 
     /**
      * a list with extensions to remove
      */
-    String EXTENSIONS_REMOVE = EXTENSIONS_PROPERTIES_PREFIX + "remove";
-
-    /**
-     * a list with extensions to skip
-     */
-    String EXTENSIONS_SKIP = EXTENSIONS_PROPERTIES_PREFIX + "skip";
+    public static final String EXTENSIONS_REMOVE = EXTENSIONS_PROPERTIES_PREFIX + "remove";
 
     /**
      * the prefix for the name of subsystems related properties
      */
-    String SUBSYSTEMS_PROPERTIES_PREFIX = "subsystems.";
+    public static final String SUBSYSTEMS_PROPERTIES_PREFIX = "subsystems.";
 
     /**
      * a list with subsystems to remove
      */
-    String SUBSYSTEMS_REMOVE = SUBSYSTEMS_PROPERTIES_PREFIX + "remove";
+    public static final String SUBSYSTEMS_REMOVE = SUBSYSTEMS_PROPERTIES_PREFIX + "remove";
 
     /**
-     * a list with subsystems to skip
+     * Retrieves the prefix for all env properties in the context of a subsystem task.
+     * @param subsystem the subsystem in context
+     * @return the prefix for all env properties in the context of a subsystem task
      */
-    String SUBSYSTEMS_SKIP = SUBSYSTEMS_PROPERTIES_PREFIX + "skip";
+    public static String getSubsystemTaskPropertiesPrefix(String subsystem) {
+        return new StringBuilder("subsystem.").append(subsystem).append('.').toString();
+    }
+
+    /**
+     * Retrieves the prefix for all env properties in the context of a subsystem subtask.
+     * @param subsystem the subsystem in context
+     * @param subtask the subtask in context
+     * @return the prefix for all env properties in the context of a subsystem subtask
+     */
+    public static String getSubsystemSubtaskPropertiesPrefix(String subsystem, String subtask) {
+        return new StringBuilder(getSubsystemTaskPropertiesPrefix(subsystem)).append(subtask).append('.').toString();
+    }
 }
