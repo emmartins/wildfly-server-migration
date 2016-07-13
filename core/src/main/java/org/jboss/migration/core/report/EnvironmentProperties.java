@@ -37,7 +37,17 @@ public interface EnvironmentProperties {
     String HTML_REPORT_PROPERTIES_PREFIX = REPORT_PROPERTIES_PREFIX + "html.";
 
     /**
+     * the prefix of all properties related with the summary report
+     */
+    String SUMMARY_REPORT_PROPERTIES_PREFIX = REPORT_PROPERTIES_PREFIX + "summary.";
+
+    /**
      * The HTML report will show subtasks, if the task has a path size smaller or equal, than this property value.
      */
     String PROPERTY_MAX_TASK_PATH_SIZE_TO_DISPLAY_SUBTASKS = HTML_REPORT_PROPERTIES_PREFIX + "maxTaskPathSizeToDisplaySubtasks";
+
+    /**
+     * The SUMMARY report will show subtasks, if the task has a path size smaller or equal, than this property value.
+     */
+    String SUMMARY_REPORT_PROPERTY_MAX_TASK_PATH_SIZE_TO_DISPLAY_SUBTASKS = SUMMARY_REPORT_PROPERTIES_PREFIX + "maxTaskPathSizeToDisplaySubtasks";
 }

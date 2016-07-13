@@ -140,15 +140,8 @@ public class CommandLineServerMigration {
                     .run();
 
             // write reports
-            final String xmlReportFileName = userEnvironment.getPropertyAsString(EnvironmentProperties.REPORT_XML_FILE_NAME);
-            if (xmlReportFileName != null) {
-                try {
-                    XmlReportWriter.INSTANCE.writeContent(outputDirPath.resolve(xmlReportFileName).toFile(), migrationData);
-                } catch (Throwable e) {
-                    ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
-                }
-            }
             final String htmlReportFileName = userEnvironment.getPropertyAsString(EnvironmentProperties.REPORT_HTML_FILE_NAME);
+            final String xmlReportFileName = userEnvironment.getPropertyAsString(EnvironmentProperties.REPORT_XML_FILE_NAME);
             if (htmlReportFileName != null) {
                 try {
                     final String htmlReportTemplateFileName = userEnvironment.getPropertyAsString(EnvironmentProperties.REPORT_HTML_TEMPLATE_FILE_NAME, "migration-report-template.html");
@@ -156,6 +149,13 @@ public class CommandLineServerMigration {
                     HtmlReportWriter.INSTANCE.toPath(outputDirPath.resolve(htmlReportFileName), migrationData, HtmlReportWriter.ReportTemplate.from(htmlReportTemplatePath));
                 } catch (Throwable e) {
                     ServerMigrationLogger.ROOT_LOGGER.error("HTML Report write failed", e);
+                }
+            }
+            if (xmlReportFileName != null) {
+                try {
+                    XmlReportWriter.INSTANCE.writeContent(outputDirPath.resolve(xmlReportFileName).toFile(), migrationData);
+                } catch (Throwable e) {
+                    ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
                 }
             }
             if (migrationData.getRootTask().getResult().getStatus() == ServerMigrationTaskResult.Status.FAIL) {

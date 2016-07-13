@@ -79,6 +79,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                 if(!SUCCESS.equals(outcome)) {
                     throw new RuntimeException("Subsystem "+subsystemName+" migration failed: "+result.get("migration-error").asString());
                 } else {
+                    final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().sucess();
                     final List<String> migrateWarnings = new ArrayList<>();
                     if (result.get(RESULT).hasDefined("migration-warnings")) {
                         for (ModelNode modelNode : result.get(RESULT).get("migration-warnings").asList()) {
@@ -90,6 +91,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                         context.getLogger().infof("Subsystem %s migrated.", subsystemName);
                     } else {
                         context.getLogger().infof("Subsystem %s migrated with warnings: %s", subsystemName, migrateWarnings);
+                        resultBuilder.addAttribute("migration-warnings", migrateWarnings);
                     }
                     // FIXME tmp workaround for legacy subsystems which do not remove itself
                     if (server.getSubsystems().contains(subsystemName)) {
@@ -97,7 +99,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                         server.removeSubsystem(subsystemName);
                         context.getLogger().debugf("Subsystem %s removed after migration.", subsystemName);
                     }
-                    return ServerMigrationTaskResult.SUCCESS;
+                    return resultBuilder.build();
                 }
             }
         };

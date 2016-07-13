@@ -50,8 +50,9 @@ public class UpdateManagementHttpsSocketBinding implements ServerMigrationTask {
         String SKIP = PROPERTIES_PREFIX + "skip";
 
         String PORT = PROPERTIES_PREFIX + "port";
-
     }
+
+    public static final String DEFAULT_PORT = "${jboss.management.https.port:9993}";
 
     private final WildFly10StandaloneServer target;
 
@@ -69,7 +70,10 @@ public class UpdateManagementHttpsSocketBinding implements ServerMigrationTask {
     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
         final MigrationEnvironment env = context.getServerMigrationContext().getMigrationEnvironment();
         if (!env.getPropertyAsBoolean(EnvironmentProperties.SKIP, Boolean.FALSE)) {
-            final String envPropertyPort = env.requirePropertyAsString(EnvironmentProperties.PORT, true);
+            String envPropertyPort = env.getPropertyAsString(EnvironmentProperties.PORT);
+            if (envPropertyPort == null || envPropertyPort.isEmpty()) {
+                envPropertyPort = DEFAULT_PORT;
+            }
             final boolean targetStarted = target.isStarted();
             if (!targetStarted) {
                 target.start();

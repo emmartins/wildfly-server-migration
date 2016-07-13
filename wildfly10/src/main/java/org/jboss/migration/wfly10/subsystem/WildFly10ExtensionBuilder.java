@@ -45,6 +45,10 @@ public class WildFly10ExtensionBuilder {
         return addSubsystem(subsystemName, "update-subsystem", tasks);
     }
 
+    public WildFly10ExtensionBuilder addNewSubsystem(String subsystemName) {
+        return addNewSubsystem(subsystemName, AddSubsystem.INSTANCE);
+    }
+
     public WildFly10ExtensionBuilder addNewSubsystem(String subsystemName, AddSubsystem addSubsystem) {
         return addSubsystem(subsystemName, "add-subsystem", AddExtension.INSTANCE, addSubsystem);
     }

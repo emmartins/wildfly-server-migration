@@ -21,6 +21,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -50,7 +51,7 @@ public class AddExtension implements WildFly10SubsystemMigrationTaskFactory {
             }
 
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 final String extensionName = subsystem.getExtension().getName();
                 if (!server.getExtensions().contains(extensionName)) {
                     context.getLogger().debugf("Adding Extension %s...", extensionName);
@@ -59,8 +60,10 @@ public class AddExtension implements WildFly10SubsystemMigrationTaskFactory {
                     server.executeManagementOperation(op);
                     context.getLogger().infof("Extension %s added.",extensionName);
                     return ServerMigrationTaskResult.SUCCESS;
+                } else {
+                    context.getLogger().infof("Skipped adding extension %s, already exists in config.", extensionName);
+                    return ServerMigrationTaskResult.SKIPPED;
                 }
-                return ServerMigrationTaskResult.SKIPPED;
             }
         };
     }

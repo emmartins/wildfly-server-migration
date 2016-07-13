@@ -22,6 +22,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -52,7 +53,7 @@ public class WorkaroundForWFLY5520 implements WildFly10SubsystemMigrationTaskFac
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 // this tmp workaround only needed when migrating into EAP 7.0.0.Beta1
                 if (!server.getServer().getProductInfo().getName().equals("EAP") || !server.getServer().getProductInfo().getVersion().equals("7.0.0.Beta1")) {
                     return ServerMigrationTaskResult.SKIPPED;

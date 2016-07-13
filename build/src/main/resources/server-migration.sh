@@ -5,6 +5,20 @@
 # A simple tool for migrating servers.
 #
 
+TOOL_OPTS=""
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+      -D*)
+          JAVA_OPTS=""$JAVA_OPTS" \"$1\""
+                ;;
+      *)
+          TOOL_OPTS="$TOOL_OPTS $1"
+          ;;
+    esac
+    shift
+done
+
 DIRNAME=`dirname "$0"`
 BASE_DIR=`cd "$DIRNAME"; pwd`
 
@@ -54,4 +68,4 @@ fi
 eval \"$JAVA\" $JAVA_OPTS \
     -cp \""$BASE_DIR"/lib/*\" \
     org.jboss.migration.cli.CommandLineServerMigration \
-    '"$@"'
+    "$TOOL_OPTS"
