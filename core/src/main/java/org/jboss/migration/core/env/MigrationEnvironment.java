@@ -27,7 +27,7 @@ import java.util.TreeMap;
 /**
  * @author emmartins
  */
-public class MigrationEnvironment {
+public class MigrationEnvironment implements Environment {
 
     private final SortedMap<String, PropertyValue> properties;
 
@@ -67,6 +67,11 @@ public class MigrationEnvironment {
             return null;
         }
         return propertyValue.getListValue();
+    }
+
+    public List<String> getPropertyAsList(String propertyName, List<String> defaultValue) {
+        final List<String> propertyValue = getPropertyAsList(propertyName);
+        return propertyValue != null ? propertyValue : defaultValue;
     }
 
     public Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailedException {

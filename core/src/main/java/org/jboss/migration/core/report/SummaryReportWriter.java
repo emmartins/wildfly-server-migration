@@ -39,11 +39,7 @@ public class SummaryReportWriter {
     private static final int MIN_SEPARATOR_LENGTH = 3;
 
     public String toString(MigrationData migrationData) {
-        return toString(migrationData, 5);
-    }
-
-    public String toString(MigrationData migrationData, int maxTaskDepth) {
-        final List<SummaryTaskEntry> summaryTaskEntries = getSummaryTaskEntries(migrationData, maxTaskDepth);
+        final List<SummaryTaskEntry> summaryTaskEntries = getSummaryTaskEntries(migrationData);
         final int taskNameAndSeparatorLength = getTaskNameAndSeparatorLength(summaryTaskEntries);
         final String lineSeparator = getLineSeparator(taskNameAndSeparatorLength);
         final StringBuilder sb = new StringBuilder();
@@ -60,14 +56,15 @@ public class SummaryReportWriter {
         return sb.toString();
     }
 
-    protected List<SummaryTaskEntry> getSummaryTaskEntries(MigrationData migrationData, int maxTaskDepth) {
+    protected List<SummaryTaskEntry> getSummaryTaskEntries(MigrationData migrationData) {
+        final int maxTaskPathSizeToDisplaySubtasks = Integer.valueOf(migrationData.getServerMigrationEnvironment().getPropertyAsString(EnvironmentProperties.SUMMARY_REPORT_PROPERTY_MAX_TASK_PATH_SIZE_TO_DISPLAY_SUBTASKS, "5"));
         final List<SummaryTaskEntry> summaryTaskEntries = new ArrayList<>();
         int taskDepth = 0;
-        getSummaryTaskEntry(migrationData.getRootTask(), " ", summaryTaskEntries, taskDepth, maxTaskDepth);
+        getSummaryTaskEntry(migrationData.getRootTask(), " ", summaryTaskEntries, taskDepth, maxTaskPathSizeToDisplaySubtasks);
         return  summaryTaskEntries;
     }
 
-    protected void getSummaryTaskEntry(ServerMigrationTaskExecution task, String prefix, List<SummaryTaskEntry> summaryTaskEntries, int taskDepth, int maxTaskDepth) {
+    protected void getSummaryTaskEntry(ServerMigrationTaskExecution task, String prefix, List<SummaryTaskEntry> summaryTaskEntries, int taskDepth, int maxTaskPathSizeToDisplaySubtasks) {
         if (task.getResult().getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
             return;
         }
@@ -75,11 +72,11 @@ public class SummaryReportWriter {
         summaryTaskEntries.add(new SummaryTaskEntry(taskNameWithPrefix, task.getResult()));
         String subtaskPrefix = TASK_NAME_LEVEL_INDENT + prefix;
         taskDepth++;
-        if (taskDepth > maxTaskDepth) {
+        if (taskDepth > maxTaskPathSizeToDisplaySubtasks) {
             return;
         }
         for (ServerMigrationTaskExecution subtask : task.getSubtasks()) {
-            getSummaryTaskEntry(subtask, subtaskPrefix, summaryTaskEntries, taskDepth, maxTaskDepth);
+            getSummaryTaskEntry(subtask, subtaskPrefix, summaryTaskEntries, taskDepth, maxTaskPathSizeToDisplaySubtasks);
         }
     }
 

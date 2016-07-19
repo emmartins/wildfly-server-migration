@@ -26,6 +26,7 @@ import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserChoiceWithOtherOption;
 import org.jboss.migration.core.console.UserConfirmation;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -52,14 +53,10 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("setup-javaee7-default-bindings").build();
 
     public interface EnvironmentProperties {
-        String DEFAULT_CONTEXT_SERVICE_JNDI_NAME = "defaultContextServiceJndiName";
         String DEFAULT_DATA_SOURCE_JNDI_NAME = "defaultDataSourceJndiName";
         String DEFAULT_DATA_SOURCE_NAME = "defaultDataSourceName";
         String DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME = "defaultJmsConnectionFactoryJndiName";
         String DEFAULT_JMS_CONNECTION_FACTORY_NAME = "defaultJmsConnectionFactoryName";
-        String DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME = "defaultManagedThreadFactoryJndiName";
-        String DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME = "defaultManagedExecutorServiceJndiName";
-        String DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME = "defaultManagedScheduledExecutorServiceJndiName";
     }
 
     public static final String TASK_RESULT_ATTR_CONTEXT_SERVICE = "default-context-service";
@@ -86,47 +83,39 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 // read env properties
                 final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
-                final String defaultContextServiceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_CONTEXT_SERVICE_JNDI_NAME));
-                final String defaultDataSourceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME));
-                final String defaultDataSourceName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_DATA_SOURCE_NAME));
-                final String defaultJmsConnectionFactoryJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME));
-                final String defaultJmsConnectionFactoryName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_NAME));
-                final String defaultManagedThreadFactoryJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME));
-                final String defaultManagedExecutorServiceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME));
-                final String defaultManagedScheduledExecutorServiceJndiName = migrationEnvironment.getPropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME));
+                final String defaultDataSourceJndiName = taskEnvironment.getPropertyAsString(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME);
+                final String defaultDataSourceName = taskEnvironment.getPropertyAsString(EnvironmentProperties.DEFAULT_DATA_SOURCE_NAME);
+                final String defaultJmsConnectionFactoryJndiName = taskEnvironment.getPropertyAsString(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME);
+                final String defaultJmsConnectionFactoryName = taskEnvironment.getPropertyAsString(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_NAME);
                 // do migration
                 final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
                 final PathAddress pathAddress = pathAddress(pathElement(SUBSYSTEM, subsystem.getName()), pathElement("service", "default-bindings"));
                 final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                if (defaultContextServiceJndiName != null && !defaultContextServiceJndiName.isEmpty()) {
-                    addOp.get("context-service").set(defaultContextServiceJndiName);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, defaultContextServiceJndiName);
+                // add ee concurrency utils defaults if related task was not skipped
+                final boolean addConcurrencyUtilitiesDefaultConfigSkipped = new TaskEnvironment(migrationEnvironment, org.jboss.migration.wfly10.subsystem.EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(subsystem.getName(), AddConcurrencyUtilitiesDefaultConfig.SERVER_MIGRATION_TASK_NAME.getName())).isSkippedByEnvironment();
+                if (!addConcurrencyUtilitiesDefaultConfigSkipped) {
+                    addOp.get("context-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
+                    addOp.get("managed-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
+                    addOp.get("managed-scheduled-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
+                    addOp.get("managed-thread-factory").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
                 }
-                if (defaultManagedExecutorServiceJndiName != null && !defaultManagedExecutorServiceJndiName.isEmpty()) {
-                    addOp.get("managed-executor-service").set(defaultManagedExecutorServiceJndiName);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, defaultManagedExecutorServiceJndiName);
-                }
-                if (defaultManagedScheduledExecutorServiceJndiName != null && !defaultManagedScheduledExecutorServiceJndiName.isEmpty()) {
-                    addOp.get("managed-scheduled-executor-service").set(defaultManagedScheduledExecutorServiceJndiName);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, defaultManagedScheduledExecutorServiceJndiName);
-                }
-                if (defaultManagedThreadFactoryJndiName != null && !defaultManagedThreadFactoryJndiName.isEmpty()) {
-                    addOp.get("managed-thread-factory").set(defaultManagedThreadFactoryJndiName);
-                    taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, defaultManagedThreadFactoryJndiName);
-                }
-                setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, server, context, taskResultBuilder);
-                setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, server, context, taskResultBuilder);
+                setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, server, context, taskEnvironment, taskResultBuilder);
+                setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, server, context, taskEnvironment, taskResultBuilder);
                 server.executeManagementOperation(addOp);
                 context.getLogger().infof("Java EE Default Bindings configured.");
                 return taskResultBuilder.sucess().build();
             }
-            private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
+            private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it
                 final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.MESSAGING_ACTIVEMQ);
                 if (subsystemConfig == null) {
@@ -216,7 +205,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                                 @Override
                                 public void onYes() throws Exception {
                                     // set env property
-                                    context.getServerMigrationContext().getMigrationEnvironment().setProperty(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME), jmsConnectionFactoryJndiName);
+                                    taskEnvironment.setProperty(EnvironmentProperties.DEFAULT_JMS_CONNECTION_FACTORY_JNDI_NAME, jmsConnectionFactoryJndiName);
                                 }
                                 @Override
                                 public void onError() throws Exception {
@@ -232,7 +221,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                     new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Factory, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Factory: ", resultHandler).execute();
                 }
             }
-            private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
+            private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, WildFly10StandaloneServer server, final ServerMigrationTaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it
                 final ModelNode subsystemConfig = server.getSubsystem(WildFly10SubsystemNames.DATASOURCES);
                 if (subsystemConfig == null) {
@@ -291,7 +280,7 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
                                 @Override
                                 public void onYes() throws Exception {
                                     // set env property
-                                    context.getServerMigrationContext().getMigrationEnvironment().setProperty(getEnvironmentPropertyName(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME), datasourceJndiName);
+                                    taskEnvironment.setProperty(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME, datasourceJndiName);
                                 }
                                 @Override
                                 public void onError() throws Exception {

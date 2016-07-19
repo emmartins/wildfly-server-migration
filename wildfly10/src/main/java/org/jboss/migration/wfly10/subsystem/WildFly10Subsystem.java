@@ -20,6 +20,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 
 import java.util.List;
@@ -28,8 +29,6 @@ import java.util.List;
  * @author emmartins
  */
 public class WildFly10Subsystem {
-
-    public static final String SUBSYSTEM_TASK_ENV_PROPERTY_SKIP = "skip";
 
     private final String name;
     private final String namespaceWithoutVersion;
@@ -96,13 +95,13 @@ public class WildFly10Subsystem {
                 for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
                     context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, server));
                 }
-                return ServerMigrationTaskResult.SUCCESS;
+                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
     }
 
     protected boolean skipExecution(ServerMigrationTaskContext context) {
-        return context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(EnvironmentProperties.getSubsystemTaskPropertiesPrefix(name) + SUBSYSTEM_TASK_ENV_PROPERTY_SKIP, Boolean.FALSE);
+        return new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemTaskPropertiesPrefix(name)).isSkippedByEnvironment();
     }
 
 }

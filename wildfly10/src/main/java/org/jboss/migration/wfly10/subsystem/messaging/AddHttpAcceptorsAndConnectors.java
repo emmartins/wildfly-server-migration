@@ -22,7 +22,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -48,6 +48,12 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
         String UNDERTOW_SERVER_NAME = "undertowServerName";
     }
 
+    public static final String DEFAULT_HTTP_ACCEPTOR_NAME = "http-acceptor";
+    public static final String DEFAULT_HTTP_CONNECTOR_NAME = "http-connector";
+    public static final String DEFAULT_SOCKET_BINDING_NAME = "http";
+    public static final String DEFAULT_UNDERTOW_HTTP_LISTENER_NAME = "http";
+    public static final String DEFAULT_UNDERTOW_SERVER_NAME = "default-server";
+
     public static final AddHttpAcceptorsAndConnectors INSTANCE = new AddHttpAcceptorsAndConnectors();
 
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("add-messaging-http-acceptors-and-connectors").build();
@@ -72,17 +78,16 @@ public class AddHttpAcceptorsAndConnectors implements WildFly10SubsystemMigratio
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 // read env properties
-                final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
-                final String httpAcceptorName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.HTTP_ACCEPTOR_NAME), true);
-                final String httpConnectorName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.HTTP_CONNECTOR_NAME), true);
-                final String socketBindingName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.SOCKET_BINDING_NAME), true);
-                final String undertowHttpListenerName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME), true);
-                final String undertowServerName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.UNDERTOW_SERVER_NAME), true);
+                final String httpAcceptorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_ACCEPTOR_NAME, DEFAULT_HTTP_ACCEPTOR_NAME);
+                final String httpConnectorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_CONNECTOR_NAME, DEFAULT_HTTP_CONNECTOR_NAME);
+                final String socketBindingName = taskEnvironment.getPropertyAsString(EnvironmentProperties.SOCKET_BINDING_NAME, DEFAULT_SOCKET_BINDING_NAME);
+                final String undertowHttpListenerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME, DEFAULT_UNDERTOW_HTTP_LISTENER_NAME);
+                final String undertowServerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_SERVER_NAME, DEFAULT_UNDERTOW_SERVER_NAME);
                 // ensure undertow's default http listener is configured
                 final ModelNode undertowConfig = server.getSubsystem(WildFly10SubsystemNames.UNDERTOW);
                 if (undertowConfig == null) {

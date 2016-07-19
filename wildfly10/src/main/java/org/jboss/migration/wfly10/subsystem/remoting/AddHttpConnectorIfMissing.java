@@ -23,7 +23,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
@@ -46,6 +46,10 @@ public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTas
         String SECURITY_REALM_NAME = "securityRealmName";
     }
 
+    public static final String DEFAULT_HTTP_CONNECTOR_NAME = "http-remoting-connector";
+    public static final String DEFAULT_CONNECTOR_REF_NAME = "http";
+    public static final String DEFAULT_SECURITY_REALM_NAME = "ApplicationRealm";
+
     public static final AddHttpConnectorIfMissing INSTANCE = new AddHttpConnectorIfMissing();
 
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder().setName("add-remoting-http-connector").build();
@@ -65,15 +69,14 @@ public class AddHttpConnectorIfMissing implements WildFly10SubsystemMigrationTas
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 // read env properties
-                final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
-                final String httpConnectorName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.HTTP_CONNECTOR_NAME), true);
-                final String connectorRefName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.CONNECTOR_REF_NAME), true);
-                final String securityRealmName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.SECURITY_REALM_NAME), true);
+                final String httpConnectorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_CONNECTOR_NAME, DEFAULT_HTTP_CONNECTOR_NAME);
+                final String connectorRefName = taskEnvironment.getPropertyAsString(EnvironmentProperties.CONNECTOR_REF_NAME, DEFAULT_CONNECTOR_REF_NAME);
+                final String securityRealmName = taskEnvironment.getPropertyAsString(EnvironmentProperties.SECURITY_REALM_NAME, DEFAULT_SECURITY_REALM_NAME);
                 // if not defined add http connector
                 final PathElement subsystemPathElement = pathElement(SUBSYSTEM, subsystem.getName());
                 if (!config.hasDefined(HTTP_CONNECTOR, httpConnectorName)) {

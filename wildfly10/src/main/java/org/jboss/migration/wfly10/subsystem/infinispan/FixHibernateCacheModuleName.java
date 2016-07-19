@@ -21,12 +21,13 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.standalone.WildFly10StandaloneServer;
 import org.jboss.migration.wfly10.subsystem.WildFly10Subsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTask;
 import org.jboss.migration.wfly10.subsystem.WildFly10SubsystemMigrationTaskFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -53,6 +54,8 @@ public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationT
 
     private static final String CACHE_CONTAINER = "cache-container";
     private static final String MODULE_ATTR_NAME = "module";
+    private static final String DEFAULT_NEW_MODULE_NAME = "org.hibernate.infinispan";
+    private static final List<String> DEFAULT_LEGACY_MODULE_NAMES = Arrays.asList("org.jboss.as.jpa.hibernate:4", "org.hibernate");
 
     @Override
     public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server) {
@@ -62,14 +65,13 @@ public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationT
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, WildFly10StandaloneServer server, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 // read env properties
-                final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
-                final List<String> legacyModuleNames = migrationEnvironment.requirePropertyAsList(getEnvironmentPropertyName(EnvironmentProperties.LEGACY_MODULE_NAMES), true);
-                final String newModuleName = migrationEnvironment.requirePropertyAsString(getEnvironmentPropertyName(EnvironmentProperties.NEW_MODULE_NAME), true);
+                final List<String> legacyModuleNames = taskEnvironment.getPropertyAsList(EnvironmentProperties.LEGACY_MODULE_NAMES, DEFAULT_LEGACY_MODULE_NAMES);
+                final String newModuleName = taskEnvironment.getPropertyAsString(EnvironmentProperties.NEW_MODULE_NAME, DEFAULT_NEW_MODULE_NAME);
                 // do migration
                 if (!config.hasDefined(CACHE_CONTAINER)) {
                     context.getLogger().infof("No Cache container");

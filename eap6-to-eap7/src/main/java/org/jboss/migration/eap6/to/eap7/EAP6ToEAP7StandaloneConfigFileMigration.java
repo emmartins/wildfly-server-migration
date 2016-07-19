@@ -24,7 +24,6 @@ import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFil
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileSecurityRealmsMigration;
 import org.jboss.migration.wfly10.standalone.config.WildFly10StandaloneConfigFileSubsystemsMigration;
-import org.jboss.migration.wfly10.subsystem.AddSubsystem;
 import org.jboss.migration.wfly10.subsystem.WildFly10Extension;
 import org.jboss.migration.wfly10.subsystem.WildFly10ExtensionBuilder;
 import org.jboss.migration.wfly10.subsystem.WildFly10ExtensionNames;
@@ -233,12 +232,14 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
                 .build()
         );
 
+        /* If missing then EAP 7 automatically adds bean-validation subsystem to configs
         // bean-validation did not exist in source server, need tasks to create extension and subsystem default config
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.BEAN_VALIDATION)
-                .addNewSubsystem(WildFly10SubsystemNames.BEAN_VALIDATION, AddSubsystem.INSTANCE)
+                .addNewSubsystem(WildFly10SubsystemNames.BEAN_VALIDATION)
                 .build()
         );
+        */
 
         // singleton did not exist in source server, need tasks to create extension and subsystem default config
         supportedExtensions.add(new WildFly10ExtensionBuilder()
@@ -256,7 +257,7 @@ public class EAP6ToEAP7StandaloneConfigFileMigration extends WildFly10Standalone
         // request-controller did not exist in source server, need tasks to create extension and subsystem default config
         supportedExtensions.add(new WildFly10ExtensionBuilder()
                 .setName(WildFly10ExtensionNames.REQUEST_CONTROLLER)
-                .addNewSubsystem(WildFly10SubsystemNames.REQUEST_CONTROLLER, AddSubsystem.INSTANCE)
+                .addNewSubsystem(WildFly10SubsystemNames.REQUEST_CONTROLLER)
                 .build()
         );
 
