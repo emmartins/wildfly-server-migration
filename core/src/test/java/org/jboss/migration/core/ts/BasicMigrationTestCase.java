@@ -28,13 +28,19 @@ public class BasicMigrationTestCase {
 
     @Test
     public void testSupportedMigration() {
-        final MigrationData migrationData = new ServerMigration().from(TestSourceServerProvider.SERVER.getBaseDir()).to(TestTargetServerProvider.SERVER.getBaseDir()).run();
+        final MigrationData migrationData = new ServerMigration()
+                .from(TestSourceServerProvider.SERVER.getBaseDir())
+                .to(TestTargetServerProvider.SERVER.getBaseDir())
+                .run();
         Assert.assertTrue(migrationData.getRootTask().getResult().getStatus() == ServerMigrationTaskResult.Status.SUCCESS);
     }
 
     @Test
     public void testUnsupportedMigration() {
-        final MigrationData migrationData = new ServerMigration().to(TestSourceServerProvider.SERVER.getBaseDir()).from(TestTargetServerProvider.SERVER.getBaseDir()).run();
+        final MigrationData migrationData = new ServerMigration()
+                .to(TestSourceServerProvider.SERVER.getBaseDir())
+                .from(TestTargetServerProvider.SERVER.getBaseDir())
+                .run();
         Assert.assertNotNull(migrationData.getRootTask().getResult().getFailReason());
     }
 }
