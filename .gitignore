@@ -14,3 +14,5 @@ hotspot.log
 .DS_Store
 jboss-server-migration
 migration.log
+testsuite/servers
+testsuite/jboss-server-migration
