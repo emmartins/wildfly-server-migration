@@ -46,7 +46,7 @@ rm -Rf $TOOL_DIR
 unzip $TEST_DIR/../build/target/jboss-server-migration-*.zip -d $TEST_DIR
 
 echo "### Executing the migration..."
-$TOOL_DIR/server-migration.sh --source $SOURCE_DIST_DIR --target $TARGET_DIST_DIR --interactive false
+$TOOL_DIR/server-migration.sh --source $SOURCE_DIST_DIR --target $TARGET_DIST_DIR --interactive false -Djboss.server.migration.domain.skip=false
 
 echo "### Patching target server's migrated config files..."
 TARGET_STANDALONE_CONFIG_DIR="$TARGET_DIST_DIR/standalone/configuration"

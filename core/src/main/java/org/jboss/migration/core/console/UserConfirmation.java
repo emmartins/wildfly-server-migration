@@ -56,6 +56,7 @@ public class UserConfirmation {
     }
 
     public void execute() throws Exception {
+        theConsole.printf("%n");
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);

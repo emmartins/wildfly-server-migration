@@ -149,6 +149,9 @@ public class ServerMigrationTaskExecution {
         if (this.result != null) {
             throw new IllegalStateException();
         }
+        if (subtask.getName() == null) {
+            throw new IllegalArgumentException("substask "+subtask+" has no name");
+        }
         final ServerMigrationTaskExecution child = new ServerMigrationTaskExecution(subtask, this);
         children.add(child);
         child.run();

@@ -19,7 +19,7 @@ import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
-import org.jboss.migration.wfly10.full.WildFly10FullServer;
+import org.jboss.migration.wfly10.dist.full.WildFly10FullServer;
 
 import java.nio.file.Path;
 

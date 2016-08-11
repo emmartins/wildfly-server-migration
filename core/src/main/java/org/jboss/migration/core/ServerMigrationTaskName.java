@@ -78,17 +78,15 @@ public class ServerMigrationTaskName implements Serializable {
      */
     public static class Builder {
 
-        private String name;
+        private final String name;
         private Map<String, String> attributes;
 
         /**
-         * Sets the task id name
-         * @param name the task id name
-         * @return the builder
+         * the task id name
+         * @param name
          */
-        public Builder setName(String name) {
+        public Builder(String name) {
             this.name = name;
-            return this;
         }
 
         /**

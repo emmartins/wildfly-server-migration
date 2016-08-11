@@ -15,11 +15,11 @@
  */
 package org.jboss.migration.eap;
 
+import org.jboss.migration.core.AbstractServerProvider;
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ManifestProductInfo;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.AbstractServerProvider;
 import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.io.IOException;

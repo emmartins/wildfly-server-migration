@@ -50,4 +50,10 @@ public interface Server {
      */
     ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException;
 
+    /**
+     * Resolves a path.
+     * @param path the path's name
+     * @return the resolved path if the server is able to resolve it's name, null otherwise
+     */
+    Path resolvePath(String path);
 }
