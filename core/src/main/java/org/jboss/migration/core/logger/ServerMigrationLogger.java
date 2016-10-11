@@ -186,18 +186,4 @@ public interface ServerMigrationLogger extends BasicLogger {
      */
     @Message(id = 8, value = "Target file %s previously copied from different source.")
     IllegalStateException targetPreviouslyCopiedFromDifferentSource(Path targetPath);
-
-    /**
-     * Logs a msg indicating the backup of an existent file copy's target, by renaming it.
-     */
-    @LogMessage(level = INFO)
-    @Message(id = Message.NONE, value = "File %s exists on target, renaming to %s.beforeMigration.")
-    void targetFileRenamed(Path targetPath, String targetFileName);
-
-    /**
-     * Logs a msg indicating the copy of a file.
-     */
-    @LogMessage(level = INFO)
-    @Message(id = Message.NONE, value = "File %s copied to %s.")
-    void fileCopied(Path source, Path target);
 }

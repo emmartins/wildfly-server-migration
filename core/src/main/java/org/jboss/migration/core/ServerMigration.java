@@ -134,8 +134,7 @@ public class ServerMigration {
         console.printf("%n");
 
         final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, migrationEnvironment);
-        final ServerMigrationTaskName serverMigrationTaskName = new ServerMigrationTaskName.Builder()
-                .setName("server")
+        final ServerMigrationTaskName serverMigrationTaskName = new ServerMigrationTaskName.Builder("server")
                 .build();
         final ServerMigrationTask serverMigrationTask = new ServerMigrationTask() {
             @Override

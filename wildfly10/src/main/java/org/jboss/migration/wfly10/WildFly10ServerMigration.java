@@ -32,10 +32,4 @@ public interface WildFly10ServerMigration<S extends Server> {
      * @return
      */
     ServerMigrationTaskResult run(S source, WildFly10Server target, ServerMigrationTaskContext context);
-
-    /**
-     * Retrieves the type of the supported source server.
-     * @return
-     */
-    Class<S> getSourceType();
 }

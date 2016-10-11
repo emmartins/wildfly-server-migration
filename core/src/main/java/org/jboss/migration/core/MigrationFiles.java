@@ -63,7 +63,7 @@ public class MigrationFiles {
         Files.createDirectories(target.getParent());
         // if target file exists make a backup copy
         if (Files.exists(target)) {
-            ServerMigrationLogger.ROOT_LOGGER.targetFileRenamed(target, target.getFileName().toString());
+            ServerMigrationLogger.ROOT_LOGGER.debugf("File %s exists on target, renaming to %s.beforeMigration.", target, target.getFileName().toString());
             Files.copy(target, target.getParent().resolve(target.getFileName().toString()+".beforeMigration"), StandardCopyOption.REPLACE_EXISTING);
         }
         // copy file
@@ -71,6 +71,6 @@ public class MigrationFiles {
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         // keep track of the file copy to prevent more copies for same target
         copiedFiles.put(target, source);
-        ServerMigrationLogger.ROOT_LOGGER.fileCopied(source, target);
+        ServerMigrationLogger.ROOT_LOGGER.debugf("File %s copied to %s.", source, target);
     }
 }

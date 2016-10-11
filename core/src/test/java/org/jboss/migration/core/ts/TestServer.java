@@ -56,4 +56,9 @@ public class TestServer extends AbstractServer {
         }
         return ServerMigrationTaskResult.SUCCESS;
     }
+
+    @Override
+    public Path resolvePath(String path) {
+        return null;
+    }
 }
