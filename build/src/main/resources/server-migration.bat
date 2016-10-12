@@ -29,24 +29,17 @@ if "x%JAVA_HOME%" == "x" (
 
 set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.baseDir=%BASE_DIR%"
 
-set LOGGING_CONFIG=
 echo "%JAVA_OPTS%" | findstr /I "logging.configuration" > nul
 if errorlevel == 1 (
-  set "LOGGING_CONFIG=-Dlogging.configuration=file:%BASE_DIR%\config\logging.properties -Djboss.server.migration.logfile=%BASE_DIR%\output\migration.log"
+  set "JAVA_OPTS=%JAVA_OPTS% -Dlogging.configuration=file:%BASE_DIR%\config\logging.properties -Djboss.server.migration.logfile=%BASE_DIR%\output\migration.log"
 ) else (
   echo logging.configuration already set in JAVA_OPTS
 )
-if "x%LOGGING_CONFIG%" == "x" (
-  "%JAVA%" %JAVA_OPTS% ^
-      -cp "%BASE_DIR%\lib\*" ^
-       org.jboss.migration.cli.CommandLineServerMigration ^
-         %*
-) else (
-  "%JAVA%" %JAVA_OPTS% "%LOGGING_CONFIG%" ^
-      -cp "%BASE_DIR%\lib\*" ^
-       org.jboss.migration.cli.CommandLineServerMigration ^
-       %*
-)
+
+"%JAVA%" %JAVA_OPTS% ^
+    -cp "%BASE_DIR%\lib\*" ^
+    org.jboss.migration.cli.CommandLineServerMigration ^
+    %*
 
 set /A RC=%errorlevel%
 :END
