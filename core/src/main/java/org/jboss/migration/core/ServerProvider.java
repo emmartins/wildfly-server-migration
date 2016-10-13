@@ -25,6 +25,7 @@ import java.nio.file.Path;
  * @author emmartins
  */
 public interface ServerProvider {
+
     /**
      * Retrieves a server from its base directory.
      * @param migrationName the migration server's name
