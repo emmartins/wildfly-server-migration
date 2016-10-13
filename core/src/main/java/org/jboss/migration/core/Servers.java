@@ -51,6 +51,9 @@ public final class Servers {
                 if (server != null) {
                     ServerMigrationLogger.ROOT_LOGGER.debugf("%s recognized as %s base dir. Server product info: %s", baseDir, serverProvider.getName(), server.getProductInfo());
                     return server;
+                } else {
+                    ServerMigrationLogger.ROOT_LOGGER.debugf("%s not recognized as %s base dir.", baseDir, serverProvider.getName());
+
                 }
             } catch (Throwable e) {
                 ServerMigrationLogger.ROOT_LOGGER.debugf(e, "Failure retrieving server from provider %s", serverProvider.getClass());
