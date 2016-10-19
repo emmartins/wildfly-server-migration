@@ -18,12 +18,11 @@ package org.jboss.migration.eap6.to.eap7;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.eap.EAP7ServerMigrationProvider;
-import org.jboss.migration.eap6.to.eap7.interfaces.AddPrivateInterface;
-import org.jboss.migration.eap6.to.eap7.interfaces.UpdateUnsecureInterface;
-import org.jboss.migration.eap6.to.eap7.jvms.RemovePermgenAttributesFromJVMs;
-import org.jboss.migration.eap6.to.eap7.management.interfaces.EnableHttpInterfaceSupportForHttpUpgrade;
-import org.jboss.migration.eap6.to.eap7.standalone.UpdateManagementHttpsSocketBinding;
-import org.jboss.migration.eap6.to.eap7.subsystem.AddJmxSubsystemToHosts;
+import org.jboss.migration.eap6.to.eap7.tasks.UpdateUnsecureInterface;
+import org.jboss.migration.eap6.to.eap7.tasks.RemovePermgenAttributesFromJVMs;
+import org.jboss.migration.eap6.to.eap7.tasks.EnableHttpInterfaceSupportForHttpUpgrade;
+import org.jboss.migration.eap6.to.eap7.tasks.UpdateManagementHttpsSocketBinding;
+import org.jboss.migration.eap6.to.eap7.tasks.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
 import org.jboss.migration.wfly10.config.task.JVMsMigration;
 import org.jboss.migration.wfly10.config.task.ManagementInterfacesMigration;
@@ -49,6 +48,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSu
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.MigrateHttpListener;
+import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 
 /**
@@ -84,9 +84,13 @@ public class EAP6ToEAP7ServerMigrationProvider implements EAP7ServerMigrationPro
                 .standaloneMigration(serverUpdateBuilders.standaloneConfigurationMigrationBuilder()
                         .subsystemsMigration(subsystemsMigration)
                         .managementInterfacesMigration(managementInterfacesMigration)
+                        .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
+                                .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<EAP6Server>())
+                        )
                         .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
                                 .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
                                         .addSubtaskFactory(new UpdateManagementHttpsSocketBinding())
+                                        .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<EAP6Server>())
                                 )
                         )
                 )
@@ -96,10 +100,15 @@ public class EAP6ToEAP7ServerMigrationProvider implements EAP7ServerMigrationPro
                                 .profilesMigration(subsystemsMigration)
                                 .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
                                         .addSubtaskFactory(new UpdateUnsecureInterface())
-                                        .addSubtaskFactory(new AddPrivateInterface())
+                                        .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<EAP6Server>())
                                 )
                                 .serverGroupsMigration(serverUpdateBuilders.serverGroupMigrationBuilder()
                                         .addJVMsMigration(jvMsMigration)
+                                )
+                                .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
+                                        .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
+                                                .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<EAP6Server>())
+                                        )
                                 )
                         )
                         .hostConfigurationsMigration(serverUpdateBuilders.hostConfigurationMigrationBuilder()

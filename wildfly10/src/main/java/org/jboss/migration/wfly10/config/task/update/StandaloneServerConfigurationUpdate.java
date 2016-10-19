@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.update;
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.config.task.DeploymentsMigration;
+import org.jboss.migration.wfly10.config.task.InterfacesMigration;
 import org.jboss.migration.wfly10.config.task.ManagementInterfacesMigration;
 import org.jboss.migration.wfly10.config.task.SecurityRealmsMigration;
 import org.jboss.migration.wfly10.config.task.SocketBindingGroupMigration;
@@ -38,6 +39,7 @@ public class StandaloneServerConfigurationUpdate<S extends JBossServer<S>> exten
     public static class Builder<S extends JBossServer<S>> {
 
         private DeploymentsMigration<ServerPath<S>> deploymentsMigration;
+        private InterfacesMigration<ServerPath<S>> interfacesMigration;
         private ManagementInterfacesMigration<ServerPath<S>> managementInterfacesMigration;
         private SecurityRealmsMigration<ServerPath<S>> securityRealmsMigration;
         private SocketBindingGroupsMigration<ServerPath<S>> socketBindingGroupsMigration;
@@ -50,6 +52,15 @@ public class StandaloneServerConfigurationUpdate<S extends JBossServer<S>> exten
 
         public Builder<S> deploymentsMigration(DeploymentsMigration.Builder<ServerPath<S>> deploymentsMigrationBuilder) {
             return deploymentsMigration(deploymentsMigrationBuilder.build());
+        }
+
+        public Builder<S> interfacesMigration(InterfacesMigration<ServerPath<S>> interfacesMigration) {
+            this.interfacesMigration = interfacesMigration;
+            return this;
+        }
+
+        public Builder<S> interfacesMigration(InterfacesMigration.Builder<ServerPath<S>> interfacesMigrationBuilder) {
+            return this.interfacesMigration(interfacesMigrationBuilder.build());
         }
 
         public Builder<S> managementInterfacesMigration(ManagementInterfacesMigration<ServerPath<S>> managementInterfacesMigration) {
@@ -105,6 +116,9 @@ public class StandaloneServerConfigurationUpdate<S extends JBossServer<S>> exten
                 builder.addDeploymentsMigration(deploymentsMigration);
             } else {
                 builder.addDeploymentsMigration(new RemoveDeployment<ServerPath<S>>().buildDeploymentsMigration());
+            }
+            if (interfacesMigration != null) {
+                builder.addInterfacesMigration(interfacesMigration);
             }
             if (managementInterfacesMigration != null) {
                 builder.addManagementInterfacesMigration(managementInterfacesMigration);

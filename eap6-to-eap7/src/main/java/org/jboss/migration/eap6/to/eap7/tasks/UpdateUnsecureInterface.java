@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap6.to.eap7.management.interfaces;
+package org.jboss.migration.eap6.to.eap7.tasks;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
@@ -26,25 +27,28 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerMigrationTasks;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.eap.EAP6Server;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.task.ManagementInterfacesMigration;
+import org.jboss.migration.wfly10.config.management.InterfacesManagement;
+import org.jboss.migration.wfly10.config.task.InterfacesMigration;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INET_ADDRESS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
 
 /**
- * Updates the management interface http-interface to support http upgrade.
+ * Adds private interface to config.
  * @author emmartins
  */
-public class EnableHttpInterfaceSupportForHttpUpgrade implements ManagementInterfacesMigration.SubtaskFactory<ServerPath<EAP6Server>> {
+public class UpdateUnsecureInterface implements InterfacesMigration.SubtaskFactory<ServerPath<EAP6Server>> {
 
-    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "enable-http-upgrade-support";
+    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "update-unsecure-interface";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).build();
-    private static final String INTERFACE_NAME = "http-interface";
+    private static final String INTERFACE_NAME = "unsecure";
 
     @Override
-    public void addSubtasks(ServerPath<EAP6Server> source, final ManagementInterfacesManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
+    public void addSubtasks(ServerPath<EAP6Server> source, final InterfacesManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
         final ServerMigrationTask subtask = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -53,16 +57,20 @@ public class EnableHttpInterfaceSupportForHttpUpgrade implements ManagementInter
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
                 if (!resourceManagement.getResourceNames().contains(INTERFACE_NAME)) {
+                    context.getLogger().infof("Skipping task to update %s interface, not found in the configuration.", INTERFACE_NAME);
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                // http interface found, turn on http upgrade
                 final PathAddress pathAddress = resourceManagement.getResourcePathAddress(INTERFACE_NAME);
-                //pathAddress(pathElement(CORE_SERVICE, MANAGEMENT), pathElement(MANAGEMENT_INTERFACE, "http-interface"));
+                final ModelNode getInterfaceOp = Util.createEmptyOperation(READ_RESOURCE_OPERATION, pathAddress);
+                if (resourceManagement.getServerConfiguration().executeManagementOperation(getInterfaceOp).get(RESULT).hasDefined(INET_ADDRESS)) {
+                    context.getLogger().infof("Skipping task to update %s interface, %s attribute already defined.", INTERFACE_NAME, INET_ADDRESS);
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
                 final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                writeAttrOp.get(NAME).set("http-upgrade-enabled");
-                writeAttrOp.get(VALUE).set(true);
+                writeAttrOp.get(NAME).set(INET_ADDRESS);
+                writeAttrOp.get(VALUE).set(new ValueExpression("${jboss.bind.address.unsecure:127.0.0.1}"));
                 resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Activated HTTP Management Interface's support for HTTP Upgrade.");
+                context.getLogger().infof("Interface %s inet address configured.", INTERFACE_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };

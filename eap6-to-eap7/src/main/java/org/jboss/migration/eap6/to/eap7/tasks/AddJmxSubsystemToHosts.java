@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.eap6.to.eap7.subsystem;
+
+package org.jboss.migration.eap6.to.eap7.tasks;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
