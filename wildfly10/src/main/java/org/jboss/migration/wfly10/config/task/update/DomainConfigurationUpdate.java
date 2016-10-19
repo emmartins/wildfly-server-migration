@@ -92,6 +92,10 @@ public class DomainConfigurationUpdate<S extends JBossServer<S>> extends DomainC
             return socketBindingGroupsMigration(SocketBindingGroupsMigration.from(socketBindingGroupMigration));
         }
 
+        public Builder<S> socketBindingGroupsMigration(SocketBindingGroupMigration.Builder<ServerPath<S>> socketBindingGroupMigrationBuilder) {
+            return socketBindingGroupsMigration(socketBindingGroupMigrationBuilder.build());
+        }
+
         public Builder<S> interfacesMigration(InterfacesMigration<ServerPath<S>> interfacesMigration) {
             this.interfacesMigration = interfacesMigration;
             return this;
@@ -117,11 +121,11 @@ public class DomainConfigurationUpdate<S extends JBossServer<S>> extends DomainC
             if (serverGroupsMigration != null) {
                 builder.addServerGroupsMigration(serverGroupsMigration);
             }
-            if (socketBindingGroupsMigration != null) {
-                builder.addSocketBindingGroupsMigration(socketBindingGroupsMigration);
-            }
             if (interfacesMigration != null) {
                 builder.addInterfacesMigration(interfacesMigration);
+            }
+            if (socketBindingGroupsMigration != null) {
+                builder.addSocketBindingGroupsMigration(socketBindingGroupsMigration);
             }
             return new DomainConfigurationUpdate<>(builder);
         }

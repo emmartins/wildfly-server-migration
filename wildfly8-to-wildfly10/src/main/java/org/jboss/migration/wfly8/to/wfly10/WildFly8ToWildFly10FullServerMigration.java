@@ -28,6 +28,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateC
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
+import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFly10FullServerMigrationProvider;
 import org.jboss.migration.wfly8.WildFly8Server;
@@ -52,11 +53,27 @@ public class WildFly8ToWildFly10FullServerMigration implements WildFly10FullServ
                 .build();
         return new ServerUpdate.Builder<WildFly8Server>()
                 .standaloneMigration(serverUpdateBuilders.standaloneConfigurationMigrationBuilder()
-                        .subsystemsMigration(subsystemsMigration))
+                        .subsystemsMigration(subsystemsMigration)
+                        .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
+                                .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly8Server>())
+                        )
+                        .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
+                                .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
+                                        .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly8Server>())
+                                )
+                        ))
                 .domainMigration(serverUpdateBuilders.domainBuilder()
                         .domainConfigurationsMigration(serverUpdateBuilders.domainConfigurationMigrationBuilder()
                                 .subsystemsMigration(subsystemsMigration)
-                                .profilesMigration(subsystemsMigration))
+                                .profilesMigration(subsystemsMigration)
+                                .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
+                                        .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly8Server>())
+                                )
+                                .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
+                                        .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
+                                                .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly8Server>())
+                                        )
+                                ))
                         .defaultHostConfigurationsMigration())
                 .build();
     }

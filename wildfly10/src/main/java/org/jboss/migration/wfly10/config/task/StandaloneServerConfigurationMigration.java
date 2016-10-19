@@ -55,6 +55,15 @@ public class StandaloneServerConfigurationMigration<S> extends ServerConfigurati
             });
         }
 
+        public ServerConfigurationMigration.Builder addInterfacesMigration(final InterfacesMigration<S> interfacesMigration) {
+            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
+                @Override
+                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
+                    return interfacesMigration.getTask(source, configuration.getInterfacesManagement());
+                }
+            });
+        }
+
         public ServerConfigurationMigration.Builder addManagementInterfacesMigration(final ManagementInterfacesMigration<S> managementInterfacesMigration) {
             return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
                 @Override

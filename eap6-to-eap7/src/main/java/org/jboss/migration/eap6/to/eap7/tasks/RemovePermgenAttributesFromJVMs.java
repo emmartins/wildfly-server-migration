@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap6.to.eap7.jvms;
+package org.jboss.migration.eap6.to.eap7.tasks;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap6.to.eap7.socketbindings;
+package org.jboss.migration.eap6.to.eap7.tasks;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
@@ -25,26 +25,34 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerMigrationTasks;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.wfly10.config.management.SocketBindingsManagement;
 import org.jboss.migration.wfly10.config.task.SocketBindingsMigration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
 
 /**
+ * Updates the management-https socket binding config.
  * @author emmartins
  */
-public class UsePrivateInterfaceOnJGroupsSocketBindings implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
+public class UpdateManagementHttpsSocketBinding implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
 
-    public static final String[] JGROUPS_SOCKET_BINDINGS = {"jgroups-mping", "jgroups-tcp", "jgroups-tcp-fd", "jgroups-udp", "jgroups-udp-fd"};
-    private static final String INTERFACE_ATTR_NAME = "interface";
-    private static final String INTERFACE_ATTR_VALUE = "private";
-    private static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("use-private-interface-on-jgroups-socket-bindings").build();
+    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "update-management-https";
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).build();
+
+    public interface EnvironmentProperties {
+        /**
+         * the prefix for the name of the management-https socket binding related properties
+         */
+        String PROPERTIES_PREFIX = SocketBindingsMigration.SOCKET_BINDINGS + "." + SERVER_MIGRATION_TASK_NAME_NAME + ".";
+
+        String PORT = PROPERTIES_PREFIX + "port";
+    }
+
+    public static final String DEFAULT_PORT = "${jboss.management.https.port:9993}";
 
     @Override
     public void addSubtasks(ServerPath<EAP6Server> source, final SocketBindingsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
@@ -55,26 +63,22 @@ public class UsePrivateInterfaceOnJGroupsSocketBindings implements SocketBinding
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                final List<String> updated = new ArrayList<>();
-                for (String socketBinding : JGROUPS_SOCKET_BINDINGS) {
-                    ModelNode config = resourceManagement.getResource(socketBinding);
-                    if (config != null) {
-                        if (!config.hasDefined(INTERFACE_ATTR_NAME) || !config.get(INTERFACE_ATTR_NAME).asString().equals(INTERFACE_ATTR_VALUE)) {
-                            final PathAddress pathAddress = resourceManagement.getResourcePathAddress(socketBinding);
-                            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                            writeAttrOp.get(NAME).set(INTERFACE_ATTR_NAME);
-                            writeAttrOp.get(VALUE).set(INTERFACE_ATTR_VALUE);
-                            resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                            context.getLogger().infof("Socket binding %s interface set to %s", socketBinding, INTERFACE_ATTR_VALUE);
-                            updated.add(socketBinding);
-                        }
-                    }
+                final MigrationEnvironment env = context.getServerMigrationContext().getMigrationEnvironment();
+                String envPropertyPort = env.getPropertyAsString(EnvironmentProperties.PORT);
+                if (envPropertyPort == null || envPropertyPort.isEmpty()) {
+                    envPropertyPort = DEFAULT_PORT;
                 }
-                if (updated.isEmpty()) {
+                if (!resourceManagement.getResourceNames().contains("management-https")) {
                     return ServerMigrationTaskResult.SKIPPED;
-                } else {
-                    return new ServerMigrationTaskResult.Builder().sucess().addAttribute("updated", updated.toString()).build();
                 }
+                // management-https binding found, update port
+                final PathAddress pathAddress = resourceManagement.getResourcePathAddress("management-https");
+                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                writeAttrOp.get(NAME).set("port");
+                writeAttrOp.get(VALUE).set(envPropertyPort);
+                resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
+                context.getLogger().infof("Socket binding 'management-https' default port set to "+envPropertyPort+".");
+                return ServerMigrationTaskResult.SUCCESS;
             }
         };
         subtasks.add(subtask);
