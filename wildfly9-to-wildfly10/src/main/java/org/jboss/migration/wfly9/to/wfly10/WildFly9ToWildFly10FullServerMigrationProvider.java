@@ -15,8 +15,10 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
+import org.jboss.migration.wfly10.config.task.InterfacesMigration;
+import org.jboss.migration.wfly10.config.task.JVMsMigration;
+import org.jboss.migration.wfly10.config.task.SocketBindingGroupMigration;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
@@ -25,6 +27,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SupportedExtensions;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
+import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFly10FullServerMigrationProvider;
 import org.jboss.migration.wfly9.WildFly9Server;
@@ -38,35 +41,43 @@ public class WildFly9ToWildFly10FullServerMigrationProvider implements WildFly10
     @Override
     public WildFly10ServerMigration getServerMigration() {
         final ServerUpdate.Builders<WildFly9Server> serverUpdateBuilders = new ServerUpdate.Builders<>();
-        final SubsystemsMigration<ServerPath<WildFly9Server>> subsystemsMigration = serverUpdateBuilders.subsystemsMigrationBuilder()
+        final SubsystemsMigration subsystemsMigration = serverUpdateBuilders.subsystemsMigrationBuilder()
                 .addExtensions(SupportedExtensions.allExcept(ExtensionNames.BATCH_JBERET, ExtensionNames.SINGLETON))
                 .addExtension(new ExtensionBuilder(ExtensionNames.BATCH_JBERET).addNewSubsystem(SubsystemNames.BATCH_JBERET, AddBatchJBeretSubsystem.INSTANCE))
                 .addExtension(new ExtensionBuilder(ExtensionNames.SINGLETON).addNewSubsystem(SubsystemNames.SINGLETON, AddSingletonSubsystem.INSTANCE))
                 .build();
+        final JVMsMigration jvMsMigration = serverUpdateBuilders.jvmsMigrationBuilder()
+                .subtask(new RemovePermgenAttributesFromJVMs())
+                .build();
+        final InterfacesMigration interfacesMigration = serverUpdateBuilders.interfacesMigrationBuilder()
+                .subtask(new AddPrivateInterface.InterfacesSubtaskFactory())
+                .build();
+        final SocketBindingGroupMigration socketBindingGroupMigration = serverUpdateBuilders.socketBindingGroupMigrationBuilder()
+                .socketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
+                        .subtask(new AddPrivateInterface.SocketBindingsSubtaskFactory()))
+                .build();
         return new ServerUpdate.Builder<WildFly9Server>()
                 .standaloneMigration(serverUpdateBuilders.standaloneConfigurationMigrationBuilder()
                         .subsystemsMigration(subsystemsMigration)
-                        .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                .subtask(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly9Server>())
-                        )
-                        .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
-                                .socketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
-                                        .subtask(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly9Server>())
-                                )
-                        ))
+                        .interfacesMigration(interfacesMigration)
+                        .socketBindingGroupsMigration(socketBindingGroupMigration)
+                )
                 .domainMigration(serverUpdateBuilders.domainBuilder()
                         .domainConfigurationsMigration(serverUpdateBuilders.domainConfigurationMigrationBuilder()
                                 .subsystemsMigration(subsystemsMigration)
                                 .profilesMigration(subsystemsMigration)
-                                .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                        .subtask(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly9Server>())
+                                .interfacesMigration(interfacesMigration)
+                                .socketBindingGroupsMigration(socketBindingGroupMigration)
+                                .serverGroupsMigration(serverUpdateBuilders.serverGroupMigrationBuilder()
+                                        .jvmsMigration(jvMsMigration)
                                 )
-                                .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
-                                        .socketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
-                                                .subtask(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly9Server>())
-                                        )
-                                ))
-                        .defaultHostConfigurationsMigration())
+                        )
+                        .hostConfigurationsMigration(serverUpdateBuilders.hostConfigurationMigrationBuilder()
+                                .hostUpdate(serverUpdateBuilders.hostUpdateBuilder()
+                                        .jvmsMigration(jvMsMigration)
+                                )
+                        )
+                )
                 .build();
     }
 

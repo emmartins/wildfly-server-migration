@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap6.to.eap7.tasks;
+package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerMigrationTasks;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.wfly10.config.management.JVMsManagement;
 import org.jboss.migration.wfly10.config.task.JVMsMigration;
 
@@ -33,18 +33,18 @@ import org.jboss.migration.wfly10.config.task.JVMsMigration;
  * Removes permgen from JVM Configs.
  * @author emmartins
  */
-public class RemovePermgenAttributesFromJVMs implements JVMsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
+public class RemovePermgenAttributesFromJVMs<S extends JBossServer> implements JVMsMigration.SubtaskFactory<ServerPath<S>> {
 
     public static final String SERVER_MIGRATION_TASK_NAME_NAME = "remove-permgen";
 
     @Override
-    public void addSubtasks(ServerPath<EAP6Server> source, JVMsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
+    public void addSubtasks(ServerPath<S> source, JVMsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
         for (String resourceName : resourceManagement.getResourceNames()) {
             addResourceSubtask(resourceName, source, resourceManagement, subtasks);
         }
     }
 
-    protected void addResourceSubtask(final String resourceName, final ServerPath<EAP6Server> source, final JVMsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
+    protected void addResourceSubtask(final String resourceName, final ServerPath<S> source, final JVMsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).addAttribute("name", resourceName).build();
         final ServerMigrationTask subtask = new ServerMigrationTask() {
             @Override
