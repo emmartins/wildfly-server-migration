@@ -38,9 +38,9 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.WRI
  * Updates the management-https socket binding config.
  * @author emmartins
  */
-public class UpdateManagementHttpsSocketBinding implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
+public class UpdateManagementHttpsSocketBindingPort implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
 
-    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "update-management-https";
+    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "update-management-https-port";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).build();
 
     public interface EnvironmentProperties {

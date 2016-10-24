@@ -158,6 +158,18 @@ public class HostMigration<S> implements HostsMigration.SubtaskFactory<S> {
             });
         }
 
+        public Builder<S> addInterfacesMigration(final InterfacesMigration<S> resourcesMigration) {
+            return addSubtaskFactory(new SubtaskFactory<S>() {
+                @Override
+                public void addSubtasks(S source, HostConfiguration configuration, ServerMigrationTasks subtasks) throws Exception {
+                    final ServerMigrationTask subtask = resourcesMigration.getTask(source, configuration.getInterfacesManagement());
+                    if (subtask != null) {
+                        subtasks.add(subtask);
+                    }
+                }
+            });
+        }
+
         public Builder<S> addManagementInterfacesMigration(final ManagementInterfacesMigration<S> resourcesMigration) {
             return addSubtaskFactory(new SubtaskFactory<S>() {
                 @Override

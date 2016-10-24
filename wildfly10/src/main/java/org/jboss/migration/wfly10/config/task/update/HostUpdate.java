@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.update;
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.config.task.HostMigration;
+import org.jboss.migration.wfly10.config.task.InterfacesMigration;
 import org.jboss.migration.wfly10.config.task.JVMsMigration;
 import org.jboss.migration.wfly10.config.task.ManagementInterfacesMigration;
 import org.jboss.migration.wfly10.config.task.SecurityRealmsMigration;
@@ -37,6 +38,7 @@ public class HostUpdate<S extends JBossServer<S>> extends HostMigration<ServerPa
 
         private SubsystemsMigration<ServerPath<S>> subsystemsMigration;
         private SecurityRealmsMigration<ServerPath<S>> securityRealmsMigration;
+        private InterfacesMigration<ServerPath<S>> interfacesMigration;
         private ManagementInterfacesMigration<ServerPath<S>> managementInterfacesMigration;
         private JVMsMigration<ServerPath<S>> jvMsMigration;
 
@@ -58,6 +60,15 @@ public class HostUpdate<S extends JBossServer<S>> extends HostMigration<ServerPa
             return securityRealmsMigration(securityRealmsMigrationBuilder.build());
         }
 
+        public Builder<S> interfacesMigration(InterfacesMigration<ServerPath<S>> interfacesMigration) {
+            this.interfacesMigration = interfacesMigration;
+            return this;
+        }
+
+        public Builder<S> interfacesMigration(InterfacesMigration.Builder<ServerPath<S>> interfacesMigrationBuilder) {
+            return interfacesMigration(interfacesMigrationBuilder.build());
+        }
+
         public Builder<S> managementInterfacesMigration(ManagementInterfacesMigration<ServerPath<S>> managementInterfacesMigration) {
             this.managementInterfacesMigration = managementInterfacesMigration;
             return this;
@@ -67,13 +78,13 @@ public class HostUpdate<S extends JBossServer<S>> extends HostMigration<ServerPa
             return managementInterfacesMigration(managementInterfacesMigrationBuilder.build());
         }
 
-        public Builder<S> jvMsMigration(JVMsMigration<ServerPath<S>> jvMsMigration) {
+        public Builder<S> jvmsMigration(JVMsMigration<ServerPath<S>> jvMsMigration) {
             this.jvMsMigration = jvMsMigration;
             return this;
         }
 
-        public Builder<S> jvMsMigration(JVMsMigration.Builder<ServerPath<S>> jvMsMigrationBuilder) {
-            return jvMsMigration(jvMsMigrationBuilder.build());
+        public Builder<S> jvmsMigration(JVMsMigration.Builder<ServerPath<S>> jvMsMigrationBuilder) {
+            return jvmsMigration(jvMsMigrationBuilder.build());
         }
 
         public HostUpdate<S> build() {
@@ -85,6 +96,9 @@ public class HostUpdate<S extends JBossServer<S>> extends HostMigration<ServerPa
                 builder.addSecurityRealmsMigration(securityRealmsMigration);
             } else {
                 builder.addSecurityRealmsMigration(new MigrateCompatibleSecurityRealm<S>().buildSecurityRealmsMigration());
+            }
+            if (interfacesMigration != null) {
+                builder.addInterfacesMigration(interfacesMigration);
             }
             if (managementInterfacesMigration != null) {
                 builder.addManagementInterfacesMigration(managementInterfacesMigration);

@@ -151,6 +151,6 @@ public class MigrateCompatibleSecurityRealm<S extends JBossServer<S>> implements
     }
 
     public SecurityRealmsMigration<ServerPath<S>> buildSecurityRealmsMigration() {
-        return new SecurityRealmsMigration.Builder<ServerPath<S>>().addSubtaskFactory(this).build();
+        return new SecurityRealmsMigration.Builder<ServerPath<S>>().subtask(this).build();
     }
 }

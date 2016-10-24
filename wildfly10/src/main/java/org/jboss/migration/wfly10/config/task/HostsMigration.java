@@ -48,7 +48,7 @@ public class HostsMigration<S> extends ResourcesMigration<S, HostsManagement> {
             });
         }
         public Builder<S> addHostMigration(HostMigration hostMigration) {
-            return addSubtaskFactory(hostMigration);
+            return subtask(hostMigration);
         }
         @Override
         public HostsMigration<S> build() {

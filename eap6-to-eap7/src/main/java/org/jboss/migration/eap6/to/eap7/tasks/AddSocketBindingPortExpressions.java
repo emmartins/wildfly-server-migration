@@ -38,13 +38,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Set socket binding's ports as value expressions.
  * @author emmartins
  */
-public class SetSocketBindingPortExpressions implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
-
-    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "set-port-expression";
-    public static final String SERVER_MIGRATION_TASK_NAME_ATTR_SOCKET_BINDING = "socket-binding";
+public class AddSocketBindingPortExpressions implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
     private final String[] resourceNames;
 
-    public SetSocketBindingPortExpressions(String ...resourceNames) {
+    public AddSocketBindingPortExpressions(String ...resourceNames) {
         this.resourceNames = resourceNames.clone();
     }
 
@@ -56,26 +53,25 @@ public class SetSocketBindingPortExpressions implements SocketBindingsMigration.
     }
 
     protected void addSubtask(String resourceName, ServerPath<EAP6Server> source, final SocketBindingsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
+        final String taskName = "add-"+resourceName+"-port-expression";
         final String propertyName = "jboss."+resourceName+".port";
-        final Task task = new Task(resourceName, propertyName , resourceManagement);
-        final String envSkipProperty = SocketBindingsMigration.SOCKET_BINDING + "." + resourceName + "." + SERVER_MIGRATION_TASK_NAME_NAME + ".skip";
+        final Task task = new Task(resourceName, taskName, propertyName , resourceManagement);
+        final String envSkipProperty = SocketBindingsMigration.SOCKET_BINDINGS + "." + taskName + ".skip";
         subtasks.add(new SkippableByEnvServerMigrationTask(task, envSkipProperty));
     }
 
     static class Task implements ServerMigrationTask {
-
-        private static final String PORT = "port";
 
         private final String resourceName;
         private final String propertyName;
         private final ServerMigrationTaskName taskName;
         private final SocketBindingsManagement resourceManagement;
 
-        Task(String resourceName, String propertyName, SocketBindingsManagement resourceManagement) {
+        Task(String resourceName, String taskName, String propertyName, SocketBindingsManagement resourceManagement) {
             this.resourceName = resourceName;
             this.propertyName = propertyName;
             this.resourceManagement = resourceManagement;
-            this.taskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTR_SOCKET_BINDING, resourceName).build();
+            this.taskName = new ServerMigrationTaskName.Builder(taskName).build();
         }
 
         @Override

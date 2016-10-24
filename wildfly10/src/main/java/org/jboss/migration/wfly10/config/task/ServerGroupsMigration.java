@@ -49,7 +49,7 @@ public class ServerGroupsMigration<S> extends ResourcesMigration<S, ServerGroups
             });
         }
         public Builder serverGroupMigration(ServerGroupMigration serverGroupMigration) {
-            return addSubtaskFactory(serverGroupMigration);
+            return subtask(serverGroupMigration);
         }
         @Override
         public ServerGroupsMigration<S> build() {

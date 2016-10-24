@@ -55,7 +55,7 @@ public class ProfilesMigration<S> extends ResourcesMigration<S, ProfilesManageme
         }
 
         public Builder<S> profileMigration(ProfileMigration<S> profileMigration) {
-            return addSubtaskFactory(profileMigration);
+            return subtask(profileMigration);
         }
     }
 

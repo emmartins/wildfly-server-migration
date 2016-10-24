@@ -86,7 +86,7 @@ public class ServerGroupMigration<S> implements ServerGroupsMigration.SubtaskFac
             return this;
         }
 
-        public Builder<S> addJVMsMigration(final JVMsMigration<S> jvMsMigration) {
+        public Builder<S> jvmsMigration(final JVMsMigration<S> jvMsMigration) {
             return addSubtaskFactory(new SubtaskFactory<S>() {
                 @Override
                 public void addSubtasks(S source, ServerGroupManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
@@ -98,8 +98,8 @@ public class ServerGroupMigration<S> implements ServerGroupsMigration.SubtaskFac
             });
         }
 
-        public Builder<S> addJVMsMigration(final JVMsMigration.Builder<S> jvMsMigrationBuilder) {
-            return addJVMsMigration(jvMsMigrationBuilder.build());
+        public Builder<S> jvmsMigration(final JVMsMigration.Builder<S> jvMsMigrationBuilder) {
+            return jvmsMigration(jvMsMigrationBuilder.build());
         }
 
         public ServerGroupMigration<S> build() {

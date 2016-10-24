@@ -49,7 +49,7 @@ public class SocketBindingGroupsMigration<S> extends ResourcesMigration<S, Socke
             });
         }
         public Builder socketBindingGroupMigration(SocketBindingGroupMigration socketBindingGroupMigration) {
-            return addSubtaskFactory(socketBindingGroupMigration);
+            return subtask(socketBindingGroupMigration);
         }
         @Override
         public SocketBindingGroupsMigration<S> build() {

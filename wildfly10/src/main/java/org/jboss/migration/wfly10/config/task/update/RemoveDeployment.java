@@ -56,6 +56,6 @@ public class RemoveDeployment<S> implements DeploymentsMigration.SubtaskFactory<
     }
 
     public DeploymentsMigration<S> buildDeploymentsMigration() {
-        return new DeploymentsMigration.Builder<S>().addSubtaskFactory(this).build();
+        return new DeploymentsMigration.Builder<S>().subtask(this).build();
     }
 }

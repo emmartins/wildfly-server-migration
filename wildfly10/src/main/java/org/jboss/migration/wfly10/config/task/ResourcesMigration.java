@@ -91,7 +91,7 @@ public class ResourcesMigration<S, T extends ResourcesManagement> {
             return (B) this;
         }
 
-        public B addSubtaskFactory(final SubtaskFactory<S, T> subtaskFactory) {
+        public B subtask(final SubtaskFactory<S, T> subtaskFactory) {
             subtaskFactories.add(subtaskFactory);
             return (B) this;
         }

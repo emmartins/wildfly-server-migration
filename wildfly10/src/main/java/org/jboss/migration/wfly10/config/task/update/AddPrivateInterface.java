@@ -47,7 +47,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 public class AddPrivateInterface {
 
     private static final String INTERFACE_ATTR_VALUE = "private";
-    private static final String INTERFACE_ATTR_NAME = "interface";
     private static final String[] JGROUPS_SOCKET_BINDINGS = {"jgroups-mping", "jgroups-tcp", "jgroups-tcp-fd", "jgroups-udp", "jgroups-udp-fd"};
 
     public static class InterfacesSubtaskFactory<S extends JBossServer> implements InterfacesMigration.SubtaskFactory<ServerPath<S>> {
@@ -100,7 +99,7 @@ public class AddPrivateInterface {
 
     public static class SocketBindingsSubtaskFactory<S extends JBossServer> implements SocketBindingsMigration.SubtaskFactory<ServerPath<S>> {
 
-        public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("use-private-interface-on-jgroups-socket-bindings").build();
+        public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("set-jgroups-socket-bindings-interface-private").build();
 
         @Override
         public void addSubtasks(ServerPath<S> source, final SocketBindingsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
@@ -117,10 +116,10 @@ public class AddPrivateInterface {
                     for (String socketBinding : JGROUPS_SOCKET_BINDINGS) {
                         ModelNode config = resourceManagement.getResource(socketBinding);
                         if (config != null) {
-                            if (!config.hasDefined(INTERFACE_ATTR_NAME) || !config.get(INTERFACE_ATTR_NAME).asString().equals(INTERFACE_ATTR_VALUE)) {
+                            if (!config.hasDefined(INTERFACE) || !config.get(INTERFACE).asString().equals(INTERFACE_ATTR_VALUE)) {
                                 final PathAddress pathAddress = resourceManagement.getResourcePathAddress(socketBinding);
                                 final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                                writeAttrOp.get(NAME).set(INTERFACE_ATTR_NAME);
+                                writeAttrOp.get(NAME).set(INTERFACE);
                                 writeAttrOp.get(VALUE).set(INTERFACE_ATTR_VALUE);
                                 resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
                                 context.getLogger().infof("Socket binding %s interface set to %s", socketBinding, INTERFACE_ATTR_VALUE);

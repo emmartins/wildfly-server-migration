@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class SocketBindingGroupMigration<S> implements SocketBindingGroupsMigration.SubtaskFactory<S> {
 
-    public static final String SOCKET_BINDING = "socket-binding";
+    public static final String SOCKET_BINDING_GROUP = "socket-binding-group";
     public static final String SERVER_MIGRATION_TASK_NAME_ATTR_NAME = "name";
 
     protected final List<SubtaskFactory<S>> subtaskFactories;
@@ -51,7 +51,7 @@ public class SocketBindingGroupMigration<S> implements SocketBindingGroupsMigrat
     }
 
     protected void addResourceSubtask(final String resourceName, S source, SocketBindingGroupsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
-        final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SOCKET_BINDING)
+        final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SOCKET_BINDING_GROUP)
                 .addAttribute(SERVER_MIGRATION_TASK_NAME_ATTR_NAME, resourceName)
                 .build();
         final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(SERVER_MIGRATION_TASK_NAME)
@@ -86,7 +86,7 @@ public class SocketBindingGroupMigration<S> implements SocketBindingGroupsMigrat
             return this;
         }
 
-        public Builder addSocketBindingsMigration(final SocketBindingsMigration<S> socketBindingsMigration) {
+        public Builder socketBindingsMigration(final SocketBindingsMigration<S> socketBindingsMigration) {
             return addSubtaskFactory(new SubtaskFactory<S>() {
                 @Override
                 public void addSubtasks(S source, SocketBindingGroupManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
@@ -98,8 +98,8 @@ public class SocketBindingGroupMigration<S> implements SocketBindingGroupsMigrat
             });
         }
 
-        public Builder addSocketBindingsMigration(SocketBindingsMigration.Builder<S> socketBindingsMigrationBuilder) {
-            return addSocketBindingsMigration(socketBindingsMigrationBuilder.build());
+        public Builder socketBindingsMigration(SocketBindingsMigration.Builder<S> socketBindingsMigrationBuilder) {
+            return socketBindingsMigration(socketBindingsMigrationBuilder.build());
         }
 
         public SocketBindingGroupMigration build() {
