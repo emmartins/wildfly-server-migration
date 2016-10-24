@@ -97,19 +97,19 @@ public class SetSocketBindingPortExpressions implements SocketBindingsMigration.
                 return ServerMigrationTaskResult.SKIPPED;
             }
             // check current attribute value
-            final ModelNode socketBindingPort = resource.get(PORT);
-            if (socketBindingPort.getType() == ModelType.EXPRESSION) {
-                context.getLogger().debugf("Socket binding %s unexpected port value %s, task to add port property skipped.", resourceName, socketBindingPort.asExpression());
+            final ModelNode resourceAttr = resource.get(PORT);
+            if (resourceAttr.getType() == ModelType.EXPRESSION) {
+                context.getLogger().debugf("Socket binding %s unexpected port value %s, task to add port property skipped.", resourceName, resourceAttr.asExpression().getExpressionString());
                 return ServerMigrationTaskResult.SKIPPED;
             }
             // update attribute value
-            final ValueExpression valueExpression = new ValueExpression("${"+propertyName+":"+socketBindingPort.asString()+"}");
+            final ValueExpression valueExpression = new ValueExpression("${"+propertyName+":"+resourceAttr.asString()+"}");
             final PathAddress pathAddress = resourceManagement.getResourcePathAddress(resourceName);
             final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
             writeAttrOp.get(NAME).set(PORT);
             writeAttrOp.get(VALUE).set(valueExpression);
             resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-            context.getLogger().infof("Socket binding %s port value expression set as %s.", resourceName, valueExpression);
+            context.getLogger().infof("Socket binding %s port value expression set as %s.", resourceName, valueExpression.getExpressionString());
             return ServerMigrationTaskResult.SUCCESS;
         }
     }
