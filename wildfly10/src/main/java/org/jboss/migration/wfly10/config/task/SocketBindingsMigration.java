@@ -27,6 +27,8 @@ public class SocketBindingsMigration<S> extends ResourcesMigration<S, SocketBind
 
     public static final String SOCKET_BINDINGS = "socket-bindings";
 
+    public static final String SOCKET_BINDING = "socket-binding";
+
     protected SocketBindingsMigration(Builder<S> builder) {
         super(builder);
     }
