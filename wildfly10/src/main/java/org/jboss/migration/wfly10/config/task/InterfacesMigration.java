@@ -26,6 +26,7 @@ import org.jboss.migration.wfly10.config.management.InterfacesManagement;
 public class InterfacesMigration<S> extends ResourcesMigration<S, InterfacesManagement> {
 
     public static final String INTERFACES = "interfaces";
+    public static final String INTERFACE = "interface";
 
     protected InterfacesMigration(Builder<S> builder) {
         super(builder);

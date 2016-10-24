@@ -26,24 +26,20 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerMigrationTasks;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.wfly10.config.management.InterfacesManagement;
 import org.jboss.migration.wfly10.config.task.InterfacesMigration;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INET_ADDRESS;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * Adds private interface to config.
  * @author emmartins
  */
-public class UpdateUnsecureInterface implements InterfacesMigration.SubtaskFactory<ServerPath<EAP6Server>> {
+public class SetUnsecureInterfaceInetAddress implements InterfacesMigration.SubtaskFactory<ServerPath<EAP6Server>> {
 
-    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "update-unsecure-interface";
+    public static final String SERVER_MIGRATION_TASK_NAME_NAME = "set-unsecure-interface-inet-address";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).build();
     private static final String INTERFACE_NAME = "unsecure";
 
@@ -56,24 +52,28 @@ public class UpdateUnsecureInterface implements InterfacesMigration.SubtaskFacto
             }
             @Override
             public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                if (!resourceManagement.getResourceNames().contains(INTERFACE_NAME)) {
-                    context.getLogger().infof("Skipping task to update %s interface, not found in the configuration.", INTERFACE_NAME);
+                // retrieve resource config
+                final ModelNode resource = resourceManagement.getResource(INTERFACE_NAME);
+                if (resource == null) {
+                    context.getLogger().debugf("Interface %s does not exists.", INTERFACE_NAME);
                     return ServerMigrationTaskResult.SKIPPED;
                 }
+                // check if attribute is defined
+                if (resource.hasDefined(INET_ADDRESS)) {
+                    context.getLogger().debugf("Interface %s inet address already defined.", INTERFACE_NAME);
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                // set attribute value
+                final ValueExpression valueExpression = new ValueExpression("${jboss.bind.address.unsecure:127.0.0.1}");
                 final PathAddress pathAddress = resourceManagement.getResourcePathAddress(INTERFACE_NAME);
-                final ModelNode getInterfaceOp = Util.createEmptyOperation(READ_RESOURCE_OPERATION, pathAddress);
-                if (resourceManagement.getServerConfiguration().executeManagementOperation(getInterfaceOp).get(RESULT).hasDefined(INET_ADDRESS)) {
-                    context.getLogger().infof("Skipping task to update %s interface, %s attribute already defined.", INTERFACE_NAME, INET_ADDRESS);
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
                 final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
                 writeAttrOp.get(NAME).set(INET_ADDRESS);
-                writeAttrOp.get(VALUE).set(new ValueExpression("${jboss.bind.address.unsecure:127.0.0.1}"));
+                writeAttrOp.get(VALUE).set(valueExpression);
                 resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Interface %s inet address configured.", INTERFACE_NAME);
+                context.getLogger().infof("Interface %s inet address value set as %s.", INTERFACE_NAME, valueExpression.getExpressionString());
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
-        subtasks.add(subtask);
+        subtasks.add(new SkippableByEnvServerMigrationTask(subtask, InterfacesMigration.INTERFACE+"."+INTERFACE_NAME+"."+SERVER_MIGRATION_TASK_NAME_NAME+".skip"));
     }
 }

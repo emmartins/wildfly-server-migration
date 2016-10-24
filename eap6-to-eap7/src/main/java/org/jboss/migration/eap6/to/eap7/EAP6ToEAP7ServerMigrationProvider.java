@@ -19,7 +19,7 @@ import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.eap.EAP7ServerMigrationProvider;
 import org.jboss.migration.eap6.to.eap7.tasks.SetSocketBindingPortExpressions;
-import org.jboss.migration.eap6.to.eap7.tasks.UpdateUnsecureInterface;
+import org.jboss.migration.eap6.to.eap7.tasks.SetUnsecureInterfaceInetAddress;
 import org.jboss.migration.eap6.to.eap7.tasks.RemovePermgenAttributesFromJVMs;
 import org.jboss.migration.eap6.to.eap7.tasks.EnableHttpInterfaceSupportForHttpUpgrade;
 import org.jboss.migration.eap6.to.eap7.tasks.UpdateManagementHttpsSocketBinding;
@@ -101,7 +101,7 @@ public class EAP6ToEAP7ServerMigrationProvider implements EAP7ServerMigrationPro
                                 .subsystemsMigration(subsystemsMigration)
                                 .profilesMigration(subsystemsMigration)
                                 .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                        .addSubtaskFactory(new UpdateUnsecureInterface())
+                                        .addSubtaskFactory(new SetUnsecureInterfaceInetAddress())
                                         .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<EAP6Server>())
                                 )
                                 .serverGroupsMigration(serverUpdateBuilders.serverGroupMigrationBuilder()
