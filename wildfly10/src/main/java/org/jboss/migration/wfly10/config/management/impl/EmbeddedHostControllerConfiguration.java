@@ -78,6 +78,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
 
     @Override
     protected ModelControllerClient startConfiguration() {
+
         final List<String> cmds = new ArrayList<>();
         if (domainConfig != null) {
             cmds.add("--domain-config="+ domainConfig);

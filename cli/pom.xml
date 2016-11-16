@@ -35,6 +35,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
@@ -43,7 +49,6 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
@@ -52,6 +57,12 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.logmanager</groupId>
+            <artifactId>jboss-logmanager</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>staxmapper</artifactId>
