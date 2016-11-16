@@ -20,6 +20,7 @@ import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationsMigration;
+import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationsMigration;
 
 import java.util.Collection;
@@ -29,7 +30,7 @@ import java.util.Collection;
  */
 class StandaloneServerConfigurationsUpdate<S extends JBossServer<S>> extends StandaloneServerConfigurationsMigration<S, ServerPath<S>> {
 
-    StandaloneServerConfigurationsUpdate(StandaloneServerConfigurationUpdate<S> configurationMigration) {
+    StandaloneServerConfigurationsUpdate(StandaloneServerConfigurationMigration<ServerPath<S>> configurationMigration) {
         super(new SourceStandaloneServerConfigurations<S>(), configurationMigration);
     }
 

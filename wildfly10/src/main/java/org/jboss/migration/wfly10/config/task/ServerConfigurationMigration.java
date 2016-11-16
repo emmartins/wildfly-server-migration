@@ -23,9 +23,11 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,14 +44,14 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
     private final String configType;
     protected final XMLConfigurationProvider xmlConfigurationProvider;
     protected final ManageableConfigurationProvider<T> manageableConfigurationProvider;
-    protected final List<ManageableConfigurationSubtaskFactory<S, T>> manageableConfigurationSubtaskFactories;
+    protected final List<ManageableServerConfigurationTaskFactory<S, T>> manageableConfigurationSubtaskFactories;
     protected final List<XMLConfigurationSubtaskFactory<S>> xmlConfigurationSubtaskFactories;
 
     protected ServerConfigurationMigration(Builder builder) {
         this.configType = builder.configType;
         this.xmlConfigurationProvider = builder.xmlConfigurationProvider;
         this.manageableConfigurationProvider = builder.manageableConfigurationProvider;
-        this.manageableConfigurationSubtaskFactories = Collections.unmodifiableList(builder.manageableConfigurationSubtaskFactories);
+        this.manageableConfigurationSubtaskFactories = Collections.unmodifiableList(builder.manageableConfigurationSubtaskFactories.factories);
         this.xmlConfigurationSubtaskFactories = Collections.unmodifiableList(builder.xmlConfigurationSubtaskFactories);
     }
 
@@ -74,7 +76,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
                 final Path xmlConfigurationPath = xmlConfigurationProvider.getXMLConfiguration(source, targetConfigDir, target, context);
                 // execute xml config subtasks
                 for (XMLConfigurationSubtaskFactory subtaskFactory : xmlConfigurationSubtaskFactories) {
-                    final ServerMigrationTask subtask = subtaskFactory.getXMLConfigurationSubtask(source, xmlConfigurationPath, target);
+                    final ServerMigrationTask subtask = subtaskFactory.getTask(source, xmlConfigurationPath, target);
                     if (subtask != null) {
                         context.execute(subtask);
                     }
@@ -87,8 +89,8 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
                     configurationManagement.start();
                     try {
                         // execute config management subtasks
-                        for (ManageableConfigurationSubtaskFactory subtaskFactory : manageableConfigurationSubtaskFactories) {
-                            final ServerMigrationTask subtask = subtaskFactory.getManageableConfigurationSubtask(source, configurationManagement);
+                        for (ManageableServerConfigurationTaskFactory subtaskFactory : manageableConfigurationSubtaskFactories) {
+                            final ServerMigrationTask subtask = subtaskFactory.getTask(source, configurationManagement);
                             if (subtask != null) {
                                 context.execute(subtask);
                             }
@@ -112,23 +114,6 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
     }
 
     /**
-     * XML Config Subtasks factory.
-     * @param <S> the source for the configuration
-     */
-    public interface XMLConfigurationSubtaskFactory<S> {
-        ServerMigrationTask getXMLConfigurationSubtask(S source, Path xmlConfigurationPath, WildFly10Server target);
-    }
-
-    /**
-     * Manageable Config Subtasks factory.
-     * @param <S> the source for the configuration
-     * @param <T> the manageable config type
-     */
-    public interface ManageableConfigurationSubtaskFactory<S, T extends ManageableServerConfiguration> {
-        ServerMigrationTask getManageableConfigurationSubtask(S source, T configuration) throws Exception;
-    }
-
-    /**
      * Provider for the manageable configuration
      * @param <T>
      */
@@ -136,43 +121,68 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
         T getManageableConfiguration(Path targetConfigFilePath, WildFly10Server target) throws Exception;
     }
 
+    public interface XMLConfigurationSubtaskFactory<S> {
+        ServerMigrationTask getTask(S source, Path xmlConfigurationPath, WildFly10Server target);
+    }
+
     /**
      * The ServerConfigurationMigration builder.
      * @param <S> the source for the configuration
      * @param <T> the manageable config type
      */
-    public static class Builder<B extends Builder, S, T extends ManageableServerConfiguration> {
+    public static class Builder<S, T extends ManageableServerConfiguration> {
 
         private final String configType;
         private final XMLConfigurationProvider xmlConfigurationProvider;
         private ManageableConfigurationProvider<T> manageableConfigurationProvider;
-        private final List<ManageableConfigurationSubtaskFactory<S, T>> manageableConfigurationSubtaskFactories;
+        private final ManageableServerConfigurationTaskFactories<S, T> manageableConfigurationSubtaskFactories;
         private final List<XMLConfigurationSubtaskFactory<S>> xmlConfigurationSubtaskFactories;
 
         public Builder(String configType, XMLConfigurationProvider xmlConfigurationProvider) {
             this.configType = configType;
             this.xmlConfigurationProvider = xmlConfigurationProvider;
-            manageableConfigurationSubtaskFactories = new ArrayList<>();
+            manageableConfigurationSubtaskFactories = new ManageableServerConfigurationTaskFactories<>();
             xmlConfigurationSubtaskFactories = new ArrayList<>();
         }
 
-        public B manageableConfigurationProvider(ManageableConfigurationProvider<T> manageableConfigurationProvider) {
+        public Builder<S, T> manageableConfigurationProvider(ManageableConfigurationProvider<T> manageableConfigurationProvider) {
             this.manageableConfigurationProvider = manageableConfigurationProvider;
-            return (B) this;
+            return this;
         }
 
-        public B addManageableConfigurationSubtaskFactory(ManageableConfigurationSubtaskFactory<S, T> subtaskFactory) {
+        public Builder<S, T> subtask(ManageableServerConfigurationTaskFactory<S, T> subtaskFactory) {
             manageableConfigurationSubtaskFactories.add(subtaskFactory);
-            return (B) this;
+            return this;
         }
 
-        public B addXMLConfigurationSubtaskFactory(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
+        public Builder<S, T> subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
             xmlConfigurationSubtaskFactories.add(subtaskFactory);
-            return (B) this;
+            return this;
         }
 
         public ServerConfigurationMigration<S, T> build() {
             return new ServerConfigurationMigration(this);
+        }
+    }
+
+    public static class ManageableServerConfigurationTaskFactories<S, T extends ManageableServerConfiguration> {
+
+        private final List<ManageableServerConfigurationTaskFactory<S, T>> factories;
+
+        public ManageableServerConfigurationTaskFactories() {
+            this.factories = new ArrayList<>();
+        }
+
+        public List<ManageableServerConfigurationTaskFactory<S, T>> getFactories() {
+            return Collections.unmodifiableList(factories);
+        }
+
+        public void add(ManageableServerConfigurationTaskFactory<S, T> subtaskFactory) {
+            factories.add(subtaskFactory);
+        }
+
+        public void addAll(Collection<ManageableServerConfigurationTaskFactory<S, T>> subtaskFactories) {
+            factories.addAll(subtaskFactories);
         }
     }
 }

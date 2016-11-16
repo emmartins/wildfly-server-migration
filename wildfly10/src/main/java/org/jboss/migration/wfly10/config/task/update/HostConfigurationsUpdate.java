@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.update;
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationsMigration;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ import java.util.Collection;
  */
 class HostConfigurationsUpdate<S extends JBossServer<S>> extends HostConfigurationsMigration<S, ServerPath<S>> {
 
-    HostConfigurationsUpdate(HostConfigurationUpdate<S> configurationMigration) {
+    HostConfigurationsUpdate(HostConfigurationMigration<ServerPath<S>> configurationMigration) {
         super(new SourceHostConfigurations<S>(), configurationMigration);
     }
 

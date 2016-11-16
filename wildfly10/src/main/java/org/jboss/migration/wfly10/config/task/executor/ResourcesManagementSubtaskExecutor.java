@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.update;
+package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.core.JBossServer;
-import org.jboss.migration.wfly10.config.task.StandaloneServerMigration;
+import org.jboss.migration.wfly10.config.management.ResourcesManagement;
 
 /**
  * @author emmartins
  */
-public class StandaloneServerUpdate<S extends JBossServer<S>> extends StandaloneServerMigration<S> {
-    public StandaloneServerUpdate(StandaloneServerConfigurationsUpdate<S> configurationsUpdate) {
-        super(configurationsUpdate);
-    }
-    public StandaloneServerUpdate(StandaloneServerConfigurationUpdate<S> configurationUpdate) {
-        this(new StandaloneServerConfigurationsUpdate<S>(configurationUpdate));
-    }
+public interface ResourcesManagementSubtaskExecutor<S, T extends ResourcesManagement> extends ResourceManagementSubtaskExecutor<S, T> {
 }

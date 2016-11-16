@@ -56,7 +56,7 @@ public class ServerMigration<S extends Server> implements WildFly10ServerMigrati
 
         private final List<SubtaskFactory<S>> subtaskFactories = new ArrayList<>();
 
-        public Builder addFactory(SubtaskFactory<S> subtaskFactory) {
+        public Builder subtask(SubtaskFactory<S> subtaskFactory) {
             subtaskFactories.add(subtaskFactory);
             return this;
         }

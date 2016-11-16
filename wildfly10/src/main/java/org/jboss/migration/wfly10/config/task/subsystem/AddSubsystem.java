@@ -28,7 +28,7 @@ import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
  * A task which creates a subsystem if its missing from the server's config.
  * @author emmartins
  */
-public class AddSubsystem implements WildFly10SubsystemMigrationTaskFactory {
+public class AddSubsystem implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
     public static final AddSubsystem INSTANCE = new AddSubsystem();
 
@@ -36,14 +36,14 @@ public class AddSubsystem implements WildFly10SubsystemMigrationTaskFactory {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, final WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, final UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
             @Override
             public ServerMigrationTaskName getName() {
                 return new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", subsystem.getName()).build();
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config != null) {
                     context.getLogger().infof("Skipped adding subsystem %s, already exists in config.", subsystem.getName());
                     return ServerMigrationTaskResult.SKIPPED;
@@ -56,7 +56,7 @@ public class AddSubsystem implements WildFly10SubsystemMigrationTaskFactory {
         };
     }
 
-    protected void addSubsystem(WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+    protected void addSubsystem(UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
         final ModelNode op = Util.createAddOperation(subsystemsManagement.getResourcePathAddress(subsystem.getName()));
         subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
     }

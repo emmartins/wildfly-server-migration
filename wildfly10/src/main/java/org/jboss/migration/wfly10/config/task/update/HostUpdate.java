@@ -18,11 +18,10 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.task.HostMigration;
-import org.jboss.migration.wfly10.config.task.JVMsMigration;
-import org.jboss.migration.wfly10.config.task.ManagementInterfacesMigration;
-import org.jboss.migration.wfly10.config.task.SecurityRealmsMigration;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
+import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
 
 /**
  * @author emmartins
@@ -33,66 +32,23 @@ public class HostUpdate<S extends JBossServer<S>> extends HostMigration<ServerPa
         super(builder);
     }
 
-    public static class Builder<S extends JBossServer<S>> {
+    public static class Builder<S extends JBossServer<S>> extends HostMigration.Builder<ServerPath<S>> {
 
-        private SubsystemsMigration<ServerPath<S>> subsystemsMigration;
-        private SecurityRealmsMigration<ServerPath<S>> securityRealmsMigration;
-        private ManagementInterfacesMigration<ServerPath<S>> managementInterfacesMigration;
-        private JVMsMigration<ServerPath<S>> jvMsMigration;
-
-        public Builder<S> subsystemsMigration(SubsystemsMigration<ServerPath<S>> subsystemsMigration) {
-            this.subsystemsMigration = subsystemsMigration;
+        @Override
+        public Builder<S> subtask(HostConfigurationTaskFactory<ServerPath<S>> subtaskFactory) {
+            super.subtask(subtaskFactory);
             return this;
         }
 
-        public Builder<S> subsystemsMigration(SubsystemsMigration.Builder<ServerPath<S>> subsystemsMigrationBuilder) {
-            return subsystemsMigration(subsystemsMigrationBuilder.build());
-        }
-
-        public Builder<S> securityRealmsMigration(SecurityRealmsMigration<ServerPath<S>> securityRealmsMigration) {
-            this.securityRealmsMigration = securityRealmsMigration;
+        @Override
+        public Builder<S> subtask(ManageableServerConfigurationTaskFactory<ServerPath<S>, HostConfiguration> subtaskFactory) {
+            super.subtask(subtaskFactory);
             return this;
         }
 
-        public Builder<S> securityRealmsMigration(SecurityRealmsMigration.Builder<ServerPath<S>> securityRealmsMigrationBuilder) {
-            return securityRealmsMigration(securityRealmsMigrationBuilder.build());
-        }
-
-        public Builder<S> managementInterfacesMigration(ManagementInterfacesMigration<ServerPath<S>> managementInterfacesMigration) {
-            this.managementInterfacesMigration = managementInterfacesMigration;
-            return this;
-        }
-
-        public Builder<S> managementInterfacesMigration(ManagementInterfacesMigration.Builder<ServerPath<S>> managementInterfacesMigrationBuilder) {
-            return managementInterfacesMigration(managementInterfacesMigrationBuilder.build());
-        }
-
-        public Builder<S> jvMsMigration(JVMsMigration<ServerPath<S>> jvMsMigration) {
-            this.jvMsMigration = jvMsMigration;
-            return this;
-        }
-
-        public Builder<S> jvMsMigration(JVMsMigration.Builder<ServerPath<S>> jvMsMigrationBuilder) {
-            return jvMsMigration(jvMsMigrationBuilder.build());
-        }
-
+        @Override
         public HostUpdate<S> build() {
-            final HostMigration.Builder<ServerPath<S>> builder = new HostMigration.Builder<>();
-            if (subsystemsMigration != null) {
-                builder.addSubsystemsMigration(subsystemsMigration);
-            }
-            if (securityRealmsMigration != null) {
-                builder.addSecurityRealmsMigration(securityRealmsMigration);
-            } else {
-                builder.addSecurityRealmsMigration(new MigrateCompatibleSecurityRealm<S>().buildSecurityRealmsMigration());
-            }
-            if (managementInterfacesMigration != null) {
-                builder.addManagementInterfacesMigration(managementInterfacesMigration);
-            }
-            if (jvMsMigration != null) {
-                builder.addJVMsMigration(jvMsMigration);
-            }
-            return new HostUpdate<>(builder);
+            return new HostUpdate<>(this);
         }
     }
 }

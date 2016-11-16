@@ -26,9 +26,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTask;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 
@@ -36,7 +34,7 @@ import static org.jboss.as.controller.PathElement.pathElement;
  * A task which adds the 'ejb' cache, present on EAP 7 default configs, to Infinispan subsystem configuration.
  * @author emmartins
  */
-public class AddEjbCache implements WildFly10SubsystemMigrationTaskFactory {
+public class AddEjbCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
     public static final AddEjbCache INSTANCE = new AddEjbCache();
 
@@ -72,14 +70,14 @@ public class AddEjbCache implements WildFly10SubsystemMigrationTaskFactory {
     private static final String PURGE_ATTR_NAME = "purge";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     context.getLogger().debug("No subsystem config, skipping configuration update.");
                     return ServerMigrationTaskResult.SKIPPED;

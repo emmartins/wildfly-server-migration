@@ -25,9 +25,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTask;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -36,7 +34,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  * A task which adds the default EE Concurrency Utilities config to the subsystem.
  * @author emmartins
  */
-public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemMigrationTaskFactory {
+public class AddConcurrencyUtilitiesDefaultConfig implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
     public static final String DEFAULT_CONTEXT_SERVICE_JNDI_NAME = "java:jboss/ee/concurrency/context/default";
     public static final String DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME = "java:jboss/ee/concurrency/factory/default";
@@ -56,14 +54,14 @@ public class AddConcurrencyUtilitiesDefaultConfig implements WildFly10SubsystemM
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

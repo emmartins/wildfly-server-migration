@@ -61,6 +61,16 @@ public class XMLFiles {
                 }
                 return FileVisitResult.CONTINUE;
             }
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                if (recursive || dir.equals(start)) {
+                    return FileVisitResult.CONTINUE;
+                } else {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+            }
+
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
                 if (e == null) {

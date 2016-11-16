@@ -50,7 +50,9 @@ $TOOL_DIR/server-migration.sh --source $SOURCE_DIST_DIR --target $TARGET_DIST_DI
 
 echo "### Patching target server's migrated config files..."
 TARGET_STANDALONE_CONFIG_DIR="$TARGET_DIST_DIR/standalone/configuration"
-sed -f $TEST_DIR/migration.patch -i '' $TARGET_STANDALONE_CONFIG_DIR/standalone.xml $TARGET_STANDALONE_CONFIG_DIR/standalone-full.xml
+TARGET_DOMAIN_CONFIG_DIR="$TARGET_DIST_DIR/domain/configuration"
+
+sed -f $TEST_DIR/migration.patch -i '' $TARGET_STANDALONE_CONFIG_DIR/standalone.xml $TARGET_STANDALONE_CONFIG_DIR/standalone-full.xml $TARGET_DOMAIN_CONFIG_DIR/domain.xml
 
 echo "### Running target server's testsuite..."
-mvn -f $TARGET_SRC_DIR/testsuite/pom.xml clean install -Dts.basic
+mvn -f $TARGET_SRC_DIR/testsuite/pom.xml clean install -Dts.basic -Dts.domain

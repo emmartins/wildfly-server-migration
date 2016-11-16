@@ -17,12 +17,10 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedHostControllerConfiguration;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
-
-import java.nio.file.Path;
+import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
 
 /**
  * Builder for a domain config migration.
@@ -36,7 +34,7 @@ public class DomainConfigurationMigration<S> extends ServerConfigurationMigratio
         super(builder);
     }
 
-    public static class Builder<S> extends ServerConfigurationMigration.Builder<Builder, S, HostControllerConfiguration> {
+    public static class Builder<S> extends ServerConfigurationMigration.Builder<S, HostControllerConfiguration> {
 
         public Builder(XMLConfigurationProvider<S> xmlConfigurationProvider) {
             super(DOMAIN, xmlConfigurationProvider);
@@ -48,56 +46,29 @@ public class DomainConfigurationMigration<S> extends ServerConfigurationMigratio
             return new DomainConfigurationMigration<>(this);
         }
 
-        public Builder<S> addDeploymentsMigration(final DeploymentsMigration<S> deploymentsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, HostControllerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return deploymentsMigration.getTask(source, configuration.getDeploymentsManagement());
-                }
-            });
+        @Override
+        public Builder<S> manageableConfigurationProvider(ManageableConfigurationProvider<HostControllerConfiguration> manageableConfigurationProvider) {
+            super.manageableConfigurationProvider(manageableConfigurationProvider);
+            return this;
         }
 
-        public Builder<S> addProfilesMigration(final ProfilesMigration<S> profilesMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, HostControllerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return profilesMigration.getTask(source, configuration.getProfilesManagement());
-                }
-            });
+        @Override
+        public Builder<S> subtask(ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> subtaskFactory) {
+            super.subtask(subtaskFactory);
+            return this;
         }
 
-        public Builder<S> addSubsystemsMigration(final SubsystemsMigration<S> subsystemsMigration) {
-            return addXMLConfigurationSubtaskFactory(new XMLConfigurationSubtaskFactory<S>() {
-                @Override
-                public ServerMigrationTask getXMLConfigurationSubtask(S source, Path xmlConfigurationPath, WildFly10Server target) {
-                    return subsystemsMigration.getXMLConfigurationTask(source, xmlConfigurationPath, target);
-                }
-            });
+        @Override
+        public Builder<S> subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
+            super.subtask(subtaskFactory);
+            return this;
         }
 
-        public Builder<S> addServerGroupsMigration(final ServerGroupsMigration<S> serverGroupsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, HostControllerConfiguration>() {
+        public Builder<S> subtask(final DomainConfigurationTaskFactory<S> subtaskFactory) {
+            return subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
                 @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return serverGroupsMigration.getTask(source, configuration.getServerGroupsManagement());
-                }
-            });
-        }
-
-        public Builder<S> addSocketBindingGroupsMigration(final SocketBindingGroupsMigration<S> socketBindingGroupsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, HostControllerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return socketBindingGroupsMigration.getTask(source, configuration.getSocketBindingGroupsManagement());
-                }
-            });
-        }
-
-        public Builder<S> addInterfacesMigration(final InterfacesMigration<S> interfacesMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, HostControllerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return interfacesMigration.getTask(source, configuration.getInterfacesManagement());
+                public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
+                    return subtaskFactory.getTask(source, configuration);
                 }
             });
         }

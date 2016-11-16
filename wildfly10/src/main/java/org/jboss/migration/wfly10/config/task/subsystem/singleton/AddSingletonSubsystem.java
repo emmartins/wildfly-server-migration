@@ -22,18 +22,19 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
+import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Singleton subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddSingletonSubsystem extends AddSubsystem {
+public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
 
     public static final AddSingletonSubsystem INSTANCE = new AddSingletonSubsystem();
 
     private AddSingletonSubsystem() {
+        super(SubsystemNames.SINGLETON);
     }
 
     private static final String DEFAULT_ATTR_NAME = "default";
@@ -47,7 +48,7 @@ public class AddSingletonSubsystem extends AddSubsystem {
     private static final String ELECTION_POLICY_NAME = "simple";
 
     @Override
-    protected void addSubsystem(WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
         // add subsystem with default config
                 /*
             <subsystem xmlns="urn:jboss:domain:singleton:1.0">
@@ -60,7 +61,7 @@ public class AddSingletonSubsystem extends AddSubsystem {
             */
         final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
         final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
+        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         subsystemAddOperation.get(DEFAULT_ATTR_NAME).set(DEFAULT_ATTR_VALUE);
         compositeOperationBuilder.addStep(subsystemAddOperation);

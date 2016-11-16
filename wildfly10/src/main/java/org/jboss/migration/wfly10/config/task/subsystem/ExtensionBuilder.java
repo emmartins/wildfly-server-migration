@@ -40,18 +40,6 @@ public class ExtensionBuilder {
         return addSubsystem(subsystemName, "supported-subsystem", null);
     }
 
-    public ExtensionBuilder addUpdatedSubsystem(String subsystemName, WildFly10SubsystemMigrationTaskFactory... tasks) {
-        return addSubsystem(subsystemName, "update-subsystem", tasks);
-    }
-
-    public ExtensionBuilder addNewSubsystem(String subsystemName) {
-        return addNewSubsystem(subsystemName, AddSubsystem.INSTANCE);
-    }
-
-    public ExtensionBuilder addNewSubsystem(String subsystemName, AddSubsystem addSubsystem) {
-        return addSubsystem(subsystemName, "add-subsystem", AddExtension.INSTANCE, addSubsystem);
-    }
-
     public ExtensionBuilder addSubsystem(String subsystemName, String taskName, WildFly10SubsystemMigrationTaskFactory... tasks) {
         final WildFly10SubsystemBuilder subsystemBuilder = new WildFly10SubsystemBuilder()
                 .setName(subsystemName)

@@ -15,16 +15,14 @@
  */
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
-import org.jboss.migration.wfly10.config.task.subsystem.SupportedExtensions;
-import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
+import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
+import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
+import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFly10FullServerMigrationProvider;
 import org.jboss.migration.wfly9.WildFly9Server;
@@ -38,35 +36,33 @@ public class WildFly9ToWildFly10FullServerMigrationProvider implements WildFly10
     @Override
     public WildFly10ServerMigration getServerMigration() {
         final ServerUpdate.Builders<WildFly9Server> serverUpdateBuilders = new ServerUpdate.Builders<>();
-        final SubsystemsMigration<ServerPath<WildFly9Server>> subsystemsMigration = serverUpdateBuilders.subsystemsMigrationBuilder()
-                .addExtensions(SupportedExtensions.allExcept(ExtensionNames.BATCH_JBERET, ExtensionNames.SINGLETON))
-                .addExtension(new ExtensionBuilder(ExtensionNames.BATCH_JBERET).addNewSubsystem(SubsystemNames.BATCH_JBERET, AddBatchJBeretSubsystem.INSTANCE))
-                .addExtension(new ExtensionBuilder(ExtensionNames.SINGLETON).addNewSubsystem(SubsystemNames.SINGLETON, AddSingletonSubsystem.INSTANCE))
-                .build();
-        return new ServerUpdate.Builder<WildFly9Server>()
-                .standaloneMigration(serverUpdateBuilders.standaloneConfigurationMigrationBuilder()
-                        .subsystemsMigration(subsystemsMigration)
-                        .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly9Server>())
+        return serverUpdateBuilders.serverUpdateBuilder()
+                .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
+                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(MigrateSubsystemTasks.MESSAGING)
+                        .subtask(AddSubsystemTasks.BATCH_JBERET)
+                        .subtask(AddSubsystemTasks.SINGLETON)
+                        .subtask(AddPrivateInterface.INSTANCE)
+                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
+                        .subtask(RemoveDeployments.INSTANCE)
+                )
+                .domain(serverUpdateBuilders.domainBuilder()
+                        .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(MigrateSubsystemTasks.MESSAGING)
+                                .subtask(AddSubsystemTasks.BATCH_JBERET)
+                                .subtask(AddSubsystemTasks.SINGLETON)
+                                .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
+                                .subtask(AddPrivateInterface.INSTANCE)
+                                .subtask(RemoveDeployments.INSTANCE)
                         )
-                        .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
-                                .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
-                                        .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly9Server>())
+                        .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(serverUpdateBuilders.hostBuilder()
+                                        .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
+                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                                 )
-                        ))
-                .domainMigration(serverUpdateBuilders.domainBuilder()
-                        .domainConfigurationsMigration(serverUpdateBuilders.domainConfigurationMigrationBuilder()
-                                .subsystemsMigration(subsystemsMigration)
-                                .profilesMigration(subsystemsMigration)
-                                .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                        .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly9Server>())
-                                )
-                                .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
-                                        .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
-                                                .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly9Server>())
-                                        )
-                                ))
-                        .defaultHostConfigurationsMigration())
+                        )
+                )
                 .build();
     }
 

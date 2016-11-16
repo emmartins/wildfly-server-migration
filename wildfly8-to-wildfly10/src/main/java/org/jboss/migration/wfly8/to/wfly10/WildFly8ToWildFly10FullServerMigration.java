@@ -15,20 +15,14 @@
  */
 package org.jboss.migration.wfly8.to.wfly10;
 
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
-import org.jboss.migration.wfly10.config.task.subsystem.SupportedExtensions;
-import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
-import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
-import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
+import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
+import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
+import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFly10FullServerMigrationProvider;
 import org.jboss.migration.wfly8.WildFly8Server;
@@ -42,39 +36,41 @@ public class WildFly8ToWildFly10FullServerMigration implements WildFly10FullServ
     @Override
     public WildFly10ServerMigration getServerMigration() {
         final ServerUpdate.Builders<WildFly8Server> serverUpdateBuilders = new ServerUpdate.Builders<>();
-        final SubsystemsMigration<ServerPath<WildFly8Server>> subsystemsMigration = serverUpdateBuilders.subsystemsMigrationBuilder()
-                .addExtensions(SupportedExtensions.allExcept(ExtensionNames.BATCH_JBERET, ExtensionNames.BEAN_VALIDATION, ExtensionNames.INFINISPAN, ExtensionNames.REQUEST_CONTROLLER, ExtensionNames.SECURITY_MANAGER, ExtensionNames.SINGLETON))
-                .addExtension(new ExtensionBuilder(ExtensionNames.INFINISPAN).addUpdatedSubsystem(SubsystemNames.INFINISPAN, AddServerCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE))
-                .addExtension(new ExtensionBuilder(ExtensionNames.BEAN_VALIDATION).addNewSubsystem(SubsystemNames.BEAN_VALIDATION, AddSubsystem.INSTANCE))
-                .addExtension(new ExtensionBuilder(ExtensionNames.BATCH_JBERET).addNewSubsystem(SubsystemNames.BATCH_JBERET, AddBatchJBeretSubsystem.INSTANCE))
-                .addExtension(new ExtensionBuilder(ExtensionNames.REQUEST_CONTROLLER).addNewSubsystem(SubsystemNames.REQUEST_CONTROLLER))
-                .addExtension(new ExtensionBuilder(ExtensionNames.SECURITY_MANAGER).addNewSubsystem(SubsystemNames.SECURITY_MANAGER, AddSecurityManagerSubsystem.INSTANCE))
-                .addExtension(new ExtensionBuilder(ExtensionNames.SINGLETON).addNewSubsystem(SubsystemNames.SINGLETON, AddSingletonSubsystem.INSTANCE))
-                .build();
-        return new ServerUpdate.Builder<WildFly8Server>()
-                .standaloneMigration(serverUpdateBuilders.standaloneConfigurationMigrationBuilder()
-                        .subsystemsMigration(subsystemsMigration)
-                        .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly8Server>())
+        return serverUpdateBuilders.serverUpdateBuilder()
+                .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
+                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(MigrateSubsystemTasks.JACORB)
+                        .subtask(MigrateSubsystemTasks.MESSAGING)
+                        .subtask(SubsystemUpdates.INFINISPAN)
+                        .subtask(AddSubsystemTasks.BATCH_JBERET)
+                        .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
+                        .subtask(AddSubsystemTasks.SECURITY_MANAGER)
+                        .subtask(AddSubsystemTasks.SINGLETON)
+                        .subtask(AddPrivateInterface.INSTANCE)
+                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
+                        .subtask(RemoveDeployments.INSTANCE)
+                )
+                .domain(serverUpdateBuilders.domainBuilder()
+                        .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(MigrateSubsystemTasks.JACORB)
+                                .subtask(MigrateSubsystemTasks.MESSAGING)
+                                .subtask(SubsystemUpdates.INFINISPAN)
+                                .subtask(AddSubsystemTasks.BATCH_JBERET)
+                                .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
+                                .subtask(AddSubsystemTasks.SECURITY_MANAGER)
+                                .subtask(AddSubsystemTasks.SINGLETON)
+                                .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
+                                .subtask(AddPrivateInterface.INSTANCE)
+                                .subtask(RemoveDeployments.INSTANCE)
                         )
-                        .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
-                                .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
-                                        .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly8Server>())
+                        .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(serverUpdateBuilders.hostBuilder()
+                                        .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
+                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                                 )
-                        ))
-                .domainMigration(serverUpdateBuilders.domainBuilder()
-                        .domainConfigurationsMigration(serverUpdateBuilders.domainConfigurationMigrationBuilder()
-                                .subsystemsMigration(subsystemsMigration)
-                                .profilesMigration(subsystemsMigration)
-                                .interfacesMigration(serverUpdateBuilders.interfacesMigrationBuilder()
-                                        .addSubtaskFactory(new AddPrivateInterface.InterfacesSubtaskFactory<WildFly8Server>())
-                                )
-                                .socketBindingGroupsMigration(serverUpdateBuilders.socketBindingGroupMigrationBuilder()
-                                        .addSocketBindingsMigration(serverUpdateBuilders.socketBindingsMigrationBuilder()
-                                                .addSubtaskFactory(new AddPrivateInterface.SocketBindingsSubtaskFactory<WildFly8Server>())
-                                        )
-                                ))
-                        .defaultHostConfigurationsMigration())
+                        )
+                )
                 .build();
     }
 

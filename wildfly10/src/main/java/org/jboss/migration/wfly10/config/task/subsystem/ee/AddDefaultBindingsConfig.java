@@ -30,9 +30,7 @@ import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTask;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +43,7 @@ import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
  * A task which configures the default Java EE 7 bindings.
  * @author emmartins
  */
-public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTaskFactory {
+public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
     public static final AddDefaultBindingsConfig INSTANCE = new AddDefaultBindingsConfig();
 
@@ -75,14 +73,14 @@ public class AddDefaultBindingsConfig implements WildFly10SubsystemMigrationTask
     private static final String DATA_SOURCE_JNDI_NAME = "jndi-name";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(final ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(final ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

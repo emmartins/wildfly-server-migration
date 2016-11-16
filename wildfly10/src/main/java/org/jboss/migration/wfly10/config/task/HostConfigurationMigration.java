@@ -19,6 +19,8 @@ package org.jboss.migration.wfly10.config.task;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedHostControllerConfiguration;
+import org.jboss.migration.wfly10.config.task.factory.HostsManagementTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
 
 /**
  * Host config migration.
@@ -29,32 +31,34 @@ public class HostConfigurationMigration<S> extends ServerConfigurationMigration<
     public static final String HOST = "host";
 
     protected HostConfigurationMigration(Builder builder) {
-        super(builder);
+        super(builder.builder);
     }
 
-    public static class Builder<S> extends ServerConfigurationMigration.Builder<Builder, S, HostControllerConfiguration> {
+    public static class Builder<S> {
+
+        private final ServerConfigurationMigration.Builder<S, HostControllerConfiguration> builder;
 
         public Builder(XMLConfigurationProvider<S> xmlConfigurationProvider) {
-            super(HOST, xmlConfigurationProvider);
-            manageableConfigurationProvider(new EmbeddedHostControllerConfiguration.HostConfigFileMigrationFactory());
+            builder = new ServerConfigurationMigration.Builder<>(HOST, xmlConfigurationProvider);
+            builder.manageableConfigurationProvider(new EmbeddedHostControllerConfiguration.HostConfigFileMigrationFactory());
         }
 
-        @Override
         public HostConfigurationMigration<S> build() {
             return new HostConfigurationMigration<>(this);
         }
 
-        public Builder<S> addHostsMigration(final HostsMigration<S> hostsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, HostControllerConfiguration>() {
+        public Builder<S> subtask(final HostsManagementTaskFactory<S> taskFactory) {
+            builder.subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
                 @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return hostsMigration.getTask(source, configuration.getHostsManagement());
+                public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
+                    return taskFactory.getTask(source, configuration.getHostsManagement());
                 }
             });
+            return this;
         }
 
-        public Builder<S> addHostsMigration(final HostMigration<S> hostMigration) {
-            return addHostsMigration(new HostsMigration.Builder<S>().addHostMigration(hostMigration).build());
+        public Builder<S> subtask(final HostMigration.Builder<S> hostMigrationBuilder) {
+            return subtask(hostMigrationBuilder.build());
         }
     }
 }

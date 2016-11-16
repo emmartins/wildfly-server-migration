@@ -26,8 +26,7 @@ import java.util.Set;
  * Interface to manage children resources of a specific type
  * @author emmartins
   */
-public interface ResourcesManagement {
-    ManageableServerConfiguration getServerConfiguration();
+public interface ResourcesManagement extends ResourceManagement {
     PathAddress getParentPathAddress();
     String getResourceType();
     PathAddress getResourcePathAddress(String resourceName);

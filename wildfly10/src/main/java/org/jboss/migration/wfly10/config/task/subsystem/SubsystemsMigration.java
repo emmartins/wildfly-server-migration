@@ -21,18 +21,9 @@ import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.core.util.xml.XMLFileFilter;
-import org.jboss.migration.core.util.xml.XMLFiles;
-import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,34 +35,12 @@ import java.util.List;
  */
 public class SubsystemsMigration<S> {
 
-    public static final ServerMigrationTaskName XML_CONFIG_SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("subsystems-xml-config").build();
     public static final ServerMigrationTaskName MANAGEMENT_RESOURCES_SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("subsystems-management-resources").build();
-    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM = "remove-subsystem";
-    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION = "remove-extension";
-    public static final String SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_MODULE = "module";
-    public static final String SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAMESPACE = "namespace";
 
     private final List<Extension> supportedExtensions;
 
     protected SubsystemsMigration(Builder builder) {
         this.supportedExtensions = Collections.unmodifiableList(builder.supportedExtensions);
-    }
-
-    public ServerMigrationTask getXMLConfigurationTask(final S source, final Path targetConfigFilePath, final WildFly10Server target) {
-        return new ServerMigrationTask() {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return XML_CONFIG_SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-                context.getLogger().infof("Subsystems XML migration starting...");
-                removeExtensionsAndSubsystems(source, targetConfigFilePath, target, context);
-                context.getLogger().infof("Subsystems XML migration done.");
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
     }
 
     public ServerMigrationTask getSubsystemsManagementTask(S source, final SubsystemsManagement subsystemsManagement) {
@@ -89,80 +58,6 @@ public class SubsystemsMigration<S> {
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
-    }
-
-    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFly10Server targetServer, final ServerMigrationTaskContext context) throws IOException {
-        final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
-        final List<WildFly10Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
-        // setup the extensions filter
-        final XMLFileFilter extensionsFilter = new XMLFileFilter() {
-            @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws IOException {
-                if (startElement.getName().getLocalPart().equals("extension")) {
-                    Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
-                    final String moduleName = moduleAttr.getValue();
-                    // keep if module matches a supported extension name
-                    for (Extension extension : migrationExtensions) {
-                        if (extension.getName().equals(moduleName)) {
-                            return Result.KEEP;
-                        }
-                    }
-                    // not supported, remove it
-                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_MODULE, moduleName).build();
-                    final ServerMigrationTask subtask = new ServerMigrationTask() {
-                        @Override
-                        public ServerMigrationTaskName getName() {
-                            return subtaskName;
-                        }
-
-                        @Override
-                        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                            context.getLogger().infof("Extension with module %s removed.", moduleName);
-                            return ServerMigrationTaskResult.SUCCESS;
-                        }
-                    };
-                    context.execute(subtask);
-                    return Result.REMOVE;
-                } else {
-                    return Result.NOT_APPLICABLE;
-                }
-            }
-        };
-        // setup subsystems filter
-        final XMLFileFilter subsystemsFilter = new XMLFileFilter() {
-            @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws IOException {
-                if (startElement.getName().getLocalPart().equals("subsystem")) {
-                    final String namespaceURI = startElement.getName().getNamespaceURI();
-                    // keep if the namespace uri starts with a supported subsystem's namespace without version
-                    for (WildFly10Subsystem subsystem : migrationSubsystems) {
-                        final String namespaceWithoutVersion = subsystem.getNamespaceWithoutVersion();
-                        if (namespaceWithoutVersion != null && namespaceURI.startsWith(namespaceWithoutVersion + ':')) {
-                            return Result.KEEP;
-                        }
-                    }
-                    // not supported, remove subsystem
-                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAMESPACE, namespaceURI).build();
-                    final ServerMigrationTask subtask = new ServerMigrationTask() {
-                        @Override
-                        public ServerMigrationTaskName getName() {
-                            return subtaskName;
-                        }
-
-                        @Override
-                        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                            context.getLogger().infof("Subsystem with namespace %s removed.", namespaceURI);
-                            return ServerMigrationTaskResult.SUCCESS;
-                        }
-                    };
-                    context.execute(subtask);
-                    return Result.REMOVE;
-                } else {
-                    return Result.NOT_APPLICABLE;
-                }
-            }
-        };
-        XMLFiles.filter(xmlConfigurationPath, extensionsFilter, subsystemsFilter);
     }
 
     protected void migrateExtensions(final SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws IOException {
@@ -185,19 +80,6 @@ public class SubsystemsMigration<S> {
             }
             return migrationExtensions;
         }
-    }
-
-    private List<WildFly10Subsystem> getMigrationSubsystems(List<Extension> migrationExtensions, MigrationEnvironment migrationEnvironment) {
-        final List<String> removedByEnv = migrationEnvironment.getPropertyAsList(EnvironmentProperties.SUBSYSTEMS_REMOVE);
-        List<WildFly10Subsystem> migrationSubsystems = new ArrayList<>();
-        for (Extension extension : migrationExtensions) {
-            for (WildFly10Subsystem subsystem : extension.getSubsystems()) {
-                if (removedByEnv == null || !removedByEnv.contains(subsystem.getName())) {
-                    migrationSubsystems.add(subsystem);
-                }
-            }
-        }
-        return migrationSubsystems;
     }
 
     public static class Builder<S> {
