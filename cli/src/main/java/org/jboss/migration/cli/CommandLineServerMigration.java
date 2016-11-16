@@ -57,6 +57,9 @@ public class CommandLineServerMigration {
      * @param args the command-line arguments
      */
     public static void main(String[] args) {
+
+        WildFlySecurityManager.setPropertyPrivileged("java.util.logging.manager", "org.jboss.logmanager.LogManager");
+
         try {
             if(args.length < 4) {
                 usage();
@@ -128,8 +131,6 @@ public class CommandLineServerMigration {
             if (environment != null) {
                 userEnvironment.setProperties(loadProperties(environment));
             }
-
-            WildFlySecurityManager.setPropertyPrivileged("java.util.logging.manager", "org.jboss.logmanager.LogManager");
 
             // run migration
             final MigrationData migrationData = new ServerMigration()
