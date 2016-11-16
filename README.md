@@ -3,19 +3,6 @@ JBoss Server Migration Tool
 
 The JBoss Server Migration Tool is a tool that migrates JBoss Application Servers. It reads the server configuration and properties files for a previous release of WildFly or JBoss EAP, referred to as the source server, and migrates them to the latest release or target server.
 
-Currently the following configuration files, which are located in the `standalone/configuration/` directory, are updated by the migration:
-
-* standalone.xml
-* standalone-ha.xml
-* standalone-full.xml
-* standalone-full-ha.xml
-* application-users.properties
-* application-roles.properties
-* mgmt-users.properties
-* mgmt-groups.properties
-
-
-
 System Requirements
 ------------
 
@@ -32,7 +19,7 @@ Build the Server Migration Tool
 
 2. Navigate to the `build/target/` directory and unzip the ` jboss-server-migration-VERSION_NUMBER.zip` file
 
-        unzip  jboss-server-migration-1.0.0.Alpha2-SNAPSHOT.zip
+        unzip  jboss-server-migration-1.0.0.Beta1.zip
 
 
 Run the Server Migration Tool
@@ -41,7 +28,7 @@ Run the Server Migration Tool
 1. Open a terminal and navigate to the `build/target/jboss-server-migration/` directory.
 2. Run the following command.
 
-        For Linux:   ./server-migration.sh --source SOURCE_SERVER_PATH --target TARGET_SERVER_PATH
+        For Linux|Mac:   ./server-migration.sh --source SOURCE_SERVER_PATH --target TARGET_SERVER_PATH
         For Windows: server-migration.bat --source SOURCE_SERVER_PATH --target SOURCE_SERVER_PATH
 
     Replace `SOURCE_SERVER_PATH` with the path to previous version of the server installation that you want to migrate from, for example:  `${user.home}/jboss-eap-6.4/`
