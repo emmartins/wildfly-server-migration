@@ -23,6 +23,7 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 /**
@@ -33,7 +34,7 @@ public class EAP6ServerProvider extends AbstractServerProvider {
 
     @Override
     protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
-        final Path manifestPath = JBossServer.getModulesDir(baseDir).resolve("system").resolve("layers").resolve("base").resolve("org").resolve("jboss").resolve("as").resolve("product").resolve("eap").resolve("dir").resolve("META-INF").resolve("MANIFEST.MF");
+        final Path manifestPath = JBossServer.getModulesFile(baseDir, FileSystems.getDefault().getPath("org").resolve("jboss").resolve("as").resolve("product").resolve("eap").resolve("dir").resolve("META-INF").resolve("MANIFEST.MF"));
         final ManifestProductInfo productInfo = ManifestProductInfo.from(manifestPath);
         return productInfo;
     }
