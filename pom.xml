@@ -27,7 +27,7 @@
 
     <groupId>org.jboss.migration</groupId>
     <artifactId>jboss-server-migration-parent</artifactId>
-    <version>1.0.0.Alpha2-SNAPSHOT</version>
+    <version>1.0.0.Beta1</version>
 
     <name>JBoss Server Migration</name>
     <description>A tool used for migrating a JBoss server.</description>
