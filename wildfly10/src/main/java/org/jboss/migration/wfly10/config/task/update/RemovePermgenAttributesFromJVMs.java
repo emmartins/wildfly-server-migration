@@ -55,6 +55,16 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
         final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
                 .subtask(subtaskExecutor)
+                .eventListener(new ParentServerMigrationTask.EventListener() {
+                    @Override
+                    public void started(ServerMigrationTaskContext context) {
+                        context.getLogger().infof("Removal of permgen attributes from JVM configs starting...");
+                    }
+                    @Override
+                    public void done(ServerMigrationTaskContext context) {
+                        context.getLogger().infof("Removal of permgen attributes from JVM configs done.");
+                    }
+                })
                 .build();
         return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME + ".skip");
     }
