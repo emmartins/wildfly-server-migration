@@ -21,18 +21,19 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
+import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Security Manager subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddSecurityManagerSubsystem extends AddSubsystem {
+public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S> {
 
     public static final AddSecurityManagerSubsystem INSTANCE = new AddSecurityManagerSubsystem();
 
     private AddSecurityManagerSubsystem() {
+        super(SubsystemNames.SECURITY_MANAGER);
     }
 
     private static final String DEPLOYMENT_PERMISSIONS = "deployment-permissions";
@@ -42,7 +43,7 @@ public class AddSecurityManagerSubsystem extends AddSubsystem {
     private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
 
     @Override
-    protected void addSubsystem(WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
         // add subsystem with default config
             /*
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
@@ -54,7 +55,7 @@ public class AddSecurityManagerSubsystem extends AddSubsystem {
             </subsystem>
              */
         final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
-        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
+        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         configurationManagement.executeManagementOperation(subsystemAddOperation);
         // add default deployment permissions

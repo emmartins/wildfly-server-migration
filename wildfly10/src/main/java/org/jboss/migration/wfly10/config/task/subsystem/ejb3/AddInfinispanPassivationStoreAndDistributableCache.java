@@ -25,9 +25,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTask;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 
@@ -35,7 +33,7 @@ import static org.jboss.as.controller.PathElement.pathElement;
  * A task which adds EJB3 subsystem's infinipan passivation-store, and distributable cache, if missing.
  * @author emmartins
  */
-public class AddInfinispanPassivationStoreAndDistributableCache implements WildFly10SubsystemMigrationTaskFactory {
+public class AddInfinispanPassivationStoreAndDistributableCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
     public static final AddInfinispanPassivationStoreAndDistributableCache INSTANCE = new AddInfinispanPassivationStoreAndDistributableCache();
 
@@ -69,14 +67,14 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements WildF
     public static final String TASK_RESULT_ATTR_DISTRIBUTABLE_CACHE_ADDED = "distributable-cache-added";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, final ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, final ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

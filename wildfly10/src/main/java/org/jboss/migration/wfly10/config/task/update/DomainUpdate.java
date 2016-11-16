@@ -17,7 +17,10 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.JBossServer;
+import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.DomainMigration;
+import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 
 /**
  * @author emmartins
@@ -29,34 +32,30 @@ public class DomainUpdate<S extends JBossServer<S>> extends DomainMigration<S> {
 
     public static class Builder<S extends JBossServer<S>> extends DomainMigration.Builder<S> {
 
-        public Builder<S> domainConfigurationsMigration(DomainConfigurationsUpdate<S> domainConfigurationsUpdate) {
+        public Builder<S> domainConfigurations(DomainConfigurationsUpdate<S> domainConfigurationsUpdate) {
             super.domainConfigurations(domainConfigurationsUpdate);
             return this;
         }
 
-        public Builder<S> domainConfigurationsMigration(DomainConfigurationUpdate<S> domainConfigurationUpdate) {
-            return domainConfigurationsMigration(new DomainConfigurationsUpdate<>(domainConfigurationUpdate));
+        public Builder<S> domainConfigurations(DomainConfigurationMigration<ServerPath<S>> domainConfigurationUpdate) {
+            return domainConfigurations(new DomainConfigurationsUpdate<>(domainConfigurationUpdate));
         }
 
-        public Builder<S> domainConfigurationsMigration(DomainConfigurationUpdate.Builder<S> domainConfigurationUpdatebuilder) {
-            return domainConfigurationsMigration(domainConfigurationUpdatebuilder.build());
+        public Builder<S> domainConfigurations(DomainConfigurationMigration.Builder<ServerPath<S>> domainConfigurationUpdatebuilder) {
+            return domainConfigurations(domainConfigurationUpdatebuilder.build());
         }
 
-        public Builder<S> hostConfigurationsMigration(HostConfigurationsUpdate<S> hostConfigurationsUpdate) {
+        public Builder<S> hostConfigurations(HostConfigurationsUpdate<S> hostConfigurationsUpdate) {
             super.hostConfigurations(hostConfigurationsUpdate);
             return this;
         }
 
-        public Builder<S> hostConfigurationsMigration(HostConfigurationUpdate<S> hostConfigurationUpdate) {
-            return hostConfigurationsMigration(new HostConfigurationsUpdate<>(hostConfigurationUpdate));
+        public Builder<S> hostConfigurations(HostConfigurationMigration<ServerPath<S>> hostConfigurationUpdate) {
+            return hostConfigurations(new HostConfigurationsUpdate<>(hostConfigurationUpdate));
         }
 
-        public Builder<S> hostConfigurationsMigration(HostConfigurationUpdate.Builder<S> hostConfigurationUpdateBuilder) {
-            return hostConfigurationsMigration(hostConfigurationUpdateBuilder.build());
-        }
-
-        public Builder<S> defaultHostConfigurationsMigration() {
-            return hostConfigurationsMigration(new HostConfigurationUpdate.Builder<S>().hostUpdate(new HostUpdate.Builder<S>().build()));
+        public Builder<S> hostConfigurations(HostConfigurationMigration.Builder<ServerPath<S>> hostConfigurationUpdateBuilder) {
+            return hostConfigurations(hostConfigurationUpdateBuilder.build());
         }
 
         public DomainUpdate<S> build() {

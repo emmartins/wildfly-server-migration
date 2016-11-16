@@ -90,6 +90,17 @@ public class ServerMigrationTaskName implements Serializable {
         }
 
         /**
+         * the task name to build from
+         * @param taskName
+         */
+        public Builder(ServerMigrationTaskName taskName) {
+            this(taskName.name);
+            if (!taskName.getAttributes().isEmpty()) {
+                attributes = new HashMap<>(taskName.getAttributes());
+            }
+        }
+
+        /**
          * Adds a task id attribute
          * @param name the task id attribute name
          * @param value the task id attribute value

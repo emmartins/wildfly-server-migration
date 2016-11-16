@@ -19,8 +19,7 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface ProfileManagement {
-    ManageableServerConfiguration getServerConfiguration();
+public interface ProfileManagement extends ResourceManagement {
     String getProfileName();
     SubsystemsManagement getSubsystemsManagement();
 }

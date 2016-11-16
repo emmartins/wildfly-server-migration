@@ -18,8 +18,21 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.wfly10.config.management.HostConfiguration;
+import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
+import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
+import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
+import org.jboss.migration.wfly10.config.task.DomainMigration;
+import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.MigrationBuilders;
+import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.ServerMigration;
+import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationMigration;
+import org.jboss.migration.wfly10.config.task.StandaloneServerMigration;
+import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
 
 /**
  * @author emmartins
@@ -30,61 +43,156 @@ public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
         super(builder);
     }
 
-    public static class Builder<S extends JBossServer<S>> {
+    public static class Builder<S extends JBossServer<S>> extends ServerMigration.Builder<S> {
 
-        private DomainUpdate<S> domainUpdate;
-        private StandaloneServerUpdate<S> standaloneServerUpdate;
-
-        public Builder<S> domainMigration(DomainUpdate<S> domainUpdate) {
-            this.domainUpdate = domainUpdate;
+        @Override
+        public Builder<S> subtask(SubtaskFactory<S> subtaskFactory) {
+            super.subtask(subtaskFactory);
             return this;
         }
 
-        public Builder<S> domainMigration(DomainUpdate.Builder<S> domainUpdateBuilder) {
-            return domainMigration(domainUpdateBuilder.build());
+        public Builder<S> domain(DomainMigration<S> domainUpdate) {
+            return subtask(domainUpdate);
         }
 
-        public Builder<S> standaloneMigration(StandaloneServerUpdate<S> standaloneServerUpdate) {
-            this.standaloneServerUpdate = standaloneServerUpdate;
-            return this;
+        public Builder<S> domain(DomainMigration.Builder<S> domainUpdateBuilder) {
+            return domain(domainUpdateBuilder.build());
         }
 
-        public Builder<S> standaloneMigration(StandaloneServerConfigurationUpdate<S> standaloneServerConfigurationUpdate) {
-            this.standaloneServerUpdate = new StandaloneServerUpdate<>(standaloneServerConfigurationUpdate);
-            return this;
+        public Builder<S> standaloneServer(StandaloneServerMigration<S> standaloneServerUpdate) {
+            return subtask(standaloneServerUpdate);
         }
 
-        public Builder<S> standaloneMigration(StandaloneServerConfigurationUpdate.Builder<S> standaloneServerConfigurationUpdateBuilder) {
-            return standaloneMigration(standaloneServerConfigurationUpdateBuilder.build());
+        public Builder<S> standaloneServer(StandaloneServerConfigurationsUpdate<S> configurationsMigration) {
+            return standaloneServer(new StandaloneServerMigration(configurationsMigration));
+        }
+
+        public Builder<S> standaloneServer(StandaloneServerConfigurationMigration<ServerPath<S>> standaloneServerConfigurationUpdate) {
+           return standaloneServer(new StandaloneServerConfigurationsUpdate(standaloneServerConfigurationUpdate));
+        }
+
+        public Builder<S> standaloneServer(StandaloneServerConfigurationMigration.Builder<ServerPath<S>> standaloneServerConfigurationUpdateBuilder) {
+            return standaloneServer(standaloneServerConfigurationUpdateBuilder.build());
         }
 
         public ServerUpdate<S> build() {
-            final ServerMigration.Builder<S> builder = new ServerMigration.Builder<>();
-            if (standaloneServerUpdate != null) {
-                builder.addFactory(standaloneServerUpdate);
-            }
-            if (domainUpdate != null) {
-                builder.addFactory(domainUpdate);
-            }
-            return new ServerUpdate(builder);
+            return new ServerUpdate(this);
         }
     }
 
     public static class Builders<S extends JBossServer<S>> extends MigrationBuilders<S, ServerPath<S>> {
+
+        private final ServerConfigurationMigration.XMLConfigurationProvider<S> defaultXmlConfigurationProvider = new CopySourceXMLConfiguration();
+
+        public ServerUpdate.Builder<S> serverUpdateBuilder() {
+            return new ServerUpdate.Builder();
+        }
+
+        public DomainConfigurationMigration.Builder<ServerPath<S>> domainConfigurationBuilder() {
+            return new DomainConfigurationMigration.Builder(defaultXmlConfigurationProvider);
+        }
+
+        public HostConfigurationMigration.Builder<ServerPath<S>> hostConfigurationBuilder() {
+            return new HostConfigurationMigration.Builder(defaultXmlConfigurationProvider);
+        }
+
+        public StandaloneServerConfigurationMigration.Builder<ServerPath<S>> standaloneConfigurationBuilder() {
+            return new StandaloneServerConfigurationMigration.Builder(defaultXmlConfigurationProvider);
+        }
+
         public DomainUpdate.Builder<S> domainBuilder() {
             return new DomainUpdate.Builder<>();
         }
-        public StandaloneServerConfigurationUpdate.Builder<S> standaloneConfigurationMigrationBuilder() {
-            return new StandaloneServerConfigurationUpdate.Builder<>();
+
+        public HostUpdate.Builder<S> hostBuilder() {
+            return new HostUpdate.Builder();
         }
-        public DomainConfigurationUpdate.Builder<S> domainConfigurationMigrationBuilder() {
-            return new DomainConfigurationUpdate.Builder<>();
+    }
+
+    public static class SimpleBuilder<S extends JBossServer<S>> {
+
+        private final Builders<S> builders = new Builders<>();
+        private StandaloneServerConfigurationMigration.Builder<ServerPath<S>> standaloneBuilder;
+        private DomainConfigurationMigration.Builder<ServerPath<S>> domainBuilder;
+        private HostUpdate.Builder<S> hostBuilder;
+
+        public synchronized StandaloneServerConfigurationMigration.Builder<ServerPath<S>> standaloneConfigBuilder() {
+            if (standaloneBuilder == null) {
+                standaloneBuilder = builders.standaloneConfigurationBuilder();
+            }
+            return standaloneBuilder;
         }
-        public HostConfigurationUpdate.Builder<S> hostConfigurationMigrationBuilder() {
-            return new HostConfigurationUpdate.Builder<>();
+
+        public synchronized DomainConfigurationMigration.Builder<ServerPath<S>> domainConfigBuilder() {
+            if (domainBuilder == null) {
+                domainBuilder = builders.domainConfigurationBuilder();
+            }
+            return domainBuilder;
         }
-        public HostUpdate.Builder<S> hostUpdateBuilder() {
-            return new HostUpdate.Builder<>();
+
+        public synchronized HostUpdate.Builder<S> hostConfigBuilder() {
+            if (hostBuilder == null) {
+                hostBuilder = builders.hostBuilder();
+            }
+            return hostBuilder;
+        }
+
+        public SimpleBuilder<S> standaloneConfigTask(ServerConfigurationMigration.XMLConfigurationSubtaskFactory<ServerPath<S>> subtaskFactory) {
+            standaloneConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> standaloneConfigTask(ManageableServerConfigurationTaskFactory<ServerPath<S>, StandaloneServerConfiguration> subtaskFactory) {
+            standaloneConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> standaloneConfigTask(StandaloneServerConfigurationTaskFactory<ServerPath<S>> subtaskFactory) {
+            standaloneConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> domainConfigTask(ServerConfigurationMigration.XMLConfigurationSubtaskFactory<ServerPath<S>> subtaskFactory) {
+            domainConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> domainConfigTask(ManageableServerConfigurationTaskFactory<ServerPath<S>, HostControllerConfiguration> subtaskFactory) {
+            domainConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> domainConfigTask(DomainConfigurationTaskFactory<ServerPath<S>> subtaskFactory) {
+            domainConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> hostConfigTask(ManageableServerConfigurationTaskFactory<ServerPath<S>, HostConfiguration> subtaskFactory) {
+            hostConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public SimpleBuilder<S> hostConfigTask(HostConfigurationTaskFactory<ServerPath<S>> subtaskFactory) {
+            hostConfigBuilder().subtask(subtaskFactory);
+            return this;
+        }
+
+        public ServerUpdate<S> build() {
+            final Builder<S> builder = new Builder<>();
+            if (standaloneBuilder != null) {
+                builder.standaloneServer(standaloneBuilder);
+            }
+            if (domainBuilder != null || hostBuilder != null) {
+                final DomainUpdate.Builder<S> domain = builders.domainBuilder();
+                if (domainBuilder != null) {
+                    domain.domainConfigurations(domainBuilder);
+                }
+                if (hostBuilder != null) {
+                    domain.hostConfigurations(builders.hostConfigurationBuilder().subtask(hostBuilder));
+                }
+                builder.domain(domain);
+            }
+            return builder.build();
         }
     }
 }

@@ -17,7 +17,6 @@
 package org.jboss.migration.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,13 +28,13 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
 
     private final ServerMigrationTaskName name;
     private final EventListener eventListener;
-    private final List<ServerMigrationTask> subtasks;
+    private final List<SubtaskExecutor> subtasks;
     private final boolean succeedOnlyIfHasSuccessfulSubtasks;
 
     public ParentServerMigrationTask(Builder builder) {
         this.name = builder.name;
         this.eventListener = builder.eventListener;
-        this.subtasks = builder.subtasks != null ? Collections.unmodifiableList(builder.subtasks) : Collections.<ServerMigrationTask>emptyList();
+        this.subtasks = builder.subtasks != null ? Collections.unmodifiableList(builder.subtasks) : Collections.<SubtaskExecutor>emptyList();
         this.succeedOnlyIfHasSuccessfulSubtasks = builder.succeedOnlyIfHasSuccessfulSubtasks;
     }
 
@@ -50,8 +49,8 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
             eventListener.started(context);
         }
         try {
-            for (ServerMigrationTask subtask : subtasks) {
-                context.execute(subtask);
+            for (SubtaskExecutor subtaskExecutor : subtasks) {
+                subtaskExecutor.executeSubtasks(context);
             }
         } finally {
             if (eventListener != null) {
@@ -73,7 +72,7 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
 
         private final ServerMigrationTaskName name;
         private EventListener eventListener;
-        private final List<ServerMigrationTask> subtasks;
+        private final List<SubtaskExecutor> subtasks;
         private boolean succeedOnlyIfHasSuccessfulSubtasks = true;
 
         public Builder(ServerMigrationTaskName name) {
@@ -81,27 +80,18 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
             this.subtasks = new ArrayList<>();
         }
 
-        public Builder addSubtask(ServerMigrationTask subtask) {
+        public Builder subtask(final ServerMigrationTask subtask) {
+            return subtask(new SubtaskExecutor() {
+                @Override
+                public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+                    context.execute(subtask);
+                }
+            });
+        }
+
+        public Builder subtask(SubtaskExecutor subtask) {
             subtasks.add(subtask);
             return this;
-        }
-
-        public Builder addSubtasks(Collection<ServerMigrationTask> subtasks) {
-            subtasks.addAll(subtasks);
-            return this;
-        }
-
-        public ServerMigrationTasks getSubtasks() {
-            return new ServerMigrationTasks() {
-                @Override
-                public void add(ServerMigrationTask task) {
-                    addSubtask(task);
-                }
-                @Override
-                public void addAll(Collection<ServerMigrationTask> tasks) {
-                    addSubtasks(tasks);
-                }
-            };
         }
 
         public Builder succeedOnlyIfHasSuccessfulSubtasks() {
@@ -124,4 +114,7 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
         }
     }
 
+    public interface SubtaskExecutor {
+        void executeSubtasks(ServerMigrationTaskContext context) throws Exception;
+    }
 }

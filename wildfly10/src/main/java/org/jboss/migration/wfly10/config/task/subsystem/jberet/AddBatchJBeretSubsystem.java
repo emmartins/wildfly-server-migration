@@ -21,18 +21,19 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
+import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Batch JBeret subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddBatchJBeretSubsystem extends AddSubsystem {
+public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
 
     public static final AddBatchJBeretSubsystem INSTANCE = new AddBatchJBeretSubsystem();
 
     private AddBatchJBeretSubsystem() {
+        super(SubsystemNames.BATCH_JBERET);
     }
 
     private static final String DEFAULT_JOB_REPOSITORY_ATTR_NAME = "default-job-repository";
@@ -52,7 +53,7 @@ public class AddBatchJBeretSubsystem extends AddSubsystem {
     private static final String KEEPALIVE_TIME_UNIT_ATTR_VALUE = "seconds";
 
     @Override
-    protected void addSubsystem(WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
         /*
             <subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">
                 <default-job-repository name="in-memory"/>
@@ -67,7 +68,7 @@ public class AddBatchJBeretSubsystem extends AddSubsystem {
             </subsystem>
              */
         final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
+        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         subsystemAddOperation.get(DEFAULT_JOB_REPOSITORY_ATTR_NAME).set(DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
         subsystemAddOperation.get(DEFAULT_THREAD_POOL_ATTR_NAME).set(DEFAULT_THREAD_POOL_ATTR_VALUE);

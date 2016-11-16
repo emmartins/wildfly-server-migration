@@ -21,16 +21,19 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.ValueExpression;
+import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.ServerMigrationTasks;
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.eap.EAP6Server;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupManagement;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
 import org.jboss.migration.wfly10.config.management.SocketBindingsManagement;
-import org.jboss.migration.wfly10.config.task.SocketBindingsMigration;
+import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -38,40 +41,69 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Set socket binding's ports as value expressions.
  * @author emmartins
  */
-public class AddSocketBindingPortExpressions implements SocketBindingsMigration.SubtaskFactory<ServerPath<EAP6Server>> {
-    private final String[] resourceNames;
+public class AddSocketBindingPortExpressions<S> implements ManageableServerConfigurationTaskFactory<S, ManageableServerConfiguration> {
 
-    public AddSocketBindingPortExpressions(String ...resourceNames) {
-        this.resourceNames = resourceNames.clone();
+    public static final String[] SOCKET_BINDINGS = {
+            "ajp",
+            "http",
+            "https"
+    };
+
+    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("add-socket-binding-port-expressions").build();
+
+    public static final AddSocketBindingPortExpressions INSTANCE = new AddSocketBindingPortExpressions();
+
+    private AddSocketBindingPortExpressions() {
     }
 
     @Override
-    public void addSubtasks(ServerPath<EAP6Server> source, SocketBindingsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
-        for (String resourceName : resourceNames) {
-            addSubtask(resourceName, source, resourceManagement, subtasks);
+    public ServerMigrationTask getTask(S source, ManageableServerConfiguration configuration) throws Exception {
+        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(TASK_NAME)
+                .subtask(SubtaskExecutorAdapters.of(source, configuration, new SubtaskExecutor<S>()))
+                .eventListener(new ParentServerMigrationTask.EventListener() {
+                    @Override
+                    public void started(ServerMigrationTaskContext context) {
+                        context.getLogger().infof("Adding socket binding's port expressions...");
+                    }
+
+                    @Override
+                    public void done(ServerMigrationTaskContext context) {
+                        context.getLogger().infof("Socket binding's port expressions added.");
+                    }
+                });
+        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), TASK_NAME + ".skip");
+    }
+
+    public static class SubtaskExecutor<S> implements SocketBindingGroupsManagementSubtaskExecutor<S> {
+        @Override
+        public void executeSubtasks(S source, SocketBindingGroupsManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
+            for (String socketBindingGroupName : resourceManagement.getResourceNames()) {
+                context.getLogger().debugf("Processing socket binding group %s...", socketBindingGroupName);
+                final SocketBindingGroupManagement socketBindingGroupManagement = resourceManagement.getSocketBindingGroupManagement(socketBindingGroupName);
+                for (String socketBindingName : SOCKET_BINDINGS) {
+                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("add-"+socketBindingName+"-port-expression")
+                            .addAttribute("group", socketBindingGroupManagement.getSocketBindingGroupName())
+                            .build();
+                    final String propertyName = "jboss."+socketBindingName+".port";
+                    final AddSocketBindingPortExpression subtask = new AddSocketBindingPortExpression(socketBindingName, subtaskName, propertyName , socketBindingGroupManagement.getSocketBindingsManagement());
+                    context.execute(new SkippableByEnvServerMigrationTask(subtask, TASK_NAME + "." + subtaskName.getName() + ".skip"));
+                }
+            }
         }
     }
 
-    protected void addSubtask(String resourceName, ServerPath<EAP6Server> source, final SocketBindingsManagement resourceManagement, ServerMigrationTasks subtasks) throws Exception {
-        final String taskName = "add-"+resourceName+"-port-expression";
-        final String propertyName = "jboss."+resourceName+".port";
-        final Task task = new Task(resourceName, taskName, propertyName , resourceManagement);
-        final String envSkipProperty = SocketBindingsMigration.SOCKET_BINDINGS + "." + taskName + ".skip";
-        subtasks.add(new SkippableByEnvServerMigrationTask(task, envSkipProperty));
-    }
-
-    static class Task implements ServerMigrationTask {
+    static class AddSocketBindingPortExpression implements ServerMigrationTask {
 
         private final String resourceName;
         private final String propertyName;
         private final ServerMigrationTaskName taskName;
         private final SocketBindingsManagement resourceManagement;
 
-        Task(String resourceName, String taskName, String propertyName, SocketBindingsManagement resourceManagement) {
+        AddSocketBindingPortExpression(String resourceName, ServerMigrationTaskName taskName, String propertyName, SocketBindingsManagement resourceManagement) {
             this.resourceName = resourceName;
             this.propertyName = propertyName;
             this.resourceManagement = resourceManagement;
-            this.taskName = new ServerMigrationTaskName.Builder(taskName).build();
+            this.taskName = taskName;
         }
 
         @Override
@@ -105,7 +137,7 @@ public class AddSocketBindingPortExpressions implements SocketBindingsMigration.
             writeAttrOp.get(NAME).set(PORT);
             writeAttrOp.get(VALUE).set(valueExpression);
             resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-            context.getLogger().infof("Socket binding %s port value expression set as %s.", resourceName, valueExpression.getExpressionString());
+            context.getLogger().infof("Socket binding %s port value expression set as %s.", pathAddress.toCLIStyleString(), valueExpression.getExpressionString());
             return ServerMigrationTaskResult.SUCCESS;
         }
     }

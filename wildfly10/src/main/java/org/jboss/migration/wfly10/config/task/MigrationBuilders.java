@@ -25,43 +25,29 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
  * @param <SC> source config type
  */
 public class MigrationBuilders<SS extends Server, SC> {
+
     public DomainMigration.Builder<SS> domainBuilder() {
         return new DomainMigration.Builder<>();
     }
-    public SubsystemsMigration.Builder<SC> subsystemsMigrationBuilder() {
+
+    public SubsystemsMigration.Builder<SC> subsystemsBuilder() {
         return new SubsystemsMigration.Builder<>();
     }
-    public StandaloneServerConfigurationMigration.Builder<SC> standaloneConfigurationMigrationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {
+
+    public StandaloneServerConfigurationMigration.Builder<SC> standaloneMigrationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {
         return new StandaloneServerConfigurationMigration.Builder<>(xmlConfigurationProvider);
     }
-    public DomainConfigurationMigration.Builder<SC> domainConfigurationMigrationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {
+
+    public DomainConfigurationMigration.Builder<SC> domainConfigurationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {
         return new DomainConfigurationMigration.Builder<>(xmlConfigurationProvider);
     }
-    public HostConfigurationMigration.Builder<SC> hostConfigurationMigrationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {
+
+    public HostConfigurationMigration.Builder<SC> hostConfigurationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {
         return new HostConfigurationMigration.Builder<>(xmlConfigurationProvider);
     }
-    public HostMigration.Builder<SC> hostMigrationBuilder() {
+
+    public HostMigration.Builder<SC> hostBuilder() {
         return new HostMigration.Builder<>();
     }
-    public ProfileMigration.Builder<SC> profileMigrationBuilder() {
-        return new ProfileMigration.Builder<>();
-    }
-    public SocketBindingGroupMigration.Builder<SC> socketBindingGroupMigrationBuilder() {
-        return new SocketBindingGroupMigration.Builder<>();
-    }
-    public SocketBindingsMigration.Builder<SC> socketBindingsMigrationBuilder() {
-        return new SocketBindingsMigration.Builder<>();
-    }
-    public ManagementInterfacesMigration.Builder<SC> managementInterfacesMigrationBuilder() {
-        return new ManagementInterfacesMigration.Builder<>();
-    }
-    public InterfacesMigration.Builder<SC> interfacesMigrationBuilder() {
-        return new InterfacesMigration.Builder<>();
-    }
-    public JVMsMigration.Builder<SC> jvmsMigrationBuilder() {
-        return new JVMsMigration.Builder<>();
-    }
-    public ServerGroupMigration.Builder<SC> serverGroupMigrationBuilder() {
-        return new ServerGroupMigration.Builder<>();
-    }
+
 }

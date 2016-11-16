@@ -25,23 +25,19 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTask;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10SubsystemMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.jboss.as.controller.PathElement.pathElement;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * A task which changes the module name of any Hibernate Cache present in Infinispan subsystem.
  * @author emmartins
  */
-public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationTaskFactory {
+public class FixHibernateCacheModuleName implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
     public interface EnvironmentProperties {
         String LEGACY_MODULE_NAMES = "deprecatedModuleNames";
@@ -61,14 +57,14 @@ public class FixHibernateCacheModuleName implements WildFly10SubsystemMigrationT
     private static final List<String> DEFAULT_LEGACY_MODULE_NAMES = Arrays.asList("org.jboss.as.jpa.hibernate:4", "org.hibernate");
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
-        return new WildFly10SubsystemMigrationTask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

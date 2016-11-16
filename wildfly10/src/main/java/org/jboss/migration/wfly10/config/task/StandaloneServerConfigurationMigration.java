@@ -17,12 +17,10 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.wfly10.WildFly10Server;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedStandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
-
-import java.nio.file.Path;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
 
 /**
  * Standalone config migration.
@@ -30,11 +28,11 @@ import java.nio.file.Path;
  */
 public class StandaloneServerConfigurationMigration<S> extends ServerConfigurationMigration<S, StandaloneServerConfiguration> {
 
-    protected StandaloneServerConfigurationMigration(Builder builder) {
+    protected StandaloneServerConfigurationMigration(ServerConfigurationMigration.Builder<S, StandaloneServerConfiguration> builder) {
         super(builder);
     }
 
-    public static class Builder<S> extends ServerConfigurationMigration.Builder<Builder, S, StandaloneServerConfiguration> {
+    public static class Builder<S> extends ServerConfigurationMigration.Builder<S, StandaloneServerConfiguration> {
 
         public Builder(XMLConfigurationProvider<S> xmlConfigurationProvider) {
             super("standalone", xmlConfigurationProvider);
@@ -42,68 +40,36 @@ public class StandaloneServerConfigurationMigration<S> extends ServerConfigurati
         }
 
         @Override
+        public Builder<S> manageableConfigurationProvider(ManageableConfigurationProvider<StandaloneServerConfiguration> manageableConfigurationProvider) {
+            super.manageableConfigurationProvider(manageableConfigurationProvider);
+            return this;
+        }
+
+        @Override
+        public Builder<S> subtask(ManageableServerConfigurationTaskFactory<S, StandaloneServerConfiguration> subtaskFactory) {
+            super.subtask(subtaskFactory);
+            return this;
+        }
+
+        public Builder<S> subtask(final StandaloneServerConfigurationTaskFactory<S> subtaskFactory) {
+            subtask(new ManageableServerConfigurationTaskFactory<S, StandaloneServerConfiguration>() {
+                @Override
+                public ServerMigrationTask getTask(S source, StandaloneServerConfiguration configuration) throws Exception {
+                    return subtaskFactory.getTask(source, configuration);
+                }
+            });
+            return this;
+        }
+
+        @Override
+        public Builder<S> subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
+            super.subtask(subtaskFactory);
+            return this;
+        }
+
+        @Override
         public StandaloneServerConfigurationMigration<S> build() {
             return new StandaloneServerConfigurationMigration<>(this);
-        }
-
-        public Builder<S> addDeploymentsMigration(final DeploymentsMigration<S> deploymentsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return deploymentsMigration.getTask(source, configuration.getDeploymentsManagement());
-                }
-            });
-        }
-
-        public ServerConfigurationMigration.Builder addInterfacesMigration(final InterfacesMigration<S> interfacesMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return interfacesMigration.getTask(source, configuration.getInterfacesManagement());
-                }
-            });
-        }
-
-        public ServerConfigurationMigration.Builder addManagementInterfacesMigration(final ManagementInterfacesMigration<S> managementInterfacesMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return managementInterfacesMigration.getTask(source, configuration.getManagementInterfacesManagement());
-                }
-            });
-        }
-
-        public ServerConfigurationMigration.Builder addSecurityRealmsMigration(final SecurityRealmsMigration<S> securityRealmsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return securityRealmsMigration.getTask(source, configuration.getSecurityRealmsManagement());
-                }
-            });
-        }
-
-        public ServerConfigurationMigration.Builder addSocketBindingGroupsMigration(final SocketBindingGroupsMigration<S> socketBindingGroupsMigration) {
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return socketBindingGroupsMigration.getTask(source, configuration.getSocketBindingGroupsManagement());
-                }
-            });
-        }
-
-        public Builder<S> addSubsystemsMigration(final SubsystemsMigration<S> subsystemsMigration) {
-            addXMLConfigurationSubtaskFactory(new XMLConfigurationSubtaskFactory<S>() {
-                @Override
-                public ServerMigrationTask getXMLConfigurationSubtask(S source, Path xmlConfigurationPath, WildFly10Server target) {
-                    return subsystemsMigration.getXMLConfigurationTask(source, xmlConfigurationPath, target);
-                }
-            });
-            return addManageableConfigurationSubtaskFactory(new ManageableConfigurationSubtaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getManageableConfigurationSubtask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return subsystemsMigration.getSubsystemsManagementTask(source, configuration.getSubsystemsManagement());
-                }
-            });
         }
     }
 }
