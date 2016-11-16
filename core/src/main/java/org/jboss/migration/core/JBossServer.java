@@ -151,6 +151,23 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
         return baseDir.resolve("modules");
     }
 
+    public static Path getModulesFile(Path baseDir, Path file) throws IOException {
+        final Path modulesDir = getModulesDir(baseDir);
+        final Path systemLayersBaseDir = modulesDir.resolve("system").resolve("layers").resolve("base");
+        final Path overlaysDir = systemLayersBaseDir.resolve(".overlays");
+        final Path overlaysFile = overlaysDir.resolve(".overlays");
+        if (Files.exists(overlaysFile)) {
+            String activeOverlayFileName = new String(Files.readAllBytes(overlaysFile)).trim();
+            if (!activeOverlayFileName.isEmpty()) {
+                final Path activeOverlayFile = overlaysDir.resolve(activeOverlayFileName).resolve(file);
+                if (Files.exists(activeOverlayFile)) {
+                    return activeOverlayFile;
+                }
+            }
+        }
+        return systemLayersBaseDir.resolve(file);
+    }
+
     public Path getModulesDir() {
         return getModulesDir(getBaseDir());
     }
