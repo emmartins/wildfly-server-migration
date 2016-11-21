@@ -82,16 +82,16 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
-                        context.getLogger().debugf("HTTP upgrade management setup starting...");
+                        context.getLogger().infof("HTTP upgrade management setup starting...");
                     }
                     @Override
                     public void done(ServerMigrationTaskContext context) {
-                        context.getLogger().debugf("HTTP upgrade management setup completed.");
+                        context.getLogger().infof("HTTP upgrade management setup completed.");
                     }
                 })
                 .subtask(subtaskExecutor)
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME + ".skip");
+        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     static class SetManagementInterfacesHttpUpgradeEnabled<S> implements ManagementInterfacesManagementSubtaskExecutor<S> {
@@ -126,7 +126,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
                     writeAttrOp.get(NAME).set(HTTP_UPGRADE_ENABLED);
                     writeAttrOp.get(VALUE).set(true);
                     resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                    context.getLogger().debugf("Management interface '%s' http upgrade enabled.", MANAGEMENT_INTERFACE_NAME);
+                    context.getLogger().infof("Management interface '%s' http upgrade enabled.", MANAGEMENT_INTERFACE_NAME);
                     return ServerMigrationTaskResult.SUCCESS;
                 }
             };
