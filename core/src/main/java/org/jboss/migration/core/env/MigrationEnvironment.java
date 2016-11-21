@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author emmartins
@@ -30,6 +32,7 @@ import java.util.TreeMap;
 public class MigrationEnvironment implements Environment {
 
     private final SortedMap<String, PropertyValue> properties;
+    private final SortedSet<String> readed = new TreeSet<>();
 
     public MigrationEnvironment() {
         this.properties = new TreeMap<>();
@@ -49,6 +52,7 @@ public class MigrationEnvironment implements Environment {
     }
 
     public String getPropertyAsString(String propertyName) {
+        //readed.add(propertyName);
         final PropertyValue propertyValue = properties.get(propertyName);
         if (propertyValue == null) {
             return null;
@@ -62,6 +66,7 @@ public class MigrationEnvironment implements Environment {
     }
 
     public List<String> getPropertyAsList(String propertyName) {
+        //readed.add(propertyName);
         final PropertyValue propertyValue = properties.get(propertyName);
         if (propertyValue == null) {
             return null;
@@ -129,6 +134,7 @@ public class MigrationEnvironment implements Environment {
             }
         }
         return Collections.unmodifiableList(result);
+        //return Collections.unmodifiableList(new ArrayList<>(readed));
     }
 
     private static class PropertyValue {

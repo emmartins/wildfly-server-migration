@@ -107,7 +107,7 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
         for (String propertyName : environment.getPropertyNamesReaded()) {
             final ElementNode propertyNode = new ElementNode(environmentNode, "property");
             propertyNode.addAttribute("name", new AttributeValue(propertyName));
-            propertyNode.addAttribute("value", new AttributeValue(environment.getPropertyAsString(propertyName)));
+            propertyNode.addAttribute("value", new AttributeValue(environment.getPropertyAsString(propertyName, "null")));
             environmentNode.addChild(propertyNode);
         }
         parentElementNode.addChild(environmentNode);

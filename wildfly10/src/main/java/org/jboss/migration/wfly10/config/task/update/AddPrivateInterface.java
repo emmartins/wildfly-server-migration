@@ -63,11 +63,11 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
-                        context.getLogger().debugf("Private interface setup starting...");
+                        context.getLogger().infof("Private interface setup starting...");
                     }
                     @Override
                     public void done(ServerMigrationTaskContext context) {
-                        context.getLogger().debugf("Private interface setup done.");
+                        context.getLogger().infof("Private interface setup done.");
                     }
                 })
                 .subtask(SubtaskExecutorAdapters.of(source, configuration, new AddInterface()))
