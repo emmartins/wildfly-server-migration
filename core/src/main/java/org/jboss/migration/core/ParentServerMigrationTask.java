@@ -48,14 +48,11 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
         if (eventListener != null) {
             eventListener.started(context);
         }
-        try {
-            for (SubtaskExecutor subtaskExecutor : subtasks) {
-                subtaskExecutor.executeSubtasks(context);
-            }
-        } finally {
-            if (eventListener != null) {
-                eventListener.done(context);
-            }
+        for (SubtaskExecutor subtaskExecutor : subtasks) {
+            subtaskExecutor.executeSubtasks(context);
+        }
+        if (eventListener != null) {
+            eventListener.done(context);
         }
         return (!succeedOnlyIfHasSuccessfulSubtasks || context.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
     }
