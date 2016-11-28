@@ -64,11 +64,10 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
+      <!--
       <includes>
         <include>org.jboss.migration:jboss-server-migration-cli</include>
-<!--
         <include>org.jboss.migration:jboss-server-migration-core</include>
--->        
         <include>org.jboss.migration:jboss-server-migration-eap6</include>
         <include>org.jboss.migration:jboss-server-migration-eap6-to-eap7</include>
         <include>org.jboss.migration:jboss-server-migration-eap7</include>
@@ -78,6 +77,7 @@
         <include>org.jboss.migration:jboss-server-migration-wildfly9-to-wildfly10</include>
         <include>org.jboss.migration:jboss-server-migration-wildfly10</include>
       </includes>
+      -->
     </dependencySet>
   </dependencySets>
 </assembly>

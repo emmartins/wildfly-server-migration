@@ -87,7 +87,8 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
             cmds.add("--host-config="+ hostConfig);
         }
         cmds.add("--admin-only");
-        hostController = EmbeddedProcessFactory.createHostController(getServer().getBaseDir().toString(), null, null, cmds.toArray(new String[cmds.size()]));
+        final String[] systemPackages = {"org.jboss.logmanager"};
+        hostController = EmbeddedProcessFactory.createHostController(getServer().getBaseDir().toString(), null, systemPackages, cmds.toArray(new String[cmds.size()]));
         try {
             hostController.start();
         } catch (EmbeddedProcessStartException e) {
