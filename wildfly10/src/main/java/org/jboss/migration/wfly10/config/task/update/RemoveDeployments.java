@@ -57,8 +57,18 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
     protected ServerMigrationTask getTask(S source, DeploymentsManagement deploymentsManagement) throws Exception {
         final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
                 .subtask(SubtaskExecutorAdapters.of(source, deploymentsManagement, new SubtaskExecutor()))
+                .eventListener(new ParentServerMigrationTask.EventListener() {
+                    @Override
+                    public void started(ServerMigrationTaskContext context) {
+                        context.getLogger().infof("Deployments removal starting...");
+                    }
+                    @Override
+                    public void done(ServerMigrationTaskContext context) {
+                        context.getLogger().infof("Deployments removal done.");
+                    }
+                })
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME + ".skip");
+        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     public static class SubtaskExecutor<S> implements DeploymentsManagementSubtaskExecutor<S> {

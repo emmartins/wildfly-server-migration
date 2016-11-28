@@ -77,7 +77,7 @@ public class HtmlReportWriter {
 
     private void appendEnvironment(MigrationData migrationData, StringBuilder sb) {
         for (String property : migrationData.getServerMigrationEnvironment().getPropertyNamesReaded()) {
-            appendProperty(property, migrationData.getServerMigrationEnvironment().getPropertyAsString(property), sb);
+            appendProperty(property, migrationData.getServerMigrationEnvironment().getPropertyAsString(property, "null"), sb);
         }
     }
 

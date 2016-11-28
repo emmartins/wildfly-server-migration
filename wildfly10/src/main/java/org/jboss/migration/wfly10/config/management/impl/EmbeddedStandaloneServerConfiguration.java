@@ -77,7 +77,8 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     @Override
     protected ModelControllerClient startConfiguration() {
         final String[] cmds = {"--server-config="+config,"--admin-only"};
-        standaloneServer = EmbeddedProcessFactory.createStandaloneServer(getServer().getBaseDir().toString(), null, null, cmds);
+        final String[] systemPackages = {"org.jboss.logmanager"};
+        standaloneServer = EmbeddedProcessFactory.createStandaloneServer(getServer().getBaseDir().toString(), null, systemPackages, cmds);
         try {
             standaloneServer.start();
         } catch (EmbeddedProcessStartException e) {
