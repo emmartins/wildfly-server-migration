@@ -18,7 +18,6 @@ package org.jboss.migration.eap6.to.eap7;
 import org.jboss.migration.eap.EAP6Server;
 import org.jboss.migration.eap.EAP71ServerMigrationProvider;
 import org.jboss.migration.eap6.to.eap7.tasks.AddJmxSubsystemToHosts;
-import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP71SubsystemUpdates;
 import org.jboss.migration.eap6.to.eap7.tasks.SetupHttpUpgradeManagement;
@@ -63,6 +62,7 @@ public class EAP6ToEAP71ServerMigrationProvider implements EAP71ServerMigrationP
                         .subtask(AddPrivateInterface.INSTANCE)
                         .subtask(AddSocketBindingPortExpressions.INSTANCE)
                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
+                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
                         .subtask(RemoveDeployments.INSTANCE)
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -95,6 +95,7 @@ public class EAP6ToEAP71ServerMigrationProvider implements EAP71ServerMigrationP
                                         .subtask(SetupHttpUpgradeManagement.INSTANCE)
                                         .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
                                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
+                                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
                                         .build()
                                 )
                         )
