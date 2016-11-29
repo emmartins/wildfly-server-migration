@@ -1,1 +1,2 @@
 org.jboss.migration.eap.EAP7ServerProvider
+org.jboss.migration.eap.EAP71ServerProvider

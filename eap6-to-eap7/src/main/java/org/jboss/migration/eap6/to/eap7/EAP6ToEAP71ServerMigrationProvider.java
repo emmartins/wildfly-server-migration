@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,13 +16,15 @@
 package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAP6Server;
-import org.jboss.migration.eap.EAP7ServerMigrationProvider;
+import org.jboss.migration.eap.EAP71ServerMigrationProvider;
 import org.jboss.migration.eap6.to.eap7.tasks.AddJmxSubsystemToHosts;
+import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
-import org.jboss.migration.eap6.to.eap7.tasks.EAP7SubsystemUpdates;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP71SubsystemUpdates;
 import org.jboss.migration.eap6.to.eap7.tasks.SetupHttpUpgradeManagement;
 import org.jboss.migration.eap6.to.eap7.tasks.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.WildFly10ServerMigration;
+import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
@@ -33,10 +35,10 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 
 /**
- * Server migration, from EAP 6.4 to EAP 7.0.
+ * Server migration, from EAP 6.4 to EAP 7.1.
  * @author emmartins
  */
-public class EAP6ToEAP7ServerMigrationProvider implements EAP7ServerMigrationProvider {
+public class EAP6ToEAP71ServerMigrationProvider implements EAP71ServerMigrationProvider {
 
     @Override
     public WildFly10ServerMigration getServerMigration() {
@@ -46,13 +48,13 @@ public class EAP6ToEAP7ServerMigrationProvider implements EAP7ServerMigrationPro
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
                         .subtask(MigrateSubsystemTasks.JACORB)
                         .subtask(MigrateSubsystemTasks.WEB)
-                        .subtask(EAP7SubsystemUpdates.UNDERTOW)
+                        .subtask(EAP71SubsystemUpdates.UNDERTOW)
                         .subtask(MigrateSubsystemTasks.MESSAGING)
-                        .subtask(EAP7SubsystemUpdates.MESSAGING_ACTIVEMQ)
-                        .subtask(EAP7SubsystemUpdates.INFINISPAN)
-                        .subtask(EAP7SubsystemUpdates.EE)
-                        .subtask(EAP7SubsystemUpdates.EJB3)
-                        .subtask(EAP7SubsystemUpdates.REMOTING)
+                        .subtask(EAP71SubsystemUpdates.MESSAGING_ACTIVEMQ)
+                        .subtask(EAP71SubsystemUpdates.INFINISPAN)
+                        .subtask(EAP71SubsystemUpdates.EE)
+                        .subtask(EAP71SubsystemUpdates.EJB3)
+                        .subtask(EAP71SubsystemUpdates.REMOTING)
                         .subtask(AddSubsystemTasks.BATCH_JBERET)
                         .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
                         .subtask(AddSubsystemTasks.SECURITY_MANAGER)
@@ -68,13 +70,13 @@ public class EAP6ToEAP7ServerMigrationProvider implements EAP7ServerMigrationPro
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
                                 .subtask(MigrateSubsystemTasks.JACORB)
                                 .subtask(MigrateSubsystemTasks.WEB)
-                                .subtask(EAP7SubsystemUpdates.UNDERTOW)
+                                .subtask(EAP71SubsystemUpdates.UNDERTOW)
                                 .subtask(MigrateSubsystemTasks.MESSAGING)
-                                .subtask(EAP7SubsystemUpdates.MESSAGING_ACTIVEMQ)
-                                .subtask(EAP7SubsystemUpdates.INFINISPAN)
-                                .subtask(EAP7SubsystemUpdates.EE)
-                                .subtask(EAP7SubsystemUpdates.EJB3)
-                                .subtask(EAP7SubsystemUpdates.REMOTING)
+                                .subtask(EAP71SubsystemUpdates.MESSAGING_ACTIVEMQ)
+                                .subtask(EAP71SubsystemUpdates.INFINISPAN)
+                                .subtask(EAP71SubsystemUpdates.EE)
+                                .subtask(EAP71SubsystemUpdates.EJB3)
+                                .subtask(EAP71SubsystemUpdates.REMOTING)
                                 .subtask(AddSubsystemTasks.BATCH_JBERET)
                                 .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
                                 .subtask(AddSubsystemTasks.SECURITY_MANAGER)

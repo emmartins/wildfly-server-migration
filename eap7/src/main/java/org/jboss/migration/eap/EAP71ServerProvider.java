@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Red Hat, Inc.
+ * Copyright 2016 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,24 +25,20 @@ import java.nio.file.Path;
  * The EAP 7 {@link org.jboss.migration.core.ServerProvider}.
  * @author emmartins
  */
-public class EAP7ServerProvider extends EAP6ServerProvider {
-
-    protected String getProductVersionRegex() {
-        return "7.0\\..*";
-    }
+public class EAP71ServerProvider extends EAP7ServerProvider {
 
     @Override
-    protected String getProductNameRegex() {
-        return "("+super.getProductNameRegex() + ")|(JBoss EAP)";
+    protected String getProductVersionRegex() {
+        return "7.1\\..*";
     }
 
     @Override
     protected Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        return new EAP7Server(migrationName, productInfo, baseDir, migrationEnvironment);
+        return new EAP71Server(migrationName, productInfo, baseDir, migrationEnvironment);
     }
 
     @Override
     public String getName() {
-        return "EAP 7.0";
+        return "EAP 7.1";
     }
 }
