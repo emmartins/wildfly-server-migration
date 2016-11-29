@@ -16,7 +16,14 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.MigrateHttpListener;
 
 /**
  * @author emmartins
@@ -31,7 +38,9 @@ public class EAP71SubsystemUpdates {
 
     public static final UpdateSubsystemTaskFactory REMOTING = EAP7SubsystemUpdates.REMOTING;
 
-    public static final UpdateSubsystemTaskFactory UNDERTOW = EAP7SubsystemUpdates.UNDERTOW;
+    public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
+            .subtasks(AddBufferCache.INSTANCE, MigrateHttpListener.INSTANCE, AddWebsockets.INSTANCE, AddHttpsListener.INSTANCE, EnableHttp2.INSTANCE)
+            .build();
 
     public static final UpdateSubsystemTaskFactory MESSAGING_ACTIVEMQ = EAP7SubsystemUpdates.MESSAGING_ACTIVEMQ;
 
