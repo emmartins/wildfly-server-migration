@@ -19,6 +19,10 @@ package org.jboss.migration.eap6.to.eap7.tasks;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddEjbCache;
+import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
+import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
+import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
@@ -30,7 +34,9 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.MigrateHttpList
  */
 public class EAP71SubsystemUpdates {
 
-    public static final UpdateSubsystemTaskFactory INFINISPAN = EAP7SubsystemUpdates.INFINISPAN;
+    public static final UpdateSubsystemTaskFactory INFINISPAN = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.INFINISPAN, ExtensionNames.INFINISPAN)
+                                .subtasks(AddServerCache.INSTANCE, AddEjbCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE, UpdateWebCache.INSTANCE)
+                                .build();
 
     public static final UpdateSubsystemTaskFactory EE = EAP7SubsystemUpdates.EE;
 
