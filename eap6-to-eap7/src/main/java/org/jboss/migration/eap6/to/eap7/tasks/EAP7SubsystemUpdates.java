@@ -36,7 +36,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.MigrateHttpList
 /**
  * @author emmartins
  */
-public class SubsystemUpdates {
+public class EAP7SubsystemUpdates {
 
     public static final UpdateSubsystemTaskFactory INFINISPAN = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.INFINISPAN, ExtensionNames.INFINISPAN)
                                 .subtasks(AddServerCache.INSTANCE, AddEjbCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE)
