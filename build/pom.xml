@@ -69,12 +69,22 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly8-to-eap7</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly8-to-wildfly10</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly9</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly9-to-eap7</artifactId>
         </dependency>
 
         <dependency>

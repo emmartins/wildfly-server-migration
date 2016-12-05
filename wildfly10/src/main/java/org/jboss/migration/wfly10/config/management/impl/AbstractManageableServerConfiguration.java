@@ -21,7 +21,7 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 
@@ -44,10 +44,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUC
  */
 public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
 
-    private final WildFly10Server server;
+    private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
 
-    protected AbstractManageableServerConfiguration(WildFly10Server server) {
+    protected AbstractManageableServerConfiguration(WildFlyServer10 server) {
         this.server = server;
     }
 
@@ -78,7 +78,7 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     }
 
     @Override
-    public WildFly10Server getServer() {
+    public WildFlyServer10 getServer() {
         return server;
     }
 

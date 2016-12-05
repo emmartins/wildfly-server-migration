@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationsMigration;
 import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationsMigration;
@@ -36,7 +36,7 @@ class StandaloneServerConfigurationsUpdate<S extends JBossServer<S>> extends Sta
 
     private static class SourceStandaloneServerConfigurations<S extends JBossServer<S>> implements ServerConfigurationsMigration.SourceConfigurations<S, ServerPath<S>> {
         @Override
-        public Collection<ServerPath<S>> getConfigurations(S source, WildFly10Server target) {
+        public Collection<ServerPath<S>> getConfigurations(S source, WildFlyServer10 target) {
             return source.getStandaloneConfigs();
         }
     }

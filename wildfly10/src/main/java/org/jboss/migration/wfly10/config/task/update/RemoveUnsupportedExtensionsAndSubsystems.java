@@ -23,7 +23,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.util.xml.XMLFileFilter;
 import org.jboss.migration.core.util.xml.XMLFiles;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 import org.jboss.migration.wfly10.config.task.subsystem.Extension;
@@ -67,7 +67,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
     }
 
     @Override
-    public ServerMigrationTask getTask(final S source, final Path xmlConfigurationPath, final WildFly10Server target) {
+    public ServerMigrationTask getTask(final S source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
         return new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -84,7 +84,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         };
     }
 
-    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFly10Server targetServer, final ServerMigrationTaskContext context) throws IOException {
+    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final ServerMigrationTaskContext context) throws IOException {
         final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         final List<WildFly10Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();

@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.InterfacesManagement;
@@ -56,7 +56,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     private final SocketBindingGroupsManagement socketBindingGroupsManagement;
     private final SubsystemsManagement subsystemsManagement;
 
-    public EmbeddedStandaloneServerConfiguration(String config, WildFly10Server server) {
+    public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
         super(server);
         this.config = config;
         this.deploymentsManagement = new DeploymentsManagementImpl(null, this);
@@ -128,7 +128,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
 
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
-        public StandaloneServerConfiguration getManageableConfiguration(Path configFile, WildFly10Server server) {
+        public StandaloneServerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
             return new EmbeddedStandaloneServerConfiguration(configFile.getFileName().toString(), server);
         }
     }

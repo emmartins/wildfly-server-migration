@@ -24,7 +24,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
  * Implementation for the standalone server migration.
@@ -54,7 +54,7 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
     }
 
     @Override
-    public ServerMigrationTask getTask(final S source, final WildFly10Server target) {
+    public ServerMigrationTask getTask(final S source, final WildFlyServer10 target) {
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
