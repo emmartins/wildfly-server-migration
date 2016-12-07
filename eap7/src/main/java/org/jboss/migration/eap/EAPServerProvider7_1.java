@@ -39,6 +39,6 @@ public class EAPServerProvider7_1 extends EAPServerProvider7_0 {
 
     @Override
     public String getName() {
-        return "EAP 7.1";
+        return "JBoss EAP 7.1";
     }
 }

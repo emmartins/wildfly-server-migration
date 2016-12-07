@@ -30,6 +30,8 @@ import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateC
 import org.jboss.migration.wfly10.config.task.subsystem.messaging.AddHttpAcceptorsAndConnectors;
 import org.jboss.migration.wfly10.config.task.subsystem.remoting.AddHttpConnectorIfMissing;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpListenerRedirectSocket;
 
@@ -55,7 +57,7 @@ public class EAPSubsystemUpdates7_0 {
                                 .build();
 
     public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
-                                .subtasks(AddBufferCache.INSTANCE, SetDefaultHttpListenerRedirectSocket.INSTANCE, AddWebsockets.INSTANCE)
+                                .subtasks(AddBufferCache.INSTANCE, SetDefaultHttpListenerRedirectSocket.INSTANCE, AddWebsockets.INSTANCE, new SetDefaultHostResponseHeaderServer(), new SetDefaultHostResponseHeaderXPoweredBy())
                                 .build();
 
     public static final UpdateSubsystemTaskFactory MESSAGING_ACTIVEMQ = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.MESSAGING_ACTIVEMQ, ExtensionNames.MESSAGING_ACTIVEMQ)

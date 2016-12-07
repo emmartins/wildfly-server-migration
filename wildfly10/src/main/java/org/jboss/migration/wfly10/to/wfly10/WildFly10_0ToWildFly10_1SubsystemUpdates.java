@@ -22,6 +22,8 @@ import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFacto
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
 
 /**
  * @author emmartins
@@ -33,7 +35,7 @@ public class WildFly10_0ToWildFly10_1SubsystemUpdates {
                                 .build();
 
     public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
-            .subtasks(AddHttpsListener.INSTANCE, EnableHttp2.INSTANCE)
+            .subtasks(AddHttpsListener.INSTANCE, EnableHttp2.INSTANCE, new SetDefaultHostResponseHeaderServer(), new SetDefaultHostResponseHeaderXPoweredBy())
             .build();
 
 }
