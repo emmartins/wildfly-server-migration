@@ -22,7 +22,9 @@ import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFacto
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
-import org.jboss.migration.wfly10.to.wfly10.WildFly10_0ToWildFly10_1SubsystemUpdates;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpListenerRedirectSocket;
 
 /**
  * @author emmartins
@@ -33,5 +35,7 @@ public class WildFly8ToWildFly10_1SubsystemUpdates {
             .subtasks(AddServerCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE, UpdateWebCache.INSTANCE)
             .build();
 
-    public static final UpdateSubsystemTaskFactory UNDERTOW = WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW;
+    public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
+            .subtasks(SetDefaultHttpListenerRedirectSocket.INSTANCE, AddHttpsListener.INSTANCE, EnableHttp2.INSTANCE)
+            .build();
 }

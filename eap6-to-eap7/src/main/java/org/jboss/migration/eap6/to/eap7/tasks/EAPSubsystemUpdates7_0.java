@@ -31,7 +31,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.messaging.AddHttpAccepto
 import org.jboss.migration.wfly10.config.task.subsystem.remoting.AddHttpConnectorIfMissing;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.MigrateHttpListener;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpListenerRedirectSocket;
 
 /**
  * @author emmartins
@@ -55,7 +55,7 @@ public class EAPSubsystemUpdates7_0 {
                                 .build();
 
     public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
-                                .subtasks(AddBufferCache.INSTANCE, MigrateHttpListener.INSTANCE, AddWebsockets.INSTANCE)
+                                .subtasks(AddBufferCache.INSTANCE, SetDefaultHttpListenerRedirectSocket.INSTANCE, AddWebsockets.INSTANCE)
                                 .build();
 
     public static final UpdateSubsystemTaskFactory MESSAGING_ACTIVEMQ = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.MESSAGING_ACTIVEMQ, ExtensionNames.MESSAGING_ACTIVEMQ)

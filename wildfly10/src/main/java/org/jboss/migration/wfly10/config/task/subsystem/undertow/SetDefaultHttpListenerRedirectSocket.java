@@ -30,23 +30,22 @@ import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFacto
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
- * A task which updates the config of the default http listener.
+ * A task which ensures that Undertow's default http listener 'redirect-socket' is set.
  * @author emmartins
  */
-public class MigrateHttpListener implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class SetDefaultHttpListenerRedirectSocket implements UpdateSubsystemTaskFactory.SubtaskFactory {
 
-    private static final String SERVER = "server";
     private static final String SERVER_NAME = "default-server";
     private static final String HTTP_LISTENER = "http-listener";
     private static final String HTTP_LISTENER_NAME = "http";
     private static final String REDIRECT_SOCKET_ATTR_NAME = "redirect-socket";
     private static final String REDIRECT_SOCKET_ATTR_VALUE = "https";
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("migrate-undertow-http-listener").build();
+    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("set-default-http-listener-redirect-socket").build();
 
-    public static final MigrateHttpListener INSTANCE = new MigrateHttpListener();
+    public static final SetDefaultHttpListenerRedirectSocket INSTANCE = new SetDefaultHttpListenerRedirectSocket();
 
-    private MigrateHttpListener() {
+    private SetDefaultHttpListenerRedirectSocket() {
     }
 
     @Override
@@ -62,13 +61,11 @@ public class MigrateHttpListener implements UpdateSubsystemTaskFactory.SubtaskFa
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                if (config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME)) {
+                if (config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME) && !config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME, REDIRECT_SOCKET_ATTR_NAME)) {
                     final PathAddress pathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(SERVER, SERVER_NAME), PathElement.pathElement(HTTP_LISTENER, HTTP_LISTENER_NAME));
-                    final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                    op.get(NAME).set(REDIRECT_SOCKET_ATTR_NAME);
-                    op.get(VALUE).set(REDIRECT_SOCKET_ATTR_VALUE);
+                    final ModelNode op = Util.getWriteAttributeOperation(pathAddress, REDIRECT_SOCKET_ATTR_NAME, REDIRECT_SOCKET_ATTR_VALUE);
                     subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
-                    context.getLogger().infof("Undertow's default HTTP listener 'redirect-socket' set to 'https'.");
+                    context.getLogger().infof("Undertow's default HTTP listener 'redirect-socket' set as 'https'.");
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {
                     return ServerMigrationTaskResult.SKIPPED;
