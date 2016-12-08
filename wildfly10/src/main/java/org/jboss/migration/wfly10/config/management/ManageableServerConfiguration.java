@@ -35,6 +35,7 @@ public interface ManageableServerConfiguration {
     ExtensionsManagement getExtensionsManagement();
     InterfacesManagement getInterfacesManagement();
     SocketBindingGroupsManagement getSocketBindingGroupsManagement();
+    SystemPropertiesManagement getSystemPropertiesManagement();
     Path resolvePath(String path)  throws IOException, ManagementOperationException;
     ModelControllerClient getModelControllerClient();
 }

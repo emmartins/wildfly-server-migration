@@ -27,6 +27,7 @@ import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -55,6 +56,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     private final SecurityRealmsManagement securityRealmsManagement;
     private final SocketBindingGroupsManagement socketBindingGroupsManagement;
     private final SubsystemsManagement subsystemsManagement;
+    private final SystemPropertiesManagement systemPropertiesManagement;
 
     public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
         super(server);
@@ -69,6 +71,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         this.subsystemsManagement = new SubsystemsManagementImpl(null, this);
         this.interfacesManagement = new InterfacesManagementImpl(null, this);
         this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
+        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
         final PathAddress managementCoreServicePathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT));
         this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
         this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
@@ -89,6 +92,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
 
     @Override
     protected void stopConfiguration() {
+        writeConfiguration();
         standaloneServer.stop();
         standaloneServer = null;
     }
@@ -105,6 +109,11 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     @Override
     public InterfacesManagement getInterfacesManagement() {
         return interfacesManagement;
+    }
+
+    @Override
+    public SystemPropertiesManagement getSystemPropertiesManagement() {
+        return systemPropertiesManagement;
     }
 
     @Override

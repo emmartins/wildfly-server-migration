@@ -26,6 +26,7 @@ import org.jboss.migration.wfly10.config.management.InterfacesManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
+import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -53,6 +54,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     private final ProfilesManagement profilesManagement;
     private final ServerGroupsManagement serverGroupsManagement;
     private final SocketBindingGroupsManagement socketBindingGroupsManagement;
+    private final SystemPropertiesManagement systemPropertiesManagement;
 
     protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, WildFlyServer10 server) {
         super(server);
@@ -74,6 +76,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         this.serverGroupsManagement = new ServerGroupsManagementImpl(null, this);
         this.interfacesManagement = new InterfacesManagementImpl(null, this);
         this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
+        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
     }
 
     @Override
@@ -99,6 +102,9 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
 
     @Override
     protected void stopConfiguration() {
+        if (hostConfig == null) {
+            writeConfiguration();
+        }
         hostController.stop();
         hostController = null;
     }
@@ -129,6 +135,11 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     @Override
     public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
         return socketBindingGroupsManagement;
+    }
+
+    @Override
+    public SystemPropertiesManagement getSystemPropertiesManagement() {
+        return systemPropertiesManagement;
     }
 
     @Override

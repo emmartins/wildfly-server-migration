@@ -31,13 +31,7 @@ import java.nio.file.Paths;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.FAILURE_DESCRIPTION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PATH;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RELATIVE_TO;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
@@ -117,5 +111,17 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     @Override
     public ModelControllerClient getModelControllerClient() {
         return modelControllerClient;
+    }
+
+    protected void writeConfiguration() {
+        // force write of xml config by tmp setting a system property
+        final String systemPropertyName = "org.jboss.migration.tmp."+System.nanoTime();
+        final PathAddress pathAddress = getSystemPropertiesManagement().getResourcePathAddress(systemPropertyName);
+        try {
+            executeManagementOperation(Util.createAddOperation(pathAddress));
+            executeManagementOperation(Util.createRemoveOperation(pathAddress));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
