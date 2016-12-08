@@ -35,7 +35,7 @@ import org.jboss.migration.wfly8.WildFlyServer8;
  * Server migration, from WildFly 8 to WildFly 10.1.
  * @author emmartins
  */
-public class WildFly8ToWildFly10_1ServerMigration implements WildFlyFullServerMigrationProvider10_1 {
+public class WildFly8ToWildFly10_1ServerMigrationProvider implements WildFlyFullServerMigrationProvider10_1 {
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {

@@ -17,47 +17,34 @@
 package org.jboss.migration.eap7.to.eap7;
 
 import org.jboss.migration.eap.EAPServer7_0;
-import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
-import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 
 /**
- * Server migration, from EAP 7.0 to EAP 7.1.
+ * Server migration, from EAP 7.0 to EAP 7.0.
  * @author emmartins
  */
-public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigrationProvider7_1 {
+public class EAP7_0ToEAP7_0ServerMigrationProvider implements EAPServerMigrationProvider7_0 {
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
         final ServerUpdate.Builders serverUpdateBuilders = new ServerUpdate.Builders();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                        .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
-                        .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
-                        .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
                         .subtask(RemoveDeployments.INSTANCE)
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                                .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
-                                .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
-                                .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
                                         .build()
                                 )
                         )

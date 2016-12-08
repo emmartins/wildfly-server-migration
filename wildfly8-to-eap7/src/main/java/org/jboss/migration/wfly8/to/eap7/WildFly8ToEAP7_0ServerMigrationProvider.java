@@ -33,7 +33,7 @@ import org.jboss.migration.wfly8.WildFlyServer8;
  * Server migration, from WildFly 8 to EAP 7.0.
  * @author emmartins
  */
-public class WildFly8ToEAP7_0ServerMigration implements EAPServerMigrationProvider7_0 {
+public class WildFly8ToEAP7_0ServerMigrationProvider implements EAPServerMigrationProvider7_0 {
 
 
     @Override

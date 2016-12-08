@@ -14,3 +14,4 @@
 # limitations under the License.
 #
 org.jboss.migration.eap7.to.eap7.EAP7_0ToEAP7_1ServerMigrationProvider
+org.jboss.migration.eap7.to.eap7.EAP7_1ToEAP7_1ServerMigrationProvider

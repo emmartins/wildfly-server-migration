@@ -14,50 +14,43 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap7.to.eap7;
+package org.jboss.migration.wfly10.to.wfly10;
 
-import org.jboss.migration.eap.EAPServer7_0;
-import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
-import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
+import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
 
 /**
- * Server migration, from EAP 7.0 to EAP 7.1.
+ * Server migration, from WFLY 10.1 to WFLY 10.1.
  * @author emmartins
  */
-public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigrationProvider7_1 {
+public class WildFly10_1ToWildFly10_1ServerMigrationProvider implements WildFlyFullServerMigrationProvider10_1 {
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders serverUpdateBuilders = new ServerUpdate.Builders();
+        final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                        .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
-                        .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
-                        .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
+                        .subtask(WildFly10_1ToWildFly10_1SubsystemUpdates.UNDERTOW)
                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
                         .subtask(RemoveDeployments.INSTANCE)
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                                .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
-                                .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
-                                .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
+                                .subtask(WildFly10_1ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
                                         .build()
                                 )
                         )
@@ -66,7 +59,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
     }
 
     @Override
-    public Class<EAPServer7_0> getSourceType() {
-        return EAPServer7_0.class;
+    public Class<WildFlyFullServer10_1> getSourceType() {
+        return WildFlyFullServer10_1.class;
     }
 }
