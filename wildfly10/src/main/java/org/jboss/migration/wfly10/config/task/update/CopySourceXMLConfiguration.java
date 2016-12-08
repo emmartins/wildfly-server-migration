@@ -19,7 +19,7 @@ package org.jboss.migration.wfly10.config.task.update;
 import org.jboss.migration.core.JBossServer;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.nio.file.Path;
  */
 public class CopySourceXMLConfiguration<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationProvider<ServerPath<S>> {
     @Override
-    public Path getXMLConfiguration(ServerPath<S> source, Path targetConfigDir, WildFly10Server target, ServerMigrationTaskContext context) throws IOException {
+    public Path getXMLConfiguration(ServerPath<S> source, Path targetConfigDir, WildFlyServer10 target, ServerMigrationTaskContext context) throws IOException {
         final Path targetConfigFilePath = targetConfigDir.resolve(source.getPath().getFileName());
         context.getLogger().tracef("Target configuration file is %s", targetConfigFilePath);
         // copy xml from source to target

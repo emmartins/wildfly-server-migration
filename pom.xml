@@ -85,8 +85,10 @@
         <module>eap6-to-eap7</module>
         <module>eap7</module>
         <module>wildfly8</module>
+        <module>wildfly8-to-eap7</module>        
         <module>wildfly8-to-wildfly10</module>        
         <module>wildfly9</module>
+        <module>wildfly9-to-eap7</module>                
         <module>wildfly9-to-wildfly10</module>
         <module>wildfly10</module>
     </modules>
@@ -244,6 +246,12 @@
             
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly8-to-eap7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly8-to-wildfly10</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -254,6 +262,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly9-to-eap7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly9-to-wildfly10</artifactId>

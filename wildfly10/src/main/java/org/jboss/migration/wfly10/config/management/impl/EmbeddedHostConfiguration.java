@@ -27,6 +27,7 @@ import org.jboss.migration.wfly10.config.management.ManagementInterfacesManageme
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.HostMigration;
 
 import java.io.IOException;
@@ -34,9 +35,7 @@ import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MANAGEMENT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
@@ -52,6 +51,7 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
     private final ManagementInterfacesManagement managementInterfacesManagement;
     private final JVMsManagement JVMsManagement;
     private final SocketBindingGroupsManagement socketBindingGroupsManagement;
+    private final SystemPropertiesManagement systemPropertiesManagement;
 
     private final PathAddress hostPathAddress;
 
@@ -70,6 +70,8 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
         this.subsystemsManagement = new SubsystemsManagementImpl(hostPathAddress, this);
         this.JVMsManagement = new JVMsManagementImpl(hostPathAddress, this);
         this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(hostPathAddress, this);
+        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(hostPathAddress, this);
+
         final PathAddress managementCoreServicePathAddress = hostPathAddress.append(pathElement(CORE_SERVICE, MANAGEMENT));
         this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
         this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
@@ -82,6 +84,7 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
 
     @Override
     protected void stopConfiguration() {
+        writeConfiguration();
     }
 
     @Override
@@ -107,6 +110,11 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
     @Override
     public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
         return socketBindingGroupsManagement;
+    }
+
+    @Override
+    public SystemPropertiesManagement getSystemPropertiesManagement() {
+        return systemPropertiesManagement;
     }
 
     public JVMsManagement getJVMsManagement() {

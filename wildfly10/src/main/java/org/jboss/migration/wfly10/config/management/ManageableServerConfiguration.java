@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.management;
 
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -31,10 +31,11 @@ public interface ManageableServerConfiguration {
     void stop();
     boolean isStarted();
     ModelNode executeManagementOperation(ModelNode operation) throws IOException, ManagementOperationException;
-    WildFly10Server getServer();
+    WildFlyServer10 getServer();
     ExtensionsManagement getExtensionsManagement();
     InterfacesManagement getInterfacesManagement();
     SocketBindingGroupsManagement getSocketBindingGroupsManagement();
+    SystemPropertiesManagement getSystemPropertiesManagement();
     Path resolvePath(String path)  throws IOException, ManagementOperationException;
     ModelControllerClient getModelControllerClient();
 }

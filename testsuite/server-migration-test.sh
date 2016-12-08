@@ -17,7 +17,10 @@ else
     echo "### Usage: ./server-migration-test.sh SOURCE_DIST_DIR TARGET_SRC_DIR"
     exit
 fi
-
+if [ ! -d $SOURCE_DIST_DIR ]; then
+    echo "### Source Server base directory $SOURCE_DIST_DIR does not exists!"
+    exit 1;
+fi
 echo "### Source Server base directory: $SOURCE_DIST_DIR"
 
 if [ "x$TARGET_SRC_DIR" != "x" ]; then
@@ -28,7 +31,10 @@ else
     echo "### Usage: ./server-migration-test.sh SOURCE_DIST_DIR TARGET_SRC_DIR"
     exit
 fi
-
+if [ ! -d $TARGET_SRC_DIR ]; then
+    echo "### Target Server base directory $TARGET_SRC_DIR does not exists!"
+    exit 1;
+fi
 echo "### Target Server base directory: $TARGET_SRC_DIR"
 
 for i in "$TARGET_SRC_DIR/dist/target"/*
@@ -38,7 +44,10 @@ do
     break
   fi
 done
-
+if [ ! -d $TARGET_DIST_DIR ]; then
+    echo "### Target Server dist directory $TARGET_DIST_DIR does not exists!"
+    exit 1;
+fi
 echo "### Target Server dist directory: $TARGET_DIST_DIR"
 
 echo "### Preparing JBoss Server Migration Tool binary..."

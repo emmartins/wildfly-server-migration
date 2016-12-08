@@ -169,8 +169,8 @@ public class SupportedExtensions {
             .addSupportedSubsystem(SubsystemNames.IIOP_OPENJDK)
             .build();
 
-    public static List<Extension> all() {
-        final List<Extension> result = new ArrayList<>();
+    public static Set<Extension> all() {
+        final Set<Extension> result = new HashSet<>();
         result.add(CONNECTOR);
         result.add(DEPLOYMENT_SCANNER);
         result.add(EE);
@@ -206,7 +206,7 @@ public class SupportedExtensions {
         result.add(UNDERTOW);
         result.add(WEB);
         result.add(WELD);
-        return Collections.unmodifiableList(result);
+        return Collections.unmodifiableSet(result);
     }
 
     public static List<Extension> allExcept(String... extensionNames) {

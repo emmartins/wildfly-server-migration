@@ -21,7 +21,7 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 
@@ -31,23 +31,17 @@ import java.nio.file.Paths;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.FAILURE_DESCRIPTION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PATH;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RELATIVE_TO;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
  */
 public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
 
-    private final WildFly10Server server;
+    private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
 
-    protected AbstractManageableServerConfiguration(WildFly10Server server) {
+    protected AbstractManageableServerConfiguration(WildFlyServer10 server) {
         this.server = server;
     }
 
@@ -78,7 +72,7 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     }
 
     @Override
-    public WildFly10Server getServer() {
+    public WildFlyServer10 getServer() {
         return server;
     }
 
@@ -117,5 +111,17 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     @Override
     public ModelControllerClient getModelControllerClient() {
         return modelControllerClient;
+    }
+
+    protected void writeConfiguration() {
+        // force write of xml config by tmp setting a system property
+        final String systemPropertyName = "org.jboss.migration.tmp."+System.nanoTime();
+        final PathAddress pathAddress = getSystemPropertiesManagement().getResourcePathAddress(systemPropertyName);
+        try {
+            executeManagementOperation(Util.createAddOperation(pathAddress));
+            executeManagementOperation(Util.createRemoveOperation(pathAddress));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

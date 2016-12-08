@@ -17,7 +17,7 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.migration.wfly10.WildFly10Server;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
@@ -26,6 +26,7 @@ import org.jboss.migration.wfly10.config.management.InterfacesManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
+import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -53,8 +54,9 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     private final ProfilesManagement profilesManagement;
     private final ServerGroupsManagement serverGroupsManagement;
     private final SocketBindingGroupsManagement socketBindingGroupsManagement;
+    private final SystemPropertiesManagement systemPropertiesManagement;
 
-    protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, WildFly10Server server) {
+    protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, WildFlyServer10 server) {
         super(server);
         this.domainConfig = domainConfig;
         this.extensionsManagement = new ExtensionsManagementImpl(null, this) {
@@ -74,6 +76,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         this.serverGroupsManagement = new ServerGroupsManagementImpl(null, this);
         this.interfacesManagement = new InterfacesManagementImpl(null, this);
         this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
+        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
     }
 
     @Override
@@ -99,6 +102,9 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
 
     @Override
     protected void stopConfiguration() {
+        if (hostConfig == null) {
+            writeConfiguration();
+        }
         hostController.stop();
         hostController = null;
     }
@@ -132,20 +138,25 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     }
 
     @Override
+    public SystemPropertiesManagement getSystemPropertiesManagement() {
+        return systemPropertiesManagement;
+    }
+
+    @Override
     public ServerGroupsManagement getServerGroupsManagement() {
         return serverGroupsManagement;
     }
 
     public static class DomainConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
-        public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFly10Server server) {
+        public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
             return new EmbeddedHostControllerConfiguration(configFile.getFileName().toString(), null, server);
         }
     }
 
     public static class HostConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
-        public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFly10Server server) {
+        public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
             return new EmbeddedHostControllerConfiguration(null, configFile.getFileName().toString(), server);
         }
     }
