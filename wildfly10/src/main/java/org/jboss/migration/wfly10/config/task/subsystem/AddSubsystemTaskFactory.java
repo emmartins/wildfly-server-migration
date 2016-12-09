@@ -24,6 +24,7 @@ import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
+import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
@@ -78,6 +79,12 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
         return getTask(source,
                 SubtaskExecutorAdapters.of(source, configuration, addExtensionSubtask),
                 SubtaskExecutorAdapters.of(source, configuration, addSubsystemConfigSubtask));
+    }
+
+    public ServerMigrationTask getTask(S source, SubsystemsManagement subsystemsManagement) throws Exception {
+        return getTask(source,
+                SubtaskExecutorAdapters.of(source, subsystemsManagement.getServerConfiguration(), addExtensionSubtask),
+                SubtaskExecutorAdapters.of(source, subsystemsManagement, addSubsystemConfigSubtask));
     }
 
     private ServerMigrationTask getTask(S source, ParentServerMigrationTask.SubtaskExecutor addExtensionSubtask, ParentServerMigrationTask.SubtaskExecutor addSubsystemSubtask) throws Exception {

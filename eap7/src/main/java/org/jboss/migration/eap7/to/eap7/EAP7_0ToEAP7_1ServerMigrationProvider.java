@@ -25,6 +25,7 @@ import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRe
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
 
 /**
  * Server migration, from EAP 7.0 to EAP 7.1.
@@ -51,6 +52,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
                                 .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
+                                .subtask(AddLoadBalancerProfile.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )

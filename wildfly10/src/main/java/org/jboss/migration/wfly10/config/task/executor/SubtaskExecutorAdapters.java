@@ -25,6 +25,7 @@ import org.jboss.migration.wfly10.config.management.ManageableServerConfiguratio
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
+import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 
 /**
  * @author emmartins
@@ -61,6 +62,15 @@ public class SubtaskExecutorAdapters {
     }
 
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final DeploymentsManagement resourcesManagement, final DeploymentsManagementSubtaskExecutor<S> subtaskExecutor) {
+        return new ParentServerMigrationTask.SubtaskExecutor() {
+            @Override
+            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+                subtaskExecutor.executeSubtasks(source, resourcesManagement, context);
+            }
+        };
+    }
+
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SubsystemsManagement resourcesManagement, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
