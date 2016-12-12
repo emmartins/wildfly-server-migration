@@ -133,7 +133,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
         private void copyPropertiesFile(String propertiesName, String securityRealmName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmsManagement securityRealmsManagement, ServerMigrationTaskContext context) throws IOException {
             final Server sourceServer = source.getServer();
             final Server targetServer = securityRealmsManagement.getServerConfiguration().getServer();
-            final ModelNode properties = securityRealmConfig.get(propertiesName);
+            final ModelNode properties = securityRealmConfig.get(propertiesName, PROPERTIES);
             if (properties.hasDefined(PATH)) {
                 final String path = properties.get(PATH).asString();
                 context.getLogger().debugf("Properties path: %s", path);
@@ -145,10 +145,10 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                 if (relativeTo == null) {
                     // path is absolute, if in source server base dir then relativize and copy to target server base dir, and update the config with the new path
                     final Path sourcePath = Paths.get(path);
-                    context.getLogger().infof("Source Properties file path: %s", sourcePath);
+                    context.getLogger().debugf("Source Properties file path: %s", sourcePath);
                     if (sourcePath.startsWith(sourceServer.getBaseDir())) {
                         final Path targetPath = sourceServer.getBaseDir().resolve(targetServer.getBaseDir().relativize(sourcePath));
-                        context.getLogger().infof("Target Properties file path: %s", targetPath);
+                        context.getLogger().debugf("Target Properties file path: %s", targetPath);
                         context.getServerMigrationContext().getMigrationFiles().copy(sourcePath, targetPath);
                         final PathAddress pathAddress = securityRealmsManagement.getResourcePathAddress(securityRealmName).append(PathElement.pathElement(propertiesName, PROPERTIES));
                         final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
@@ -156,7 +156,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                         op.get(VALUE).set(targetPath.toString());
                         securityRealmsManagement.getServerConfiguration().executeManagementOperation(op);
                     } else {
-                        context.getLogger().infof("Source Properties file path is not in source server base dir, skipping file copy");
+                        context.getLogger().debugf("Source Properties file path is not in source server base dir, skipping file copy");
                     }
                 } else {
                     // path is relative to relative_to
@@ -165,17 +165,17 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                         throw new IOException("failed to resolve source path "+relativeTo);
                     }
                     final Path sourcePath = resolvedSourcePath.normalize().resolve(path);
-                    context.getLogger().infof("Source Properties file path: %s", sourcePath);
+                    context.getLogger().debugf("Source Properties file path: %s", sourcePath);
                     final Path resolvedTargetPath = targetServer.resolvePath(relativeTo);
                     if (resolvedTargetPath == null) {
                         throw new IOException("failed to resolve target path "+relativeTo);
                     }
                     final Path targetPath = resolvedTargetPath.normalize().resolve(path);
-                    context.getLogger().infof("Target Properties file path: %s", targetPath);
+                    context.getLogger().debugf("Target Properties file path: %s", targetPath);
                     if (!sourcePath.equals(targetPath)) {
                         context.getServerMigrationContext().getMigrationFiles().copy(sourcePath, targetPath);
                     } else {
-                        context.getLogger().infof("Resolved paths for Source and Target Properties files is the same.");
+                        context.getLogger().debugf("Resolved paths for Source and Target Properties files is the same.");
                     }
                 }
             }
