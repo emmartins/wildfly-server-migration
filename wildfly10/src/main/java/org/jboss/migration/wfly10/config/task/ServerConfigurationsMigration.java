@@ -95,6 +95,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
                 }
             } else {
                 taskContext.getLogger().infof("No source's %s configurations found.", configFileMigration.getConfigType());
+                return ServerMigrationTaskResult.SKIPPED;
             }
 
             if (serverMigrationContext.isInteractive()) {
