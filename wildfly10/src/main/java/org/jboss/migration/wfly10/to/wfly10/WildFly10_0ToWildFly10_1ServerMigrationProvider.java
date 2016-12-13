@@ -52,6 +52,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
                                 .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.INFINISPAN)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
+                                .subtask(AddLoadBalancerProfile.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )

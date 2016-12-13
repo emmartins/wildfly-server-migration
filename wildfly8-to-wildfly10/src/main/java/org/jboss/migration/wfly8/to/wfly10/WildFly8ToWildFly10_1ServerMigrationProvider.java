@@ -29,6 +29,7 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
 import org.jboss.migration.wfly8.WildFlyServer8;
 
 /**
@@ -72,6 +73,7 @@ public class WildFly8ToWildFly10_1ServerMigrationProvider implements WildFlyFull
                                 .subtask(AddPrivateInterface.INSTANCE)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
                                 .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
+                                .subtask(AddLoadBalancerProfile.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()

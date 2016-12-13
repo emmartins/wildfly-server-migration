@@ -17,6 +17,7 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAPSubsystemUpdates7_1;
@@ -87,6 +88,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(AddPrivateInterface.INSTANCE)
                                 .subtask(AddSocketBindingPortExpressions.INSTANCE)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
+                                .subtask(AddLoadBalancerProfile.INSTANCE)
                                 .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
