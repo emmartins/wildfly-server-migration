@@ -18,25 +18,25 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
  * @author emmartins
  */
-public class ManageableServerConfigurationParentTaskFactory<S, T extends ManageableServerConfiguration> implements ManageableServerConfigurationTaskFactory<S, T> {
+public class ParentManageableServerConfigurationTaskFactory<S, T extends ManageableServerConfiguration> implements ManageableServerConfigurationTaskFactory<S, T> {
 
     private final List<ManageableServerConfigurationTaskFactory<S, T>> subtaskFactories;
     private final ServerMigrationTaskName taskName;
     private String skipTaskPropertyName;
     private ParentServerMigrationTask.EventListener eventListener;
 
-    protected ManageableServerConfigurationParentTaskFactory(Builder<S, T> builder) {
+    protected ParentManageableServerConfigurationTaskFactory(Builder<S, T> builder) {
         this.subtaskFactories = builder.taskFactories.getFactories();
         this.taskName = builder.taskName;
         this.skipTaskPropertyName = builder.skipTaskPropertyName;
@@ -51,7 +51,15 @@ public class ManageableServerConfigurationParentTaskFactory<S, T extends Managea
             taskBuilder.eventListener(eventListener);
         }
         for (final ManageableServerConfigurationTaskFactory<S, T> subtaskFactory : subtaskFactories) {
-            taskBuilder.subtask(subtaskFactory.getTask(source, configuration));
+            taskBuilder.subtask(new ParentServerMigrationTask.SubtaskExecutor() {
+                @Override
+                public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+                    final ServerMigrationTask subtask = subtaskFactory.getTask(source, configuration);
+                    if (subtask != null) {
+                        context.execute(subtask);
+                    }
+                }
+            });
         }
         ServerMigrationTask task = taskBuilder.build();
         if (skipTaskPropertyName != null) {
@@ -77,11 +85,6 @@ public class ManageableServerConfigurationParentTaskFactory<S, T extends Managea
             return this;
         }
 
-        public Builder<S, T> subtasks(Collection<ManageableServerConfigurationTaskFactory<S, T>> subtaskFactories) {
-            taskFactories.addAll(subtaskFactories);
-            return this;
-        }
-
         public Builder<S, T> eventListener(ParentServerMigrationTask.EventListener eventListener) {
             this.eventListener = eventListener;
             return this;
@@ -92,8 +95,8 @@ public class ManageableServerConfigurationParentTaskFactory<S, T extends Managea
             return this;
         }
 
-        public ManageableServerConfigurationParentTaskFactory<S, T> build() {
-            return new ManageableServerConfigurationParentTaskFactory(this);
+        public ParentManageableServerConfigurationTaskFactory<S, T> build() {
+            return new ParentManageableServerConfigurationTaskFactory(this);
         }
     }
 }
