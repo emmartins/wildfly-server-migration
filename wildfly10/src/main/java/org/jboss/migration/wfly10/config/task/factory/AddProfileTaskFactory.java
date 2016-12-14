@@ -24,105 +24,77 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileManagement;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author emmartins
  */
-public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<S> {
+public class AddProfileTaskFactory<S> extends ParentManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> {
 
-    private final String profileName;
-    private final ServerMigrationTaskName taskName;
-    private final List<ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>> subtasks;
-    private final String skipTaskPropertyName;
-    private final ParentServerMigrationTask.EventListener eventListener;
-
-    protected AddProfileTaskFactory(Builder<S> builder) {
-        this.profileName = builder.profileName;
-        this.taskName = builder.taskName != null ? builder.taskName : new ServerMigrationTaskName.Builder("add-profile-"+profileName).build();
-        this.subtasks = Collections.unmodifiableList(builder.subtasks);
-        this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
-        this.eventListener = builder.eventListener != null ? builder.eventListener : new ParentServerMigrationTask.EventListener() {
-            @Override
-            public void started(ServerMigrationTaskContext context) {
-                context.getLogger().infof("Adding profile %s...", profileName);
-            }
-            @Override
-            public void done(ServerMigrationTaskContext context) {
-                context.getLogger().infof("Profile %s added.", profileName);
-            }
-        };
+    public AddProfileTaskFactory(Builder<S> builder) {
+        super(builder);
     }
 
-    @Override
-    public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
-                .eventListener(eventListener)
-                .subtask(new CreateProfileTask(profileName, configuration));
-        for (ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> subtaskFactory : subtasks) {
-            final ServerMigrationTask subtask = subtaskFactory.getTask(source, configuration);
-            if (subtask != null) {
-                taskBuilder.subtask(subtask);
-            }
-        }
-        final ServerMigrationTask task = taskBuilder.build();
-        return new SkippableByEnvServerMigrationTask(task, skipTaskPropertyName);
-    }
-
-    public static class CreateProfileTask implements ServerMigrationTask {
-        private final HostControllerConfiguration configuration;
+    public static class CreateProfileTask<S> implements ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> {
         private final String profileName;
         private final ServerMigrationTaskName taskName;
 
-        public CreateProfileTask(String profileName, HostControllerConfiguration configuration) {
-            this.configuration = configuration;
+        public CreateProfileTask(String profileName) {
             this.profileName = profileName;
             this.taskName = new ServerMigrationTaskName.Builder("create-profile").addAttribute("name", profileName).build();
         }
 
         @Override
-        public ServerMigrationTaskName getName() {
-            return taskName;
-        }
+        public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
+            return new ServerMigrationTask() {
+                @Override
+                public ServerMigrationTaskName getName() {
+                    return taskName;
+                }
 
-        @Override
-        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-            final PathAddress pathAddress = configuration.getProfilesManagement().getResourcePathAddress(profileName);
-            final ModelNode op = Util.createAddOperation(pathAddress);
-            configuration.executeManagementOperation(op);
-            context.getLogger().infof("Profile %s created.", profileName);
-            return ServerMigrationTaskResult.SUCCESS;
+                @Override
+                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                    final PathAddress pathAddress = configuration.getProfilesManagement().getResourcePathAddress(profileName);
+                    final ModelNode op = Util.createAddOperation(pathAddress);
+                    configuration.executeManagementOperation(op);
+                    context.getLogger().infof("Profile %s created.", profileName);
+                    return ServerMigrationTaskResult.SUCCESS;
+                }
+            };
         }
     }
 
-    public static class Builder<S> {
+    public static class Builder<S> extends ParentManageableServerConfigurationTaskFactory.Builder<S, HostControllerConfiguration>{
 
-        private ServerMigrationTaskName taskName;
         private final String profileName;
-        private final List<ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>> subtasks;
-        private String skipTaskPropertyName;
-        private ParentServerMigrationTask.EventListener eventListener;
 
-        public Builder(String profileName) {
+        public Builder(final String profileName) {
+            super(new ServerMigrationTaskName.Builder("add-profile-"+profileName).build());
             this.profileName = profileName;
-            this.subtasks = new ArrayList<>();
+            eventListener(new ParentServerMigrationTask.EventListener() {
+                @Override
+                public void started(ServerMigrationTaskContext context) {
+                    context.getLogger().infof("Adding profile %s...", profileName);
+                }
+                @Override
+                public void done(ServerMigrationTaskContext context) {
+                    context.getLogger().infof("Profile %s added.", profileName);
+                }
+            });
+            skipTaskPropertyName(getTaskName().getName()+".skip");
+            subtask(new CreateProfileTask(profileName));
         }
 
+        @Override
         public Builder<S> eventListener(ParentServerMigrationTask.EventListener eventListener) {
-            this.eventListener = eventListener;
-            return this;
+            return (Builder<S>) super.eventListener(eventListener);
         }
 
+        @Override
         public Builder<S> skipTaskPropertyName(String skipTaskPropertyName) {
-            this.skipTaskPropertyName = skipTaskPropertyName;
-            return this;
+            return (Builder<S>) super.skipTaskPropertyName(skipTaskPropertyName);
         }
 
         public Builder<S> subtask(final AddSubsystemTaskFactory<S> subtaskFactory) {
@@ -138,9 +110,9 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
             });
         }
 
+        @Override
         public Builder<S> subtask(ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> subtaskFactory) {
-            subtasks.add(subtaskFactory);
-            return this;
+            return (Builder<S>) super.subtask(subtaskFactory);
         }
 
         public Builder<S> subtask(final DomainConfigurationTaskFactory<S> subtaskFactory) {
@@ -150,11 +122,6 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
                     return subtaskFactory.getTask(source, configuration);
                 }
             });
-        }
-
-        public Builder<S> taskName(ServerMigrationTaskName taskName) {
-            this.taskName = taskName;
-            return this;
         }
 
         public AddProfileTaskFactory<S> build() {
