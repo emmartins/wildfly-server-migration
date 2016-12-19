@@ -73,7 +73,8 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
     }
 
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .skipTaskPropertyName(TASK_NAME_NAME + ".skip")
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
@@ -86,7 +87,6 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
                 })
                 .subtask(subtaskExecutor)
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     static class SetUnsecureInterfaceInetAddress<S> implements InterfacesManagementSubtaskExecutor<S> {

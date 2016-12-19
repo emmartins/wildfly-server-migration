@@ -28,7 +28,6 @@ import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -71,7 +70,8 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
     }
 
     public ServerMigrationTask getTask(ServerPath<S> source, SecurityRealmsManagement resourcesManagement) throws Exception {
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .skipTaskPropertyName(TASK_NAME + ".skip")
                 .subtask(SubtaskExecutorAdapters.of(source, resourcesManagement, new SubtaskExecutor<S>()))
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
@@ -82,8 +82,8 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                     public void done(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Security realms migration done.");
                     }
-                });
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), TASK_NAME + ".skip");
+                })
+                .build();
     }
 
     public static class SubtaskExecutor<S extends JBossServer<S>> implements SecurityRealmsManagementSubtaskExecutor<ServerPath<S>> {

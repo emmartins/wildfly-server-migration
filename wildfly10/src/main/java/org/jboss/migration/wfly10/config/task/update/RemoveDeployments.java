@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -55,7 +54,8 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
     }
 
     protected ServerMigrationTask getTask(S source, DeploymentsManagement deploymentsManagement) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .skipTaskPropertyName(TASK_NAME_NAME + ".skip")
                 .subtask(SubtaskExecutorAdapters.of(source, deploymentsManagement, new SubtaskExecutor()))
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
@@ -68,7 +68,6 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
                     }
                 })
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     public static class SubtaskExecutor<S> implements DeploymentsManagementSubtaskExecutor<S> {

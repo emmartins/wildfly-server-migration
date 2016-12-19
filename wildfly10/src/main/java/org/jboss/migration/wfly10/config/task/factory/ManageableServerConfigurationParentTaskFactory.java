@@ -19,7 +19,6 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
@@ -45,19 +44,17 @@ public class ManageableServerConfigurationParentTaskFactory<S, T extends Managea
 
     @Override
     public ServerMigrationTask getTask(final S source, final T configuration) throws Exception {
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
-                .succeedOnlyIfHasSuccessfulSubtasks();
+        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName);
+        if (skipTaskPropertyName != null) {
+            taskBuilder.skipTaskPropertyName(skipTaskPropertyName);
+        }
         if (eventListener != null) {
             taskBuilder.eventListener(eventListener);
         }
         for (final ManageableServerConfigurationTaskFactory<S, T> subtaskFactory : subtaskFactories) {
             taskBuilder.subtask(subtaskFactory.getTask(source, configuration));
         }
-        ServerMigrationTask task = taskBuilder.build();
-        if (skipTaskPropertyName != null) {
-            task = new SkippableByEnvServerMigrationTask(task, skipTaskPropertyName);
-        }
-        return task;
+        return taskBuilder.build();
     }
 
     public static class Builder<S, T extends ManageableServerConfiguration> {

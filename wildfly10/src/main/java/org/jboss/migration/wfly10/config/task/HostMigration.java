@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.HostsManagement;
@@ -85,7 +84,8 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
     @Override
     public ServerMigrationTask getTask(final S source, final HostsManagement hostsManagement) throws Exception {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(HOSTS).build();
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
+        return new ParentServerMigrationTask.Builder(taskName)
+                .skipTaskPropertyName(taskName.getName()+".skip")
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
@@ -106,8 +106,8 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
                             }
                         }
                     }
-                });
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), taskName.getName()+".skip");
+                })
+                .build();
     }
 
     /**
@@ -149,83 +149,6 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
             });
         }
 
-        /*
-        public Builder<S> subsystems(final SubsystemsMigration<S> resourcesMigration) {
-            return subtask(new SubtaskFactory<S>() {
-                @Override
-                public void addSubtasks(S source, HostConfiguration configuration, ServerMigrationTasks subtasks) throws Exception {
-                    final ServerMigrationTask subtask = resourcesMigration.getSubsystemsManagementTask(source, configuration.getSubsystemsManagement());
-                    if (subtask != null) {
-                        subtasks.add(subtask);
-                    }
-                }
-            });
-        }
-
-        public Builder<S> securityRealms(final SecurityRealmsMigration<S> resourcesMigration) {
-            return subtask(new SubtaskFactory<S>() {
-                @Override
-                public void addSubtasks(S source, HostConfiguration configuration, ServerMigrationTasks subtasks) throws Exception {
-                    final ServerMigrationTask subtask = resourcesMigration.getTask(source, configuration.getSecurityRealmsManagement());
-                    if (subtask != null) {
-                        subtasks.add(subtask);
-                    }
-                }
-            });
-        }
-
-        public Builder<S> securityRealms(final SecurityRealmsMigration.SubtaskFactory<S> subtaskFactory) {
-            return securityRealms(new SecurityRealmsMigration.Builder<S>().subtask(subtaskFactory).build());
-        }
-
-        public Builder<S> interfaces(final InterfacesMigration<S> resourcesMigration) {
-            return subtask(new SubtaskFactory<S>() {
-                @Override
-                public void addSubtasks(S source, HostConfiguration configuration, ServerMigrationTasks subtasks) throws Exception {
-                    final ServerMigrationTask subtask = resourcesMigration.getTask(source, configuration.getInterfacesManagement());
-                    if (subtask != null) {
-                        subtasks.add(subtask);
-                    }
-                }
-            });
-        }
-
-        public Builder<S> interfaces(final InterfacesMigration.SubtaskFactory<S> subtaskFactory) {
-            return interfaces(new InterfacesMigration.Builder<S>().subtask(subtaskFactory).build());
-        }
-
-        public Builder<S> managementInterfaces(final ManagementInterfacesMigration<S> resourcesMigration) {
-            return subtask(new SubtaskFactory<S>() {
-                @Override
-                public void addSubtasks(S source, HostConfiguration configuration, ServerMigrationTasks subtasks) throws Exception {
-                    final ServerMigrationTask subtask = resourcesMigration.getTask(source, configuration.getManagementInterfacesManagement());
-                    if (subtask != null) {
-                        subtasks.add(subtask);
-                    }
-                }
-            });
-        }
-
-        public Builder<S> managementInterfaces(final ManagementInterfacesMigration.SubtaskFactory<S> subtaskFactory) {
-            return managementInterfaces(new ManagementInterfacesMigration.Builder<S>().subtask(subtaskFactory).build());
-        }
-
-        public Builder<S> jvms(final JVMsMigration<S> resourcesMigration) {
-            return subtask(new SubtaskFactory<S>() {
-                @Override
-                public void addSubtasks(S source, HostConfiguration configuration, ServerMigrationTasks subtasks) throws Exception {
-                    final ServerMigrationTask subtask = resourcesMigration.getTask(source, configuration.getJVMsManagement());
-                    if (subtask != null) {
-                        subtasks.add(subtask);
-                    }
-                }
-            });
-        }
-
-        public Builder<S> jvms(final JVMsMigration.SubtaskFactory<S> subtaskFactory) {
-            return jvms(new JVMsMigration.Builder<S>().subtask(subtaskFactory).build());
-        }
-*/
         public HostMigration<S> build() {
             return new HostMigration(this);
         }

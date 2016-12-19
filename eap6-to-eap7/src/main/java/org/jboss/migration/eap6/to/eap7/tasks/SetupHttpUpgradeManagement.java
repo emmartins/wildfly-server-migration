@@ -78,7 +78,8 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
     }
 
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .skipTaskPropertyName(TASK_NAME_NAME + ".skip")
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
@@ -91,7 +92,6 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
                 })
                 .subtask(subtaskExecutor)
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     static class SetManagementInterfacesHttpUpgradeEnabled<S> implements ManagementInterfacesManagementSubtaskExecutor<S> {

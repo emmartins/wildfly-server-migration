@@ -24,7 +24,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.JVMsManagement;
@@ -53,7 +52,8 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
     }
 
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .skipTaskPropertyName(TASK_NAME + ".skip")
                 .subtask(subtaskExecutor)
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
@@ -66,7 +66,6 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
                     }
                 })
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME + ".skip");
     }
 
     protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final JVMsManagement jvMsManagement) throws Exception {

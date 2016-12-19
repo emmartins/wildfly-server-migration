@@ -24,7 +24,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileManagement;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
@@ -64,6 +63,7 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
     @Override
     public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
         final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
+                .skipTaskPropertyName(skipTaskPropertyName)
                 .eventListener(eventListener)
                 .subtask(new CreateProfileTask(profileName, configuration));
         for (ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> subtaskFactory : subtasks) {
@@ -72,8 +72,7 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
                 taskBuilder.subtask(subtask);
             }
         }
-        final ServerMigrationTask task = taskBuilder.build();
-        return new SkippableByEnvServerMigrationTask(task, skipTaskPropertyName);
+        return taskBuilder.build();
     }
 
     public static class CreateProfileTask implements ServerMigrationTask {

@@ -59,7 +59,8 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
 
     @Override
     public ServerMigrationTask getTask(S source, ManageableServerConfiguration configuration) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(new ServerMigrationTaskName.Builder(TASK_NAME).build())
+        return new ParentServerMigrationTask.Builder(new ServerMigrationTaskName.Builder(TASK_NAME).build())
+                .skipTaskPropertyName(TASK_NAME + ".skip")
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
@@ -73,7 +74,6 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
                 .subtask(SubtaskExecutorAdapters.of(source, configuration, new AddInterface()))
                 .subtask(SubtaskExecutorAdapters.of(source, configuration, new UpdateSocketBindingGroups()))
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME + ".skip");
     }
 
     static class AddInterface<S> implements InterfacesManagementSubtaskExecutor<S> {
@@ -131,14 +131,15 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
 
         @Override
         public void executeSubtasks(S source, SocketBindingGroupsManagement socketBindingGroupsManagement, ServerMigrationTaskContext context) throws Exception {
-            final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(SUBTASK_NAME);
+            final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(SUBTASK_NAME)
+                    .skipTaskPropertyName(TASK_NAME + "." + SUBTASK_NAME + ".skip");
             for (final String socketBindingGroupName : socketBindingGroupsManagement.getResourceNames()) {
                 final ServerMigrationTask subtask = getResourceTask(source, socketBindingGroupsManagement.getSocketBindingGroupManagement(socketBindingGroupName));
                 if (subtask != null) {
                     taskBuilder.subtask(subtask);
                 }
             }
-            context.execute(new SkippableByEnvServerMigrationTask(taskBuilder.build(), TASK_NAME + "." + SUBTASK_NAME + ".skip"));
+            context.execute(taskBuilder.build());
         }
 
         public ServerMigrationTask getResourceTask(S source, final SocketBindingGroupManagement socketBindingGroupManagement) throws Exception {

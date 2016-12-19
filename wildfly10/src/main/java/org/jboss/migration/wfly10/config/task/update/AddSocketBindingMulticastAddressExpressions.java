@@ -56,7 +56,8 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
 
     @Override
     public ServerMigrationTask getTask(S source, ManageableServerConfiguration configuration) throws Exception {
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .skipTaskPropertyName(TASK_NAME + ".skip")
                 .subtask(SubtaskExecutorAdapters.of(source, configuration, new SubtaskExecutor<S>()))
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
@@ -68,8 +69,8 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
                     public void done(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Socket binding's multicast address expressions added.");
                     }
-                });
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), TASK_NAME + ".skip");
+                })
+                .build();
     }
 
     public static class SubtaskExecutor<S> implements SocketBindingGroupsManagementSubtaskExecutor<S> {

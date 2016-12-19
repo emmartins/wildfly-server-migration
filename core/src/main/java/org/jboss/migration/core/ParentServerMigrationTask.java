@@ -30,12 +30,14 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
     private final EventListener eventListener;
     private final List<SubtaskExecutor> subtasks;
     private final boolean succeedOnlyIfHasSuccessfulSubtasks;
+    private String skipTaskPropertyName;
 
     public ParentServerMigrationTask(Builder builder) {
         this.name = builder.name;
         this.eventListener = builder.eventListener;
         this.subtasks = builder.subtasks != null ? Collections.unmodifiableList(builder.subtasks) : Collections.<SubtaskExecutor>emptyList();
         this.succeedOnlyIfHasSuccessfulSubtasks = builder.succeedOnlyIfHasSuccessfulSubtasks;
+        this.skipTaskPropertyName = builder.skipTaskPropertyName;
     }
 
     @Override
@@ -45,6 +47,9 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
 
     @Override
     public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+        if (skipTaskPropertyName != null && context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(skipTaskPropertyName, Boolean.TRUE)) {
+            return ServerMigrationTaskResult.SKIPPED;
+        }
         if (eventListener != null) {
             eventListener.started(context);
         }
@@ -65,44 +70,52 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
     /**
      * The parent task builder.
      */
-    public static class Builder {
+    public static class Builder<T extends Builder> {
 
         private final ServerMigrationTaskName name;
         private EventListener eventListener;
         private final List<SubtaskExecutor> subtasks;
         private boolean succeedOnlyIfHasSuccessfulSubtasks = true;
+        private String skipTaskPropertyName;
 
         public Builder(ServerMigrationTaskName name) {
             this.name = name;
             this.subtasks = new ArrayList<>();
         }
 
-        public Builder subtask(final ServerMigrationTask subtask) {
+        public Builder<T> subtask(final ServerMigrationTask subtask) {
             return subtask(new SubtaskExecutor() {
                 @Override
                 public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
-                    context.execute(subtask);
+                    if (subtask != null) {
+                        context.execute(subtask);
+                    }
                 }
             });
         }
 
-        public Builder subtask(SubtaskExecutor subtask) {
+        public Builder<T> subtask(SubtaskExecutor subtask) {
             subtasks.add(subtask);
             return this;
         }
 
-        public Builder succeedOnlyIfHasSuccessfulSubtasks() {
+        public Builder<T> succeedOnlyIfHasSuccessfulSubtasks() {
             succeedOnlyIfHasSuccessfulSubtasks = true;
             return this;
         }
 
-        public Builder succeedAlways() {
+        public Builder<T> succeedAlways() {
             succeedOnlyIfHasSuccessfulSubtasks = false;
             return this;
         }
 
-        public Builder eventListener(EventListener eventListener) {
+        public Builder<T> eventListener(EventListener eventListener) {
             this.eventListener = eventListener;
+            return this;
+        }
+
+        public Builder<T> skipTaskPropertyName(String skipTaskPropertyName) {
+            this.skipTaskPropertyName = skipTaskPropertyName;
             return this;
         }
 

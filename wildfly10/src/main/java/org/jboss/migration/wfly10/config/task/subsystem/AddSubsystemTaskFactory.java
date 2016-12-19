@@ -20,7 +20,6 @@ import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -89,12 +88,13 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
 
     private ServerMigrationTask getTask(S source, ParentServerMigrationTask.SubtaskExecutor addExtensionSubtask, ParentServerMigrationTask.SubtaskExecutor addSubsystemSubtask) throws Exception {
         final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
+                .skipTaskPropertyName(skipTaskPropertyName)
                 .subtask(addExtensionSubtask)
                 .subtask(addSubsystemSubtask);
         if (eventListener != null) {
             taskBuilder.eventListener(eventListener);
         }
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), skipTaskPropertyName);
+        return taskBuilder.build();
     }
 
     public static class Builder<S> {
