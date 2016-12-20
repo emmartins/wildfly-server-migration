@@ -20,7 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.JBossServer;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;

@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.core;
 
+package org.jboss.migration.core.jboss;
+
+import org.jboss.migration.core.AbstractServer;
+import org.jboss.migration.core.ProductInfo;
+import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.util.xml.SimpleXMLFileMatcher;
 import org.jboss.migration.core.util.xml.XMLFileMatcher;
 import org.jboss.migration.core.util.xml.XMLFiles;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An abstract JBoss {@link Server} impl, which is usable only as migration source.
+ * An abstract JBoss {@link org.jboss.migration.core.Server} impl, which is usable only as migration source.
  * @author emmartins
  */
 public abstract class JBossServer<S extends JBossServer> extends AbstractServer {
@@ -58,26 +65,27 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
     private final Path standaloneServerDir;
     private final Path standaloneConfigDir;
     private final Map<String, Path> pathResolver;
+    private final Modules modules;
 
     public JBossServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
         super(migrationName, productInfo, baseDir, migrationEnvironment);
         // build server paths from env
-        Path domainBaseDir = FileSystems.getDefault().getPath(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_BASE_DIR), "domain"));
+        Path domainBaseDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_BASE_DIR), "domain"));
         if (!domainBaseDir.isAbsolute()) {
             domainBaseDir = baseDir.resolve(domainBaseDir);
         }
         this.domainBaseDir = domainBaseDir;
-        Path domainConfigDir = FileSystems.getDefault().getPath(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_CONFIG_DIR), "configuration"));
+        Path domainConfigDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_CONFIG_DIR), "configuration"));
         if (!domainConfigDir.isAbsolute()) {
             domainConfigDir = domainBaseDir.resolve(domainConfigDir);
         }
         this.domainConfigDir = domainConfigDir;
-        Path standaloneServerDir = FileSystems.getDefault().getPath(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_SERVER_DIR), "standalone"));
+        Path standaloneServerDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_SERVER_DIR), "standalone"));
         if (!standaloneServerDir.isAbsolute()) {
             standaloneServerDir = baseDir.resolve(standaloneServerDir);
         }
         this.standaloneServerDir = standaloneServerDir;
-        Path standaloneConfigDir = FileSystems.getDefault().getPath(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_CONFIG_DIR), "configuration"));
+        Path standaloneConfigDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_CONFIG_DIR), "configuration"));
         if (!standaloneConfigDir.isAbsolute()) {
             standaloneConfigDir = standaloneServerDir.resolve(standaloneConfigDir);
         }
@@ -90,6 +98,7 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
         this.pathResolver.put("jboss.domain.base.dir", domainBaseDir);
         this.pathResolver.put("jboss.domain.config.dir", domainConfigDir);
         this.pathResolver.put("jboss.domain.data.dir", domainBaseDir.resolve("data"));
+        this.modules = new Modules(baseDir);
     }
 
     protected String getFullEnvironmentPropertyName(String propertyName) {
@@ -103,7 +112,7 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
             final List<String> envConfigs = getMigrationEnvironment().getPropertyAsList(fullEnvPropertyName);
             if (envConfigs != null && !envConfigs.isEmpty()) {
                 for (String envConfig : envConfigs) {
-                    Path config = FileSystems.getDefault().getPath(envConfig);
+                    Path config = Paths.get(envConfig);
                     if (!config.isAbsolute()) {
                         config = configurationDir.resolve(config);
                     }
@@ -147,31 +156,6 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
         return getConfigs(getDomainConfigurationDir(), "host", EnvironmentProperties.PROPERTY_DOMAIN_HOST_CONFIG_FILES);
     }
 
-    public static Path getModulesDir(Path baseDir) {
-        return baseDir.resolve("modules");
-    }
-
-    public static Path getModulesFile(Path baseDir, Path file) throws IOException {
-        final Path modulesDir = getModulesDir(baseDir);
-        final Path systemLayersBaseDir = modulesDir.resolve("system").resolve("layers").resolve("base");
-        final Path overlaysDir = systemLayersBaseDir.resolve(".overlays");
-        final Path overlaysFile = overlaysDir.resolve(".overlays");
-        if (Files.exists(overlaysFile)) {
-            String activeOverlayFileName = new String(Files.readAllBytes(overlaysFile)).trim();
-            if (!activeOverlayFileName.isEmpty()) {
-                final Path activeOverlayFile = overlaysDir.resolve(activeOverlayFileName).resolve(file);
-                if (Files.exists(activeOverlayFile)) {
-                    return activeOverlayFile;
-                }
-            }
-        }
-        return systemLayersBaseDir.resolve(file);
-    }
-
-    public Path getModulesDir() {
-        return getModulesDir(getBaseDir());
-    }
-
     public Path getDomainDir() {
         return domainBaseDir;
     }
@@ -191,5 +175,99 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
     @Override
     public Path resolvePath(String path) {
         return pathResolver.get(path);
+    }
+
+    public Modules getModules() {
+        return modules;
+    }
+
+    public static class Module {
+        private final Path moduleDir;
+        private final ModuleSpecification moduleSpecification;
+
+        public Module(Path moduleDir, ModuleSpecification moduleSpecification) {
+            this.moduleDir = moduleDir;
+            this.moduleSpecification = moduleSpecification;
+        }
+
+        public ModuleSpecification getModuleSpecification() {
+            return moduleSpecification;
+        }
+
+        public Path getModuleDir() {
+            return moduleDir;
+        }
+    }
+
+    public static class Modules {
+
+        private final Path modulesDir;
+        private final Path systemLayersBaseDir;
+        private final Path overlayDir;
+
+        public Modules(Path serverBaseDir) {
+            this.modulesDir = serverBaseDir.resolve("modules");
+            this.systemLayersBaseDir = modulesDir.resolve("system").resolve("layers").resolve("base");
+            final Path overlaysDir = systemLayersBaseDir.resolve(".overlays");
+            final Path overlaysFile = overlaysDir.resolve(".overlays");
+            if (Files.exists(overlaysFile)) {
+                try {
+                    final String activeOverlayFileName = new String(Files.readAllBytes(overlaysFile)).trim();
+                    if (!activeOverlayFileName.isEmpty()) {
+                        overlayDir = overlaysDir.resolve(activeOverlayFileName);
+                    } else {
+                        overlayDir = null;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("failed to read overlays file", e);
+                }
+            } else {
+                overlayDir = null;
+            }
+        }
+
+        public Path getModulesDir() {
+            return modulesDir;
+        }
+
+        public Module getModule(ModuleIdentifier moduleId) throws IOException {
+            final Path moduleDir = getModuleDir(moduleId);
+            if (!Files.exists(moduleDir)) {
+                return null;
+            }
+            final Path moduleSpecPath = moduleDir.resolve("module.xml");
+            if (!Files.exists(moduleSpecPath)) {
+                return null;
+            }
+            final ModuleSpecification moduleSpecification;
+            try {
+                moduleSpecification = ModuleSpecification.Parser.parse(moduleSpecPath);
+            } catch (XMLStreamException e) {
+                throw new IOException(e);
+            }
+            return new Module(moduleDir, moduleSpecification);
+        }
+
+        public Module getModule(String moduleId) throws IOException {
+            return getModule(ModuleIdentifier.fromString(moduleId));
+        }
+
+        public Path getModuleDir(ModuleIdentifier moduleId) {
+            if (moduleId == null) {
+                throw new IllegalArgumentException("The module identifier cannot be null.");
+            }
+            final Path modulePath = Paths.get(new StringBuilder(moduleId.getName().replace('.', File.separatorChar)).
+                    append(File.separator).
+                    append(moduleId.getSlot()).
+                    toString());
+            if (overlayDir != null) {
+                final Path overlayModuleDir = overlayDir.resolve(modulePath);
+                if (Files.exists(overlayModuleDir)) {
+                    return overlayModuleDir;
+                }
+            }
+            final Path systemLayersBaseModuleDir = systemLayersBaseDir.resolve(modulePath);
+            return systemLayersBaseModuleDir;
+        }
     }
 }

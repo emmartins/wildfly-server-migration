@@ -18,7 +18,9 @@ package org.jboss.migration.wfly10.to.wfly10;
 
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.subsystem.messaging.JMSBridgesModulesFinder;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
+import org.jboss.migration.wfly10.config.task.update.MigrateModules;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
@@ -35,12 +37,14 @@ public class WildFly10_1ToWildFly10_1ServerMigrationProvider implements WildFlyF
         final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
+                        .subtask(new MigrateModules.Builder<WildFlyServer10>().modulesFinder(new JMSBridgesModulesFinder()).build())
                         .subtask(WildFly10_1ToWildFly10_1SubsystemUpdates.UNDERTOW)
                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                         .subtask(RemoveDeployments.INSTANCE)
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(new MigrateModules.Builder<WildFlyServer10>().modulesFinder(new JMSBridgesModulesFinder()).build())
                                 .subtask(WildFly10_1ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
