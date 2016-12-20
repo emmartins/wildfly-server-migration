@@ -16,9 +16,9 @@
 package org.jboss.migration.cli;
 
 import org.jboss.migration.core.MigrationData;
+import org.jboss.migration.core.ServerMigration;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.core.ServerMigration;
 import org.jboss.migration.core.env.SystemEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.report.HtmlReportWriter;
@@ -28,10 +28,9 @@ import org.wildfly.security.manager.WildFlySecurityManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -118,7 +117,7 @@ public class CommandLineServerMigration {
             if (baseDir == null) {
                 throw new RuntimeException("system environment does not specifies the tool's base dir");
             }
-            final Path baseDirPath = FileSystems.getDefault().getPath(baseDir);
+            final Path baseDirPath = Paths.get(baseDir);
             final Path configDirPath = baseDirPath.resolve("config");
             final Path outputDirPath = baseDirPath.resolve("output");
 
@@ -186,9 +185,8 @@ public class CommandLineServerMigration {
     }
 
     private static Path resolvePath(String s) throws IllegalArgumentException {
-        final FileSystem fileSystem = FileSystems.getDefault();
-        Path path = fileSystem.getPath(s).normalize();
-        Path absolutePath = path.isAbsolute() ? path : fileSystem.getPath(System.getProperty("user.dir")).resolve(path);
+        Path path = Paths.get(s).normalize();
+        Path absolutePath = path.isAbsolute() ? path : Paths.get(System.getProperty("user.dir")).resolve(path);
         if (!Files.exists(absolutePath)) {
             throw new IllegalArgumentException("File "+absolutePath+" does not exists.");
         } else {

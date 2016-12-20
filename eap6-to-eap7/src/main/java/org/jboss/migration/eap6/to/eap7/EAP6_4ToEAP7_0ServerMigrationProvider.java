@@ -17,6 +17,7 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
+import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAPSubsystemUpdates7_0;
@@ -44,6 +45,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                         .subtask(MigrateSubsystemTasks.JACORB)
                         .subtask(MigrateSubsystemTasks.WEB)
                         .subtask(EAPSubsystemUpdates7_0.UNDERTOW)
@@ -66,6 +68,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(MigrateSubsystemTasks.JACORB)
                                 .subtask(MigrateSubsystemTasks.WEB)
                                 .subtask(EAPSubsystemUpdates7_0.UNDERTOW)
@@ -87,6 +90,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                                 .build()
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(AddJmxSubsystemToHosts.INSTANCE)
                                         .subtask(UpdateUnsecureInterface.INSTANCE)

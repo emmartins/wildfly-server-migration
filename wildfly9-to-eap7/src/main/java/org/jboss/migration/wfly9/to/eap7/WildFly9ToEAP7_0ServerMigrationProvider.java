@@ -17,6 +17,7 @@ package org.jboss.migration.wfly9.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
@@ -40,6 +41,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                         .subtask(WildFly9ToEAP7_0SubsystemUpdates.UNDERTOW)
                         .subtask(MigrateSubsystemTasks.MESSAGING)
                         .subtask(AddSubsystemTasks.BATCH_JBERET)
@@ -51,6 +53,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(WildFly9ToEAP7_0SubsystemUpdates.UNDERTOW)
                                 .subtask(MigrateSubsystemTasks.MESSAGING)
                                 .subtask(AddSubsystemTasks.BATCH_JBERET)
@@ -61,6 +64,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(RemoveDeployments.INSTANCE)
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(UpdateUnsecureInterface.INSTANCE)
                                         .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)

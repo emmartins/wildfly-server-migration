@@ -19,6 +19,7 @@ package org.jboss.migration.eap7.to.eap7;
 import org.jboss.migration.eap.EAPServer7_0;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
@@ -39,6 +40,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                         .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
                         .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
                         .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
@@ -49,6 +51,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
                                 .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
@@ -57,6 +60,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .build()
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                                         .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)

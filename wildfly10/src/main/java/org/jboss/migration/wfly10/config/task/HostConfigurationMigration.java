@@ -47,6 +47,11 @@ public class HostConfigurationMigration<S> extends ServerConfigurationMigration<
             return new HostConfigurationMigration<>(this);
         }
 
+        public Builder<S> subtask(final XMLConfigurationSubtaskFactory<S> taskFactory) {
+            builder.subtask(taskFactory);
+            return this;
+        }
+
         public Builder<S> subtask(final HostsManagementTaskFactory<S> taskFactory) {
             builder.subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
                 @Override
