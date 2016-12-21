@@ -16,6 +16,7 @@
 package org.jboss.migration.wfly9.to.wfly10;
 
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
@@ -43,6 +44,7 @@ public class WildFly9ToWildFly10_1ServerMigrationProvider implements WildFlyFull
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                         .subtask(WildFly9ToWildFly10_1SubsystemUpdates.INFINISPAN)
                         .subtask(WildFly9ToWildFly10_1SubsystemUpdates.UNDERTOW)
                         .subtask(MigrateSubsystemTasks.MESSAGING)
@@ -57,6 +59,7 @@ public class WildFly9ToWildFly10_1ServerMigrationProvider implements WildFlyFull
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(WildFly9ToWildFly10_1SubsystemUpdates.INFINISPAN)
                                 .subtask(WildFly9ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(MigrateSubsystemTasks.MESSAGING)
@@ -70,6 +73,7 @@ public class WildFly9ToWildFly10_1ServerMigrationProvider implements WildFlyFull
                                 .subtask(RemoveDeployments.INSTANCE)
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(UpdateUnsecureInterface.INSTANCE)
                                         .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)

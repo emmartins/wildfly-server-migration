@@ -18,6 +18,7 @@ package org.jboss.migration.wfly10.to.wfly10;
 
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
@@ -39,6 +40,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                         .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW)
                         .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.INFINISPAN)
                         .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
@@ -49,6 +51,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.INFINISPAN)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
@@ -57,6 +60,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
                                 .build()
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                                         .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)

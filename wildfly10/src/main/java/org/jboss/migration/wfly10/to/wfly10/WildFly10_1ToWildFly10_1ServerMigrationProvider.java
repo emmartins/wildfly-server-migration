@@ -18,6 +18,7 @@ package org.jboss.migration.wfly10.to.wfly10;
 
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -35,17 +36,20 @@ public class WildFly10_1ToWildFly10_1ServerMigrationProvider implements WildFlyF
         final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
+                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                         .subtask(WildFly10_1ToWildFly10_1SubsystemUpdates.UNDERTOW)
                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                         .subtask(RemoveDeployments.INSTANCE)
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(WildFly10_1ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
                                         .build()

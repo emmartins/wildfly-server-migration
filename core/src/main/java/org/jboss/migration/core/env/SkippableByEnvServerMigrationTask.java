@@ -33,6 +33,10 @@ public class SkippableByEnvServerMigrationTask implements ServerMigrationTask {
         this.propertyName = propertyName;
     }
 
+    public SkippableByEnvServerMigrationTask(ServerMigrationTask task) {
+        this(task, task.getName().getName()+".skip");
+    }
+
     @Override
     public ServerMigrationTaskName getName() {
         return task.getName();

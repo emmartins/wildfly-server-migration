@@ -16,10 +16,11 @@
 package org.jboss.migration.wfly8;
 
 import org.jboss.migration.core.AbstractServerProvider;
-import org.jboss.migration.core.JBossServer;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.ModuleIdentifier;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -38,7 +39,11 @@ public class WildFlyServerProvider8 extends AbstractServerProvider {
 
     @Override
     protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
-        final Path versionModuleMainDirPath = JBossServer.getModulesDir(baseDir).resolve("system").resolve("layers").resolve("base").resolve("org").resolve("jboss").resolve("as").resolve("version").resolve("main");
+        final JBossServer.Module module = new JBossServer.Modules(baseDir).getModule("org.jboss.as.version");
+        if (module == null) {
+            return null;
+        }
+        final Path versionModuleMainDirPath = new JBossServer.Modules(baseDir).getModuleDir(ModuleIdentifier.fromString("org.jboss.as.version"));
         if (!Files.isDirectory(versionModuleMainDirPath)) {
             return null;
         }

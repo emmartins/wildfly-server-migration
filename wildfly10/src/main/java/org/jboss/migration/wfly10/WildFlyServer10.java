@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly10;
 
-import org.jboss.migration.core.JBossServer;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTaskContext;

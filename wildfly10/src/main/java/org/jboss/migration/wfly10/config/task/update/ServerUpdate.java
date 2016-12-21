@@ -16,8 +16,11 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.core.JBossServer;
+import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.jboss.ModulesMigrationTask;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -45,10 +48,23 @@ public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
 
     public static class Builder<S extends JBossServer<S>> extends ServerMigration.Builder<S> {
 
+        public Builder() {
+            subtask(new SubtaskFactory<S>() {
+                @Override
+                public ServerMigrationTask getTask(S source, WildFlyServer10 target) {
+                    return new ModulesMigrationTask(source, target);
+                }
+            });
+        }
+
         @Override
         public Builder<S> subtask(SubtaskFactory<S> subtaskFactory) {
             super.subtask(subtaskFactory);
             return this;
+        }
+
+        public Builder<S> migrate(DomainMigration<S> domainUpdate) {
+            return subtask(domainUpdate);
         }
 
         public Builder<S> domain(DomainMigration<S> domainUpdate) {
