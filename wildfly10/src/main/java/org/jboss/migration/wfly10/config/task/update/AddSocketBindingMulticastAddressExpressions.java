@@ -82,7 +82,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
                     final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("add-"+socketBindingName+"-multicast-address-expression")
                             .addAttribute("group", socketBindingGroupManagement.getSocketBindingGroupName())
                             .build();
-                    final String propertyName = "jboss."+socketBindingName+".multicast.adress";
+                    final String propertyName = "jboss."+socketBindingName+".multicast.address";
                     final AddSocketBindingMulticastAddressExpression subtask = new AddSocketBindingMulticastAddressExpression(socketBindingName, subtaskName, propertyName , socketBindingGroupManagement.getSocketBindingsManagement());
                     context.execute(new SkippableByEnvServerMigrationTask(subtask, TASK_NAME + "." + subtaskName.getName() + ".skip"));
                 }
