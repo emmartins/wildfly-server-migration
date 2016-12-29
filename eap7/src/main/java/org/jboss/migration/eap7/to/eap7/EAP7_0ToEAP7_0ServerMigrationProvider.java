@@ -18,8 +18,9 @@ package org.jboss.migration.eap7.to.eap7;
 
 import org.jboss.migration.eap.EAPServer7_0;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -32,27 +33,20 @@ public class EAP7_0ToEAP7_0ServerMigrationProvider implements EAPServerMigration
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders serverUpdateBuilders = new ServerUpdate.Builders();
+        final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(RemoveDeployments.INSTANCE)
-                )
+                        .subtask(new MigrateReferencedModules<>())
+                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                        .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                                .subtask(RemoveDeployments.INSTANCE)
-                                .build()
-                        )
+                                .subtask(new MigrateReferencedModules<>())
+                                .subtask(new RemoveDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
+                                .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                        .build()
-                                )
-                        )
-                )
+                                        .subtask(new MigrateCompatibleSecurityRealms<>()))))
                 .build();
     }
 

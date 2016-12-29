@@ -50,7 +50,7 @@ public class UserChoice {
         this(theConsole, (String[]) null, options, prompt, resultHandler);
     }
 
-    public void execute() throws Exception {
+    public void execute() {
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);
@@ -72,7 +72,6 @@ public class UserChoice {
              * line.
              */
             theConsole.printf(ConsoleWrapper.NEW_LINE);
-            return;
         } else {
             // default is first option, and the user may just press enter to opt for it
             int choice = DEFAULT_OPTION;
@@ -101,7 +100,7 @@ public class UserChoice {
     }
 
     public interface ResultHandler {
-        void onChoice(String choice) throws Exception;
-        void onError() throws Exception;
+        void onChoice(String choice);
+        void onError();
     }
 }

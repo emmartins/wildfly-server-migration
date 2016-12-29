@@ -36,17 +36,17 @@ public class BasicResultHandlers {
         }
 
         @Override
-        public void onNo() throws Exception {
+        public void onNo() {
             result = Result.NO;
         }
 
         @Override
-        public void onYes() throws Exception {
+        public void onYes() {
             result = Result.YES;
         }
 
         @Override
-        public void onError() throws Exception {
+        public void onError() {
             result = Result.ERROR;
         }
     }

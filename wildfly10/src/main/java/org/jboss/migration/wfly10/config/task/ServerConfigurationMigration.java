@@ -18,14 +18,18 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesComponentTaskBuilder;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,7 +55,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
     protected final List<ManageableServerConfigurationTaskFactory<S, T>> manageableConfigurationSubtaskFactories;
     protected final List<XMLConfigurationSubtaskFactory<S>> xmlConfigurationSubtaskFactories;
 
-    protected ServerConfigurationMigration(Builder builder) {
+    protected ServerConfigurationMigration(BaseBuilder<S, T, ?> builder) {
         this.configType = builder.configType;
         this.xmlConfigurationProvider = builder.xmlConfigurationProvider;
         this.manageableConfigurationProvider = builder.manageableConfigurationProvider;
@@ -72,7 +76,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) {
                 final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Migrating %s configuration %s", getConfigType(), source);
@@ -95,7 +99,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
                         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, null);
                         op.get(RECURSIVE).set(true);
                         op.get(INCLUDE_DEFAULTS).set(false);
-                        context.getLogger().debugf("&&&&&&&&&&&&& Configuration resource description: %s", configurationManagement.executeManagementOperation(op));
+                        //context.getLogger().tracef("Configuration resource description: %s", configurationManagement.executeManagementOperation(op));
                         // execute config management subtasks
                         for (ManageableServerConfigurationTaskFactory subtaskFactory : manageableConfigurationSubtaskFactories) {
                             final ServerMigrationTask subtask = subtaskFactory.getTask(source, configurationManagement);
@@ -118,7 +122,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
      * @param <S>
      */
     public interface XMLConfigurationProvider<S> {
-        Path getXMLConfiguration(S source, Path targetConfigDir, WildFlyServer10 target, ServerMigrationTaskContext context) throws Exception;
+        Path getXMLConfiguration(S source, Path targetConfigDir, WildFlyServer10 target, TaskContext context);
     }
 
     /**
@@ -126,50 +130,82 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
      * @param <T>
      */
     public interface ManageableConfigurationProvider<T extends ManageableServerConfiguration> {
-        T getManageableConfiguration(Path targetConfigFilePath, WildFlyServer10 target) throws Exception;
+        T getManageableConfiguration(Path targetConfigFilePath, WildFlyServer10 target);
     }
 
     public interface XMLConfigurationSubtaskFactory<S> {
         ServerMigrationTask getTask(S source, Path xmlConfigurationPath, WildFlyServer10 target);
     }
 
+
     /**
-     * The ServerConfigurationMigration builder.
+     * The ServerConfigurationMigration ext base builder.
      * @param <S> the source for the configuration
      * @param <T> the manageable config type
      */
-    public static class Builder<S, T extends ManageableServerConfiguration> {
+    public abstract static class BaseBuilder<S, T extends ManageableServerConfiguration, B extends BaseBuilder<S, T, B>> {
 
         private final String configType;
-        private final XMLConfigurationProvider xmlConfigurationProvider;
+        private final XMLConfigurationProvider<S> xmlConfigurationProvider;
         private ManageableConfigurationProvider<T> manageableConfigurationProvider;
         private final ManageableServerConfigurationTaskFactories<S, T> manageableConfigurationSubtaskFactories;
         private final List<XMLConfigurationSubtaskFactory<S>> xmlConfigurationSubtaskFactories;
 
-        public Builder(String configType, XMLConfigurationProvider xmlConfigurationProvider) {
+        public BaseBuilder(String configType, XMLConfigurationProvider<S> xmlConfigurationProvider) {
             this.configType = configType;
             this.xmlConfigurationProvider = xmlConfigurationProvider;
             manageableConfigurationSubtaskFactories = new ManageableServerConfigurationTaskFactories<>();
             xmlConfigurationSubtaskFactories = new ArrayList<>();
         }
 
-        public Builder<S, T> manageableConfigurationProvider(ManageableConfigurationProvider<T> manageableConfigurationProvider) {
+        public B manageableConfigurationProvider(ManageableConfigurationProvider<T> manageableConfigurationProvider) {
             this.manageableConfigurationProvider = manageableConfigurationProvider;
-            return this;
+            return getThis();
         }
 
-        public Builder<S, T> subtask(ManageableServerConfigurationTaskFactory<S, T> subtaskFactory) {
+        public B subtask(ManageableServerConfigurationTaskFactory<S, T> subtaskFactory) {
             manageableConfigurationSubtaskFactories.add(subtaskFactory);
-            return this;
+            return getThis();
         }
 
-        public Builder<S, T> subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
-            xmlConfigurationSubtaskFactories.add(subtaskFactory);
-            return this;
+        public B subtask(ManageableResourceComponentTaskBuilder<S, ManageableResource, ?> subtaskBuilder) {
+            return subtask(ManageableServerConfigurationTaskFactory.of(subtaskBuilder));
         }
+
+        public B subtask(ManageableResourcesComponentTaskBuilder<S, ManageableResource, ?> subtaskBuilder) {
+            return subtask(ManageableServerConfigurationTaskFactory.of(subtaskBuilder));
+        }
+
+        public B subtask(ManageableServerConfigurationComponentTaskBuilder<S, ?> subtaskBuilder) {
+            return subtask(ManageableServerConfigurationTaskFactory.of(subtaskBuilder));
+        }
+
+        public B subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
+            xmlConfigurationSubtaskFactories.add(subtaskFactory);
+            return getThis();
+        }
+
+        protected abstract B getThis();
 
         public ServerConfigurationMigration<S, T> build() {
             return new ServerConfigurationMigration(this);
+        }
+    }
+
+    /**
+     * The ServerConfigurationMigration concrete builder.
+     * @param <S> the source for the configuration
+     * @param <T> the manageable config type
+     */
+    public static class Builder<S, T extends ManageableServerConfiguration> extends BaseBuilder<S, T, Builder<S, T>> {
+
+        public Builder(String configType, XMLConfigurationProvider xmlConfigurationProvider) {
+            super(configType, xmlConfigurationProvider);
+        }
+
+        @Override
+        protected Builder<S, T> getThis() {
+            return this;
         }
     }
 

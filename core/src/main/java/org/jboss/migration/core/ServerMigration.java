@@ -21,6 +21,11 @@ import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.SystemEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.report.SummaryReportWriter;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.TaskExecutionImpl;
 
 import java.nio.file.Path;
 
@@ -101,7 +106,7 @@ public class ServerMigration {
      * @throws IllegalStateException if the source and/or target base dir is not configured
      * @return the migration data
      */
-    public MigrationData run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailedException {
+    public MigrationData run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailureException {
         if (from == null) {
             throw ServerMigrationLogger.ROOT_LOGGER.serverBaseDirNotSet(SOURCE);
         }
@@ -143,22 +148,22 @@ public class ServerMigration {
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) {
                 context.getServerMigrationContext().getConsoleWrapper().printf("Server migration starting...%n");
                 final ServerMigrationTaskResult result = targetServer.migrate(sourceServer, context);
                 context.getServerMigrationContext().getConsoleWrapper().printf("%nServer migration done.%n%n");
                 return result;
             }
         };
-        final ServerMigrationTaskExecution serverMigrationTaskExecution = new ServerMigrationTaskExecution(serverMigrationTask, serverMigrationContext);
+        final TaskExecutionImpl taskExecutionImpl = new TaskExecutionImpl(serverMigrationTask, serverMigrationContext);
         try {
-            serverMigrationTaskExecution.run();
+            taskExecutionImpl.run();
         } catch (Throwable t) {
             ServerMigrationLogger.ROOT_LOGGER.error("Migration failed", t);
         }
 
         // build migration data
-        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, serverMigrationTaskExecution, migrationEnvironment);
+        final MigrationData migrationData = new MigrationData(sourceServer, targetServer, taskExecutionImpl, migrationEnvironment);
         // log summary report
         ServerMigrationLogger.ROOT_LOGGER.infof(SummaryReportWriter.INSTANCE.toString(migrationData));
         return migrationData;

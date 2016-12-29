@@ -16,8 +16,8 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
-import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
 
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class SecurityRealmsPluginModulesFinder implements ConfigurationModulesMi
     }
 
     @Override
-    public void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws IOException {
+    public void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
         final String namespaceURI = reader.getNamespaceURI();
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:")) {
             return;

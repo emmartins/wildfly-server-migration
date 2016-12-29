@@ -39,7 +39,7 @@ public class UserInput {
         this(theConsole, new String[] { message }, prompt, resultHandler);
     }
 
-    public void execute() throws Exception {
+    public void execute() {
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);
@@ -55,7 +55,6 @@ public class UserInput {
              * line.
              */
             theConsole.printf(ConsoleWrapper.NEW_LINE);
-            return;
         } else {
             if (!temp.equals("")) {
                 resultHandler.onInput(temp);
@@ -67,7 +66,7 @@ public class UserInput {
     }
 
     public interface ResultHandler {
-        void onInput(String input) throws Exception;
-        void onError() throws Exception;
+        void onInput(String input);
+        void onError();
     }
 }

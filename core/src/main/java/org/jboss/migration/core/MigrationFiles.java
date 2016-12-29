@@ -54,9 +54,9 @@ public class MigrationFiles {
      * @param target the file copy's path
      * @throws IllegalArgumentException if the source's file does not exists
      * @throws IllegalStateException if the target's path was used in a previous file copy, with a different source
-     * @throws IOException if the file copy failed
+     * @throws ServerMigrationFailureException if the file copy failed
      */
-    public synchronized void copy(final Path source, final Path target) throws IllegalArgumentException, IOException {
+    public synchronized void copy(final Path source, final Path target) throws IllegalArgumentException, ServerMigrationFailureException {
         // check source file exists
         if (!Files.exists(source)) {
             throw ServerMigrationLogger.ROOT_LOGGER.sourceFileDoesNotExists(source);
@@ -64,13 +64,16 @@ public class MigrationFiles {
         final Path existentCopySource = copiedFiles.get(target);
         if (existentCopySource != null) {
             ServerMigrationLogger.ROOT_LOGGER.debugf("Skipping previously copied file %s", source);
-            return;
         } else {
-            if (Files.exists(target)) {
-                Files.walkFileTree(target, new BackupVisitor(target));
+            try {
+                if (Files.exists(target)) {
+                    Files.walkFileTree(target, new BackupVisitor(target));
+                }
+                Files.createDirectories(target.getParent());
+                Files.walkFileTree(source, new CopyVisitor(source, target, copiedFiles));
+            } catch (IOException e) {
+                throw new ServerMigrationFailureException("File copy failed", e);
             }
-            Files.createDirectories(target.getParent());
-            Files.walkFileTree(source, new CopyVisitor(source, target, copiedFiles));
         }
     }
 
@@ -137,18 +140,22 @@ public class MigrationFiles {
             return target.resolve(source.relativize(sourceFile));
         }
 
-        private synchronized FileVisitResult copy(Path sourcePath) throws IOException {
+        private synchronized FileVisitResult copy(Path sourcePath) throws ServerMigrationFailureException {
             final Path targetPath = getTargetPath(sourcePath);
             final Path previousSourcePath = copiedFiles.put(targetPath, sourcePath);
             if (previousSourcePath != null) {
                 if (previousSourcePath.equals(sourcePath)) {
                     return CONTINUE;
                 } else {
-                    throw new IOException("Target "+targetPath+" previously copied and sources mismatch: new = "+sourcePath+", previous = "+previousSourcePath);
+                    throw new ServerMigrationFailureException("Target "+targetPath+" previously copied and sources mismatch: new = "+sourcePath+", previous = "+previousSourcePath);
                 }
             }
             ServerMigrationLogger.ROOT_LOGGER.tracef("Copying file %s", targetPath);
-            Files.copy(sourcePath, targetPath, COPY_OPTIONS);
+            try {
+                Files.copy(sourcePath, targetPath, COPY_OPTIONS);
+            } catch (IOException e) {
+                throw new ServerMigrationFailureException("File copy failed.", e);
+            }
             ServerMigrationLogger.ROOT_LOGGER.debugf("File %s copied to %s.", sourcePath, targetPath);
             return CONTINUE;
         }

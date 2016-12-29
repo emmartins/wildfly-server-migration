@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task;
 
-import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedHostControllerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
@@ -30,11 +29,11 @@ public class DomainConfigurationMigration<S> extends ServerConfigurationMigratio
 
     public static final String DOMAIN = "domain";
 
-    protected DomainConfigurationMigration(Builder builder) {
+    protected DomainConfigurationMigration(Builder<S> builder) {
         super(builder);
     }
 
-    public static class Builder<S> extends ServerConfigurationMigration.Builder<S, HostControllerConfiguration> {
+    public static class Builder<S> extends ServerConfigurationMigration.BaseBuilder<S, HostControllerConfiguration, Builder<S>> {
 
         public Builder(XMLConfigurationProvider<S> xmlConfigurationProvider) {
             super(DOMAIN, xmlConfigurationProvider);
@@ -46,31 +45,13 @@ public class DomainConfigurationMigration<S> extends ServerConfigurationMigratio
             return new DomainConfigurationMigration<>(this);
         }
 
-        @Override
-        public Builder<S> manageableConfigurationProvider(ManageableConfigurationProvider<HostControllerConfiguration> manageableConfigurationProvider) {
-            super.manageableConfigurationProvider(manageableConfigurationProvider);
-            return this;
-        }
-
-        @Override
-        public Builder<S> subtask(ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> subtaskFactory) {
-            super.subtask(subtaskFactory);
-            return this;
-        }
-
-        @Override
-        public Builder<S> subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
-            super.subtask(subtaskFactory);
-            return this;
-        }
-
         public Builder<S> subtask(final DomainConfigurationTaskFactory<S> subtaskFactory) {
-            return subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
-                @Override
-                public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return subtaskFactory.getTask(source, configuration);
-                }
-            });
+            return subtask((ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>) (source, configuration) -> subtaskFactory.getTask(source, configuration));
+        }
+
+        @Override
+        protected Builder<S> getThis() {
+            return this;
         }
     }
 }

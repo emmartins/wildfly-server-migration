@@ -16,12 +16,34 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationBuildParametersImpl;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParametersImpl;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesBuildParametersImpl;
+import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesComponentTaskBuilder;
+
+import java.util.Collections;
 
 /**
  * @author emmartins
  */
 public interface ManageableServerConfigurationTaskFactory<S, T extends ManageableServerConfiguration> {
-    ServerMigrationTask getTask(S source, T configuration) throws Exception;
+
+    ServerMigrationTask getTask(S source, T configuration);
+
+    static <S, T extends ManageableServerConfiguration> ManageableServerConfigurationTaskFactory<S, T> of(ManageableServerConfigurationComponentTaskBuilder<S, ?> subtaskBuilder) {
+        return (source, configuration) -> subtaskBuilder.build(new ManageableServerConfigurationBuildParametersImpl<>(source, configuration));
+    }
+
+    static <S, T extends ManageableServerConfiguration> ManageableServerConfigurationTaskFactory<S, T> of(ManageableResourceComponentTaskBuilder<S, ManageableResource, ?> subtaskBuilder) {
+        return (source, configuration) -> subtaskBuilder.build(new ManageableResourceBuildParametersImpl<>(source, configuration));
+    }
+
+    static <S, T extends ManageableServerConfiguration> ManageableServerConfigurationTaskFactory<S, T> of(ManageableResourcesComponentTaskBuilder<S, ManageableResource, ?> subtaskBuilder) {
+        return (source, configuration) -> subtaskBuilder.build(new ManageableResourcesBuildParametersImpl<>(source, configuration, Collections.singleton(configuration)));
+    }
 }

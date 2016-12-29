@@ -16,12 +16,12 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 
 /**
  * @author emmartins
  */
 public interface HostConfigurationTaskFactory<S> {
-    ServerMigrationTask getTask(S source, HostConfiguration configuration) throws Exception;
+    ServerMigrationTask getTask(S source, HostConfiguration configuration);
 }

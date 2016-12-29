@@ -16,13 +16,12 @@
 package org.jboss.migration.wfly10.dist.full;
 
 import org.jboss.migration.core.AbstractServerProvider;
-import org.jboss.migration.core.jboss.JBossServer;
-import org.jboss.migration.core.jboss.ManifestProductInfo;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.ManifestProductInfo;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -31,7 +30,7 @@ import java.nio.file.Path;
  */
 public class WildFlyFullServerProvider10_0 extends AbstractServerProvider {
 
-    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException {
         final JBossServer.Module module = new JBossServer.Modules(baseDir).getModule("org.jboss.as.product:wildfly-full");
         if (module == null) {
             return null;

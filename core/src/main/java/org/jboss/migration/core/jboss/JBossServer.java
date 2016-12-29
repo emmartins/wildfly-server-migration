@@ -18,7 +18,7 @@ package org.jboss.migration.core.jboss;
 
 import org.jboss.migration.core.AbstractServer;
 import org.jboss.migration.core.ProductInfo;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
@@ -43,7 +43,7 @@ import java.util.Map;
  * An abstract JBoss {@link org.jboss.migration.core.Server} impl, which is usable only as migration source.
  * @author emmartins
  */
-public abstract class JBossServer<S extends JBossServer> extends AbstractServer {
+public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServer {
 
     public interface EnvironmentProperties {
         String PROPERTIES_PREFIX = "server.";
@@ -106,42 +106,38 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
     }
 
     protected Collection<ServerPath<S>> getConfigs(final Path configurationDir, final String xmlDocumentElementName, final String envPropertyName) {
-        try {
-            final List<ServerPath<S>> configs = new ArrayList<>();
-            final String fullEnvPropertyName = getFullEnvironmentPropertyName(envPropertyName);
-            final List<String> envConfigs = getMigrationEnvironment().getPropertyAsList(fullEnvPropertyName);
-            if (envConfigs != null && !envConfigs.isEmpty()) {
-                for (String envConfig : envConfigs) {
-                    Path config = Paths.get(envConfig);
-                    if (!config.isAbsolute()) {
-                        config = configurationDir.resolve(config);
-                    }
-                    if (Files.exists(config)) {
-                        configs.add(new ServerPath(config, this));
-                    } else {
-                        ServerMigrationLogger.ROOT_LOGGER.warnf("Config file %s, specified by the environment property %s, does not exists.", config, fullEnvPropertyName);
-                    }
+        final List<ServerPath<S>> configs = new ArrayList<>();
+        final String fullEnvPropertyName = getFullEnvironmentPropertyName(envPropertyName);
+        final List<String> envConfigs = getMigrationEnvironment().getPropertyAsList(fullEnvPropertyName);
+        if (envConfigs != null && !envConfigs.isEmpty()) {
+            for (String envConfig : envConfigs) {
+                Path config = Paths.get(envConfig);
+                if (!config.isAbsolute()) {
+                    config = configurationDir.resolve(config);
                 }
-            } else {
-                // scan config dir
-                final XMLFileMatcher scanMatcher = new SimpleXMLFileMatcher() {
-                    @Override
-                    protected boolean documentElementLocalNameMatches(String localName) {
-                        return xmlDocumentElementName.equals(localName);
-                    }
-                    @Override
-                    protected boolean documentNamespaceURIMatches(String namespaceURI) {
-                        return namespaceURI.startsWith("urn:jboss:domain:");
-                    }
-                };
-                for (Path path : XMLFiles.scan(configurationDir, false, scanMatcher)) {
-                    configs.add(new ServerPath(path, this));
+                if (Files.exists(config)) {
+                    configs.add(new ServerPath(config, this));
+                } else {
+                    ServerMigrationLogger.ROOT_LOGGER.warnf("Config file %s, specified by the environment property %s, does not exists.", config, fullEnvPropertyName);
                 }
             }
-            return Collections.unmodifiableList(configs);
-        } catch (IOException e) {
-            throw new ServerMigrationFailedException(e);
+        } else {
+            // scan config dir
+            final XMLFileMatcher scanMatcher = new SimpleXMLFileMatcher() {
+                @Override
+                protected boolean documentElementLocalNameMatches(String localName) {
+                    return xmlDocumentElementName.equals(localName);
+                }
+                @Override
+                protected boolean documentNamespaceURIMatches(String namespaceURI) {
+                    return namespaceURI.startsWith("urn:jboss:domain:");
+                }
+            };
+            for (Path path : XMLFiles.scan(configurationDir, false, scanMatcher)) {
+                configs.add(new ServerPath(path, this));
+            }
         }
+        return Collections.unmodifiableList(configs);
     }
 
     public Collection<ServerPath<S>> getStandaloneConfigs() {
@@ -219,7 +215,7 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
                         overlayDir = null;
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException("failed to read overlays file", e);
+                    throw new ServerMigrationFailureException("failed to read overlays file", e);
                 }
             } else {
                 overlayDir = null;
@@ -230,7 +226,7 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
             return modulesDir;
         }
 
-        public Module getModule(ModuleIdentifier moduleId) throws IOException {
+        public Module getModule(ModuleIdentifier moduleId) throws ServerMigrationFailureException {
             final Path moduleDir = getModuleDir(moduleId);
             if (!Files.exists(moduleDir)) {
                 return null;
@@ -242,13 +238,13 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
             final ModuleSpecification moduleSpecification;
             try {
                 moduleSpecification = ModuleSpecification.Parser.parse(moduleSpecPath);
-            } catch (XMLStreamException e) {
-                throw new IOException(e);
+            } catch (XMLStreamException | IOException e) {
+                throw new ServerMigrationFailureException(e);
             }
             return new Module(moduleDir, moduleSpecification);
         }
 
-        public Module getModule(String moduleId) throws IOException {
+        public Module getModule(String moduleId) throws ServerMigrationFailureException {
             return getModule(ModuleIdentifier.fromString(moduleId));
         }
 
@@ -256,10 +252,9 @@ public abstract class JBossServer<S extends JBossServer> extends AbstractServer 
             if (moduleId == null) {
                 throw new IllegalArgumentException("The module identifier cannot be null.");
             }
-            final Path modulePath = Paths.get(new StringBuilder(moduleId.getName().replace('.', File.separatorChar)).
-                    append(File.separator).
-                    append(moduleId.getSlot()).
-                    toString());
+            final Path modulePath = Paths.get(moduleId.getName().replace('.', File.separatorChar) +
+                    File.separator +
+                    moduleId.getSlot());
             if (overlayDir != null) {
                 final Path overlayModuleDir = overlayDir.resolve(modulePath);
                 if (Files.exists(overlayModuleDir)) {

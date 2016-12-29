@@ -18,14 +18,14 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.core.ServerMigrationFailedException;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.console.BasicResultHandlers;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmation;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
@@ -84,7 +84,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         }
 
         @Override
-        public ServerMigrationTaskResult run(final ServerMigrationTaskContext taskContext) throws Exception {
+        public ServerMigrationTaskResult run(final TaskContext taskContext) {
             final ServerMigrationContext serverMigrationContext = taskContext.getServerMigrationContext();
             final ConsoleWrapper consoleWrapper = serverMigrationContext.getConsoleWrapper();
             consoleWrapper.printf("%n");
@@ -111,7 +111,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
                     case ERROR:
                         return run(taskContext);
                     default:
-                        throw new ServerMigrationFailedException("unexpected user interaction result");
+                        throw new ServerMigrationFailureException("unexpected user interaction result");
                 }
             } else {
                 migrateAllConfigs(sourceConfigs, targetConfigDir, target, taskContext);
@@ -119,29 +119,29 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
             return taskContext.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
         }
 
-        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final ServerMigrationTaskContext taskContext) throws Exception {
+        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
                 taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigDir, target));
             }
         }
 
-        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final ServerMigrationTaskContext taskContext) throws Exception {
+        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
                 confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
             }
         }
 
-        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final ServerMigrationTaskContext taskContext) throws Exception {
+        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final TaskContext taskContext) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
-                public void onNo() throws Exception {
+                public void onNo() {
                 }
                 @Override
-                public void onYes() throws Exception {
+                public void onYes() {
                     taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigDir, target));
                 }
                 @Override
-                public void onError() throws Exception {
+                public void onError() {
                     // repeat
                     confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
                 }

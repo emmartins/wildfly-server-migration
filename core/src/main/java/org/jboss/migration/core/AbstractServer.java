@@ -17,6 +17,8 @@ package org.jboss.migration.core;
 
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 import java.nio.file.Path;
 
@@ -57,7 +59,7 @@ public abstract class AbstractServer implements Server {
     }
 
     @Override
-    public ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException {
+    public ServerMigrationTaskResult migrate(Server source, TaskContext context) throws IllegalArgumentException {
         throw ServerMigrationLogger.ROOT_LOGGER.doesNotSupportsMigration(productInfo.getName(), productInfo.getVersion(), source.getProductInfo().getName(), source.getProductInfo().getVersion());
     }
 }

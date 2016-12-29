@@ -16,8 +16,8 @@
 package org.jboss.migration.wfly10;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 /**
  * @author emmartins
@@ -31,5 +31,5 @@ public interface WildFlyServerMigration10<S extends Server> {
      * @param context
      * @return
      */
-    ServerMigrationTaskResult run(S source, WildFlyServer10 target, ServerMigrationTaskContext context);
+    ServerMigrationTaskResult run(S source, WildFlyServer10 target, TaskContext context);
 }

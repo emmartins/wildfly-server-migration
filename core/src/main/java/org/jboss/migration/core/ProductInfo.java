@@ -46,6 +46,6 @@ public class ProductInfo {
 
     @Override
     public String toString() {
-        return new StringBuilder("name: ").append(String.valueOf(name)).append(", version: ").append(String.valueOf(version)).toString();
+        return "name: " + String.valueOf(name) + ", version: " + String.valueOf(version);
     }
 }
