@@ -47,7 +47,7 @@ public class EnvironmentProperties {
      * @return the prefix for all env properties in the context of a subsystem task
      */
     public static String getSubsystemTaskPropertiesPrefix(String subsystem) {
-        return new StringBuilder("subsystem.").append(subsystem).append('.').toString();
+        return "subsystem." + subsystem + '.';
     }
 
     /**
@@ -57,6 +57,6 @@ public class EnvironmentProperties {
      * @return the prefix for all env properties in the context of a subsystem subtask
      */
     public static String getSubsystemSubtaskPropertiesPrefix(String subsystem, String subtask) {
-        return new StringBuilder(getSubsystemTaskPropertiesPrefix(subsystem)).append(subtask).append('.').toString();
+        return getSubsystemTaskPropertiesPrefix(subsystem) + subtask + '.';
     }
 }

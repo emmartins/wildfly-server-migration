@@ -20,12 +20,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemResource;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
@@ -33,27 +33,13 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
  * A task which adds the jmx subsystem to host configs.
  * @author emmartins
  */
-public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
+public class AddJmxSubsystemToHosts<S> extends AddSubsystemResources<S> {
 
-    public static final AddJmxSubsystemToHosts INSTANCE = new AddJmxSubsystemToHosts();
-
-    private AddJmxSubsystemToHosts() {
-        super(new Builder<S>(SubsystemNames.JMX, ExtensionNames.JMX)
-                .subtask(new AddJMXSubsystemConfig<S>())
-                .eventListener(new ParentServerMigrationTask.EventListener() {
-                    @Override
-                    public void started(ServerMigrationTaskContext context) {
-                        context.getLogger().infof("Adding JMX subsystem configuration...");
-                    }
-                    @Override
-                    public void done(ServerMigrationTaskContext context) {
-                        context.getLogger().infof("JMX subsystem configuration added.");
-                    }
-                })
-        );
+    public AddJmxSubsystemToHosts() {
+        super(ExtensionNames.JMX, new AddJMXSubsystemConfig<>());
     }
 
-    static class AddJMXSubsystemConfig<S> extends AddSubsystemConfigSubtask<S> {
+    public static class AddJMXSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
 
         private static final String EXPOSE_MODEL = "expose-model";
         private static final String RESOLVED = "resolved";
@@ -61,13 +47,13 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
         private static final String REMOTING_CONNECTOR = "remoting-connector";
         private static final String JMX = "jmx";
 
-        AddJMXSubsystemConfig() {
+        protected AddJMXSubsystemConfig() {
             super(SubsystemNames.JMX);
         }
 
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
-            super.addSubsystem(subsystemsManagement, context);
+        protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemResource.Parent> params, TaskContext taskContext) {
+            super.addConfiguration(params, taskContext);
             // add jmx subsystem default config
             /*
             <profile>
@@ -78,14 +64,14 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
         </subsystem>
     </profile>
              */
-            final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
-            final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+            final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
+            final PathAddress subsystemPathAddress = params.getResource().getSubsystemResourcePathAddress(getSubsystem());
             final ModelNode exposeResolvedModelAddOperation = Util.createAddOperation(subsystemPathAddress.append(PathElement.pathElement(EXPOSE_MODEL, RESOLVED)));
-            configurationManagement.executeManagementOperation(exposeResolvedModelAddOperation);
+            serverConfiguration.executeManagementOperation(exposeResolvedModelAddOperation);
             final ModelNode exposeExpressionModelAddOperation = Util.createAddOperation(subsystemPathAddress.append(PathElement.pathElement(EXPOSE_MODEL, EXPRESSION)));
-            configurationManagement.executeManagementOperation(exposeExpressionModelAddOperation);
+            serverConfiguration.executeManagementOperation(exposeExpressionModelAddOperation);
             final ModelNode remotingConnectorAddOperation = Util.createAddOperation(subsystemPathAddress.append(PathElement.pathElement(REMOTING_CONNECTOR, JMX)));
-            configurationManagement.executeManagementOperation(remotingConnectorAddOperation);
+            serverConfiguration.executeManagementOperation(remotingConnectorAddOperation);
         }
     }
 }

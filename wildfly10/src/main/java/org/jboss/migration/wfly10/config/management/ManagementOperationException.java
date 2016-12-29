@@ -20,7 +20,16 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public class ManagementOperationException extends RuntimeException {
+
     public ManagementOperationException(String message) {
         super(message);
+    }
+
+    public ManagementOperationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ManagementOperationException(Throwable cause) {
+        super(cause);
     }
 }

@@ -16,7 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task;
 
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedHostControllerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.HostsManagementTaskFactory;
@@ -55,8 +55,8 @@ public class HostConfigurationMigration<S> extends ServerConfigurationMigration<
         public Builder<S> subtask(final HostsManagementTaskFactory<S> taskFactory) {
             builder.subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
                 @Override
-                public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return taskFactory.getTask(source, configuration.getHostsManagement());
+                public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) {
+                    return taskFactory.getTask(source, configuration);
                 }
             });
             return this;

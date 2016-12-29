@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.core.env;
 
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ public class SubEnvironment implements Environment {
     }
 
     private String getAbsolutePropertyName(String propertyName) {
-        return new StringBuilder(propertyNamePrefix).append(propertyName).toString();
+        return propertyNamePrefix + propertyName;
     }
 
     public Boolean getPropertyAsBoolean(String propertyName) {
@@ -63,15 +63,15 @@ public class SubEnvironment implements Environment {
         return environment.getPropertyAsList(getAbsolutePropertyName(propertyName), defaultValue);
     }
 
-    public Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailedException {
+    public Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailureException {
         return environment.requirePropertyAsBoolean(getAbsolutePropertyName(propertyName));
     }
 
-    public String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException {
+    public String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailureException {
         return environment.requirePropertyAsString(getAbsolutePropertyName(propertyName), failIfEmpty);
     }
 
-    public List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException {
+    public List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailureException {
         return environment.requirePropertyAsList(getAbsolutePropertyName(propertyName), failIfEmpty);
     }
 

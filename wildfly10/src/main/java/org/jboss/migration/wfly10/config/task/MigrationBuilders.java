@@ -17,7 +17,6 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemsMigration;
 
 /**
  * @author emmartins
@@ -28,10 +27,6 @@ public class MigrationBuilders<SS extends Server, SC> {
 
     public DomainMigration.Builder<SS> domainBuilder() {
         return new DomainMigration.Builder<>();
-    }
-
-    public SubsystemsMigration.Builder<SC> subsystemsBuilder() {
-        return new SubsystemsMigration.Builder<>();
     }
 
     public StandaloneServerConfigurationMigration.Builder<SC> standaloneMigrationBuilder(ServerConfigurationMigration.XMLConfigurationProvider<SC> xmlConfigurationProvider) {

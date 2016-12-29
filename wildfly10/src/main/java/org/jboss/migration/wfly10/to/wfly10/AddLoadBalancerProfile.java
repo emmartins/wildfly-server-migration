@@ -20,102 +20,87 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingsManagement;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.factory.AddProfileTaskFactory;
-import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
+import org.jboss.migration.wfly10.config.management.SubsystemResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.profile.AddProfileTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * @author emmartins
  */
-public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
+public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
 
-    public static final AddLoadBalancerProfile INSTANCE = new AddLoadBalancerProfile();
-
-    private AddLoadBalancerProfile() {
-        super(new AddProfileTaskFactory.Builder<S>("load-balancer")
-                .subtask(new AddLoadBalancerSocketBindingsGroup<S>())
-                .subtask(new AddSubsystemTaskFactory.Builder<S>(SubsystemNames.IO, ExtensionNames.IO).subtask(new AddIOSubsystemConfig<S>()).build())
-                .subtask(new AddSubsystemTaskFactory.Builder<S>(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW).subtask(new AddUndertowSubsystemConfig<S>()).build())
-                .subtask(new AddSubsystemTaskFactory.Builder<S>(SubsystemNames.LOGGING, ExtensionNames.LOGGING).subtask(new AddLoggingSubsystemConfig<S>()).build())
-        );
+    public AddLoadBalancerProfile() {
+        super("load-balancer");
+        subtasks.subtask(new AddLoadBalancerSocketBindingsGroup<>());
+        addSubsystemSubtasks(new AddSubsystemResources<>(ExtensionNames.IO, new AddIOSubsystemConfig<>()),
+                new AddSubsystemResources<>(ExtensionNames.UNDERTOW, new AddUndertowSubsystemConfig<>()),
+                new AddSubsystemResources<>(ExtensionNames.LOGGING, new AddLoggingSubsystemConfig<>()));
     }
 
-    static class AddLoadBalancerSocketBindingsGroup<S> implements ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> {
+    public static class AddLoadBalancerSocketBindingsGroup<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
+
         private static final String SOCKET_BINDING_GROUP_NAME = "load-balancer-sockets";
-        private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("add-"+SOCKET_BINDING_GROUP_NAME).build();
-        @Override
-        public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
-            return new ServerMigrationTask() {
-                @Override
-                public ServerMigrationTaskName getName() {
-                    return TASK_NAME;
-                }
-                @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                    final SocketBindingGroupsManagement socketBindingGroupsManagement = configuration.getSocketBindingGroupsManagement();
-                    if (socketBindingGroupsManagement.getResourceNames().contains(SOCKET_BINDING_GROUP_NAME)) {
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
-                    // create socket binding group
-                    final PathAddress socketBindingGroupPathAddress = socketBindingGroupsManagement.getResourcePathAddress(SOCKET_BINDING_GROUP_NAME);
-                    final ModelNode socketBindingGroupOp = Util.createAddOperation(socketBindingGroupPathAddress);
-                    socketBindingGroupOp.get("default-interface").set("public");
-                    configuration.executeManagementOperation(socketBindingGroupOp);
-                    // retreive socket binding group
-                    final SocketBindingGroupManagement socketBindingGroupManagement = socketBindingGroupsManagement.getSocketBindingGroupManagement(SOCKET_BINDING_GROUP_NAME);
-                    final SocketBindingsManagement socketBindingsManagement = socketBindingGroupManagement.getSocketBindingsManagement();
-                    // add http
-                    final PathAddress httpPathAddress = socketBindingsManagement.getResourcePathAddress("http");
-                    final ModelNode httpOp = Util.createAddOperation(httpPathAddress);
-                    httpOp.get("port").set(new ValueExpression("${jboss.http.port:8080}"));
-                    configuration.executeManagementOperation(httpOp);
-                    // add https
-                    final PathAddress httpsPathAddress = socketBindingsManagement.getResourcePathAddress("https");
-                    final ModelNode httpsOp = Util.createAddOperation(httpsPathAddress);
-                    httpsOp.get("port").set(new ValueExpression("${jboss.https.port:8443}"));
-                    configuration.executeManagementOperation(httpsOp);
-                    // add mcmp-management
-                    final PathAddress mcmpManagementPathAddress = socketBindingsManagement.getResourcePathAddress("mcmp-management");
-                    final ModelNode mcmpManagementOp = Util.createAddOperation(mcmpManagementPathAddress);
-                    mcmpManagementOp.get("interface").set("private");
-                    mcmpManagementOp.get("port").set(new ValueExpression("${jboss.mcmp.port:8090}"));
-                    configuration.executeManagementOperation(mcmpManagementOp);
-                    // add modcluster
-                    final PathAddress modclusterPathAddress = socketBindingsManagement.getResourcePathAddress("modcluster");
-                    final ModelNode modclusterOp = Util.createAddOperation(modclusterPathAddress);
-                    modclusterOp.get("interface").set("private");
-                    modclusterOp.get("multicast-address").set(new ValueExpression("${jboss.modcluster.multicast.address:224.0.1.105}"));
-                    modclusterOp.get("multicast-port").set(23364);
-                    configuration.executeManagementOperation(modclusterOp);
-                    return ServerMigrationTaskResult.SUCCESS;
-                }
-            };
+
+        protected AddLoadBalancerSocketBindingsGroup() {
+            name("add-"+SOCKET_BINDING_GROUP_NAME);
+            skipPolicyBuilder(buildParameters -> context -> buildParameters.getServerConfiguration().getSocketBindingGroupResource(SOCKET_BINDING_GROUP_NAME) != null);
+            runBuilder(params -> context -> {
+                final ManageableServerConfiguration configuration = params.getServerConfiguration();
+                final PathAddress socketBindingGroupPathAddress = configuration.getSocketBindingGroupResourcePathAddress(SOCKET_BINDING_GROUP_NAME);
+                final ModelNode socketBindingGroupOp = Util.createAddOperation(socketBindingGroupPathAddress);
+                socketBindingGroupOp.get("default-interface").set("public");
+                configuration.executeManagementOperation(socketBindingGroupOp);
+                // retreive socket binding group
+                final SocketBindingGroupResource socketBindingGroupResource = configuration.getSocketBindingGroupResource(SOCKET_BINDING_GROUP_NAME);
+                // add http
+                final PathAddress httpPathAddress = socketBindingGroupResource.getSocketBindingResourcePathAddress("http");
+                final ModelNode httpOp = Util.createAddOperation(httpPathAddress);
+                httpOp.get("port").set(new ValueExpression("${jboss.http.port:8080}"));
+                configuration.executeManagementOperation(httpOp);
+                // add https
+                final PathAddress httpsPathAddress = socketBindingGroupResource.getSocketBindingResourcePathAddress("https");
+                final ModelNode httpsOp = Util.createAddOperation(httpsPathAddress);
+                httpsOp.get("port").set(new ValueExpression("${jboss.https.port:8443}"));
+                configuration.executeManagementOperation(httpsOp);
+                // add mcmp-management
+                final PathAddress mcmpManagementPathAddress = socketBindingGroupResource.getSocketBindingResourcePathAddress("mcmp-management");
+                final ModelNode mcmpManagementOp = Util.createAddOperation(mcmpManagementPathAddress);
+                mcmpManagementOp.get("interface").set("private");
+                mcmpManagementOp.get("port").set(new ValueExpression("${jboss.mcmp.port:8090}"));
+                configuration.executeManagementOperation(mcmpManagementOp);
+                // add modcluster
+                final PathAddress modclusterPathAddress = socketBindingGroupResource.getSocketBindingResourcePathAddress("modcluster");
+                final ModelNode modclusterOp = Util.createAddOperation(modclusterPathAddress);
+                modclusterOp.get("interface").set("private");
+                modclusterOp.get("multicast-address").set(new ValueExpression("${jboss.modcluster.multicast.address:224.0.1.105}"));
+                modclusterOp.get("multicast-port").set(23364);
+                configuration.executeManagementOperation(modclusterOp);
+                return ServerMigrationTaskResult.SUCCESS;
+
+            });
         }
     }
 
-    static class AddIOSubsystemConfig<S> extends AddSubsystemConfigSubtask<S> {
-        AddIOSubsystemConfig() {
+    public static class AddIOSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
+        protected AddIOSubsystemConfig() {
             super(SubsystemNames.IO);
         }
+
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemResource.Parent> params, TaskContext taskContext) {
             // adds subsystem
-            super.addSubsystem(subsystemsManagement, context);
-            final ManageableServerConfiguration configuration = subsystemsManagement.getServerConfiguration();
-            final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+            super.addConfiguration(params, taskContext);
+            final ManageableServerConfiguration configuration = params.getServerConfiguration();
+            final PathAddress subsystemPathAddress = params.getResource().getSubsystemResourcePathAddress(getSubsystem());
             // add default worker
             final PathAddress workerDefaultPathAddress = subsystemPathAddress.append("worker","default");
             configuration.executeManagementOperation(Util.createAddOperation(workerDefaultPathAddress));
@@ -125,16 +110,17 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
         }
     }
 
-    static class AddUndertowSubsystemConfig<S> extends AddSubsystemConfigSubtask<S> {
-        AddUndertowSubsystemConfig() {
+    public static class AddUndertowSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
+        protected AddUndertowSubsystemConfig() {
             super(SubsystemNames.UNDERTOW);
         }
+
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemResource.Parent> params, TaskContext taskContext) {
             // adds subsystem
-            super.addSubsystem(subsystemsManagement, context);
-            final ManageableServerConfiguration configuration = subsystemsManagement.getServerConfiguration();
-            final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+            super.addConfiguration(params, taskContext);
+            final ManageableServerConfiguration configuration = params.getServerConfiguration();
+            final PathAddress subsystemPathAddress = params.getResource().getSubsystemResourcePathAddress(getSubsystem());
             // add default servlet container
             final PathAddress defaultServletContainerPathAddress = subsystemPathAddress.append("servlet-container","default");
             configuration.executeManagementOperation(Util.createAddOperation(defaultServletContainerPathAddress));
@@ -182,16 +168,17 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
         }
     }
 
-    static class AddLoggingSubsystemConfig<S> extends AddSubsystemConfigSubtask<S> {
-        AddLoggingSubsystemConfig() {
+    public static class AddLoggingSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
+        protected AddLoggingSubsystemConfig() {
             super(SubsystemNames.LOGGING);
         }
+
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemResource.Parent> params, TaskContext taskContext) {
             // adds subsystem
-            super.addSubsystem(subsystemsManagement, context);
-            final ManageableServerConfiguration configuration = subsystemsManagement.getServerConfiguration();
-            final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+            super.addConfiguration(params, taskContext);
+            final ManageableServerConfiguration configuration = params.getServerConfiguration();
+            final PathAddress subsystemPathAddress = params.getResource().getSubsystemResourcePathAddress(getSubsystem());
             // add pattern formatter PATTERN
             final PathAddress patternFormatterPATTERNPathAddress = subsystemPathAddress.append("pattern-formatter","PATTERN");
             final ModelNode patternFormatterPATTERNOp = Util.createAddOperation(patternFormatterPATTERNPathAddress);

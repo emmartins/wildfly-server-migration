@@ -55,7 +55,11 @@ public class UserConfirmation {
         this(theConsole, new String[] { message }, prompt, resultHandler);
     }
 
-    public void execute() throws Exception {
+    public UserConfirmation(ConsoleWrapper theConsole, final String message, final ResultHandler resultHandler) {
+        this(theConsole, new String[] { message }, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler);
+    }
+
+    public void execute() {
         theConsole.printf("%n");
         if (messageLines != null) {
             for (String message : messageLines) {
@@ -111,8 +115,8 @@ public class UserConfirmation {
     }
 
     public interface ResultHandler {
-        void onNo() throws Exception;
-        void onYes() throws Exception;
-        void onError() throws Exception;
+        void onNo();
+        void onYes();
+        void onError();
     }
 }

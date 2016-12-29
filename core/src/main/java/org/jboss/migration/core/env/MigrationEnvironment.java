@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.core.env;
 
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,28 +79,28 @@ public class MigrationEnvironment implements Environment {
         return propertyValue != null ? propertyValue : defaultValue;
     }
 
-    public Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailedException {
+    public Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailureException {
         final Boolean propertyValue = getPropertyAsBoolean(propertyName);
         if (propertyValue == null) {
-            throw new ServerMigrationFailedException("Environment property "+propertyName+" is required.");
+            throw new ServerMigrationFailureException("Environment property "+propertyName+" is required.");
         } else {
             return propertyValue;
         }
     }
 
-    public String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException {
+    public String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailureException {
         final String propertyValue = getPropertyAsString(propertyName);
         if (propertyValue == null || (failIfEmpty && propertyValue.isEmpty())) {
-            throw new ServerMigrationFailedException("Environment property "+propertyName+" is required.");
+            throw new ServerMigrationFailureException("Environment property "+propertyName+" is required.");
         } else {
             return propertyValue;
         }
     }
 
-    public List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException {
+    public List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailureException {
         final List<String> propertyValue = getPropertyAsList(propertyName);
         if (propertyValue == null || (failIfEmpty && propertyValue.isEmpty())) {
-            throw new ServerMigrationFailedException("Environment property "+propertyName+" is required.");
+            throw new ServerMigrationFailureException("Environment property "+propertyName+" is required.");
         } else {
             return propertyValue;
         }

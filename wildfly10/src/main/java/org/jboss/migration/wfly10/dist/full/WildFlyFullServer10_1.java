@@ -24,8 +24,6 @@ import org.jboss.migration.wfly10.WildFlyServerMigrations10;
 import java.nio.file.Path;
 import java.util.ServiceLoader;
 
-;
-
 /**
  * @author emmartins
  */

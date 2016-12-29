@@ -17,13 +17,13 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
@@ -62,7 +62,7 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) {
                 final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Standalone server migration starting...");

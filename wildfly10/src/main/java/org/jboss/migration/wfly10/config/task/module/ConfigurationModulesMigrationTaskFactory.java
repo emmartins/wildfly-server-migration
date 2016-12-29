@@ -16,12 +16,13 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
@@ -45,15 +46,6 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
  * @author emmartins
  */
 public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<ServerPath<S>> {
-
-    public static final ConfigurationModulesMigrationTaskFactory TASK_WITH_ALL_DEFAULT_MODULE_FINDERS = new ConfigurationModulesMigrationTaskFactory.Builder()
-            .modulesFinder(new DatasourcesJdbcDriversModulesFinder())
-            .modulesFinder(new DefaultJsfImplModulesFinder())
-            .modulesFinder(new EEGlobalModulesFinder())
-            .modulesFinder(new JMSBridgesModulesFinder())
-            .modulesFinder(new NamingObjectFactoriesModulesFinder())
-            .modulesFinder(new SecurityRealmsPluginModulesFinder())
-            .build();
 
     private final Map<String, List<ModulesFinder>> modulesFinders;
 
@@ -85,7 +77,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
         }
 
         @Override
-        protected void migrateModules(ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws Exception {
+        protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
             try (InputStream in = new BufferedInputStream(new FileInputStream(xmlConfigurationPath.toFile()))) {
                 XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(in);
                 reader.require(START_DOCUMENT, null, null);
@@ -94,10 +86,12 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
                         processElement(reader, moduleMigrator, context);
                     }
                 }
+            } catch (Exception e) {
+                throw new ServerMigrationFailureException(e);
             }
         }
 
-        protected void processElement(XMLStreamReader reader, ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws IOException {
+        protected void processElement(XMLStreamReader reader, ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
             final List<ModulesFinder> elementModulesFinders = modulesFinders.get(reader.getLocalName());
             if (elementModulesFinders != null) {
                 for (ModulesFinder modulesFinder : elementModulesFinders) {
@@ -120,7 +114,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
          * @param reader the XML stream reader, positioned at the start of an element of interest
          * @param moduleMigrator the module migrator
          */
-        void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws IOException;
+        void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException;
     }
 
     public static class Builder<S extends JBossServer<S>> {

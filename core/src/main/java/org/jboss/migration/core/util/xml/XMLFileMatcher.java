@@ -16,7 +16,8 @@
 
 package org.jboss.migration.core.util.xml;
 
-import java.io.IOException;
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 import java.nio.file.Path;
 
 /**
@@ -28,7 +29,7 @@ public interface XMLFileMatcher {
      * Indicates if the specified path matches a XML file.
      * @param path the XML file absolute path.
      * @return true if the path matches a XML file, false otherwise.
-     * @throws IOException if the matching failed due to an error.
+     * @throws ServerMigrationFailureException if the matching failed due to an error.
      */
-    boolean matches(Path path) throws IOException;
+    boolean matches(Path path) throws ServerMigrationFailureException;
 }

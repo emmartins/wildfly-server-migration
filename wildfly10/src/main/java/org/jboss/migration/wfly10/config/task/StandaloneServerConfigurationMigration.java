@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task;
 
-import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedStandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
@@ -28,48 +27,30 @@ import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurat
  */
 public class StandaloneServerConfigurationMigration<S> extends ServerConfigurationMigration<S, StandaloneServerConfiguration> {
 
-    protected StandaloneServerConfigurationMigration(ServerConfigurationMigration.Builder<S, StandaloneServerConfiguration> builder) {
+    protected StandaloneServerConfigurationMigration(Builder<S> builder) {
         super(builder);
     }
 
-    public static class Builder<S> extends ServerConfigurationMigration.Builder<S, StandaloneServerConfiguration> {
+    public static class Builder<S> extends ServerConfigurationMigration.BaseBuilder<S, StandaloneServerConfiguration, Builder<S>> {
 
         public Builder(XMLConfigurationProvider<S> xmlConfigurationProvider) {
             super("standalone", xmlConfigurationProvider);
             manageableConfigurationProvider(new EmbeddedStandaloneServerConfiguration.ConfigFileMigrationFactory());
         }
 
-        @Override
-        public Builder<S> manageableConfigurationProvider(ManageableConfigurationProvider<StandaloneServerConfiguration> manageableConfigurationProvider) {
-            super.manageableConfigurationProvider(manageableConfigurationProvider);
-            return this;
-        }
-
-        @Override
-        public Builder<S> subtask(ManageableServerConfigurationTaskFactory<S, StandaloneServerConfiguration> subtaskFactory) {
-            super.subtask(subtaskFactory);
-            return this;
-        }
-
         public Builder<S> subtask(final StandaloneServerConfigurationTaskFactory<S> subtaskFactory) {
-            subtask(new ManageableServerConfigurationTaskFactory<S, StandaloneServerConfiguration>() {
-                @Override
-                public ServerMigrationTask getTask(S source, StandaloneServerConfiguration configuration) throws Exception {
-                    return subtaskFactory.getTask(source, configuration);
-                }
-            });
-            return this;
-        }
-
-        @Override
-        public Builder<S> subtask(XMLConfigurationSubtaskFactory<S> subtaskFactory) {
-            super.subtask(subtaskFactory);
-            return this;
+            subtask((ManageableServerConfigurationTaskFactory<S, StandaloneServerConfiguration>) (source, configuration) -> subtaskFactory.getTask(source, configuration));
+            return getThis();
         }
 
         @Override
         public StandaloneServerConfigurationMigration<S> build() {
             return new StandaloneServerConfigurationMigration<>(this);
+        }
+
+        @Override
+        protected Builder<S> getThis() {
+            return this;
         }
     }
 }

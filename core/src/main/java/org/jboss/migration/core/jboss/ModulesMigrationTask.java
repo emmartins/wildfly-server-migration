@@ -16,14 +16,13 @@
 
 package org.jboss.migration.core.jboss;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -61,7 +60,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
     }
 
     @Override
-    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(TaskContext context) {
         if (new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), getName().getName()).isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
@@ -76,8 +75,8 @@ public class ModulesMigrationTask implements ServerMigrationTask {
         }
     }
 
-    protected void migrateModules(ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws Exception {
-        final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.<String>emptyList());
+    protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
+        final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.emptyList());
         for (String module : includedModules) {
             moduleMigrator.migrateModule(module, "requested by environment", context);
         }
@@ -93,23 +92,23 @@ public class ModulesMigrationTask implements ServerMigrationTask {
             this.sourceModules = source.getModules();
             this.targetModules = target.getModules();
             this.excludedByEnvironment = new HashSet<>();
-            for (String excludedModule : environment.getPropertyAsList(ENVIRONMENT_PROPERTY_EXCLUDES, Collections.<String>emptyList())) {
+            for (String excludedModule : environment.getPropertyAsList(ENVIRONMENT_PROPERTY_EXCLUDES, Collections.emptyList())) {
                 this.excludedByEnvironment.add(ModuleIdentifier.fromString(excludedModule));
             }
         }
 
-        public void migrateModule(String moduleId, String reason, final ServerMigrationTaskContext context) throws IOException {
+        public void migrateModule(String moduleId, String reason, final TaskContext context) {
             migrateModule(ModuleIdentifier.fromString(moduleId), reason, context);
         }
 
-        public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final ServerMigrationTaskContext context) throws IOException {
+        public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final TaskContext context) throws IllegalStateException {
             if (excludedByEnvironment.contains(moduleIdentifier)) {
                 context.getLogger().infof("Skipping module %s migration, it's excluded by environment.", moduleIdentifier);
                 return;
             }
             final JBossServer.Module sourceModule = sourceModules.getModule(moduleIdentifier);
             if (sourceModule == null) {
-                throw new IOException("Migration of module "+moduleIdentifier+" required, but module not found in source server.");
+                throw new IllegalStateException("Migration of module "+moduleIdentifier+" required, but module not found in source server.");
             }
             if (targetModules.getModule(moduleIdentifier) != null) {
                 context.getLogger().debugf("Skipping module %s migration, already exists in target.", moduleIdentifier, reason);
@@ -123,11 +122,11 @@ public class ModulesMigrationTask implements ServerMigrationTask {
                 }
 
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) {
                     context.getServerMigrationContext().getMigrationFiles().copy(sourceModule.getModuleDir(), targetModules.getModuleDir(moduleIdentifier));
                     context.getLogger().infof("Module %s migrated.", moduleIdentifier);
                     return new ServerMigrationTaskResult.Builder()
-                            .sucess()
+                            .success()
                             .addAttribute("reason", reason)
                             .build();
                 }

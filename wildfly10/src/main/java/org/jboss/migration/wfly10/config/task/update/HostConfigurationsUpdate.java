@@ -16,8 +16,8 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationsMigration;
