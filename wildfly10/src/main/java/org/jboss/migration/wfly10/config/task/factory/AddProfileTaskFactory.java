@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -41,14 +42,14 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
     private final ServerMigrationTaskName taskName;
     private final List<ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>> subtasks;
     private final String skipTaskPropertyName;
-    private final ParentServerMigrationTask.EventListener eventListener;
+    private final AbstractServerMigrationTask.Listener eventListener;
 
     protected AddProfileTaskFactory(Builder<S> builder) {
         this.profileName = builder.profileName;
         this.taskName = builder.taskName != null ? builder.taskName : new ServerMigrationTaskName.Builder("add-profile-"+profileName).build();
         this.subtasks = Collections.unmodifiableList(builder.subtasks);
         this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
-        this.eventListener = builder.eventListener != null ? builder.eventListener : new ParentServerMigrationTask.EventListener() {
+        this.eventListener = builder.eventListener != null ? builder.eventListener : new AbstractServerMigrationTask.Listener() {
             @Override
             public void started(ServerMigrationTaskContext context) {
                 context.getLogger().infof("Adding profile %s...", profileName);
@@ -63,7 +64,7 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
     @Override
     public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
         final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
-                .eventListener(eventListener)
+                .listener(eventListener)
                 .subtask(new CreateProfileTask(profileName, configuration));
         for (ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> subtaskFactory : subtasks) {
             final ServerMigrationTask subtask = subtaskFactory.getTask(source, configuration);
@@ -106,14 +107,14 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
         private final String profileName;
         private final List<ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>> subtasks;
         private String skipTaskPropertyName;
-        private ParentServerMigrationTask.EventListener eventListener;
+        private AbstractServerMigrationTask.Listener eventListener;
 
         public Builder(String profileName) {
             this.profileName = profileName;
             this.subtasks = new ArrayList<>();
         }
 
-        public Builder<S> eventListener(ParentServerMigrationTask.EventListener eventListener) {
+        public Builder<S> eventListener(AbstractServerMigrationTask.Listener eventListener) {
             this.eventListener = eventListener;
             return this;
         }
