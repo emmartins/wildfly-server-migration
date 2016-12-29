@@ -24,20 +24,16 @@ import java.util.List;
  * A {@link ServerMigrationTask} which simply execute its subtasks.
  * @author emmartins
  */
-public class ParentServerMigrationTask implements ServerMigrationTask {
+public abstract class AbstractServerMigrationTask implements ServerMigrationTask {
 
-    private final ServerMigrationTaskName name;
-    private final EventListener eventListener;
-    private final ExecutionSkipper executionSkipper;
-    private final List<SubtaskExecutor> subtasks;
-    private final boolean succeedOnlyIfHasSuccessfulSubtasks;
+    protected final ServerMigrationTaskName name;
+    protected final EventListener eventListener;
+    protected final ExecutionSkipper executionSkipper;
 
-    public ParentServerMigrationTask(Builder builder) {
+    protected AbstractServerMigrationTask(Builder builder) {
         this.name = builder.name;
         this.eventListener = builder.eventListener;
         this.executionSkipper = builder.executionSkipper;
-        this.subtasks = builder.subtasks != null ? Collections.unmodifiableList(builder.subtasks) : Collections.<SubtaskExecutor>emptyList();
-        this.succeedOnlyIfHasSuccessfulSubtasks = builder.succeedOnlyIfHasSuccessfulSubtasks;
     }
 
     @Override
@@ -53,14 +49,14 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
         if (eventListener != null) {
             eventListener.started(context);
         }
-        for (SubtaskExecutor subtaskExecutor : subtasks) {
-            subtaskExecutor.executeSubtasks(context);
-        }
+        final ServerMigrationTaskResult result = running(context);
         if (eventListener != null) {
             eventListener.done(context);
         }
-        return (!succeedOnlyIfHasSuccessfulSubtasks || context.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+        return result;
     }
+
+    protected abstract ServerMigrationTaskResult running(ServerMigrationTaskContext context) throws Exception;
 
     public interface EventListener {
         void started(ServerMigrationTaskContext context);
@@ -131,8 +127,8 @@ public class ParentServerMigrationTask implements ServerMigrationTask {
             return this;
         }
 
-        public ParentServerMigrationTask build() {
-            return new ParentServerMigrationTask(this);
+        public AbstractServerMigrationTask build() {
+            return new AbstractServerMigrationTask(this);
         }
     }
 

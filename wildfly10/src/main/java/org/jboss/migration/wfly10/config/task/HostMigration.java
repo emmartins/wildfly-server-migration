@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.HostsManagement;
@@ -85,7 +84,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
     @Override
     public ServerMigrationTask getTask(final S source, final HostsManagement hostsManagement) throws Exception {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(HOSTS).build();
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
+        return new ParentServerMigrationTask.Builder(taskName)
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
@@ -106,8 +105,8 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
                             }
                         }
                     }
-                });
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), taskName.getName()+".skip");
+                })
+                .build();
     }
 
     /**
