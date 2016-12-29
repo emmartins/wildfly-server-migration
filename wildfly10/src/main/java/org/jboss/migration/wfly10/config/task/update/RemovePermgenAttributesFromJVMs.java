@@ -24,36 +24,34 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.JVMsManagement;
-import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.task.executor.DomainConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.JVMsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.factory.ParentManageableServerConfigurationTaskFactory;
 
 /**
  * Removes permgen from JVM Configs.
  * @author emmartins
  */
-public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTaskFactory<S>, DomainConfigurationTaskFactory<S> {
+public class RemovePermgenAttributesFromJVMs<S> implements DomainConfigurationTaskFactory<S>, HostConfigurationTaskFactory<S> {
 
-    public static final RemovePermgenAttributesFromJVMs INSTANCE  = new RemovePermgenAttributesFromJVMs();
+    public static <S> ManageableServerConfigurationTaskFactory<S, HostConfiguration> getHostConfigurationTaskFactory() {
 
-    private static final String TASK_NAME_NAME = "remove-permgen-attributes-from-jvms";
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
-
-    private RemovePermgenAttributesFromJVMs() {
     }
 
-    @Override
-    public ServerMigrationTask getTask(S source, HostConfiguration configuration) throws Exception {
-        return getTask(getSubtasks(source, configuration.getJVMsManagement()));
+    public static <S> ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> getHostControllerConfigurationTaskFactory() {
+        return getTaskFactory(DomainConfigurationSubtaskExecutor.allServerGroupJVMs(new JVMsSubtaskExecutor<S>()));
     }
 
-    protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
+    private static <S, T extends ManageableServerConfiguration> ManageableServerConfigurationTaskFactory<S, T> getTaskFactory(ManageableServerConfigurationSubtaskExecutor<S, T> subtaskExecutor) {
+        return new ParentManageableServerConfigurationTaskFactory.Builder<S, T>(new ServerMigrationTaskName.Builder("remove-permgen-attributes-from-jvms").build())
                 .subtask(subtaskExecutor)
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
@@ -66,47 +64,28 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
                     }
                 })
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME + ".skip");
     }
 
-    protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final JVMsManagement jvMsManagement) throws Exception {
-        return new ParentServerMigrationTask.SubtaskExecutor() {
+    @Override
+    public ServerMigrationTask getTask(S source, HostConfiguration configuration) throws Exception {
+        return getTaskFactory(new ParentManageableServerConfigurationTaskFactory.SubtaskExecutor<S, HostConfiguration>() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
-                JVMsSubtaskExecutor.INSTANCE.executeSubtasks(source, jvMsManagement, context);
+            public void executeSubtasks(S source, HostConfiguration configuration, ServerMigrationTaskContext context) throws Exception {
+                JVMsSubtaskExecutor.INSTANCE.executeSubtasks(source, configuration.getJVMsManagement(), context);
             }
-        };
+        });
     }
 
     @Override
     public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-        return getTask(getSubtasks(source, configuration.getServerGroupsManagement()));
+        return null;
     }
 
-    protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final ServerGroupsManagement serverGroupsManagement) throws Exception {
-        return new ParentServerMigrationTask.SubtaskExecutor() {
-            @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
-                for (String serverGroupName : serverGroupsManagement.getResourceNames()) {
-                    getSubtasks(source, serverGroupsManagement.getServerGroupManagement(serverGroupName).getJVMsManagement()).executeSubtasks(context);
-                }
-            }
-        };
-    }
-
-    public static class JVMsSubtaskExecutor<S> implements JVMsManagementSubtaskExecutor<S> {
-
-        public static final JVMsSubtaskExecutor INSTANCE  = new JVMsSubtaskExecutor();
-
-        private static final String SUBTASK_NAME_NAME = "remove-permgen-attributes-from-jvm";
-
-        private JVMsSubtaskExecutor() {
-        }
-
+    static class JVMsSubtaskExecutor<S> implements JVMsManagementSubtaskExecutor<S> {
         @Override
         public void executeSubtasks(S source, final JVMsManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
             for (final String resourceName : resourceManagement.getResourceNames()) {
-                final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME)
+                final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("remove-permgen-attributes-from-jvm")
                         .addAttribute("resource", resourceManagement.getResourcePathAddress(resourceName).toCLIStyleString())
                         .build();
                 final ServerMigrationTask subtask = new ServerMigrationTask() {

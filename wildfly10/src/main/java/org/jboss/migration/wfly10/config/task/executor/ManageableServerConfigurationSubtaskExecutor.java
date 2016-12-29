@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.factory;
+package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 /**
  * @author emmartins
  */
-public interface ManageableServerConfigurationTaskFactory<S, T extends ManageableServerConfiguration> {
+public interface ManageableServerConfigurationSubtaskExecutor<S, T extends ManageableServerConfiguration> {
 
-    ServerMigrationTask getTask(S source, T configuration) throws Exception;
+    void executeSubtasks(S source, T configuration, ServerMigrationTaskContext context) throws Exception;
 
-    interface SubtaskExecutor<S, T extends ManageableServerConfiguration> {
-        void executeSubtasks(S source, T configuration, ServerMigrationTaskContext context) throws Exception;
+    class Adapter {
+
+
+        private Adapter() {
+        }
     }
 }

@@ -90,7 +90,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements Updat
 
                 boolean configUpdated = false;
                 if (!config.hasDefined(PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
-                    // replace all passivation stores with WFLY 10 default one
+                    // replace allServerGroupJVMs passivation stores with WFLY 10 default one
                     // remove file-passivation-store
                     if (config.hasDefined(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME)) {
                         final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME));

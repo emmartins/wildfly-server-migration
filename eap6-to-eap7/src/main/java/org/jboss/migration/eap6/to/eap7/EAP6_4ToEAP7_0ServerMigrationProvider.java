@@ -82,7 +82,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(UpdateUnsecureInterface.INSTANCE)
                                 .subtask(AddPrivateInterface.INSTANCE)
                                 .subtask(AddSocketBindingPortExpressions.INSTANCE)
-                                .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
+                                .subtask(RemovePermgenAttributesFromJVMs.getHostControllerConfigurationTaskFactory())
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )

@@ -100,7 +100,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
 
             if (serverMigrationContext.isInteractive()) {
                 final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
-                new UserConfirmation(consoleWrapper, "Migrate all configurations?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+                new UserConfirmation(consoleWrapper, "Migrate allServerGroupJVMs configurations?", ROOT_LOGGER.yesNo(), resultHandler).execute();
                 switch (resultHandler.getResult()) {
                     case NO:
                         confirmAllConfigs(sourceConfigs, targetConfigDir, target, taskContext);

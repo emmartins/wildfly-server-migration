@@ -21,7 +21,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
+import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,13 +32,13 @@ import java.util.List;
  */
 public class ParentManageableServerConfigurationTaskFactory<S, T extends ManageableServerConfiguration> implements ManageableServerConfigurationTaskFactory<S, T> {
 
-    private final List<ManageableServerConfigurationTaskFactory<S, T>> subtaskFactories;
+    private final List<ManageableServerConfigurationSubtaskExecutor<S, T>> subtaskExecutors;
     private final ServerMigrationTaskName taskName;
     private String skipTaskPropertyName;
     private ParentServerMigrationTask.EventListener eventListener;
 
     protected ParentManageableServerConfigurationTaskFactory(Builder<S, T> builder) {
-        this.subtaskFactories = Collections.unmodifiableList(builder.taskFactories);
+        this.subtaskExecutors = Collections.unmodifiableList(builder.taskFactories);
         this.taskName = builder.taskName;
         this.skipTaskPropertyName = builder.skipTaskPropertyName;
         this.eventListener = builder.eventListener;
@@ -50,14 +50,11 @@ public class ParentManageableServerConfigurationTaskFactory<S, T extends Managea
                 .succeedOnlyIfHasSuccessfulSubtasks()
                 .eventListener(eventListener)
                 .skipTaskPropertyName(skipTaskPropertyName);
-        for (final ManageableServerConfigurationTaskFactory<S, T> subtaskFactory : subtaskFactories) {
+        for (final ManageableServerConfigurationSubtaskExecutor<S, T> subtaskExecutor : subtaskExecutors) {
             taskBuilder.subtask(new ParentServerMigrationTask.SubtaskExecutor() {
                 @Override
                 public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
-                    final ServerMigrationTask subtask = subtaskFactory.getTask(source, configuration);
-                    if (subtask != null) {
-                        context.execute(subtask);
-                    }
+                    subtaskExecutor.executeSubtasks(source, configuration, context);
                 }
             });
         }
@@ -66,7 +63,7 @@ public class ParentManageableServerConfigurationTaskFactory<S, T extends Managea
 
     public static class Builder<S, T extends ManageableServerConfiguration> {
 
-        private final List<SubtaskExecutor<S, T>> taskFactories;
+        private final List<ManageableServerConfigurationSubtaskExecutor<S, T>> taskFactories;
         private final ServerMigrationTaskName taskName;
         private String skipTaskPropertyName;
         private ParentServerMigrationTask.EventListener eventListener;
@@ -77,7 +74,7 @@ public class ParentManageableServerConfigurationTaskFactory<S, T extends Managea
         }
 
         public Builder<S, T> subtask(final ManageableServerConfigurationTaskFactory<S, T> subtaskFactory) {
-            taskFactories.add(new SubtaskExecutor<S, T>() {
+            return subtask(new ManageableServerConfigurationSubtaskExecutor<S, T>() {
                 @Override
                 public void executeSubtasks(S source, T configuration, ServerMigrationTaskContext context) throws Exception {
                    final ServerMigrationTask subtask = subtaskFactory.getTask(source, configuration);
@@ -86,6 +83,10 @@ public class ParentManageableServerConfigurationTaskFactory<S, T extends Managea
                    }
                 }
             });
+        }
+
+        public Builder<S, T> subtask(ManageableServerConfigurationSubtaskExecutor<S, T> subtaskExecutor) {
+            taskFactories.add(subtaskExecutor);
             return this;
         }
 
@@ -106,9 +107,5 @@ public class ParentManageableServerConfigurationTaskFactory<S, T extends Managea
         public ParentManageableServerConfigurationTaskFactory<S, T> build() {
             return new ParentManageableServerConfigurationTaskFactory(this);
         }
-    }
-
-    public interface SubtaskExecutor<S, T extends ManageableServerConfiguration> {
-        void executeSubtasks(S source, T configuration, ServerMigrationTaskContext context) throws Exception;
     }
 }

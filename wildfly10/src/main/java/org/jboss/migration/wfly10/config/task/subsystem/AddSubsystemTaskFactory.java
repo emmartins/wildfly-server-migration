@@ -53,7 +53,6 @@ public class AddSubsystemTaskFactory<S, T extends ManageableServerConfiguration>
             public void started(ServerMigrationTaskContext context) {
                 context.getLogger().infof("Adding subsystem %s...", builder.subsystemName);
             }
-
             @Override
             public void done(ServerMigrationTaskContext context) {
                 context.getLogger().infof("Subsystem %s added.", builder.subsystemName);

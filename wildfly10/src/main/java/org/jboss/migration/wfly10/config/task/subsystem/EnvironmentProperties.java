@@ -42,19 +42,19 @@ public class EnvironmentProperties {
     public static final String SUBSYSTEMS_REMOVE = SUBSYSTEMS_PROPERTIES_PREFIX + "remove";
 
     /**
-     * Retrieves the prefix for all env properties in the context of a subsystem task.
+     * Retrieves the prefix for allServerGroupJVMs env properties in the context of a subsystem task.
      * @param subsystem the subsystem in context
-     * @return the prefix for all env properties in the context of a subsystem task
+     * @return the prefix for allServerGroupJVMs env properties in the context of a subsystem task
      */
     public static String getSubsystemTaskPropertiesPrefix(String subsystem) {
         return new StringBuilder("subsystem.").append(subsystem).append('.').toString();
     }
 
     /**
-     * Retrieves the prefix for all env properties in the context of a subsystem subtask.
+     * Retrieves the prefix for allServerGroupJVMs env properties in the context of a subsystem subtask.
      * @param subsystem the subsystem in context
      * @param subtask the subtask in context
-     * @return the prefix for all env properties in the context of a subsystem subtask
+     * @return the prefix for allServerGroupJVMs env properties in the context of a subsystem subtask
      */
     public static String getSubsystemSubtaskPropertiesPrefix(String subsystem, String subtask) {
         return new StringBuilder(getSubsystemTaskPropertiesPrefix(subsystem)).append(subtask).append('.').toString();

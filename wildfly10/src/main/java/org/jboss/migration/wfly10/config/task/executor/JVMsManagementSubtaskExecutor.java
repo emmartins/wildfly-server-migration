@@ -16,10 +16,40 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
+import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.JVMsManagement;
+import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
 
 /**
  * @author emmartins
  */
 public interface JVMsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, JVMsManagement> {
+
+    class Adapter {
+
+        public static <S> ManageableServerConfigurationSubtaskExecutor<S, HostControllerConfiguration> allDomain(final JVMsManagementSubtaskExecutor<S> subtaskExecutor) {
+            return new ManageableServerConfigurationSubtaskExecutor<S, HostControllerConfiguration>() {
+                @Override
+                public void executeSubtasks(S source, HostControllerConfiguration configuration, ServerMigrationTaskContext context) throws Exception {
+                    final ServerGroupsManagement resourcesManagement = configuration.getServerGroupsManagement();
+                    for (String resourceName : resourcesManagement.getResourceNames()) {
+                        subtaskExecutor.executeSubtasks(source, resourcesManagement.getServerGroupManagement(resourceName).getJVMsManagement(), context);
+                    }
+                }
+            };
+        }
+
+        public static <S> ManageableServerConfigurationSubtaskExecutor<S, HostControllerConfiguration> serverGroup(final String resourceName, final JVMsManagementSubtaskExecutor<S> subtaskExecutor) {
+            return new ManageableServerConfigurationSubtaskExecutor<S, HostControllerConfiguration>() {
+                @Override
+                public void executeSubtasks(S source, HostControllerConfiguration configuration, ServerMigrationTaskContext context) throws Exception {
+                    subtaskExecutor.executeSubtasks(source, configuration.getServerGroupsManagement().getServerGroupManagement(resourceName).getJVMsManagement(), context);
+                }
+            };
+        }
+
+        private Adapter() {
+        }
+    }
 }

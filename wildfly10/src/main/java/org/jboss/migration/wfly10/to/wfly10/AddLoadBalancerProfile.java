@@ -51,6 +51,8 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
                 .subtask(new AddSubsystemTaskFactory.Builder<S>(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW).subtask(new AddUndertowSubsystemConfig<S>()).build())
                 .subtask(new AddSubsystemTaskFactory.Builder<S>(SubsystemNames.LOGGING, ExtensionNames.LOGGING).subtask(new AddLoggingSubsystemConfig<S>()).build())
         );
+        DomainConfigurationTaskBuilders.addProfile("load-balancer")
+                ProfileTask.add()
     }
 
     static class AddLoadBalancerSocketBindingsGroup<S> implements ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration> {

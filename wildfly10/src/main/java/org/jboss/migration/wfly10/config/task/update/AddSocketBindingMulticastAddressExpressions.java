@@ -63,7 +63,6 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Adding socket binding's multicast address expressions...");
                     }
-
                     @Override
                     public void done(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Socket binding's multicast address expressions added.");

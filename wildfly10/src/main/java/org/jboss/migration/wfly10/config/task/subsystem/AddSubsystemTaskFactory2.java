@@ -44,17 +44,7 @@ public class AddSubsystemTaskFactory2 extends ParentServerMigrationTask {
         this.addExtensionSubtask = new AddExtensionSubtask<>(builder.extensionName);
         this.addSubsystemConfigSubtask = builder.addSubsystemConfigSubtask != null ? builder.addSubsystemConfigSubtask : new AddSubsystemConfigSubtask<S>(builder.subsystemName);
         this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
-        this.eventListener = builder.eventListener != null ? builder.eventListener : new ParentServerMigrationTask.EventListener() {
-            @Override
-            public void started(ServerMigrationTaskContext context) {
-                context.getLogger().infof("Adding subsystem %s...", builder.subsystemName);
-            }
-
-            @Override
-            public void done(ServerMigrationTaskContext context) {
-                context.getLogger().infof("Subsystem %s added.", builder.subsystemName);
-            }
-        };
+        this.eventListener = builder.eventListener != null ? builder.eventListener :
     }
 
     @Override
@@ -94,37 +84,16 @@ public class AddSubsystemTaskFactory2 extends ParentServerMigrationTask {
         return new SkippableByEnvServerMigrationTask(taskBuilder.build(), skipTaskPropertyName);
     }
 
-    public static class Builder<S, T extends ManageableServerConfiguration> extends ParentManageableServerConfigurationTaskFactory.Builder<S, T> {
+    public static class Builder<S> {
+
         private final String subsystemName;
         private final String extensionName;
         private AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask;
-        private String skipTaskPropertyName;
-        private ParentServerMigrationTask.EventListener eventListener;
 
         public Builder(String subsystemName, String extensionName) {
-            this(subsystemName, extensionName, )
-        }
-
-        public Builder(String subsystemName, String extensionName, AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask) {
-            super(new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subsystemName).build());
             this.subsystemName = subsystemName;
             this.extensionName = extensionName;
-            subtask(new ManageableServerConfigurationTaskFactory<S, T>() {
-                @Override
-                public ServerMigrationTask getTask(S source, T configuration) throws Exception {
-                    return null;
-                }
-            });
-        }
-
-        public Builder<S> eventListener(ParentServerMigrationTask.EventListener eventListener) {
-            this.eventListener = eventListener;
-            return this;
-        }
-
-        public Builder<S> skipTaskPropertyName(String skipTaskPropertyName) {
-            this.skipTaskPropertyName = skipTaskPropertyName;
-            return this;
+            this.addSubsystemConfigSubtask = new AddSubsystemConfigSubtask<>(subsystemName);
         }
 
         public Builder<S> subtask(AddSubsystemConfigSubtask<S> subtask) {
@@ -132,13 +101,7 @@ public class AddSubsystemTaskFactory2 extends ParentServerMigrationTask {
             return this;
         }
 
-        public Builder<S> taskName(ServerMigrationTaskName taskName) {
-            this.taskName = taskName;
-            return this;
-        }
-
-        public AddSubsystemTaskFactory2<S> build() {
-            return new AddSubsystemTaskFactory2(this);
-        }
     }
+
+    public static Config
 }
