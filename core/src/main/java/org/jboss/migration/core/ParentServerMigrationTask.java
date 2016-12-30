@@ -24,7 +24,7 @@ import java.util.List;
  * A {@link ServerMigrationTask} which simply execute its subtasks.
  * @author emmartins
  */
-public class ParentServerMigrationTask extends AbstractServerMigrationTask {
+public class ParentServerMigrationTask<C extends ServerMigrationTaskContext> extends AbstractServerMigrationTask<C> {
 
     private final List<SubtaskExecutor> subtasks;
     private final boolean succeedOnlyIfHasSuccessfulSubtasks;
@@ -36,17 +36,26 @@ public class ParentServerMigrationTask extends AbstractServerMigrationTask {
     }
 
     @Override
-    protected ServerMigrationTaskResult runTask(ServerMigrationTaskContext context) throws Exception {
+    protected C getTaskContext(ServerMigrationTaskContext context) throws Exception {
+        return context;
+    }
+
+    @Override
+    protected ServerMigrationTaskResult runTask(C context) throws Exception {
         for (SubtaskExecutor subtaskExecutor : subtasks) {
-            subtaskExecutor.executeSubtasks(context);
+            runSubtaskExecutor(subtaskExecutor, context);
         }
         return (!succeedOnlyIfHasSuccessfulSubtasks || context.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+    }
+
+    protected void runSubtaskExecutor(SubtaskExecutor subtaskExecutor, ServerMigrationTaskContext context) throws Exception {
+        subtaskExecutor.executeSubtasks(context);
     }
 
     /**
      * The parent task builder.
      */
-    protected static abstract class AbstractBuilder<T extends Builder> extends AbstractServerMigrationTask.Builder<T> {
+    public static abstract class AbstractBuilder<C extends ServerMigrationTaskContext, B extends AbstractBuilder> extends AbstractServerMigrationTask.Builder<B> {
 
         protected final List<SubtaskExecutor> subtasks;
         protected boolean succeedOnlyIfHasSuccessfulSubtasks = true;
@@ -56,7 +65,7 @@ public class ParentServerMigrationTask extends AbstractServerMigrationTask {
             this.subtasks = new ArrayList<>();
         }
 
-        public T subtask(final ServerMigrationTask subtask) {
+        public B subtask(final ServerMigrationTask subtask) {
             return subtask(new SubtaskExecutor() {
                 @Override
                 public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
@@ -65,23 +74,23 @@ public class ParentServerMigrationTask extends AbstractServerMigrationTask {
             });
         }
 
-        public T subtask(SubtaskExecutor subtask) {
+        public B subtask(SubtaskExecutor subtask) {
             subtasks.add(subtask);
-            return (T) this;
+            return (B) this;
         }
 
-        public T succeedOnlyIfHasSuccessfulSubtasks() {
+        public B succeedOnlyIfHasSuccessfulSubtasks() {
             succeedOnlyIfHasSuccessfulSubtasks = true;
-            return (T) this;
+            return (B) this;
         }
 
-        public T succeedAlways() {
+        public B succeedAlways() {
             succeedOnlyIfHasSuccessfulSubtasks = false;
-            return (T) this;
+            return (B) this;
         }
     }
 
-    public static class Builder extends AbstractBuilder<Builder> {
+    public static class Builder<C extends ServerMigrationTaskContext> extends AbstractBuilder<C, Builder> {
         public Builder(ServerMigrationTaskName name) {
             super(name);
         }
@@ -90,7 +99,7 @@ public class ParentServerMigrationTask extends AbstractServerMigrationTask {
         }
     }
 
-    public interface SubtaskExecutor {
-        void executeSubtasks(ServerMigrationTaskContext context) throws Exception;
+    public interface SubtaskExecutor<C extends ServerMigrationTaskContext> {
+        void executeSubtasks(C context) throws Exception;
     }
 }

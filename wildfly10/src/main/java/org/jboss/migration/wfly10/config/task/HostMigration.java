@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task;
 
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -85,7 +86,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
     public ServerMigrationTask getTask(final S source, final HostsManagement hostsManagement) throws Exception {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(HOSTS).build();
         return new ParentServerMigrationTask.Builder(taskName)
-                .eventListener(new ParentServerMigrationTask.EventListener() {
+                .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Hosts migration starting...");

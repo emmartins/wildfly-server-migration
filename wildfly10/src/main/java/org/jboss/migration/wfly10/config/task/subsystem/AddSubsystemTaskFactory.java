@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.subsystem;
 
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -40,14 +41,14 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
     private final AddExtensionSubtask<S> addExtensionSubtask;
     private final AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask;
     private String skipTaskPropertyName;
-    private ParentServerMigrationTask.EventListener eventListener;
+    private AbstractServerMigrationTask.Listener eventListener;
 
     protected AddSubsystemTaskFactory(final Builder<S> builder) {
         this.taskName = builder.taskName != null ? builder.taskName : new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name",builder. subsystemName).build();
         this.addExtensionSubtask = new AddExtensionSubtask<>(builder.extensionName);
         this.addSubsystemConfigSubtask = builder.addSubsystemConfigSubtask != null ? builder.addSubsystemConfigSubtask : new AddSubsystemConfigSubtask<S>(builder.subsystemName);
         this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
-        this.eventListener = builder.eventListener != null ? builder.eventListener : new ParentServerMigrationTask.EventListener() {
+        this.eventListener = builder.eventListener != null ? builder.eventListener : new AbstractServerMigrationTask.Listener() {
             @Override
             public void started(ServerMigrationTaskContext context) {
                 context.getLogger().infof("Adding subsystem %s...", builder.subsystemName);
@@ -89,12 +90,13 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
 
     private ServerMigrationTask getTask(S source, ParentServerMigrationTask.SubtaskExecutor addExtensionSubtask, ParentServerMigrationTask.SubtaskExecutor addSubsystemSubtask) throws Exception {
         final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
+                .skipTaskPropertyName(skipTaskPropertyName)
                 .subtask(addExtensionSubtask)
                 .subtask(addSubsystemSubtask);
         if (eventListener != null) {
-            taskBuilder.eventListener(eventListener);
+            taskBuilder.listener(eventListener);
         }
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), skipTaskPropertyName);
+        return taskBuilder.build();
     }
 
     public static class Builder<S> {
@@ -103,14 +105,14 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
         private final String extensionName;
         private AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask;
         private String skipTaskPropertyName;
-        private ParentServerMigrationTask.EventListener eventListener;
+        private AbstractServerMigrationTask.Listener eventListener;
 
         public Builder(String subsystemName, String extensionName) {
             this.subsystemName = subsystemName;
             this.extensionName = extensionName;
         }
 
-        public Builder<S> eventListener(ParentServerMigrationTask.EventListener eventListener) {
+        public Builder<S> eventListener(AbstractServerMigrationTask.Listener eventListener) {
             this.eventListener = eventListener;
             return this;
         }

@@ -20,6 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -73,8 +74,8 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
     }
 
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
-                .eventListener(new ParentServerMigrationTask.EventListener() {
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
+                .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().debugf("Updating unsecure interface configuration...");
@@ -86,7 +87,6 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
                 })
                 .subtask(subtaskExecutor)
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     static class SetUnsecureInterfaceInetAddress<S> implements InterfacesManagementSubtaskExecutor<S> {

@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -83,7 +84,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                 .build();
         final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(taskName)
                 .subtask(subtaskExecutor)
-                .eventListener(new ParentServerMigrationTask.EventListener() {
+                .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Migrating subsystem %s configurations...", subsystemName);
@@ -96,7 +97,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
         if (extensionModule != null) {
             taskBuilder.subtask(SubtaskExecutorAdapters.of(source, configuration, new RemoveExtension<S>(extensionModule)));
         }
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), taskNameName + ".skip");
+        return  taskBuilder.build();
     }
 
     protected static class ConfigMigration<S> implements SubsystemsManagementSubtaskExecutor<S> {

@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -55,9 +56,9 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
     }
 
     protected ServerMigrationTask getTask(S source, DeploymentsManagement deploymentsManagement) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
+        return new ParentServerMigrationTask.Builder(TASK_NAME)
                 .subtask(SubtaskExecutorAdapters.of(source, deploymentsManagement, new SubtaskExecutor()))
-                .eventListener(new ParentServerMigrationTask.EventListener() {
+                .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Deployments removal starting...");
@@ -68,7 +69,6 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
                     }
                 })
                 .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
     }
 
     public static class SubtaskExecutor<S> implements DeploymentsManagementSubtaskExecutor<S> {

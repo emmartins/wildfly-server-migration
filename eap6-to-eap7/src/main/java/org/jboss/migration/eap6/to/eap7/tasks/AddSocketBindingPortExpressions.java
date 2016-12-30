@@ -21,6 +21,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.ValueExpression;
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -60,7 +61,7 @@ public class AddSocketBindingPortExpressions<S> implements ManageableServerConfi
     public ServerMigrationTask getTask(S source, ManageableServerConfiguration configuration) throws Exception {
         return new ParentServerMigrationTask.Builder(TASK_NAME)
                 .subtask(SubtaskExecutorAdapters.of(source, configuration, new SubtaskExecutor<S>()))
-                .eventListener(new ParentServerMigrationTask.EventListener() {
+                .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().infof("Adding socket binding's port expressions...");

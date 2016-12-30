@@ -19,6 +19,7 @@ package org.jboss.migration.eap6.to.eap7.tasks;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
@@ -79,7 +80,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
 
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
         return new ParentServerMigrationTask.Builder(TASK_NAME)
-                .eventListener(new ParentServerMigrationTask.EventListener() {
+                .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(ServerMigrationTaskContext context) {
                         context.getLogger().infof("HTTP upgrade management setup starting...");

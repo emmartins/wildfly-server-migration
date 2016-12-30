@@ -20,7 +20,6 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
@@ -30,14 +29,11 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class ManageableServerConfigurationParentTaskFactory<S, T extends ManageableServerConfiguration> implements ManageableServerConfigurationTaskFactory<S, T> {
+public class ManageableServerConfigurationTaskFactory2<S, T extends ManageableServerConfiguration> extends AbstractServerMigrationTask {
 
     private final List<ManageableServerConfigurationTaskFactory<S, T>> subtaskFactories;
-    private final ServerMigrationTaskName taskName;
-    private String skipTaskPropertyName;
-    private AbstractServerMigrationTask.Listener eventListener;
 
-    protected ManageableServerConfigurationParentTaskFactory(Builder<S, T> builder) {
+    protected ManageableServerConfigurationTaskFactory2(Builder<S, T> builder) {
         this.subtaskFactories = builder.taskFactories.getFactories();
         this.taskName = builder.taskName;
         this.skipTaskPropertyName = builder.skipTaskPropertyName;
@@ -60,15 +56,12 @@ public class ManageableServerConfigurationParentTaskFactory<S, T extends Managea
         return taskBuilder.build();
     }
 
-    public static class Builder<S, T extends ManageableServerConfiguration> {
+    public static class Builder<S, T extends ManageableServerConfiguration> extends ParentServerMigrationTask.AbstractBuilder<Builder<S, T>> {
 
         private final ServerConfigurationMigration.ManageableServerConfigurationTaskFactories<S, T> taskFactories;
-        private final ServerMigrationTaskName taskName;
-        private String skipTaskPropertyName;
-        private AbstractServerMigrationTask.Listener eventListener;
 
         public Builder(ServerMigrationTaskName taskName) {
-            this.taskName = taskName;
+            super(taskName);
             this.taskFactories = new ServerConfigurationMigration.ManageableServerConfigurationTaskFactories<>();
         }
 
@@ -82,18 +75,17 @@ public class ManageableServerConfigurationParentTaskFactory<S, T extends Managea
             return this;
         }
 
-        public Builder<S, T> eventListener(AbstractServerMigrationTask.Listener eventListener) {
-            this.eventListener = eventListener;
-            return this;
+        public ManageableServerConfigurationTaskFactory<S, T> build(final S source, final T configuration) {
+            return new ManageableServerConfigurationTaskFactory<S, T>() {
+                @Override
+                public ServerMigrationTask getTask(S source, T configuration) throws Exception {
+                    return null;
+                }
+            }
+
         }
 
-        public Builder<S, T> skipTaskPropertyName(String skipTaskPropertyName) {
-            this.skipTaskPropertyName = skipTaskPropertyName;
-            return this;
-        }
-
-        public ManageableServerConfigurationParentTaskFactory<S, T> build() {
-            return new ManageableServerConfigurationParentTaskFactory(this);
-        }
     }
+
+    private static class InjectableSubtaskExecutor
 }
