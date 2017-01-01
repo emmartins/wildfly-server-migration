@@ -20,7 +20,7 @@ package org.jboss.migration.core;
  * An abstract {@link ServerMigrationTask} implementation.
  * @author emmartins
  */
-public abstract class AbstractServerMigrationTask<C extends ServerMigrationTaskContext> implements ServerMigrationTask {
+public abstract class AbstractServerMigrationTask implements ServerMigrationTask {
 
     protected final ServerMigrationTaskName name;
     protected final Listener listener;
@@ -45,7 +45,7 @@ public abstract class AbstractServerMigrationTask<C extends ServerMigrationTaskC
         if (listener != null) {
             listener.started(context);
         }
-        final ServerMigrationTaskResult result = runTask(getTaskContext(context));
+        final ServerMigrationTaskResult result = runTask(context);
         if (listener != null) {
             listener.done(context);
         }
@@ -58,9 +58,7 @@ public abstract class AbstractServerMigrationTask<C extends ServerMigrationTaskC
      * @return
      * @throws Exception
      */
-    protected abstract ServerMigrationTaskResult runTask(C context) throws Exception;
-
-    protected abstract C getTaskContext(ServerMigrationTaskContext context) throws Exception;
+    protected abstract ServerMigrationTaskResult runTask(ServerMigrationTaskContext context) throws Exception;
 
     /**
      * A listener for task run related events.

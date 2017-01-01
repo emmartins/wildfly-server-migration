@@ -25,7 +25,6 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.JVMsManagement;
@@ -88,7 +87,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
             @Override
             public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
                 for (String serverGroupName : serverGroupsManagement.getResourceNames()) {
-                    getSubtasks(source, serverGroupsManagement.getServerGroupManagement(serverGroupName).getJVMsManagement()).executeSubtasks(context);
+                    getSubtasks(source, serverGroupsManagement.getServerGroupManagement(serverGroupName).getJVMsManagement()).run(context);
                 }
             }
         };

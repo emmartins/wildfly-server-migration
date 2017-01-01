@@ -100,7 +100,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 context.getLogger().infof("Updating subsystem %s configurations...", name);
-                subtaskExecutor.executeSubtasks(context);
+                subtaskExecutor.run(context);
                 context.getLogger().infof("Subsystem %s configurations updated.", name);
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }

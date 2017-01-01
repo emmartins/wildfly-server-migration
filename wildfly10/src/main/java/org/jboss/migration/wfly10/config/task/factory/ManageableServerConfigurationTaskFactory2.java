@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
@@ -79,7 +80,7 @@ public class ManageableServerConfigurationTaskFactory2<S, T extends ManageableSe
             return new ManageableServerConfigurationTaskFactory<S, T>() {
                 @Override
                 public ServerMigrationTask getTask(S source, T configuration) throws Exception {
-                    return null;
+                    return new ParentServerMigrationTask<>(this);
                 }
             }
 
@@ -87,5 +88,4 @@ public class ManageableServerConfigurationTaskFactory2<S, T extends ManageableSe
 
     }
 
-    private static class InjectableSubtaskExecutor
 }
