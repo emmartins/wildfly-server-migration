@@ -22,7 +22,8 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
@@ -51,11 +52,11 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
         this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
         this.eventListener = builder.eventListener != null ? builder.eventListener : new AbstractServerMigrationTask.Listener() {
             @Override
-            public void started(ServerMigrationTaskContext context) {
+            public void started(TaskContext context) {
                 context.getLogger().infof("Adding profile %s...", profileName);
             }
             @Override
-            public void done(ServerMigrationTaskContext context) {
+            public void done(TaskContext context) {
                 context.getLogger().infof("Profile %s added.", profileName);
             }
         };
@@ -92,7 +93,7 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
         }
 
         @Override
-        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
             final PathAddress pathAddress = configuration.getProfilesManagement().getResourcePathAddress(profileName);
             final ModelNode op = Util.createAddOperation(pathAddress);
             configuration.executeManagementOperation(op);

@@ -24,7 +24,8 @@ import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
@@ -61,12 +62,12 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
                 .subtask(SubtaskExecutorAdapters.of(source, configuration, new SubtaskExecutor<S>()))
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Adding socket binding's multicast address expressions...");
                     }
 
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("Socket binding's multicast address expressions added.");
                     }
                 })
@@ -75,7 +76,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
 
     public static class SubtaskExecutor<S> implements SocketBindingGroupsManagementSubtaskExecutor<S> {
         @Override
-        public void executeSubtasks(S source, SocketBindingGroupsManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, SocketBindingGroupsManagement resourceManagement, TaskContext context) throws Exception {
             for (String socketBindingGroupName : resourceManagement.getResourceNames()) {
                 context.getLogger().debugf("Processing socket binding group %s...", socketBindingGroupName);
                 final SocketBindingGroupManagement socketBindingGroupManagement = resourceManagement.getSocketBindingGroupManagement(socketBindingGroupName);
@@ -111,7 +112,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
         }
 
         @Override
-        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
             // retrieve resource config
             final ModelNode resource = resourceManagement.getResource(resourceName);
             if (resource == null) {

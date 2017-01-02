@@ -23,7 +23,8 @@ import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
@@ -54,7 +55,7 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
     public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
         final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(final TaskContext context) throws Exception {
                 new SetUnsecureInterfaceInetAddress().executeSubtasks(source, configuration.getInterfacesManagement(), context);
             }
         };
@@ -66,7 +67,7 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
     public ServerMigrationTask getTask(final S source, final HostConfiguration configuration) throws Exception {
         final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(final TaskContext context) throws Exception {
                 new RemoveUnsecureInterface().executeSubtasks(source, configuration.getInterfacesManagement(), context);
             }
         };
@@ -77,11 +78,11 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
         return new ParentServerMigrationTask.Builder(TASK_NAME)
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().debugf("Updating unsecure interface configuration...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().debugf("Unsecure interface configuration updated.");
                     }
                 })
@@ -96,14 +97,14 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
         private static final String INTERFACE_NAME = "unsecure";
 
         @Override
-        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, TaskContext context) throws Exception {
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {
                     return SERVER_MIGRATION_TASK_NAME;
                 }
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     // retrieve resource config
                     final ModelNode resource = resourceManagement.getResource(INTERFACE_NAME);
                     if (resource == null) {
@@ -137,14 +138,14 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
         private static final String INTERFACE_NAME = "unsecure";
 
         @Override
-        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, TaskContext context) throws Exception {
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {
                     return SERVER_MIGRATION_TASK_NAME;
                 }
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     // retrieve resource config
                     if (!resourceManagement.getResourceNames().contains(INTERFACE_NAME)) {
                         context.getLogger().debugf("Interface %s does not exists.", INTERFACE_NAME);

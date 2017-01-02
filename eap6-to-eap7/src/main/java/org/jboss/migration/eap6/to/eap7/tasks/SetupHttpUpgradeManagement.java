@@ -22,7 +22,8 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
@@ -58,7 +59,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
     public ServerMigrationTask getTask(final S source, final StandaloneServerConfiguration configuration) throws Exception {
         final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(final TaskContext context) throws Exception {
                 new SetManagementInterfacesHttpUpgradeEnabled().executeSubtasks(source, configuration.getManagementInterfacesManagement(), context);
                 new UpdateManagementHttpsSocketBindingPort().executeSubtasks(source, configuration.getSocketBindingGroupsManagement(), context);
             }
@@ -71,7 +72,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
     public ServerMigrationTask getTask(final S source, final HostConfiguration configuration) throws Exception {
         final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(final TaskContext context) throws Exception {
                 new SetManagementInterfacesHttpUpgradeEnabled().executeSubtasks(source, configuration.getManagementInterfacesManagement(), context);
             }
         };
@@ -82,11 +83,11 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         return new ParentServerMigrationTask.Builder(TASK_NAME)
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("HTTP upgrade management setup starting...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("HTTP upgrade management setup completed.");
                     }
                 })
@@ -101,14 +102,14 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         private static final String MANAGEMENT_INTERFACE_NAME = "http-interface";
 
         @Override
-        public void executeSubtasks(final S source, final ManagementInterfacesManagement resourceManagement, final ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(final S source, final ManagementInterfacesManagement resourceManagement, final TaskContext context) throws Exception {
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {
                     return SERVER_MIGRATION_TASK_NAME;
                 }
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     // retrieve resource config
                     final ModelNode resource = resourceManagement.getResource(MANAGEMENT_INTERFACE_NAME);
                     if (resource == null) {
@@ -153,7 +154,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         private final String SOCKET_BINDING_PORT_ATTR = "port";
 
         @Override
-        public void executeSubtasks(S source, SocketBindingGroupsManagement socketBindingGroupsManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, SocketBindingGroupsManagement socketBindingGroupsManagement, TaskContext context) throws Exception {
             for (String socketBindingGroup : socketBindingGroupsManagement.getResourceNames()) {
                 final SocketBindingGroupManagement socketBindingGroupManagement = socketBindingGroupsManagement.getSocketBindingGroupManagement(socketBindingGroup);
                 final SocketBindingsManagement socketBindingsManagement = socketBindingGroupManagement.getSocketBindingsManagement();
@@ -163,7 +164,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
                         return SERVER_MIGRATION_TASK_NAME;
                     }
                     @Override
-                    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                         final MigrationEnvironment env = context.getServerMigrationContext().getMigrationEnvironment();
                         String envPropertyPort = env.getPropertyAsString(UpdateManagementHttpsSocketBindingPort.EnvironmentProperties.PORT);
                         if (envPropertyPort == null || envPropertyPort.isEmpty()) {

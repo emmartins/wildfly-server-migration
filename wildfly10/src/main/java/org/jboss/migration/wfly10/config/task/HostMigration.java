@@ -19,7 +19,8 @@ package org.jboss.migration.wfly10.config.task;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
@@ -61,7 +62,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
             }
 
             @Override
-            public ServerMigrationTaskResult run(final ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(final TaskContext context) throws Exception {
                 context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
                 context.getLogger().infof("Migrating host %s in host configuration %s ...", resourceName, source);
                 final HostConfiguration hostConfiguration = hostConfigurationProvider.getHostConfiguration(resourceName, resourceManagement.getHostControllerConfiguration());
@@ -88,17 +89,17 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
         return new ParentServerMigrationTask.Builder(taskName)
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Hosts migration starting...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("Hosts migration done.");
                     }
                 })
                 .subtask(new ParentServerMigrationTask.SubtaskExecutor() {
                     @Override
-                    public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+                    public void executeSubtasks(TaskContext context) throws Exception {
                         for (String resourceName : hostsManagement.getResourceNames()) {
                             final ServerMigrationTask subtask = getResourceSubtask(resourceName, source, hostsManagement);
                             if (subtask != null) {

@@ -38,7 +38,7 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
     }
 
     @Override
-    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
         if (skipper != null && skipper.isSkipped(context)) {
             return ServerMigrationTaskResult.SKIPPED;
         }
@@ -58,18 +58,18 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
      * @return
      * @throws Exception
      */
-    protected abstract ServerMigrationTaskResult runTask(ServerMigrationTaskContext context) throws Exception;
+    protected abstract ServerMigrationTaskResult runTask(TaskContext context) throws Exception;
 
     /**
      * A listener for task run related events.
      */
     public interface Listener {
-        void started(ServerMigrationTaskContext context);
-        void done(ServerMigrationTaskContext context);
+        void started(TaskContext context);
+        void done(TaskContext context);
     }
 
     public interface Skipper {
-        boolean isSkipped(ServerMigrationTaskContext context);
+        boolean isSkipped(TaskContext context);
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
         public T skipTaskPropertyName(final String skipTaskPropertyName) {
             return skipper(new Skipper() {
                 @Override
-                public boolean isSkipped(ServerMigrationTaskContext context) {
+                public boolean isSkipped(TaskContext context) {
                     return skipTaskPropertyName != null ? context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(skipTaskPropertyName, Boolean.FALSE) : false;
                 }
             });

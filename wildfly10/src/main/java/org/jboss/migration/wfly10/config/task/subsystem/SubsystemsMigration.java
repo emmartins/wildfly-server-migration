@@ -17,7 +17,8 @@
 package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
@@ -50,7 +51,7 @@ public class SubsystemsMigration<S> {
                 return MANAGEMENT_RESOURCES_SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
                 context.getLogger().infof("Subsystems resources migration starting...");
                 migrateExtensions(subsystemsManagement, context);
@@ -60,7 +61,7 @@ public class SubsystemsMigration<S> {
         };
     }
 
-    protected void migrateExtensions(final SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws IOException {
+    protected void migrateExtensions(final SubsystemsManagement subsystemsManagement, TaskContext context) throws IOException {
         final List<Extension> extensionsToMigrate = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         for (Extension extensionToMigrate : extensionsToMigrate) {
             extensionToMigrate.migrate(subsystemsManagement, context);

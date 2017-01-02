@@ -21,15 +21,15 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.AbstractServerMigrationTask;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -76,11 +76,11 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                 .subtask(SubtaskExecutorAdapters.of(source, resourcesManagement, new SubtaskExecutor<S>()))
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Migrating security realms...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("Security realms migration done.");
                     }
                 })
@@ -89,7 +89,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
 
     public static class SubtaskExecutor<S extends JBossServer<S>> implements SecurityRealmsManagementSubtaskExecutor<ServerPath<S>> {
         @Override
-        public void executeSubtasks(ServerPath<S> source, SecurityRealmsManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(ServerPath<S> source, SecurityRealmsManagement resourceManagement, TaskContext context) throws Exception {
             for (String resourceName : resourceManagement.getResourceNames()) {
                 final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME).addAttribute("name", resourceName).build();
                 context.execute(new Task<>(taskName, source, resourceName, resourceManagement));
@@ -117,7 +117,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
         }
 
         @Override
-        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
             context.getLogger().debugf("Security realm %s migration starting...", securityRealmName);
             final ModelNode securityRealmConfig = securityRealmsManagement.getResource(securityRealmName);
             if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
@@ -131,7 +131,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
             return ServerMigrationTaskResult.SUCCESS;
         }
 
-        private void copyPropertiesFile(String propertiesName, String securityRealmName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmsManagement securityRealmsManagement, ServerMigrationTaskContext context) throws IOException {
+        private void copyPropertiesFile(String propertiesName, String securityRealmName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmsManagement securityRealmsManagement, TaskContext context) throws IOException {
             final Server sourceServer = source.getServer();
             final Server targetServer = securityRealmsManagement.getServerConfiguration().getServer();
             final ModelNode properties = securityRealmConfig.get(propertiesName, PROPERTIES);

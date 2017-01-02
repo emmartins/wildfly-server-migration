@@ -19,9 +19,9 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -50,12 +50,12 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
         this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
         this.eventListener = builder.eventListener != null ? builder.eventListener : new AbstractServerMigrationTask.Listener() {
             @Override
-            public void started(ServerMigrationTaskContext context) {
+            public void started(TaskContext context) {
                 context.getLogger().infof("Adding subsystem %s...", builder.subsystemName);
             }
 
             @Override
-            public void done(ServerMigrationTaskContext context) {
+            public void done(TaskContext context) {
                 context.getLogger().infof("Subsystem %s added.", builder.subsystemName);
             }
         };

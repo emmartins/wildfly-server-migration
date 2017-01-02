@@ -17,7 +17,8 @@
 package org.jboss.migration.wfly10.config.task.module;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.jboss.JBossServer;
@@ -85,7 +86,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
         }
 
         @Override
-        protected void migrateModules(ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws Exception {
+        protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) throws Exception {
             try (InputStream in = new BufferedInputStream(new FileInputStream(xmlConfigurationPath.toFile()))) {
                 XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(in);
                 reader.require(START_DOCUMENT, null, null);
@@ -97,7 +98,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
             }
         }
 
-        protected void processElement(XMLStreamReader reader, ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws IOException {
+        protected void processElement(XMLStreamReader reader, ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
             final List<ModulesFinder> elementModulesFinders = modulesFinders.get(reader.getLocalName());
             if (elementModulesFinders != null) {
                 for (ModulesFinder modulesFinder : elementModulesFinders) {
@@ -120,7 +121,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
          * @param reader the XML stream reader, positioned at the start of an element of interest
          * @param moduleMigrator the module migrator
          */
-        void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws IOException;
+        void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException;
     }
 
     public static class Builder<S extends JBossServer<S>> {

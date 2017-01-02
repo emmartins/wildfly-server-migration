@@ -17,7 +17,8 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
@@ -38,7 +39,7 @@ public abstract class WildFly10SubsystemMigrationTask implements ServerMigration
     }
 
     @Override
-    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
         final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(subsystem.getName(), this.getName().getName()));
         // check if subtask was skipped by env
         if (taskEnvironment.isSkippedByEnvironment()) {
@@ -47,5 +48,5 @@ public abstract class WildFly10SubsystemMigrationTask implements ServerMigration
         return run(config, subsystem, subsystemsManagement, context, taskEnvironment);
     }
 
-    protected abstract ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception;
+    protected abstract ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception;
 }

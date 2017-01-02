@@ -21,7 +21,8 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
@@ -42,11 +43,11 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
                 .subtask(new AddJMXSubsystemConfig<S>())
                 .eventListener(new ParentServerMigrationTask.EventListener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Adding JMX subsystem configuration...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("JMX subsystem configuration added.");
                     }
                 })
@@ -66,7 +67,7 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
         }
 
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
             super.addSubsystem(subsystemsManagement, context);
             // add jmx subsystem default config
             /*

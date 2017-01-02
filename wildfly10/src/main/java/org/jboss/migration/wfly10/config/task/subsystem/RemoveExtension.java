@@ -19,7 +19,8 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
@@ -38,7 +39,7 @@ public class RemoveExtension<S> implements ExtensionsManagementSubtaskExecutor<S
     }
 
     @Override
-    public void executeSubtasks(S source, final ExtensionsManagement extensionsManagement, ServerMigrationTaskContext context) throws Exception {
+    public void executeSubtasks(S source, final ExtensionsManagement extensionsManagement, TaskContext context) throws Exception {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("remove-extension").addAttribute("name", extensionModule).build();
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
@@ -46,7 +47,7 @@ public class RemoveExtension<S> implements ExtensionsManagementSubtaskExecutor<S
                 return taskName;
             }
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 if (extensionsManagement.getResourceNames().contains(extensionModule)) {
                     context.getLogger().debugf("Removing Extension %s...", extensionModule);
                     final ModelNode op = Util.createRemoveOperation(extensionsManagement.getResourcePathAddress(extensionModule));

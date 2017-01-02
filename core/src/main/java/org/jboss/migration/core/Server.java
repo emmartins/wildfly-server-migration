@@ -48,7 +48,7 @@ public interface Server {
      * @return the server migration task result
      * @throws IllegalArgumentException if the server is not able to migrate from the specified source
      */
-    ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException;
+    ServerMigrationTaskResult migrate(Server source, TaskContext context) throws IllegalArgumentException;
 
     /**
      * Resolves a path.

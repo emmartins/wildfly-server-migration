@@ -20,7 +20,8 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationContext;
 import org.jboss.migration.core.ServerMigrationFailedException;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.BasicResultHandlers;
@@ -84,7 +85,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         }
 
         @Override
-        public ServerMigrationTaskResult run(final ServerMigrationTaskContext taskContext) throws Exception {
+        public ServerMigrationTaskResult run(final TaskContext taskContext) throws Exception {
             final ServerMigrationContext serverMigrationContext = taskContext.getServerMigrationContext();
             final ConsoleWrapper consoleWrapper = serverMigrationContext.getConsoleWrapper();
             consoleWrapper.printf("%n");
@@ -119,19 +120,19 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
             return taskContext.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
         }
 
-        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final ServerMigrationTaskContext taskContext) throws Exception {
+        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) throws Exception {
             for (S sourceConfig : sourceConfigs) {
                 taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigDir, target));
             }
         }
 
-        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final ServerMigrationTaskContext taskContext) throws Exception {
+        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) throws Exception {
             for (S sourceConfig : sourceConfigs) {
                 confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
             }
         }
 
-        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final ServerMigrationTaskContext taskContext) throws Exception {
+        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final TaskContext taskContext) throws Exception {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
                 public void onNo() throws Exception {

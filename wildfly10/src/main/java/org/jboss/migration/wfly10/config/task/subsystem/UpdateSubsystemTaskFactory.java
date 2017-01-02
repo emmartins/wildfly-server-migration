@@ -19,7 +19,8 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
@@ -95,7 +96,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
                 return serverMigrationTaskName;
             }
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
@@ -109,7 +110,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
 
     class SubtaskExecutor<S> implements SubsystemsManagementSubtaskExecutor<S> {
         @Override
-        public void executeSubtasks(final S source, final SubsystemsManagement subsystemsManagement, final ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(final S source, final SubsystemsManagement subsystemsManagement, final TaskContext context) throws Exception {
             final String configName = subsystemsManagement.getResourcePathAddress(name).toCLIStyleString();
             final ModelNode subsystemConfig = subsystemsManagement.getResource(name);
             if (subsystemConfig != null) {
@@ -124,7 +125,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
         }
     }
 
-    protected boolean skipExecution(ServerMigrationTaskContext context) {
+    protected boolean skipExecution(TaskContext context) {
         return new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemTaskPropertiesPrefix(name)).isSkippedByEnvironment();
     }
 
@@ -208,7 +209,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
         }
 
         @Override
-        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
             final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(subsystem.getName(), this.getName().getName()));
             // check if subtask was skipped by env
             if (taskEnvironment.isSkippedByEnvironment()) {
@@ -217,6 +218,6 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
             return run(config, subsystem, subsystemsManagement, context, taskEnvironment);
         }
 
-        protected abstract ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception;
+        protected abstract ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception;
     }
 }

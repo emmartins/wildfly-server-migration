@@ -16,7 +16,8 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
@@ -34,7 +35,7 @@ public class DatasourcesJdbcDriversModulesFinder implements ConfigurationModules
     }
 
     @Override
-    public void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws IOException {
+    public void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
         final String namespaceURI = reader.getNamespaceURI();
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ SubsystemNames.DATASOURCES)) {
             return;

@@ -18,7 +18,8 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
@@ -38,7 +39,7 @@ public class ServerMigration<S extends Server> implements WildFlyServerMigration
         subtaskFactories = Collections.unmodifiableList(builder.subtaskFactories);
     }
 
-    public ServerMigrationTaskResult run(S source, WildFlyServer10 target, ServerMigrationTaskContext context) {
+    public ServerMigrationTaskResult run(S source, WildFlyServer10 target, TaskContext context) {
         for (SubtaskFactory subtaskFactory : subtaskFactories) {
             ServerMigrationTask subtask = subtaskFactory.getTask(source, target);
             if (subtask != null) {

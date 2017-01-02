@@ -18,7 +18,8 @@ package org.jboss.migration.wfly10.config.task.subsystem.securitymanager;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
@@ -43,7 +44,7 @@ public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S>
     private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
 
     @Override
-    protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
         // add subsystem with default config
             /*
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">

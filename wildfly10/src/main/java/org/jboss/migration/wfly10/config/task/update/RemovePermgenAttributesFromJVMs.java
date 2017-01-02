@@ -22,7 +22,8 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
@@ -57,11 +58,11 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
                 .subtask(subtaskExecutor)
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Removal of permgen attributes from JVM configs starting...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("Removal of permgen attributes from JVM configs done.");
                     }
                 })
@@ -71,7 +72,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
     protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final JVMsManagement jvMsManagement) throws Exception {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(final TaskContext context) throws Exception {
                 JVMsSubtaskExecutor.INSTANCE.executeSubtasks(source, jvMsManagement, context);
             }
         };
@@ -85,9 +86,9 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
     protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final ServerGroupsManagement serverGroupsManagement) throws Exception {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(final TaskContext context) throws Exception {
                 for (String serverGroupName : serverGroupsManagement.getResourceNames()) {
-                    getSubtasks(source, serverGroupsManagement.getServerGroupManagement(serverGroupName).getJVMsManagement()).run(context);
+                    getSubtasks(source, serverGroupsManagement.getServerGroupManagement(serverGroupName).getJVMsManagement()).executeSubtasks(context);
                 }
             }
         };
@@ -103,7 +104,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
         }
 
         @Override
-        public void executeSubtasks(S source, final JVMsManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, final JVMsManagement resourceManagement, TaskContext context) throws Exception {
             for (final String resourceName : resourceManagement.getResourceNames()) {
                 final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME)
                         .addAttribute("resource", resourceManagement.getResourcePathAddress(resourceName).toCLIStyleString())
@@ -114,7 +115,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
                         return taskName;
                     }
                     @Override
-                    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                         final ModelNode config = resourceManagement.getResource(resourceName);
                         final PathAddress pathAddress = resourceManagement.getResourcePathAddress(resourceName);
                         boolean updated = false;

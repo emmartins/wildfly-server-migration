@@ -22,10 +22,9 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
@@ -86,11 +85,11 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                 .subtask(subtaskExecutor)
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Migrating subsystem %s configurations...", subsystemName);
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("Subsystem %s configurations migrated.", subsystemName);
                     }
                 });
@@ -109,7 +108,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
         }
 
         @Override
-        public void executeSubtasks(S source, final SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, final SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
             final String configName = subsystemsManagement.getResourcePathAddress(subsystemName).toCLIStyleString();
             final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("migrate-config")
                     .addAttribute("name", configName)
@@ -120,7 +119,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                     return taskName;
                 }
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     final ModelNode subsystemConfig = subsystemsManagement.getResource(subsystemName);
                     if (subsystemConfig == null) {
                         return ServerMigrationTaskResult.SKIPPED;
@@ -168,7 +167,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
          * @param context the task context
          * @throws Exception if there was a failure processing the warnings
          */
-        protected void processWarnings(List<String> migrationWarnings, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void processWarnings(List<String> migrationWarnings, SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
         }
     }
 }

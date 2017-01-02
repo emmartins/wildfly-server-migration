@@ -23,7 +23,8 @@ import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
@@ -63,11 +64,11 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
         return new ParentServerMigrationTask.Builder(new ServerMigrationTaskName.Builder(TASK_NAME).build())
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
-                    public void started(ServerMigrationTaskContext context) {
+                    public void started(TaskContext context) {
                         context.getLogger().infof("Private interface setup starting...");
                     }
                     @Override
-                    public void done(ServerMigrationTaskContext context) {
+                    public void done(TaskContext context) {
                         context.getLogger().infof("Private interface setup done.");
                     }
                 })
@@ -81,7 +82,7 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
         private static final ServerMigrationTaskName SUBTASK_NAME = new ServerMigrationTaskName.Builder("add-interface").build();
 
         @Override
-        public void executeSubtasks(S source, final InterfacesManagement interfacesManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, final InterfacesManagement interfacesManagement, TaskContext context) throws Exception {
             // subtask to add private interface
             final ServerMigrationTask task = new ServerMigrationTask() {
                 @Override
@@ -90,7 +91,7 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
                 }
 
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     if (interfacesManagement.getResourceNames().contains(INTERFACE_NAME)) {
                         context.getLogger().debugf("Skipping task to add private interface, the configuration already has it.");
                         return ServerMigrationTaskResult.SKIPPED;
@@ -130,7 +131,7 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
         private static final ServerMigrationTaskName SUBTASK_NAME = new ServerMigrationTaskName.Builder("update-socket-binding-groups").build();
 
         @Override
-        public void executeSubtasks(S source, SocketBindingGroupsManagement socketBindingGroupsManagement, ServerMigrationTaskContext context) throws Exception {
+        public void executeSubtasks(S source, SocketBindingGroupsManagement socketBindingGroupsManagement, TaskContext context) throws Exception {
             final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(SUBTASK_NAME)
                     .skipTaskPropertyName(TASK_NAME + "." + SUBTASK_NAME + ".skip");
             for (final String socketBindingGroupName : socketBindingGroupsManagement.getResourceNames()) {
@@ -152,7 +153,7 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
                 }
 
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     final List<String> updated = new ArrayList<>();
                     final SocketBindingsManagement resourceManagement = socketBindingGroupManagement.getSocketBindingsManagement();
                     for (String socketBinding : SOCKET_BINDING_NAMES) {

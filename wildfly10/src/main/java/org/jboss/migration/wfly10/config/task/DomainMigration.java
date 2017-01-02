@@ -18,7 +18,8 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
@@ -64,7 +65,7 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Domain migration starting...");

@@ -165,7 +165,7 @@ public class ServerMigrationTaskExecution {
         startTime = System.currentTimeMillis();
         logger.debugf("Task %s execution starting...", taskPath);
         try {
-            result = task.run(new ServerMigrationTaskContext(this));
+            result = task.run(new TaskContextImpl(this));
         } catch (ServerMigrationFailedException e) {
             result = ServerMigrationTaskResult.fail(e);
             throw e;

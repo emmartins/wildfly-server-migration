@@ -19,7 +19,8 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
@@ -48,7 +49,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
      * @param context the task context
      * @throws Exception if there was a failure processing the warnings
      */
-    protected void processWarnings(List<String> migrationWarnings, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+    protected void processWarnings(List<String> migrationWarnings, SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
     }
 
     @Override
@@ -61,7 +62,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

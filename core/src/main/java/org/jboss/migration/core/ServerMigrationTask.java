@@ -33,5 +33,5 @@ public interface ServerMigrationTask {
      * @return the task result.
      * @throws Exception if the task failed to run
      */
-    ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception;
+    ServerMigrationTaskResult run(TaskContext context) throws Exception;
 }

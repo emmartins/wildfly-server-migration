@@ -18,8 +18,8 @@ package org.jboss.migration.core.ts;
 import org.jboss.migration.core.AbstractServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.TaskContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +50,7 @@ public class TestServer extends AbstractServer {
     }
 
     @Override
-    public ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException {
+    public ServerMigrationTaskResult migrate(Server source, TaskContext context) throws IllegalArgumentException {
         if (!supportedMigrations.contains(source.getProductInfo())) {
             return super.migrate(source, context);
         }

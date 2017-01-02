@@ -17,9 +17,9 @@
 package org.jboss.migration.core.console;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 
 /**
@@ -40,7 +40,7 @@ public class UserConfirmationServerMigrationTask implements ServerMigrationTask 
         return task.getName();
     }
 
-    protected ServerMigrationTaskResult confirmTaskRun(final ServerMigrationTaskContext context) throws Exception {
+    protected ServerMigrationTaskResult confirmTaskRun(final TaskContext context) throws Exception {
         final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
         new UserConfirmation(context.getServerMigrationContext().getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
         switch (resultHandler.getResult()) {
@@ -54,12 +54,12 @@ public class UserConfirmationServerMigrationTask implements ServerMigrationTask 
         }
     }
 
-    protected ServerMigrationTaskResult runTask(final ServerMigrationTaskContext context) throws Exception {
+    protected ServerMigrationTaskResult runTask(final TaskContext context) throws Exception {
         return task.run(context);
     }
 
     @Override
-    public ServerMigrationTaskResult run(final ServerMigrationTaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(final TaskContext context) throws Exception {
         return context.getServerMigrationContext().isInteractive() ? confirmTaskRun(context) : runTask(context);
     }
 }

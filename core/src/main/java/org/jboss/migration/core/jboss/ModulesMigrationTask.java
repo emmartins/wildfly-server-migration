@@ -17,9 +17,9 @@
 package org.jboss.migration.core.jboss;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.TaskEnvironment;
 
@@ -61,7 +61,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
     }
 
     @Override
-    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
         if (new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), getName().getName()).isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
@@ -76,7 +76,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
         }
     }
 
-    protected void migrateModules(ModuleMigrator moduleMigrator, ServerMigrationTaskContext context) throws Exception {
+    protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) throws Exception {
         final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.<String>emptyList());
         for (String module : includedModules) {
             moduleMigrator.migrateModule(module, "requested by environment", context);
@@ -98,11 +98,11 @@ public class ModulesMigrationTask implements ServerMigrationTask {
             }
         }
 
-        public void migrateModule(String moduleId, String reason, final ServerMigrationTaskContext context) throws IOException {
+        public void migrateModule(String moduleId, String reason, final TaskContext context) throws IOException {
             migrateModule(ModuleIdentifier.fromString(moduleId), reason, context);
         }
 
-        public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final ServerMigrationTaskContext context) throws IOException {
+        public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final TaskContext context) throws IOException {
             if (excludedByEnvironment.contains(moduleIdentifier)) {
                 context.getLogger().infof("Skipping module %s migration, it's excluded by environment.", moduleIdentifier);
                 return;
@@ -123,7 +123,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
                 }
 
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     context.getServerMigrationContext().getMigrationFiles().copy(sourceModule.getModuleDir(), targetModules.getModuleDir(moduleIdentifier));
                     context.getLogger().infof("Module %s migrated.", moduleIdentifier);
                     return new ServerMigrationTaskResult.Builder()

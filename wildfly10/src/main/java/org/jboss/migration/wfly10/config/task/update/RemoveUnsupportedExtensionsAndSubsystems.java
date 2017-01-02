@@ -17,7 +17,8 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
@@ -74,7 +75,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                 return XML_CONFIG_SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
                 context.getLogger().debugf("Unsupported Extensions and Subsystems removal starting...");
                 removeExtensionsAndSubsystems(source, xmlConfigurationPath, target, context);
@@ -84,7 +85,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         };
     }
 
-    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final ServerMigrationTaskContext context) throws IOException {
+    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) throws IOException {
         final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         final List<WildFly10Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();
@@ -111,7 +112,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                         }
 
                         @Override
-                        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                             context.getLogger().debugf("Extension with module %s removed.", moduleName);
                             extensionsRemoved.add(moduleName);
                             return ServerMigrationTaskResult.SUCCESS;
@@ -146,7 +147,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                         }
 
                         @Override
-                        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                             context.getLogger().debugf("Subsystem with namespace %s removed.", namespaceURI);
                             subsystemsRemoved.add(namespaceURI);
                             return ServerMigrationTaskResult.SUCCESS;

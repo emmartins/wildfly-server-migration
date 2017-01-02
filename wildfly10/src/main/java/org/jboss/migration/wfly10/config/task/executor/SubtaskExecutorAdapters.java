@@ -17,7 +17,8 @@
 package org.jboss.migration.wfly10.config.task.executor;
 
 import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
@@ -37,7 +38,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final ManageableServerConfiguration configuration, final SocketBindingGroupsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, configuration.getSocketBindingGroupsManagement(), context);
             }
         };
@@ -46,7 +47,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final ManageableServerConfiguration configuration, final InterfacesManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, configuration.getInterfacesManagement(), context);
             }
         };
@@ -55,7 +56,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final ManageableServerConfiguration configuration, final ExtensionsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, configuration.getExtensionsManagement(), context);
             }
         };
@@ -64,7 +65,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final DeploymentsManagement resourcesManagement, final DeploymentsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContextImpl context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, resourcesManagement, context);
             }
         };
@@ -73,7 +74,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SubsystemsManagement resourcesManagement, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, resourcesManagement, context);
             }
         };
@@ -82,7 +83,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SecurityRealmsManagement resourcesManagement, final SecurityRealmsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, resourcesManagement, context);
             }
         };
@@ -91,7 +92,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final StandaloneServerConfiguration configuration, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, configuration.getSubsystemsManagement(), context);
             }
         };
@@ -100,7 +101,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostConfiguration configuration, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, configuration.getSubsystemsManagement(), context);
             }
         };
@@ -109,7 +110,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostControllerConfiguration configuration, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 final ProfilesManagement profilesManagement = configuration.getProfilesManagement();
                 for(String profileName : profilesManagement.getResourceNames()) {
                     context.getLogger().debugf("Processing profile %s...", profileName);
@@ -122,7 +123,7 @@ public class SubtaskExecutorAdapters {
     public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostConfiguration configuration, final JVMsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
-            public void executeSubtasks(ServerMigrationTaskContext context) throws Exception {
+            public void executeSubtasks(TaskContext context) throws Exception {
                 subtaskExecutor.executeSubtasks(source, configuration.getJVMsManagement(), context);
             }
         };

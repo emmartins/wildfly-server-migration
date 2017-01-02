@@ -17,9 +17,9 @@
 package org.jboss.migration.core.env;
 
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.TaskContext;
 
 /**
  * @author emmartins
@@ -43,7 +43,7 @@ public class SkippableByEnvServerMigrationTask implements ServerMigrationTask {
     }
 
     @Override
-    public ServerMigrationTaskResult run(final ServerMigrationTaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(final TaskContext context) throws Exception {
         return !context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(propertyName, Boolean.FALSE) ? task.run(context) : ServerMigrationTaskResult.SKIPPED;
     }
 

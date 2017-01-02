@@ -16,12 +16,13 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.ResourceManagement;
 
 /**
  * @author emmartins
  */
 public interface ResourceManagementSubtaskExecutor<S, T extends ResourceManagement> {
-    void executeSubtasks(S source, T resourceManagement, ServerMigrationTaskContext context) throws Exception;
+    void executeSubtasks(S source, T resourceManagement, TaskContext context) throws Exception;
 }

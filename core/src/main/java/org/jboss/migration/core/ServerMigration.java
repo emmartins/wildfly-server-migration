@@ -143,7 +143,7 @@ public class ServerMigration {
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 context.getServerMigrationContext().getConsoleWrapper().printf("Server migration starting...%n");
                 final ServerMigrationTaskResult result = targetServer.migrate(sourceServer, context);
                 context.getServerMigrationContext().getConsoleWrapper().printf("%nServer migration done.%n%n");

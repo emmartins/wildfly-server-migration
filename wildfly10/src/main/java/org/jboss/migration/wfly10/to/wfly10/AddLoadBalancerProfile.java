@@ -21,7 +21,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
@@ -64,7 +64,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
                     return TASK_NAME;
                 }
                 @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     final SocketBindingGroupsManagement socketBindingGroupsManagement = configuration.getSocketBindingGroupsManagement();
                     if (socketBindingGroupsManagement.getResourceNames().contains(SOCKET_BINDING_GROUP_NAME)) {
                         return ServerMigrationTaskResult.SKIPPED;
@@ -111,7 +111,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
             super(SubsystemNames.IO);
         }
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
             // adds subsystem
             super.addSubsystem(subsystemsManagement, context);
             final ManageableServerConfiguration configuration = subsystemsManagement.getServerConfiguration();
@@ -130,7 +130,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
             super(SubsystemNames.UNDERTOW);
         }
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
             // adds subsystem
             super.addSubsystem(subsystemsManagement, context);
             final ManageableServerConfiguration configuration = subsystemsManagement.getServerConfiguration();
@@ -187,7 +187,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskFactory<S> {
             super(SubsystemNames.LOGGING);
         }
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context) throws Exception {
+        protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
             // adds subsystem
             super.addSubsystem(subsystemsManagement, context);
             final ManageableServerConfiguration configuration = subsystemsManagement.getServerConfiguration();
