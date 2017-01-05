@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,30 @@
 package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ParentTask;
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.TaskContextDelegate;
+import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 /**
  * @author emmartins
  */
-public class ManageableServerConfigurationParentTask<S, T extends ManageableServerConfiguration> extends ParentTask<ManageableServerConfigurationParentTask.SubtaskExecutorContext<S, T>> {
+public class DomainConfigurationParentTask<S> extends ParentTask<DomainConfigurationParentTask.SubtaskExecutorContext<S>> {
 
-    public ManageableServerConfigurationParentTask(BaseBuilder<SubtaskExecutorContext<S, T>, ?> builder, SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>> subtaskExecutorContextFactory) {
+    public DomainConfigurationParentTask(BaseBuilder<SubtaskExecutorContext<S>, ?> builder, SubtaskExecutorContextFactory<SubtaskExecutorContext<S>> subtaskExecutorContextFactory) {
         super(builder, subtaskExecutorContextFactory);
     }
 
-    public static class Builder<S, T extends ManageableServerConfiguration> extends BaseBuilder<SubtaskExecutorContext<S,T>, Builder<S, T>> {
+    public static class Builder<S> extends BaseBuilder<SubtaskExecutorContext<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
-        public ManageableServerConfigurationParentTask<S, T> build(final S source, final T configuration) {
-            final SubtaskExecutorContextFactory<SubtaskExecutorContext<S,T>> subtaskExecutorContextFactory = new SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>>() {
+        public DomainConfigurationParentTask<S> build(final S source, final HostControllerConfiguration configuration) {
+            final SubtaskExecutorContextFactory<SubtaskExecutorContext<S>> subtaskExecutorContextFactory = new SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>>() {
                 @Override
                 public SubtaskExecutorContext<S, T> getSubtaskExecutorContext(TaskContext context) throws Exception {
                     return new SubtaskExecutorContext<>(context, source, configuration);
@@ -48,21 +50,21 @@ public class ManageableServerConfigurationParentTask<S, T extends ManageableServ
         }
 
         @Override
-        protected ManageableServerConfigurationParentTask<S, T> build(SubtaskExecutorContext<S, T> context) {
+        protected DomainConfigurationParentTask<S> build(SubtaskExecutorContext<S> context) {
             return build(context.getSource(), context.getConfiguration());
         }
 
         @Override
-        protected ManageableServerConfigurationParentTask<S, T> build(SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>> contextFactory) {
-            return new ManageableServerConfigurationParentTask(this, contextFactory);
+        protected DomainConfigurationParentTask<S> build(SubtaskExecutorContextFactory<SubtaskExecutorContext<S>> contextFactory) {
+            return new DomainConfigurationParentTask(this, contextFactory);
         }
     }
 
-    public static class SubtaskExecutorContext<S, T extends ManageableServerConfiguration> extends TaskContextDelegate {
+    public static class SubtaskExecutorContext<S> extends TaskContextDelegate {
         private final S source;
-        private final T configuration;
+        private final HostControllerConfiguration configuration;
 
-        private SubtaskExecutorContext(TaskContext taskContext, S source, T configuration) {
+        private SubtaskExecutorContext(TaskContext taskContext, S source, HostControllerConfiguration configuration) {
             super(taskContext);
             this.source = source;
             this.configuration = configuration;
@@ -72,7 +74,7 @@ public class ManageableServerConfigurationParentTask<S, T extends ManageableServ
             return source;
         }
 
-        public T getConfiguration() {
+        public HostControllerConfiguration getConfiguration() {
             return configuration;
         }
     }

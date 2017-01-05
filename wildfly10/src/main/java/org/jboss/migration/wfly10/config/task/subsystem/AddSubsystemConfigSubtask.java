@@ -18,52 +18,37 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.factory.SubsystemManagementParentTask;
 
 /**
  * A task which creates a subsystem if its missing from the server's config.
  * @author emmartins
  */
-public class AddSubsystemConfigSubtask<S> implements SubsystemsManagementSubtaskExecutor<S> {
+public class AddSubsystemConfigSubtask<S> extends SubsystemManagementParentTask.Subtask<S> {
 
-    protected final String subsystemName;
-
-    public AddSubsystemConfigSubtask(String subsystemName) {
-        this.subsystemName = subsystemName;
+    public AddSubsystemConfigSubtask(SubsystemManagementParentTask.Context<S> parentContext) {
+        super(new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", parentContext.getConfigName()).build(), parentContext);
     }
 
     @Override
-    public void executeSubtasks(S source, final SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
-        final String configName = subsystemsManagement.getResourcePathAddress(subsystemName).toCLIStyleString();
-        final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", configName).build();
-        final ServerMigrationTask task = new ServerMigrationTask() {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return taskName;
-            }
-            @Override
-            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                if (subsystemsManagement.getResource(subsystemName) != null) {
-                    context.getLogger().infof("Skipped adding subsystem config %s, already exists.", configName);
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                context.getLogger().debugf("Adding subsystem config %s...", configName);
-                addSubsystem(subsystemsManagement, context);
-                context.getLogger().infof("Subsystem config %s added.", configName);
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
-        context.execute(task);
+    protected ServerMigrationTaskResult runTask(TaskContext context) throws Exception {
+        final String configName = getConfigName();
+        if (getConfig() != null) {
+            context.getLogger().infof("Skipped adding subsystem config %s, already exists.", configName);
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        context.getLogger().debugf("Adding subsystem config %s...", configName);
+        addSubsystem(getSubsystemsManagement(), context);
+        context.getLogger().infof("Subsystem config %s added.", configName);
+        return ServerMigrationTaskResult.SUCCESS;
     }
 
-    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
-        final ModelNode op = Util.createAddOperation(subsystemsManagement.getResourcePathAddress(subsystemName));
+    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext taskContext) throws Exception {
+        final ModelNode op = Util.createAddOperation(subsystemsManagement.getResourcePathAddress(getSubsystem()));
         subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
     }
 }

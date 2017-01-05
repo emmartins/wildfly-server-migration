@@ -77,9 +77,9 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
      */
     public static class Builder<T extends Builder> {
 
-        private final ServerMigrationTaskName name;
-        private Listener listener;
-        private Skipper skipper;
+        protected final ServerMigrationTaskName name;
+        protected Listener listener;
+        protected Skipper skipper;
 
         public Builder(ServerMigrationTaskName name) {
             this.name = name;

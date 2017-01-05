@@ -16,11 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.AbstractParentTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextDelegate;
-import org.jboss.migration.wfly10.config.management.ResourceManagement;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 
 /**
@@ -28,18 +24,32 @@ import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
  */
 public class SubsystemsManagementParentTask<S> extends ResourceManagementParentTask<S, SubsystemsManagement> {
 
-    public SubsystemsManagementParentTask(BaseBuilder<SubtaskExecutorContext<S>, ?> builder, SubtaskExecutorContextFactory<SubtaskExecutorContext<S>> subtaskExecutorContextFactory) {
+    protected SubsystemsManagementParentTask(Builder<S> builder, SubtaskExecutorContextFactory<ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement>> subtaskExecutorContextFactory) {
         super(builder, subtaskExecutorContextFactory);
     }
 
-    public static class Builder<S> extends BaseBuilder<SubtaskExecutorContext<S>, Builder<S>> {
+    /*
+    public static class SubtaskExecutorContext<S> extends ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement> {
+        private SubtaskExecutorContext(TaskContext taskContext, S source, SubsystemsManagement resourceManagement) {
+            super(taskContext, source, resourceManagement);
+        }
+    }
+    */
+
+    public static class Builder<S> extends ResourceManagementParentTask.Builder<S, SubsystemsManagement> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
+        @Override
+        protected SubsystemsManagementParentTask<S> build(SubtaskExecutorContextFactory<SubtaskExecutorContext<S, SubsystemsManagement>> contextFactory) {
+            return new SubsystemsManagementParentTask(this, contextFactory);
+        }
+
+        /*
         public SubsystemsManagementParentTask<S> build(final S source, final SubsystemsManagement resourceManagement) {
-            final SubtaskExecutorContextFactory<SubtaskExecutorContext<S>> subtaskExecutorContextFactory = new SubtaskExecutorContextFactory<SubtaskExecutorContext<S>>() {
+            final SubtaskExecutorContextFactory<SubtaskExecutorContext<S, SubsystemsManagement>> subtaskExecutorContextFactory = new SubtaskExecutorContextFactory<SubtaskExecutorContext<S, SubsystemsManagement>>() {
                 @Override
                 public SubtaskExecutorContext<S> getSubtaskExecutorContext(TaskContext context) throws Exception {
                     return new SubtaskExecutorContext<>(context, source, resourceManagement);
@@ -49,19 +59,9 @@ public class SubsystemsManagementParentTask<S> extends ResourceManagementParentT
         }
 
         @Override
-        protected SubsystemsManagementParentTask<S> build(SubtaskExecutorContext<S> context) {
+        protected SubsystemsManagementParentTask<S> build(SubtaskExecutorContext<S, SubsystemsManagement> context) {
             return build(context.getSource(), context.getResourceManagement());
         }
-
-        @Override
-        protected SubsystemsManagementParentTask<S> build(SubtaskExecutorContextFactory<SubtaskExecutorContext<S>> contextFactory) {
-            return new SubsystemsManagementParentTask(this, contextFactory);
-        }
-    }
-
-    public static class SubtaskExecutorContext<S> extends ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement> {
-        private SubtaskExecutorContext(TaskContext taskContext, S source, SubsystemsManagement resourceManagement) {
-            super(taskContext, source, resourceManagement);
-        }
+        */
     }
 }

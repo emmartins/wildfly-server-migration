@@ -58,7 +58,7 @@ public class AddExtensionSubtask<S> implements ExtensionsManagementSubtaskExecut
                     context.getLogger().infof("Extension %s added.",extensionModule);
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {
-                    context.getLogger().infof("Skipped adding extension %s, already exists in config.", extensionModule);
+                    context.getLogger().infof("Extension %s already exists in config.", extensionModule);
                     return ServerMigrationTaskResult.SKIPPED;
                 }
             }
