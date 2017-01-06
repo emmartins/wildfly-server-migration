@@ -27,7 +27,7 @@ import org.jboss.migration.wfly10.config.task.factory.SubsystemManagementParentT
 /**
  * @author emmartins
  */
-public abstract class AbstractSubsystemSubtask<S> implements SubsystemManagementParentTask.SubtaskExecutor<S> {
+public abstract class AbstractSubsystemSubtask<S> implements SubsystemManagementParentTask.Subtasks<S> {
 
     @Override
     public void run(final SubsystemManagementParentTask.Context<S> parentContext) throws Exception {

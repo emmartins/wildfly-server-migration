@@ -34,16 +34,16 @@ public class AddSubsystemTaskBuilder<S> extends SubsystemConfigurationTaskBuilde
 
     public AddSubsystemTaskBuilder(final String extension, String subsystem, AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask) {
         super(extension, subsystem, new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subsystem).build());
-        subtask(new SubtaskExecutor<S>(extension, subsystem, addSubsystemConfigSubtask));
+        subtask(new Subtasks<S>(extension, subsystem, addSubsystemConfigSubtask));
     }
 
-    private static class SubtaskExecutor<S> implements ParentTask.SubtaskExecutor<ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement>> {
+    private static class Subtasks<S> implements ParentTask.Subtasks<ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement>> {
 
         private final String extension;
         private final String subsystem;
         private final AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask;
 
-        private SubtaskExecutor(String extension, String subsystem, AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask) {
+        private Subtasks(String extension, String subsystem, AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask) {
             this.extension = extension;
             this.subsystem = subsystem;
             this.addSubsystemConfigSubtask = addSubsystemConfigSubtask;

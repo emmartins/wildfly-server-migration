@@ -20,35 +20,19 @@ package org.jboss.migration.core;
  * A basic parent task.
  * @author emmartins
  */
-public class SimpleParentTask extends ParentTask<TaskContext> {
+public class SimpleParentTask extends ParentTask {
 
-    public SimpleParentTask(BaseBuilder<TaskContext, ?> builder, SubtaskExecutorContextFactory<TaskContext> subtaskExecutorContextFactory) {
-        super(builder, subtaskExecutorContextFactory);
+    public SimpleParentTask(Builder builder) {
+        super(builder);
     }
 
     public static class Builder extends BaseBuilder<TaskContext, Builder> {
-
         public Builder(ServerMigrationTaskName name) {
             super(name);
         }
 
         public SimpleParentTask build() {
-            return build(new SubtaskExecutorContextFactory() {
-                @Override
-                public TaskContext getSubtaskExecutorContext(TaskContext context) throws Exception {
-                    return context;
-                }
-            });
-        }
-
-        @Override
-        protected SimpleParentTask build(TaskContext context) {
-            return build();
-        }
-
-        @Override
-        protected SimpleParentTask build(SubtaskExecutorContextFactory<TaskContext> contextFactory) {
-            return build();
+            return new SimpleParentTask(this);
         }
     }
 }

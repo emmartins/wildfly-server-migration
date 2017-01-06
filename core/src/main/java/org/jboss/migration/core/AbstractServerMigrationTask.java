@@ -86,6 +86,12 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
             skipTaskPropertyName(name.getName()+".skip");
         }
 
+        public Builder(Builder other) {
+            this.name = other.name;
+            this.listener = other.listener;
+            this.skipper = other.skipper;
+        }
+
         @SuppressWarnings("unchecked")
         public T listener(Listener listener) {
             this.listener = listener;

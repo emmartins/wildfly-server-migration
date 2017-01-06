@@ -17,62 +17,67 @@
 package org.jboss.migration.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * An {@link ServerMigrationTask} which delegates to subtask executors.
  * @author emmartins
  */
-public class ParentTask<T extends TaskContext> extends AbstractServerMigrationTask {
+public class ParentTask extends AbstractServerMigrationTask {
 
-    protected final boolean succeedOnlyIfHasSuccessfulSubtasks;
-    protected final List<SubtaskExecutor<T>> subtasks;
-    protected final List<SubtaskExecutorContextFactory<T>> subtaskContextFactories;
+    protected final boolean succeedIfHasSuccessfulSubtasks;
+    protected final List<Subtasks<TaskContext>> subtasks;
 
-    protected ParentTask(BaseBuilder<T, ?> builder, List<SubtaskExecutorContextFactory<T>> subtaskContextFactories) {
+    protected ParentTask(Builder builder) {
         super(builder);
-        this.subtasks = builder.subtasks;
-        this.succeedOnlyIfHasSuccessfulSubtasks = builder.succeedOnlyIfHasSuccessfulSubtasks;
-        this.subtaskContextFactories = subtaskContextFactories;
+        this.succeedIfHasSuccessfulSubtasks = builder.succeedIfHasSuccessfulSubtasks;
+        this.subtasks = Collections.unmodifiableList(builder.subtasks);
     }
 
     @Override
     protected ServerMigrationTaskResult runTask(TaskContext taskContext) throws Exception {
-        for (SubtaskExecutorContextFactory<T> subtaskContextFactory : subtaskContextFactories) {
-            runSubtasks(subtaskContextFactory.getSubtaskExecutorContext(taskContext));
-        }
-        return (!succeedOnlyIfHasSuccessfulSubtasks || taskContext.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+        runSubtasks(taskContext);
+        return (!succeedIfHasSuccessfulSubtasks || taskContext.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
     }
 
-    protected void runSubtasks(T context) throws Exception {
-        for (SubtaskExecutor<T> subtaskExecutor : subtasks) {
-            subtaskExecutor.run(context);
+    protected void runSubtasks(TaskContext context) throws Exception {
+        for (Subtasks subtasks : this.subtasks) {
+            subtasks.run(context);
         }
     }
 
-    public interface SubtaskExecutor<T extends TaskContext> {
+    public interface Subtasks<T extends TaskContext> {
         void run(T context) throws Exception;
-    }
-
-    public interface SubtaskExecutorContextFactory<T extends TaskContext> {
-        T getSubtaskExecutorContext(TaskContext context) throws Exception;
     }
 
     /**
      * The parent task builder.
      */
-    public static abstract class BaseBuilder<T extends TaskContext, B extends BaseBuilder<T,B>> extends AbstractServerMigrationTask.Builder<B> {
+    protected static abstract class BaseBuilder<T extends TaskContext, B extends BaseBuilder<T,B>> extends AbstractServerMigrationTask.Builder<B> {
 
-        protected final List<SubtaskExecutor<T>> subtasks;
-        protected boolean succeedOnlyIfHasSuccessfulSubtasks = true;
+        protected final List<Subtasks<T>> subtasks = new ArrayList<>();
+        protected boolean succeedIfHasSuccessfulSubtasks = true;
 
         protected BaseBuilder(ServerMigrationTaskName name) {
             super(name);
-            subtasks = new ArrayList<>();
+        }
+
+        /*
+        protected BaseBuilder(BaseBuilder<?,?> other, List<Subtasks<T>> subtasks) {
+            super(other);
+            this.succeedIfHasSuccessfulSubtasks = other.succeedIfHasSuccessfulSubtasks;
+            this.subtasks.addAll(subtasks);
+        }
+        */
+
+        protected BaseBuilder(BaseBuilder<?,?> other) {
+            super(other);
+            this.succeedIfHasSuccessfulSubtasks = other.succeedIfHasSuccessfulSubtasks;
         }
 
         public B subtask(final ServerMigrationTask subtask) {
-            return subtask(new SubtaskExecutor<T>() {
+            return subtask(new Subtasks<T>() {
                 @Override
                 public void run(T context) throws Exception {
                     context.execute(subtask);
@@ -80,21 +85,34 @@ public class ParentTask<T extends TaskContext> extends AbstractServerMigrationTa
             });
         }
 
-        public B subtask(SubtaskExecutor<T> subtask) {
+        public B subtask(Subtasks<T> subtask) {
             subtasks.add(subtask);
             return (B) this;
         }
 
-        public B succeedOnlyIfHasSuccessfulSubtasks() {
-            succeedOnlyIfHasSuccessfulSubtasks = true;
+        public B succeedIfHasSuccessfulSubtasks() {
+            succeedIfHasSuccessfulSubtasks = true;
             return (B) this;
         }
 
         public B succeedAlways() {
-            succeedOnlyIfHasSuccessfulSubtasks = false;
+            succeedIfHasSuccessfulSubtasks = false;
             return (B) this;
         }
+    }
 
-        protected abstract ParentTask<T> build(List<SubtaskExecutorContextFactory<T>> subtaskContextFactories);
+    public static class Builder extends BaseBuilder<TaskContext, Builder> {
+
+        public Builder(ServerMigrationTaskName name) {
+            super(name);
+        }
+
+        public Builder(BaseBuilder<?,?> other) {
+            super(other);
+        }
+
+        public ParentTask build() {
+            return new ParentTask(this);
+        }
     }
 }
