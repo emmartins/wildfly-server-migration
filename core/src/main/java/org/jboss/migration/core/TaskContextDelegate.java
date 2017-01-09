@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class TaskContextDelegate implements TaskContext {
 
-    private final TaskContext taskContext;
+    protected final TaskContext taskContext;
 
     public TaskContextDelegate(TaskContext taskContext) {
         this.taskContext = taskContext;

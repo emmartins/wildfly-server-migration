@@ -17,52 +17,66 @@
 package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ParentTask;
+import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.TaskContextDelegate;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author emmartins
  */
-public class ManageableServerConfigurationParentTask<S, T extends ManageableServerConfiguration> extends ParentTask<ManageableServerConfigurationParentTask.SubtaskExecutorContext<S, T>> {
+public class ManageableServerConfigurationParentTask<S, T extends ManageableServerConfiguration> extends ParentTask<ManageableServerConfigurationParentTask.SubtaskContext<S, T>> {
 
-    public ManageableServerConfigurationParentTask(BaseBuilder<SubtaskExecutorContext<S, T>, ?> builder, SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>> subtaskExecutorContextFactory) {
-        super(builder, subtaskExecutorContextFactory);
+    protected ManageableServerConfigurationParentTask(BaseBuilder<S, T, ?> builder, List<ContextFactory<SubtaskContext<S, T>>> contextFactories) {
+        super(builder, contextFactories);
     }
 
-    public static class Builder<S, T extends ManageableServerConfiguration> extends BaseBuilder<SubtaskExecutorContext<S,T>, Builder<S, T>> {
+    public interface Subtasks<S, T extends ManageableServerConfiguration> extends ParentTask.Subtasks<SubtaskContext<S, T>> {
+    }
+
+    protected static abstract class BaseBuilder<S, T extends ManageableServerConfiguration, B extends BaseBuilder<S, T, B>> extends ParentTask.BaseBuilder<SubtaskContext<S,T>, B> {
+
+        public BaseBuilder(ServerMigrationTaskName taskName) {
+            super(taskName);
+        }
+
+        public B subtask(final ExtensionsManagementParentTask.Subtasks<S> subtask) {
+            return super.subtask(new Subtasks<S, T>() {
+                @Override
+                public void run(SubtaskContext<S, T> context) throws Exception {
+                    subtask.run(context.toExtensionsManagementSubtasksContext());
+                }
+            });
+        }
+    }
+
+    public static class Builder<S, T extends ManageableServerConfiguration> extends BaseBuilder<S, T, Builder<S, T>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
-        public ManageableServerConfigurationParentTask<S, T> build(final S source, final T configuration) {
-            final SubtaskExecutorContextFactory<SubtaskExecutorContext<S,T>> subtaskExecutorContextFactory = new SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>>() {
+        public ManageableServerConfigurationParentTask build(final S source, final T configuration) {
+            final ContextFactory<SubtaskContext<S, T>> contextFactory = new ContextFactory<SubtaskContext<S, T>>() {
                 @Override
-                public SubtaskExecutorContext<S, T> getSubtaskExecutorContext(TaskContext context) throws Exception {
-                    return new SubtaskExecutorContext<>(context, source, configuration);
+                public SubtaskContext<S, T> newInstance(TaskContext context) throws Exception {
+                    return new SubtaskContext<>(context, source, configuration);
                 }
             };
-            return build(subtaskExecutorContextFactory);
-        }
-
-        @Override
-        protected ManageableServerConfigurationParentTask<S, T> build(SubtaskExecutorContext<S, T> context) {
-            return build(context.getSource(), context.getConfiguration());
-        }
-
-        @Override
-        protected ManageableServerConfigurationParentTask<S, T> build(SubtaskExecutorContextFactory<SubtaskExecutorContext<S, T>> contextFactory) {
-            return new ManageableServerConfigurationParentTask(this, contextFactory);
+            return new ManageableServerConfigurationParentTask(this, Collections.singletonList(contextFactory));
         }
     }
 
-    public static class SubtaskExecutorContext<S, T extends ManageableServerConfiguration> extends TaskContextDelegate {
+    public static class SubtaskContext<S, T extends ManageableServerConfiguration> extends TaskContextDelegate {
         private final S source;
         private final T configuration;
 
-        private SubtaskExecutorContext(TaskContext taskContext, S source, T configuration) {
+        protected SubtaskContext(TaskContext taskContext, S source, T configuration) {
             super(taskContext);
             this.source = source;
             this.configuration = configuration;
@@ -74,6 +88,10 @@ public class ManageableServerConfigurationParentTask<S, T extends ManageableServ
 
         public T getConfiguration() {
             return configuration;
+        }
+
+        public ExtensionsManagementParentTask.SubtasksContext<S> toExtensionsManagementSubtasksContext() {
+            return new ExtensionsManagementParentTask.SubtasksContext<>(taskContext, source, configuration.getExtensionsManagement());
         }
     }
 }

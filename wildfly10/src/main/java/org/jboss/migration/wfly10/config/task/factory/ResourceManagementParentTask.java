@@ -22,47 +22,87 @@ import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.TaskContextDelegate;
 import org.jboss.migration.wfly10.config.management.ResourceManagement;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author emmartins
  */
-public class ResourceManagementParentTask<S, R extends ResourceManagement> extends ParentTask<ResourceManagementParentTask.SubtaskExecutorContext<S, R>> {
+public class ResourceManagementParentTask<S, R extends ResourceManagement, C extends ResourceManagementParentTask.SubtasksContext<S, R>> extends ParentTask<C> {
 
-    public ResourceManagementParentTask(Builder<S, R> builder, SubtaskExecutorContextFactory<ResourceManagementParentTask.SubtaskExecutorContext<S, R>> subtaskExecutorContextFactory) {
-        super(builder, subtaskExecutorContextFactory);
+    protected ResourceManagementParentTask(BaseBuilder<S, R, C, ?, ?> builder, List<ContextFactory<C>> contextFactories) {
+        super(builder, contextFactories);
     }
 
-    public static class Builder<S, R extends ResourceManagement> extends BaseBuilder<ResourceManagementParentTask.SubtaskExecutorContext<S, R>, Builder<S, R>> {
+    protected static abstract class BaseBuilder<S, R extends ResourceManagement, C extends ResourceManagementParentTask.SubtasksContext<S, R>, T extends ResourceManagementParentTask<S, R, C>, B extends BaseBuilder<S, R, C, T, B>> extends ParentTask.BaseBuilder<C, B> {
+
+        public BaseBuilder(ServerMigrationTaskName taskName) {
+            super(taskName);
+        }
+
+        protected abstract ContextFactory<C> getContextFactory(final S source, final R resourceManagement);
+        /*{
+            return new ContextFactory<C>() {
+                @Override
+                public C newInstance(TaskContext context) throws Exception {
+                    return new SubtasksContext<>(context, source, resourceManagement);
+                }
+            };
+        }*/
+
+        protected List<ContextFactory<C>> getContextFactories(final S source, final R... resourceManagements) {
+            if (resourceManagements == null || resourceManagements.length == 0) {
+                return null;
+            } else if (resourceManagements.length == 1) {
+                return Collections.singletonList(getContextFactory(source, resourceManagements[0]));
+            } else {
+                final List<ContextFactory<C>> contextFactories = new ArrayList<>();
+                for (final R resourceManagement : resourceManagements) {
+                    contextFactories.add(getContextFactory(source, resourceManagement));
+                }
+                return contextFactories;
+            }
+        }
+
+        public T build(S source, R... resourceManagements) {
+            return build(getContextFactories(source, resourceManagements));
+        }
+
+        protected T build(C context) {
+            return build(context.getSource(), context.getResourceManagement());
+        }
+
+        protected abstract T build(List<ContextFactory<C>> contextFactories);
+    }
+
+    public static class Builder<S, R extends ResourceManagement> extends BaseBuilder<S, R, SubtasksContext<S, R>, ResourceManagementParentTask<S, R, SubtasksContext<S, R>>, Builder<S, R>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
-        public ResourceManagementParentTask<S, R> build(final S source, final R resourceManagement) {
-            final SubtaskExecutorContextFactory<ResourceManagementParentTask.SubtaskExecutorContext<S, R>> subtaskExecutorContextFactory = new SubtaskExecutorContextFactory<ResourceManagementParentTask.SubtaskExecutorContext<S, R>>() {
+        @Override
+        protected ContextFactory<SubtasksContext<S, R>> getContextFactory(final S source, final R resourceManagement) {
+            return new ContextFactory<SubtasksContext<S, R>>() {
                 @Override
-                public ResourceManagementParentTask.SubtaskExecutorContext<S, R> getSubtaskExecutorContext(TaskContext context) throws Exception {
-                    return new SubtaskExecutorContext<S, R>(context, source, resourceManagement);
+                public SubtasksContext<S, R> newInstance(TaskContext context) throws Exception {
+                    return new SubtasksContext<>(context, source, resourceManagement);
                 }
             };
-            return build(subtaskExecutorContextFactory);
         }
 
         @Override
-        protected ResourceManagementParentTask<S, R> build(ResourceManagementParentTask.SubtaskExecutorContext<S, R> context) {
-            return build(context.getSource(), context.getResourceManagement());
-        }
-
-        @Override
-        protected ResourceManagementParentTask<S, R> build(SubtaskExecutorContextFactory<ResourceManagementParentTask.SubtaskExecutorContext<S, R>> contextFactory) {
-            return new ResourceManagementParentTask(this, contextFactory);
+        protected ResourceManagementParentTask<S, R, SubtasksContext<S, R>> build(List<ContextFactory<SubtasksContext<S, R>>> contextFactories) {
+            return new ResourceManagementParentTask(this, contextFactories);
         }
     }
 
-    public static class SubtaskExecutorContext<S, R extends ResourceManagement> extends TaskContextDelegate {
+    public static class SubtasksContext<S, R extends ResourceManagement> extends TaskContextDelegate {
         private final S source;
         private final R resourceManagement;
 
-        protected SubtaskExecutorContext(TaskContext taskContext, S source, R resourceManagement) {
+        protected SubtasksContext(TaskContext taskContext, S source, R resourceManagement) {
             super(taskContext);
             this.source = source;
             this.resourceManagement = resourceManagement;
@@ -76,4 +116,9 @@ public class ResourceManagementParentTask<S, R extends ResourceManagement> exten
             return resourceManagement;
         }
     }
+
+    public interface Subtasks<S, R extends ResourceManagement, C extends ResourceManagementParentTask.SubtasksContext<S, R>> extends ParentTask.Subtasks<C> {
+
+    }
+
 }

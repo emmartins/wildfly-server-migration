@@ -24,13 +24,12 @@ import java.util.List;
  * A {@link ServerMigrationTask} which delegates to subtask executors.
  * @author emmartins
  */
-public abstract class ParentTask<T extends TaskContext> extends AbstractServerMigrationTask {
+public abstract class ParentTask2 extends AbstractServerMigrationTask {
 
     protected final boolean succeedIfHasSuccessfulSubtasks;
-    protected final List<Subtasks<T>> subtasks;
-    protected final List<ContextFactory<T>> contextFactories;
+    protected final Subtasks subtasks;
 
-    protected ParentTask(BaseBuilder<T, ?> builder, List<ContextFactory<T>> contextFactories) {
+    protected ParentTask2(BaseBuilder<?> builder, Subtasks subtasks) {
         super(builder);
         this.succeedIfHasSuccessfulSubtasks = builder.succeedIfHasSuccessfulSubtasks;
         this.subtasks = Collections.unmodifiableList(builder.subtasks);
@@ -65,7 +64,7 @@ public abstract class ParentTask<T extends TaskContext> extends AbstractServerMi
     /**
      * The parent task builder.
      */
-    protected static abstract class BaseBuilder<T extends TaskContext, B extends BaseBuilder<T,B>> extends AbstractServerMigrationTask.Builder<B> {
+    protected static abstract class BaseBuilder<T extends TaskContext, B extends BaseBuilder<T,B>> extends Builder<B> {
 
         protected final List<Subtasks<T>> subtasks = new ArrayList<>();
         protected boolean succeedIfHasSuccessfulSubtasks = true;

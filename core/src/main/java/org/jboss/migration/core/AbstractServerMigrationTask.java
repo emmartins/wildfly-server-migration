@@ -75,7 +75,7 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
     /**
      * The task builder.
      */
-    public static class Builder<T extends Builder> {
+    public static class Builder<B extends Builder> {
 
         protected final ServerMigrationTaskName name;
         protected Listener listener;
@@ -93,13 +93,13 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
         }
 
         @SuppressWarnings("unchecked")
-        public T listener(Listener listener) {
+        public B listener(Listener listener) {
             this.listener = listener;
-            return (T) this;
+            return (B) this;
         }
 
         @SuppressWarnings("unchecked")
-        public T skipTaskPropertyName(final String skipTaskPropertyName) {
+        public B skipTaskPropertyName(final String skipTaskPropertyName) {
             return skipper(new Skipper() {
                 @Override
                 public boolean isSkipped(TaskContext context) {
@@ -109,9 +109,9 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
         }
 
         @SuppressWarnings("unchecked")
-        public T skipper(Skipper skipper) {
+        public B skipper(Skipper skipper) {
             this.skipper = skipper;
-            return (T) this;
+            return (B) this;
         }
     }
 }

@@ -37,7 +37,7 @@ public class AddSubsystemTaskBuilder<S> extends SubsystemConfigurationTaskBuilde
         subtask(new Subtasks<S>(extension, subsystem, addSubsystemConfigSubtask));
     }
 
-    private static class Subtasks<S> implements ParentTask.Subtasks<ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement>> {
+    private static class Subtasks<S> implements ParentTask.Subtasks<ResourceManagementParentTask.SubtasksContext<S, SubsystemsManagement>> {
 
         private final String extension;
         private final String subsystem;
@@ -50,7 +50,7 @@ public class AddSubsystemTaskBuilder<S> extends SubsystemConfigurationTaskBuilde
         }
 
         @Override
-        public void run(ResourceManagementParentTask.SubtaskExecutorContext<S, SubsystemsManagement> context) throws Exception {
+        public void run(ResourceManagementParentTask.SubtasksContext<S, SubsystemsManagement> context) throws Exception {
             final SubsystemsManagement subsystemsManagement = context.getResourceManagement();
             final ExtensionsManagement extensionsManagement = subsystemsManagement.getServerConfiguration().getExtensionsManagement();
             if (!extensionsManagement.getResourceNames().contains(extension)) {
