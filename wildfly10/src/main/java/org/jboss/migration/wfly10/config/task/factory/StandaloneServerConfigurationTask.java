@@ -19,7 +19,8 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
 
 import java.util.List;
@@ -27,13 +28,16 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class SubsystemsManagementTask<S> extends ResourceManagementTask<S, SubsystemsManagement> {
+public class StandaloneServerConfigurationTask<S> extends ManageableServerConfigurationTask<S, StandaloneServerConfiguration> {
 
-    protected SubsystemsManagementTask(Builder<S> builder, List<ParentTask.Subtasks> subtasks) {
+    protected StandaloneServerConfigurationTask(Builder<S> builder, List<ParentTask.Subtasks> subtasks) {
         super(builder, subtasks);
     }
 
-    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SubsystemsManagement, SubsystemsManagementSubtaskExecutor<S>, Builder<S>> {
+    public interface Subtasks<S> extends ManageableServerConfigurationTask.Subtasks<S, StandaloneServerConfiguration> {
+    }
+
+    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, StandaloneServerConfiguration, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
@@ -41,7 +45,16 @@ public class SubsystemsManagementTask<S> extends ResourceManagementTask<S, Subsy
 
         @Override
         protected ServerMigrationTask build(List<ParentTask.Subtasks> subtasks) {
-            return new SubsystemsManagementTask<>(this, subtasks);
+            return new StandaloneServerConfigurationTask<>(this, subtasks);
+        }
+
+        public Builder<S> subtask(final SubsystemsManagementSubtaskExecutor<S> subtask) {
+            return subtask(new Subtasks<S>() {
+                @Override
+                public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {
+                    subtask.executeSubtasks(source, configuration.getSubsystemsManagement(), taskContext);
+                }
+            });
         }
     }
 }

@@ -24,50 +24,43 @@ import java.util.List;
  * A {@link ServerMigrationTask} which delegates to subtask executors.
  * @author emmartins
  */
-public abstract class ParentTask<T extends TaskContext> extends AbstractServerMigrationTask {
+public class ParentTask extends AbstractServerMigrationTask {
 
     protected final boolean succeedIfHasSuccessfulSubtasks;
-    protected final List<Subtasks<T>> subtasks;
-    protected final List<ContextFactory<T>> contextFactories;
+    protected final List<Subtasks> subtasks;
 
-    protected ParentTask(BaseBuilder<T, ?> builder, List<ContextFactory<T>> contextFactories) {
+    protected ParentTask(BaseBuilder<Subtasks, ?> builder) {
+        this(builder, Collections.unmodifiableList(builder.subtasks));
+    }
+
+    protected ParentTask(BaseBuilder<?, ?> builder, List<Subtasks> subtasks) {
         super(builder);
         this.succeedIfHasSuccessfulSubtasks = builder.succeedIfHasSuccessfulSubtasks;
-        this.subtasks = Collections.unmodifiableList(builder.subtasks);
-        this.contextFactories = Collections.unmodifiableList(contextFactories);
+        this.subtasks = subtasks;
     }
 
     @Override
     protected ServerMigrationTaskResult runTask(TaskContext taskContext) throws Exception {
-        for (ContextFactory<T> contextFactory : contextFactories) {
-            final T subtasksContext = contextFactory.newInstance(taskContext);
-            if (subtasksContext != null) {
-                runSubtasks(subtasksContext);
-            }
-        }
+        runSubtasks(taskContext);
         return (!succeedIfHasSuccessfulSubtasks || taskContext.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
     }
 
-    protected void runSubtasks(T context) throws Exception {
-        for (Subtasks<T> subtask : subtasks) {
+    protected void runSubtasks(TaskContext context) throws Exception {
+        for (Subtasks subtask : subtasks) {
             subtask.run(context);
         }
     }
 
-    public interface Subtasks<T extends TaskContext> {
-        void run(T context) throws Exception;
-    }
-
-    public interface ContextFactory<T extends TaskContext> {
-        T newInstance(TaskContext context) throws Exception;
+    public interface Subtasks {
+        void run(TaskContext context) throws Exception;
     }
 
     /**
      * The parent task builder.
      */
-    protected static abstract class BaseBuilder<T extends TaskContext, B extends BaseBuilder<T,B>> extends AbstractServerMigrationTask.Builder<B> {
+    protected static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends AbstractServerMigrationTask.Builder<B> {
 
-        protected final List<Subtasks<T>> subtasks = new ArrayList<>();
+        protected final List<S> subtasks = new ArrayList<>();
         protected boolean succeedIfHasSuccessfulSubtasks = true;
 
         protected BaseBuilder(ServerMigrationTaskName name) {
@@ -80,23 +73,14 @@ public abstract class ParentTask<T extends TaskContext> extends AbstractServerMi
             this.succeedIfHasSuccessfulSubtasks = other.succeedIfHasSuccessfulSubtasks;
             this.subtasks.addAll(subtasks);
         }
-        */
 
         protected BaseBuilder(BaseBuilder<?,?> other) {
             super(other);
             this.succeedIfHasSuccessfulSubtasks = other.succeedIfHasSuccessfulSubtasks;
         }
+        */
 
-        public B subtask(final ServerMigrationTask subtask) {
-            return subtask(new Subtasks<T>() {
-                @Override
-                public void run(T context) throws Exception {
-                    context.execute(subtask);
-                }
-            });
-        }
-
-        public B subtask(Subtasks<T> subtask) {
+        public B subtask(S subtask) {
             subtasks.add(subtask);
             return (B) this;
         }
@@ -110,5 +94,26 @@ public abstract class ParentTask<T extends TaskContext> extends AbstractServerMi
             succeedIfHasSuccessfulSubtasks = false;
             return (B) this;
         }
+    }
+
+    public static class Builder extends BaseBuilder<Subtasks, Builder> {
+
+        public Builder(ServerMigrationTaskName name) {
+            super(name);
+        }
+
+        public Builder subtask(final ServerMigrationTask subtask) {
+            return subtask(new Subtasks() {
+                @Override
+                public void run(TaskContext context) throws Exception {
+                    context.execute(subtask);
+                }
+            });
+        }
+
+        public ParentTask build() {
+            return new ParentTask(this);
+        }
+
     }
 }
