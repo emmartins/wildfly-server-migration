@@ -18,8 +18,10 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.HostsManagement;
 import org.jboss.migration.wfly10.config.management.InterfacesManagement;
 import org.jboss.migration.wfly10.config.task.executor.InterfacesManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 
 import java.util.List;
 
@@ -28,19 +30,22 @@ import java.util.List;
  */
 public class InterfacesManagementTask<S> extends ResourceManagementTask<S, InterfacesManagement> {
 
-    protected InterfacesManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected InterfacesManagementTask(Builder<S> builder, S source, InterfacesManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, InterfacesManagement, InterfacesManagementSubtaskExecutor<S>, Builder<S>> {
+    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, InterfacesManagement> {
+    }
+
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, InterfacesManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new InterfacesManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, InterfacesManagement... resourceManagements) {
+            return new InterfacesManagementTask<>(this, source, resourceManagements);
         }
     }
 }

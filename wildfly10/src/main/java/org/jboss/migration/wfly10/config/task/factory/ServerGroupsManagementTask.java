@@ -18,7 +18,9 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
+import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ServerGroupsManagementSubtaskExecutor;
 
 import java.util.List;
@@ -28,19 +30,22 @@ import java.util.List;
  */
 public class ServerGroupsManagementTask<S> extends ResourceManagementTask<S, ServerGroupsManagement> {
 
-    protected ServerGroupsManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected ServerGroupsManagementTask(Builder<S> builder, S source, ServerGroupsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, ServerGroupsManagement, ServerGroupsManagementSubtaskExecutor<S>, Builder<S>> {
+    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ServerGroupsManagement> {
+    }
+
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, ServerGroupsManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new ServerGroupsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, ServerGroupsManagement... resourceManagements) {
+            return new ServerGroupsManagementTask<>(this, source, resourceManagements);
         }
     }
 }

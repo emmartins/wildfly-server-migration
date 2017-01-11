@@ -21,24 +21,24 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
 
-import java.util.List;
-
 /**
  * @author emmartins
  */
 public class ExtensionsManagementTask<S> extends ResourceManagementTask<S, ExtensionsManagement> {
 
-    protected ExtensionsManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected ExtensionsManagementTask(Builder<S> builder, S source, ExtensionsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, ExtensionsManagement, ExtensionsManagementSubtaskExecutor<S>, Builder<S>> {
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, ExtensionsManagement, ExtensionsManagementSubtaskExecutor<S>, Builder<S>> {
+
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
+
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new ExtensionsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, ExtensionsManagement... resourceManagements) {
+            return new ExtensionsManagementTask<>(this, source, resourceManagements);
         }
     }
 }

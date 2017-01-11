@@ -18,7 +18,9 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
+import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
 
 import java.util.List;
@@ -28,19 +30,22 @@ import java.util.List;
  */
 public class SocketBindingGroupsManagementTask<S> extends ResourceManagementTask<S, SocketBindingGroupsManagement> {
 
-    protected SocketBindingGroupsManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected SocketBindingGroupsManagementTask(Builder<S> builder, S source, SocketBindingGroupsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, SocketBindingGroupsManagement, SocketBindingGroupsManagementSubtaskExecutor<S>, Builder<S>> {
+    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, SocketBindingGroupsManagement> {
+    }
+
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SocketBindingGroupsManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new SocketBindingGroupsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, SocketBindingGroupsManagement... resourceManagements) {
+            return new SocketBindingGroupsManagementTask<>(this, source, resourceManagements);
         }
     }
 }

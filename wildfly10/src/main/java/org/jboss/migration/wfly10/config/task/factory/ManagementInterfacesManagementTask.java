@@ -18,29 +18,34 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.JVMsManagement;
 import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
 import org.jboss.migration.wfly10.config.task.executor.ManagementInterfacesManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 
 import java.util.List;
 
 /**
  * @author emmartins
  */
-public class ManagementInterfaceManagementTask<S> extends ResourceManagementTask<S, ManagementInterfacesManagement> {
+public class ManagementInterfacesManagementTask<S> extends ResourceManagementTask<S, ManagementInterfacesManagement> {
 
-    protected ManagementInterfaceManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected ManagementInterfacesManagementTask(Builder<S> builder, S source, ManagementInterfacesManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, ManagementInterfacesManagement, ManagementInterfacesManagementSubtaskExecutor<S>, Builder<S>> {
+    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ManagementInterfacesManagement> {
+    }
+
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, ManagementInterfacesManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new ManagementInterfaceManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, ManagementInterfacesManagement... resourceManagements) {
+            return new ManagementInterfacesManagementTask<>(this, source, resourceManagements);
         }
     }
 }

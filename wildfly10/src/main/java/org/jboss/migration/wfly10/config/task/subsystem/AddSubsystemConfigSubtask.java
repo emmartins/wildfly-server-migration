@@ -22,15 +22,15 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.factory.SubsystemManagementParentTask;
+import org.jboss.migration.wfly10.config.task.factory.AbstractSubsystemConfigurationTask;
 
 /**
  * A task which creates a subsystem if its missing from the server's config.
  * @author emmartins
  */
-public class AddSubsystemConfigSubtask<S> extends SubsystemManagementParentTask.Subtask<S> {
+public class AddSubsystemConfigSubtask<S> extends AbstractSubsystemConfigurationTask.Subtask<S> {
 
-    public AddSubsystemConfigSubtask(SubsystemManagementParentTask.Context<S> parentContext) {
+    public AddSubsystemConfigSubtask(AbstractSubsystemConfigurationTask.Context<S> parentContext) {
         super(new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", parentContext.getConfigName()).build(), parentContext);
     }
 

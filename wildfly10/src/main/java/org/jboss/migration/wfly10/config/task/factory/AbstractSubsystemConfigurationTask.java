@@ -35,10 +35,10 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class SubsystemManagementParentTask extends ParentTask {
+public abstract class AbstractSubsystemConfigurationTask<S> extends SubsystemsManagementTask<S> {
 
-    private SubsystemManagementParentTask(ParentTask.Builder builder) {
-        super(builder);
+    protected AbstractSubsystemConfigurationTask(SubsystemsManagementTask.Builder<S> builder, S source, SubsystemsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
     public static class Builder<S> extends BaseBuilder<Context<S>, Builder<S>> {

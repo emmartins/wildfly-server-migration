@@ -16,21 +16,18 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
-
-import java.util.List;
 
 /**
  * @author emmartins
  */
 public class SubsystemsManagementTask<S> extends ResourceManagementTask<S, SubsystemsManagement> {
 
-    protected SubsystemsManagementTask(Builder<S> builder, List<ParentTask.Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected SubsystemsManagementTask(Builder<S> builder, S source, SubsystemsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
     public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SubsystemsManagement, SubsystemsManagementSubtaskExecutor<S>, Builder<S>> {
@@ -40,8 +37,8 @@ public class SubsystemsManagementTask<S> extends ResourceManagementTask<S, Subsy
         }
 
         @Override
-        protected ServerMigrationTask build(List<ParentTask.Subtasks> subtasks) {
-            return new SubsystemsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, SubsystemsManagement... resourceManagements) {
+            return new SubsystemsManagementTask<>(this, source, resourceManagements);
         }
     }
 }

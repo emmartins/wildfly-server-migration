@@ -23,7 +23,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.factory.SubsystemManagementParentTask;
+import org.jboss.migration.wfly10.config.task.factory.AbstractSubsystemConfigurationTask;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public abstract class AbstractSubsystemTask<S> extends AbstractServerMigrationTa
     private final SubsystemsManagement subsystemsManagement;
     private final TaskEnvironment taskEnvironment;
 
-    protected AbstractSubsystemTask(ServerMigrationTaskName taskName, SubsystemManagementParentTask.Context<S> parentContext) {
+    protected AbstractSubsystemTask(ServerMigrationTaskName taskName, AbstractSubsystemConfigurationTask.Context<S> parentContext) {
         this(taskName, parentContext.getSource(), parentContext.getExtension(), parentContext.getSubsystem(), parentContext.getResourcesManagement(), new TaskEnvironment(parentContext.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(parentContext.getSubsystem(), taskName.getName())));
     }
 

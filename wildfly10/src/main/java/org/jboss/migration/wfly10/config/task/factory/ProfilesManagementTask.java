@@ -19,6 +19,7 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 
@@ -29,22 +30,22 @@ import java.util.List;
  */
 public class ProfilesManagementTask<S> extends ResourceManagementTask<S, ProfilesManagement> {
 
-    protected ProfilesManagementTask(Builder<S> builder, List<ParentTask.Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected ProfilesManagementTask(Builder<S> builder, S source, ProfilesManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
     public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ProfilesManagement> {
     }
 
-    public static class Builder<S> extends BaseBuilder<S, ProfilesManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, ProfilesManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<ParentTask.Subtasks> subtasks) {
-            return new ProfilesManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, ProfilesManagement... resourceManagements) {
+            return new ProfilesManagementTask<>(this, source, resourceManagements);
         }
     }
 }

@@ -18,7 +18,9 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.SecurityRealmsManagementSubtaskExecutor;
 
 import java.util.List;
@@ -28,19 +30,22 @@ import java.util.List;
  */
 public class SecurityRealmsManagementTask<S> extends ResourceManagementTask<S, SecurityRealmsManagement> {
 
-    protected SecurityRealmsManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected SecurityRealmsManagementTask(Builder<S> builder, S source, SecurityRealmsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, SecurityRealmsManagement, SecurityRealmsManagementSubtaskExecutor<S>, Builder<S>> {
+    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, SecurityRealmsManagement> {
+    }
+
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SecurityRealmsManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new SecurityRealmsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, SecurityRealmsManagement... resourceManagements) {
+            return new SecurityRealmsManagementTask<>(this, source, resourceManagements);
         }
     }
 }

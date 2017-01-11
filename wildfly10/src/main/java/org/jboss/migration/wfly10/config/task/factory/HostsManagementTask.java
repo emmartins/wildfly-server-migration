@@ -19,7 +19,9 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.HostsManagement;
+import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 
 import java.util.List;
@@ -29,22 +31,22 @@ import java.util.List;
  */
 public class HostsManagementTask<S> extends ResourceManagementTask<S, HostsManagement> {
 
-    protected HostsManagementTask(Builder<S> builder, List<ParentTask.Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected HostsManagementTask(Builder<S> builder, S source, HostsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
     public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, HostsManagement> {
     }
 
-    public static class Builder<S> extends BaseBuilder<S, HostsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, HostsManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<ParentTask.Subtasks> subtasks) {
-            return new HostsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, HostsManagement... resourceManagements) {
+            return new HostsManagementTask<>(this, source, resourceManagements);
         }
     }
 }

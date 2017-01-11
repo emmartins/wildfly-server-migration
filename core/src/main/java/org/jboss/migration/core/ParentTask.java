@@ -24,19 +24,13 @@ import java.util.List;
  * A {@link ServerMigrationTask} which delegates to subtask executors.
  * @author emmartins
  */
-public class ParentTask extends AbstractServerMigrationTask {
+public abstract class ParentTask extends AbstractServerMigrationTask {
 
     protected final boolean succeedIfHasSuccessfulSubtasks;
-    protected final List<Subtasks> subtasks;
 
-    protected ParentTask(BaseBuilder<Subtasks, ?> builder) {
-        this(builder, Collections.unmodifiableList(builder.subtasks));
-    }
-
-    protected ParentTask(BaseBuilder<?, ?> builder, List<Subtasks> subtasks) {
+    protected ParentTask(BaseBuilder builder) {
         super(builder);
         this.succeedIfHasSuccessfulSubtasks = builder.succeedIfHasSuccessfulSubtasks;
-        this.subtasks = subtasks;
     }
 
     @Override
@@ -45,44 +39,24 @@ public class ParentTask extends AbstractServerMigrationTask {
         return (!succeedIfHasSuccessfulSubtasks || taskContext.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
     }
 
-    protected void runSubtasks(TaskContext context) throws Exception {
-        for (Subtasks subtask : subtasks) {
-            subtask.run(context);
-        }
-    }
+    protected abstract void runSubtasks(TaskContext context) throws Exception;
 
+    /**
+     *
+     */
     public interface Subtasks {
         void run(TaskContext context) throws Exception;
     }
 
     /**
-     * The parent task builder.
+     * The parent task extensible builder.
      */
-    protected static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends AbstractServerMigrationTask.Builder<B> {
+    protected static abstract class BaseBuilder<B extends BaseBuilder<B>> extends AbstractServerMigrationTask.Builder<B> {
 
-        protected final List<S> subtasks = new ArrayList<>();
         protected boolean succeedIfHasSuccessfulSubtasks = true;
 
         protected BaseBuilder(ServerMigrationTaskName name) {
             super(name);
-        }
-
-        /*
-        protected BaseBuilder(BaseBuilder<?,?> other, List<Subtasks<T>> subtasks) {
-            super(other);
-            this.succeedIfHasSuccessfulSubtasks = other.succeedIfHasSuccessfulSubtasks;
-            this.subtasks.addAll(subtasks);
-        }
-
-        protected BaseBuilder(BaseBuilder<?,?> other) {
-            super(other);
-            this.succeedIfHasSuccessfulSubtasks = other.succeedIfHasSuccessfulSubtasks;
-        }
-        */
-
-        public B subtask(S subtask) {
-            subtasks.add(subtask);
-            return (B) this;
         }
 
         public B succeedIfHasSuccessfulSubtasks() {
@@ -94,14 +68,26 @@ public class ParentTask extends AbstractServerMigrationTask {
             succeedIfHasSuccessfulSubtasks = false;
             return (B) this;
         }
+
+        public abstract B subtask(ServerMigrationTask subtask);
+
+        public abstract B subtask(Subtasks subtasks);
     }
 
-    public static class Builder extends BaseBuilder<Subtasks, Builder> {
+    /**
+     *
+     */
+    public static class Builder extends BaseBuilder<Builder> {
+
+        private static final Subtasks[] EMPTY = {};
+        protected final List<Subtasks> subtasks;
 
         public Builder(ServerMigrationTaskName name) {
             super(name);
+            this.subtasks = new ArrayList<>();
         }
 
+        @Override
         public Builder subtask(final ServerMigrationTask subtask) {
             return subtask(new Subtasks() {
                 @Override
@@ -111,9 +97,21 @@ public class ParentTask extends AbstractServerMigrationTask {
             });
         }
 
-        public ParentTask build() {
-            return new ParentTask(this);
+        public Builder subtask(Subtasks subtasks) {
+            this.subtasks.add(subtasks);
+            return this;
         }
 
+        public ParentTask build() {
+            final Subtasks[] subtasks = this.subtasks.toArray(EMPTY);
+            return new ParentTask(this) {
+                @Override
+                protected void runSubtasks(TaskContext context) throws Exception {
+                    for (Subtasks subtask : subtasks) {
+                        subtask.run(context);
+                    }
+                }
+            };
+        }
     }
 }

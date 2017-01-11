@@ -21,26 +21,26 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
 import org.jboss.migration.wfly10.config.task.executor.DeploymentsManagementSubtaskExecutor;
 
-import java.util.List;
-
 /**
  * @author emmartins
  */
 public class DeploymentsManagementTask<S> extends ResourceManagementTask<S, DeploymentsManagement> {
 
-    protected DeploymentsManagementTask(Builder<S> builder, List<Subtasks> subtasks) {
-        super(builder, subtasks);
+    protected DeploymentsManagementTask(Builder<S> builder, S source, DeploymentsManagement... resourceManagements) {
+        super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends BaseBuilder<S, DeploymentsManagement, DeploymentsManagementSubtaskExecutor<S>, Builder<S>> {
+    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, DeploymentsManagement, DeploymentsManagementSubtaskExecutor<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        protected ServerMigrationTask build(List<Subtasks> subtasks) {
-            return new DeploymentsManagementTask<>(this, subtasks);
+        public ServerMigrationTask build(S source, DeploymentsManagement... resourceManagements) {
+            return new DeploymentsManagementTask<>(this, source, resourceManagements);
         }
     }
+
+
 }
