@@ -82,7 +82,6 @@ public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S
         public Builder(String extension, String subsystem, ServerMigrationTaskName taskName) {
             super(extension, subsystem, taskName);
         }
-
         @Override
         public ServerMigrationTask build(S source, SubsystemsManagement... resourceManagements) {
             return new SubsystemConfigurationTask<>(this, source, resourceManagements);

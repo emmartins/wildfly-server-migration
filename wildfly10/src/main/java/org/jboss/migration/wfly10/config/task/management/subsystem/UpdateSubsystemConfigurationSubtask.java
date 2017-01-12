@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConfigurationTask;
 
 /**
  * @author emmartins
@@ -29,9 +28,7 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConf
 public abstract class UpdateSubsystemConfigurationSubtask<S> implements SubsystemConfigurationTask.Subtask<S> {
 
     @Override
-    public ServerMigrationTaskName getName(SubsystemConfigurationTask.Context<S> parentContext) {
-        return new ServerMigrationTaskName.Builder("update-subsystem-config").addAttribute("name", parentContext.getSubsystemConfigurationName()).build();
-    }
+    public abstract ServerMigrationTaskName getName(SubsystemConfigurationTask.Context<S> parentContext);
 
     @Override
     public ServerMigrationTaskResult run(SubsystemConfigurationTask.Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
@@ -42,10 +39,10 @@ public abstract class UpdateSubsystemConfigurationSubtask<S> implements Subsyste
             return ServerMigrationTaskResult.SKIPPED;
         }
         taskContext.getLogger().debugf("Updating subsystem config %s...", parentContext.getSubsystemConfigurationName());
-        updateConfiguration(config, parentContext, taskContext, taskEnvironment);
+        final ServerMigrationTaskResult taskResult = updateConfiguration(config, parentContext, taskContext, taskEnvironment);
         taskContext.getLogger().infof("Subsystem config %s updated.", configName);
-        return ServerMigrationTaskResult.SUCCESS;
+        return taskResult;
     }
 
-    protected abstract void updateConfiguration(ModelNode config, SubsystemConfigurationTask.Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
+    protected abstract ServerMigrationTaskResult updateConfiguration(ModelNode config, SubsystemConfigurationTask.Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
 }

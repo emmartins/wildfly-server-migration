@@ -31,21 +31,15 @@ public class SubsystemsConfigurationTask<S> extends ResourceManagementTask<S, Su
     }
 
     public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ResourceManagementTask.BaseBuilder<S, SubsystemsManagement, SubsystemsConfigurationSubtasks<S>, B> {
-
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
-
-        @Override
-        public abstract ServerMigrationTask build(S source, SubsystemsManagement... resourceManagements);
     }
 
     public static class Builder<S> extends BaseBuilder<S, Builder<S>> {
-
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
-
         @Override
         public ServerMigrationTask build(S source, SubsystemsManagement... resourceManagements) {
             return new SubsystemsConfigurationTask<>(this, source, resourceManagements);

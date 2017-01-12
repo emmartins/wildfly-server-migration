@@ -32,6 +32,8 @@ import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.management.DomainConfigurationTask;
+import org.jboss.migration.wfly10.config.task.management.StandaloneServerConfigurationTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 

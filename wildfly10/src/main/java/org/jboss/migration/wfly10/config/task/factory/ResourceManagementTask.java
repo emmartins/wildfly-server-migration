@@ -24,17 +24,20 @@ import org.jboss.migration.wfly10.config.management.ManageableServerConfiguratio
 import org.jboss.migration.wfly10.config.management.ResourceManagement;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationTask;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author emmartins
  */
 public class ResourceManagementTask<S, R extends ResourceManagement> extends ParentTask {
 
-    private static final ResourceManagementSubtaskExecutor[] EMPTY = {};
-    protected final ResourceManagementSubtaskExecutor<S, R>[] subtasks;
+    private static final SubtasksExecutor[] EMPTY = {};
+    protected final SubtasksExecutor<S, R>[] subtasks;
     protected final S source;
     protected final R[] resourceManagements;
 
@@ -47,27 +50,35 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
 
     @Override
     protected void runSubtasks(TaskContext context) throws Exception {
-        for (ResourceManagementSubtaskExecutor<S, R> subtaskExecutor : subtasks) {
-            for (R resourceManagement : resourceManagements) {
-                subtaskExecutor.executeSubtasks(source, resourceManagement, context);
-            }
+        for (SubtasksExecutor<S, R> subtaskExecutor : subtasks) {
+            subtaskExecutor.run(source, resourceManagements, context);
         }
+    }
+
+    private interface SubtasksExecutor<S, R extends ResourceManagement> {
+        void run(S source, R[] resourceManagements, TaskContext context) throws Exception;
     }
 
     protected abstract static class BaseBuilder<S, R extends ResourceManagement, T extends ResourceManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
 
-        protected final List<ResourceManagementSubtaskExecutor<S, R>> subtasks;
+        protected final List<SubtasksExecutor<S, R>> subtasks;
 
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
             this.subtasks = new ArrayList<>();
         }
 
+        private B subtask(SubtasksExecutor<S, R> subtaskExecutor) {
+            subtasks.add(subtaskExecutor);
+            return (B) this;
+        }
+
         @Override
         public B subtask(final ServerMigrationTask subtask) {
-            return subtask(new ResourceManagementSubtaskExecutor<S, R>() {
+            return subtask(new SubtasksExecutor<S, R>() {
                 @Override
-                public void executeSubtasks(S source, R resourceManagement, TaskContext context) throws Exception {
+                public void run(S source, R[] resourceManagements, TaskContext context) throws Exception {
+                    // only execute once
                     subtask.run(context);
                 }
             });
@@ -75,45 +86,67 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
 
         @Override
         public B subtask(final Subtasks subtasks) {
-            return subtask(new ResourceManagementSubtaskExecutor<S, R>() {
+            return subtask(new SubtasksExecutor<S, R>() {
                 @Override
-                public void executeSubtasks(S source, R resourceManagement, TaskContext context) throws Exception {
+                public void run(S source, R[] resourceManagements, TaskContext context) throws Exception {
+                    // only execute once
                     subtasks.run(context);
                 }
             });
         }
 
-        public B subtask(ResourceManagementSubtaskExecutor<S, R> subtaskExecutor) {
-            subtasks.add(subtaskExecutor);
-            return (B) this;
+        public B subtask(final ResourceManagementSubtaskExecutor<S, R> subtaskExecutor) {
+            return subtask(new SubtasksExecutor<S, R>() {
+                @Override
+                public void run(S source, R[] resourceManagements, TaskContext context) throws Exception {
+                    // execute for all
+                    for (R r : resourceManagements) {
+                        subtaskExecutor.executeSubtasks(source, r, context);
+                    }
+                }
+            });
         }
 
         public B subtask(final ManageableServerConfigurationSubtaskExecutor<S, ManageableServerConfiguration> subtaskExecutor) {
-            return subtask(new ResourceManagementSubtaskExecutor<S, R>() {
+            return subtask(new SubtasksExecutor<S, R>() {
                 @Override
-                public void executeSubtasks(S source, R resourceManagement, TaskContext context) throws Exception {
-                    subtaskExecutor.run(source, resourceManagement.getServerConfiguration(), context);
+                public void run(S source, R[] resourceManagements, TaskContext context) throws Exception {
+                    // execute per server config, not resources config
+                    Set<ManageableServerConfiguration> configs = new HashSet<>();
+                    for (R r : resourceManagements) {
+                        configs.add(r.getServerConfiguration());
+                    }
+                    for (ManageableServerConfiguration config : configs) {
+                        subtaskExecutor.run(source, config, context);
+                    }
                 }
             });
         }
 
         public B subtask(final ManageableServerConfigurationTask.BaseBuilder<S, ManageableServerConfiguration, ?, ?> taskBuilder) {
-            return subtask(new ResourceManagementSubtaskExecutor<S, R>() {
+            return subtask(new SubtasksExecutor<S, R>() {
                 @Override
-                public void executeSubtasks(S source, R resourceManagement, TaskContext context) throws Exception {
-                    final ServerMigrationTask subtask = taskBuilder.build(source, resourceManagement.getServerConfiguration());
-                    if (subtask != null) {
-                        context.execute(subtask);
+                public void run(S source, R[] resourceManagements, TaskContext context) throws Exception {
+                    // build and execute per server config, not resources config
+                    Set<ManageableServerConfiguration> configs = new HashSet<>();
+                    for (R r : resourceManagements) {
+                        configs.add(r.getServerConfiguration());
+                    }
+                    for (ManageableServerConfiguration config : configs) {
+                        final ServerMigrationTask subtask = taskBuilder.build(source, config);
+                        if (subtask != null) {
+                            context.execute(subtask);
+                        }
                     }
                 }
             });
         }
 
         public B subtask(final BaseBuilder<S, R, ?, ?> taskBuilder) {
-            return subtask(new ResourceManagementSubtaskExecutor<S, R>() {
+            return subtask(new SubtasksExecutor<S, R>() {
                 @Override
-                public void executeSubtasks(S source, R resourceManagement, TaskContext context) throws Exception {
-                    final ServerMigrationTask subtask = taskBuilder.build(source, resourceManagement);
+                public void run(S source, R[] resourceManagements, TaskContext context) throws Exception {
+                    final ServerMigrationTask subtask = taskBuilder.build(source, resourceManagements);
                     if (subtask != null) {
                         context.execute(subtask);
                     }

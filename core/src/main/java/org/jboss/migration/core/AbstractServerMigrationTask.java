@@ -32,6 +32,10 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
         this.skipper = builder.skipper;
     }
 
+    protected AbstractServerMigrationTask(ServerMigrationTaskName name) {
+        this(new Builder(name));
+    }
+
     @Override
     public ServerMigrationTaskName getName() {
         return name;

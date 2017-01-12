@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.factory;
+package org.jboss.migration.wfly10.config.task.management;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
+import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationTask;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
@@ -27,16 +27,16 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsCon
 /**
  * @author emmartins
  */
-public class StandaloneServerConfigurationTask<S> extends ManageableServerConfigurationTask<S, StandaloneServerConfiguration> {
+public class HostConfigurationTask<S> extends ManageableServerConfigurationTask<S, HostConfiguration> {
 
-    protected StandaloneServerConfigurationTask(Builder<S> builder, S source, StandaloneServerConfiguration configuration) {
+    protected HostConfigurationTask(Builder<S> builder, S source, HostConfiguration configuration) {
         super(builder, source, configuration);
     }
 
-    public interface Subtasks<S> extends ManageableServerConfigurationSubtaskExecutor<S, StandaloneServerConfiguration> {
+    public interface Subtasks<S> extends ManageableServerConfigurationSubtaskExecutor<S, HostConfiguration> {
     }
 
-    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, StandaloneServerConfiguration, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, HostConfiguration, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
@@ -45,7 +45,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
         public Builder<S> subtask(final SubsystemsConfigurationSubtasks<S> subtask) {
             return subtask(new Subtasks<S>() {
                 @Override
-                public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {
+                public void run(S source, HostConfiguration configuration, TaskContext taskContext) throws Exception {
                     subtask.executeSubtasks(source, configuration.getSubsystemsManagement(), taskContext);
                 }
             });
@@ -54,7 +54,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
         public Builder<S> subtask(final SubsystemsConfigurationTask.Builder<S> subtaskBuilder) {
             return subtask(new Subtasks<S>() {
                 @Override
-                public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {
+                public void run(S source, HostConfiguration configuration, TaskContext taskContext) throws Exception {
                     final ServerMigrationTask subtask = subtaskBuilder.build(source, configuration.getSubsystemsManagement());
                     if (subtask != null) {
                         taskContext.execute(subtask);
@@ -64,8 +64,8 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
         }
 
         @Override
-        public ServerMigrationTask build(S source, StandaloneServerConfiguration configuration) {
-            return new StandaloneServerConfigurationTask<>(this, source, configuration);
+        public ServerMigrationTask build(S source, HostConfiguration configuration) {
+            return new HostConfigurationTask<>(this, source, configuration);
         }
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.factory;
+package org.jboss.migration.wfly10.config.task.management;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;

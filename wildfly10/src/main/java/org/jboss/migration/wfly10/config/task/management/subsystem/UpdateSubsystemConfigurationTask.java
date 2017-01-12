@@ -32,7 +32,6 @@ public class UpdateSubsystemConfigurationTask<S> extends SubsystemConfigurationT
     }
 
     public static class Builder<S> extends SubsystemConfigurationTask.BaseBuilder<S, Builder<S>> {
-
         public Builder(final String extension, final String subsystem) {
             super(extension, subsystem, new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
             listener(new AbstractServerMigrationTask.Listener() {
