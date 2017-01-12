@@ -14,23 +14,33 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.factory;
+package org.jboss.migration.wfly10.config.task.management.subsystem;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.factory.ResourceManagementTask;
 
 /**
  * @author emmartins
  */
-public class SubsystemsManagementTask<S> extends ResourceManagementTask<S, SubsystemsManagement> {
+public class SubsystemsConfigurationTask<S> extends ResourceManagementTask<S, SubsystemsManagement> {
 
-    protected SubsystemsManagementTask(Builder<S> builder, S source, SubsystemsManagement... resourceManagements) {
+    protected SubsystemsConfigurationTask(BaseBuilder<S, ?> builder, S source, SubsystemsManagement... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SubsystemsManagement, SubsystemsManagementSubtaskExecutor<S>, Builder<S>> {
+    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ResourceManagementTask.BaseBuilder<S, SubsystemsManagement, SubsystemsConfigurationSubtasks<S>, B> {
+
+        public BaseBuilder(ServerMigrationTaskName taskName) {
+            super(taskName);
+        }
+
+        @Override
+        public abstract ServerMigrationTask build(S source, SubsystemsManagement... resourceManagements);
+    }
+
+    public static class Builder<S> extends BaseBuilder<S, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
@@ -38,7 +48,7 @@ public class SubsystemsManagementTask<S> extends ResourceManagementTask<S, Subsy
 
         @Override
         public ServerMigrationTask build(S source, SubsystemsManagement... resourceManagements) {
-            return new SubsystemsManagementTask<>(this, source, resourceManagements);
+            return new SubsystemsConfigurationTask<>(this, source, resourceManagements);
         }
     }
 }

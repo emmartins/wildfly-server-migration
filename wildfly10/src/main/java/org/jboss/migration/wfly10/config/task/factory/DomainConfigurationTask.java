@@ -16,17 +16,16 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
-import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationTask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
             super(taskName);
         }
 
-        public Builder<S> subtask(final SubsystemsManagementSubtaskExecutor<S> subtask) {
+        public Builder<S> subtask(final SubsystemsConfigurationSubtasks<S> subtask) {
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, HostControllerConfiguration configuration, TaskContext taskContext) throws Exception {
@@ -62,7 +61,7 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
             });
         }
 
-        public Builder<S> subtask(final SubsystemsManagementTask.Builder<S> builder) {
+        public Builder<S> subtask(final SubsystemsConfigurationTask.Builder<S> builder) {
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, HostControllerConfiguration configuration, TaskContext taskContext) throws Exception {

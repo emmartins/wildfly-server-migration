@@ -21,7 +21,8 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationTask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
 /**
  * @author emmartins
@@ -41,7 +42,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
             super(taskName);
         }
 
-        public Builder<S> subtask(final SubsystemsManagementSubtaskExecutor<S> subtask) {
+        public Builder<S> subtask(final SubsystemsConfigurationSubtasks<S> subtask) {
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {
@@ -50,7 +51,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
             });
         }
 
-        public Builder<S> subtask(final SubsystemsManagementTask.Builder<S> subtaskBuilder) {
+        public Builder<S> subtask(final SubsystemsConfigurationTask.Builder<S> subtaskBuilder) {
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {

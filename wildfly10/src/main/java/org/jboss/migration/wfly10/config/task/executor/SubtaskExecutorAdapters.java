@@ -27,6 +27,7 @@ import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
 /**
  * @author emmartins
@@ -71,7 +72,7 @@ public class SubtaskExecutorAdapters {
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SubsystemsManagement resourcesManagement, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SubsystemsManagement resourcesManagement, final SubsystemsConfigurationSubtasks<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
@@ -89,7 +90,7 @@ public class SubtaskExecutorAdapters {
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final StandaloneServerConfiguration configuration, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final StandaloneServerConfiguration configuration, final SubsystemsConfigurationSubtasks<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
@@ -98,7 +99,7 @@ public class SubtaskExecutorAdapters {
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostConfiguration configuration, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostConfiguration configuration, final SubsystemsConfigurationSubtasks<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
@@ -107,7 +108,7 @@ public class SubtaskExecutorAdapters {
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostControllerConfiguration configuration, final SubsystemsManagementSubtaskExecutor<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final HostControllerConfiguration configuration, final SubsystemsConfigurationSubtasks<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {

@@ -22,7 +22,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.factory.AbstractSubsystemConfigurationTask;
+import org.jboss.migration.wfly10.config.task.subsystems.AbstractSubsystemConfigurationTask;
 
 /**
  * A task which creates a subsystem if its missing from the server's config.

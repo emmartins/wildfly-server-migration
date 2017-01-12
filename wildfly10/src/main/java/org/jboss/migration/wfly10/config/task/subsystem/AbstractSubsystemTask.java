@@ -23,7 +23,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.factory.AbstractSubsystemConfigurationTask;
+import org.jboss.migration.wfly10.config.task.subsystems.AbstractSubsystemConfigurationTask;
 
 import java.io.IOException;
 

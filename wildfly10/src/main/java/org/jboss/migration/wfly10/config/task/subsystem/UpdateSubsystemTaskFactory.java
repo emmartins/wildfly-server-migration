@@ -20,7 +20,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
@@ -28,7 +27,7 @@ import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
@@ -108,7 +107,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
         };
     }
 
-    class SubtaskExecutor<S> implements SubsystemsManagementSubtaskExecutor<S> {
+    class SubtaskExecutor<S> implements SubsystemsConfigurationSubtasks<S> {
         @Override
         public void executeSubtasks(final S source, final SubsystemsManagement subsystemsManagement, final TaskContext context) throws Exception {
             final String configName = subsystemsManagement.getResourcePathAddress(name).toCLIStyleString();

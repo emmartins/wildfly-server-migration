@@ -30,7 +30,7 @@ import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.executor.SubsystemsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
@@ -99,7 +99,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
         return  taskBuilder.build();
     }
 
-    protected static class ConfigMigration<S> implements SubsystemsManagementSubtaskExecutor<S> {
+    protected static class ConfigMigration<S> implements SubsystemsConfigurationSubtasks<S> {
 
         private final String subsystemName;
 

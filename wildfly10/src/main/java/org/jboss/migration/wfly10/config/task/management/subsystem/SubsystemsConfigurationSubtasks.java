@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.executor;
+package org.jboss.migration.wfly10.config.task.management.subsystem;
 
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.task.executor.ResourcesManagementSubtaskExecutor;
 
 /**
  * @author emmartins
  */
-public interface SubsystemsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, SubsystemsManagement> {
+public interface SubsystemsConfigurationSubtasks<S> extends ResourcesManagementSubtaskExecutor<S, SubsystemsManagement> {
 }

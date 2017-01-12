@@ -47,8 +47,8 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
 
     @Override
     protected void runSubtasks(TaskContext context) throws Exception {
-        for (R resourceManagement : resourceManagements) {
-            for (ResourceManagementSubtaskExecutor<S, R> subtaskExecutor : subtasks) {
+        for (ResourceManagementSubtaskExecutor<S, R> subtaskExecutor : subtasks) {
+            for (R resourceManagement : resourceManagements) {
                 subtaskExecutor.executeSubtasks(source, resourceManagement, context);
             }
         }
@@ -97,7 +97,7 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
             });
         }
 
-        public B subtask(final ManageableServerConfigurationTask.BaseBuilder<S, ManageableServerConfiguration, ?> taskBuilder) {
+        public B subtask(final ManageableServerConfigurationTask.BaseBuilder<S, ManageableServerConfiguration, ?, ?> taskBuilder) {
             return subtask(new ResourceManagementSubtaskExecutor<S, R>() {
                 @Override
                 public void executeSubtasks(S source, R resourceManagement, TaskContext context) throws Exception {
