@@ -20,6 +20,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.ResourceManagementTask;
 
 /**
  * @author emmartins

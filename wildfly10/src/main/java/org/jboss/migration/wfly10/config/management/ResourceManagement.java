@@ -16,9 +16,13 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import java.util.List;
+
 /**
  * @author emmartins
  */
 public interface ResourceManagement {
     ManageableServerConfiguration getServerConfiguration();
+    List<ResourceManagement> getChildren();
+    <T extends ResourceManagement> List<T> getChildrenByType(Class<T> type);
 }

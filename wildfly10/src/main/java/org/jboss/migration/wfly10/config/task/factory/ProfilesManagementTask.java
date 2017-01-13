@@ -16,14 +16,11 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
-
-import java.util.List;
+import org.jboss.migration.wfly10.config.task.management.ResourceManagementTask;
 
 /**
  * @author emmartins

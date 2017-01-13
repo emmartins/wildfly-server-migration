@@ -39,7 +39,7 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
         super(builder, source, configuration);
     }
 
-    public interface Subtasks<S> extends ManageableServerConfigurationSubtaskExecutor<S, HostControllerConfiguration> {
+    public interface Subtasks<S> extends ManageableServerConfigurationTask.Subtasks<S, HostControllerConfiguration> {
     }
 
     public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, HostControllerConfiguration, Subtasks<S>, Builder<S>> {
@@ -48,32 +48,23 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
             super(taskName);
         }
 
-        public Builder<S> subtask(final SubsystemsConfigurationSubtasks<S> subtask) {
-            return subtask(new Subtasks<S>() {
-                @Override
-                public void run(S source, HostControllerConfiguration configuration, TaskContext taskContext) throws Exception {
-                    final ProfilesManagement profilesManagement = configuration.getProfilesManagement();
-                    for (String profileNames : profilesManagement.getResourceNames()) {
-                        final ProfileManagement profileManagement = profilesManagement.getProfileManagement(profileNames);
-                        subtask.executeSubtasks(source, profileManagement.getSubsystemsManagement(), taskContext);
-                    }
+        public Builder<S> subtask(SubsystemsConfigurationSubtasks<S> subtask) {
+            return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
+                final ProfilesManagement profilesManagement = configuration.getProfilesManagement();
+                for (String profileNames : profilesManagement.getResourceNames()) {
+                    final ProfileManagement profileManagement = profilesManagement.getProfileManagement(profileNames);
+                    subtask.executeSubtasks(source, profileManagement.getSubsystemsManagement(), taskContext);
                 }
             });
         }
 
-        public Builder<S> subtask(final SubsystemsConfigurationTask.Builder<S> builder) {
-            return subtask(new Subtasks<S>() {
-                @Override
-                public void run(S source, HostControllerConfiguration configuration, TaskContext taskContext) throws Exception {
-                    final List<SubsystemsManagement> resourceManagements = new ArrayList<>();
-                    final ProfilesManagement profilesManagement = configuration.getProfilesManagement();
-                    for (String profileNames : profilesManagement.getResourceNames()) {
-                        resourceManagements.add(profilesManagement.getProfileManagement(profileNames).getSubsystemsManagement());
-                    }
-                    final ServerMigrationTask subtask = builder.build(source, resourceManagements.toArray(new SubsystemsManagement[0]));
-                    if (subtask != null) {
-                        taskContext.execute(subtask);
-                    }
+        public Builder<S> subtask(SubsystemsConfigurationTask.Builder<S> builder) {
+            return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
+                // replace with non generic resource retriever
+                final List<SubsystemsManagement> resourceManagements = configuration.getResourcesByType(SubsystemsManagement.class);
+                final ServerMigrationTask subtask = builder.build(source, resourceManagements);
+                if (subtask != null) {
+                    taskContext.execute(subtask);
                 }
             });
         }

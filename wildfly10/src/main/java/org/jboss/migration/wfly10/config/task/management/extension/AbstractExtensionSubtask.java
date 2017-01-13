@@ -24,12 +24,12 @@ import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationTask;
 
 /**
  * @author emmartins
  */
-public abstract class AbstractExtensionSubtask<S> implements ExtensionsManagementSubtaskExecutor<S>, ManageableServerConfigurationSubtaskExecutor<S, ManageableServerConfiguration> {
+public abstract class AbstractExtensionSubtask<S> implements ExtensionsManagementSubtaskExecutor<S>, ManageableServerConfigurationTask.Subtasks<S, ManageableServerConfiguration> {
 
     protected final String extensionModule;
 

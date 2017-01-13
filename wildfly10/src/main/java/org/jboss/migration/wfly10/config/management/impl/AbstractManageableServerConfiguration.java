@@ -22,12 +22,16 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
+import org.jboss.migration.wfly10.config.management.ResourceManagement;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -124,4 +128,29 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
             throw new RuntimeException(e);
         }
     }
+
+    public List<ResourceManagement> getResources() {
+        final List<ResourceManagement> result = new ArrayList<>();
+        result.add(getExtensionsManagement());
+        result.addAll(getExtensionsManagement().getChildren());
+
+        if (type == ExtensionsManagement.class)
+            return null;
+
+    }
+
+    @Override
+    public <T extends ResourceManagement> List<T> getResources(Class<T> type) {
+        final List<T> result = new ArrayList<>();
+        if (type.isAssignableFrom(ExtensionsManagement.class)) {
+            result.add((T) getExtensionsManagement());
+        } else
+        return null;
+        /*
+        .subtask(SubsystemsManagement.class, )
+         */
+
+    }
+
+
 }

@@ -21,8 +21,8 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.ResourceManagement;
 import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ import java.util.List;
  */
 public class ManageableServerConfigurationTask<S, T extends ManageableServerConfiguration> extends ParentTask {
 
-    private static final ManageableServerConfigurationSubtaskExecutor[] EMPTY = {};
-    protected final ManageableServerConfigurationSubtaskExecutor<S, T>[] subtasks;
+    private static final Subtasks[] EMPTY = {};
+    protected final Subtasks<S, T>[] subtasks;
     protected final S source;
     protected final T configuration;
 
@@ -46,14 +46,18 @@ public class ManageableServerConfigurationTask<S, T extends ManageableServerConf
 
     @Override
     protected void runSubtasks(TaskContext context) throws Exception {
-        for (ManageableServerConfigurationSubtaskExecutor<S, T> subtaskExecutor : subtasks) {
-            subtaskExecutor.run(source, configuration, context);
+        for (Subtasks<S, T> subtask : subtasks) {
+            subtask.run(source, configuration, context);
         }
     }
 
-    protected abstract static class BaseBuilder<S, C extends ManageableServerConfiguration, T extends ManageableServerConfigurationSubtaskExecutor<S, C>, B extends BaseBuilder<S, C, T, B>> extends ParentTask.BaseBuilder<B> {
+    public interface Subtasks<S, T extends ManageableServerConfiguration> {
+        void run(S source, T configuration, TaskContext taskContext) throws Exception;
+    }
 
-        protected final List<ManageableServerConfigurationSubtaskExecutor<S, C>> subtasks;
+    protected abstract static class BaseBuilder<S, C extends ManageableServerConfiguration, T extends Subtasks<S, C>, B extends BaseBuilder<S, C, T, B>> extends ParentTask.BaseBuilder<B> {
+
+        protected final List<Subtasks<S, C>> subtasks;
 
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
@@ -61,35 +65,34 @@ public class ManageableServerConfigurationTask<S, T extends ManageableServerConf
         }
 
         @Override
-        public B subtask(final ServerMigrationTask subtask) {
-            return subtask(new ManageableServerConfigurationSubtaskExecutor<S, C>() {
-                @Override
-                public void run(S source, C configuration, TaskContext context) throws Exception {
-                    subtask.run(context);
-                }
-            });
+        public B subtask(ServerMigrationTask subtask) {
+            return subtask((Subtasks<S, C>) (source, configuration, context) -> subtask.run(context));
         }
 
         @Override
-        public B subtask(final Subtasks subtasks) {
-            return subtask(new ManageableServerConfigurationSubtaskExecutor<S, C>() {
-                @Override
-                public void run(S source, C configuration, TaskContext context) throws Exception {
-                    subtasks.run(context);
+        public B subtask(ParentTask.Subtasks subtasks) {
+            return subtask((Subtasks<S, C>) (source, configuration, context) -> subtasks.run(context));
+        }
+
+        public B subtask(Subtasks<S, C> subtasks) {
+            this.subtasks.add(subtasks);
+            return (B) this;
+        }
+
+        public B subtask(BaseBuilder<S, C, ?, ?> taskBuilder) {
+            return subtask((Subtasks<S, C>) (source, configuration, context) -> {
+                final ServerMigrationTask subtask = taskBuilder.build(source, configuration);
+                if (subtask != null) {
+                    context.execute(subtask);
                 }
             });
         }
 
-        public B subtask(ManageableServerConfigurationSubtaskExecutor<S, C> subtaskExecutor) {
-            subtasks.add(subtaskExecutor);
-            return (B) this;
-        }
-
-        public B subtask(final BaseBuilder<S, C, ?, ?> taskBuilder) {
-            return subtask(new ManageableServerConfigurationSubtaskExecutor<S, C>() {
-                @Override
-                public void run(S source, C configuration, TaskContext context) throws Exception {
-                    final ServerMigrationTask subtask = taskBuilder.build(source, configuration);
+        public <R extends ResourceManagement> B subtask(Class<R> childrenType, ResourceManagementTask.BaseBuilder<S, R, ?, ?> taskBuilder) {
+            return subtask((Subtasks<S, C>) (source, configuration, context) -> {
+                final List<R> children = configuration.getResourcesByType(childrenType);
+                if (!children.isEmpty()) {
+                    final ServerMigrationTask subtask = taskBuilder.build(source, children);
                     if (subtask != null) {
                         context.execute(subtask);
                     }
@@ -97,19 +100,14 @@ public class ManageableServerConfigurationTask<S, T extends ManageableServerConf
             });
         }
 
-        public B subtask(final ExtensionsManagementSubtaskExecutor<S> subtask) {
-            return subtask(new ManageableServerConfigurationSubtaskExecutor<S, C>() {
-                @Override
-                public void run(S source, C configuration, TaskContext taskContext) throws Exception {
-                    subtask.executeSubtasks(source, configuration.getExtensionsManagement(), taskContext);
-                }
-            });
+        public B subtask(ExtensionsManagementSubtaskExecutor<S> subtask) {
+            return subtask((Subtasks<S, C>) (source, configuration, taskContext) -> subtask.executeSubtasks(source, configuration.getExtensionsManagement(), taskContext));
         }
 
         public abstract ServerMigrationTask build(S source, C configuration);
     }
 
-    public static class Builder<S, C extends ManageableServerConfiguration> extends BaseBuilder<S, C, ManageableServerConfigurationSubtaskExecutor<S, C>, Builder<S, C>> {
+    public static class Builder<S, C extends ManageableServerConfiguration> extends BaseBuilder<S, C, Subtasks<S, C>, Builder<S, C>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
