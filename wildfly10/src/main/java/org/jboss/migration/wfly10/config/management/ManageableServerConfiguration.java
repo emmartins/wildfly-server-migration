@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public interface ManageableServerConfiguration {
+public interface ManageableServerConfiguration extends ManageableResource.Parent {
     void start();
     void stop();
     boolean isStarted();
@@ -39,6 +39,4 @@ public interface ManageableServerConfiguration {
     SystemPropertiesManagement getSystemPropertiesManagement();
     Path resolvePath(String path)  throws IOException, ManagementOperationException;
     ModelControllerClient getModelControllerClient();
-    <T extends ResourceManagement> List<T> getResourcesByType(Class<T> type);
-    List<ResourceManagement> getResources();
 }

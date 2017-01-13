@@ -25,7 +25,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
-import org.jboss.migration.wfly10.config.management.ResourceManagement;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -129,8 +129,8 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
         }
     }
 
-    public List<ResourceManagement> getResources() {
-        final List<ResourceManagement> result = new ArrayList<>();
+    public List<ManageableResource> getResources() {
+        final List<ManageableResource> result = new ArrayList<>();
         result.add(getExtensionsManagement());
         result.addAll(getExtensionsManagement().getChildren());
 
@@ -140,7 +140,7 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     }
 
     @Override
-    public <T extends ResourceManagement> List<T> getResources(Class<T> type) {
+    public <T extends ManageableResource> List<T> getResources(Class<T> type) {
         final List<T> result = new ArrayList<>();
         if (type.isAssignableFrom(ExtensionsManagement.class)) {
             result.add((T) getExtensionsManagement());

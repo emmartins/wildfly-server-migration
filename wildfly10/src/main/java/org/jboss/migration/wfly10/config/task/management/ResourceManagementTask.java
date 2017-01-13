@@ -21,7 +21,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.ResourceManagement;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
 
@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * @author emmartins
  */
-public class ResourceManagementTask<S, R extends ResourceManagement> extends ParentTask {
+public class ResourceManagementTask<S, R extends ManageableResource> extends ParentTask {
 
     protected final SubtasksExecutor<S, R>[] subtasks;
     protected final S source;
@@ -53,11 +53,11 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
         }
     }
 
-    private interface SubtasksExecutor<S, R extends ResourceManagement> {
+    private interface SubtasksExecutor<S, R extends ManageableResource> {
         void run(S source, List<R> resourceManagements, TaskContext context) throws Exception;
     }
 
-    protected abstract static class BaseBuilder<S, R extends ResourceManagement, T extends ResourceManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
+    protected abstract static class BaseBuilder<S, R extends ManageableResource, T extends ResourceManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
 
         protected final List<SubtasksExecutor<S, R>> subtasks;
 
@@ -96,7 +96,7 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
             });
         }
 
-        public <R1 extends ResourceManagement> B subtask(Class<R1> childrenType, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
+        public <R1 extends ManageableResource> B subtask(Class<R1> childrenType, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
             return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
                 // collect all children
                 List<R1> children = new ArrayList<>();
@@ -110,7 +110,7 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
             });
         }
 
-        public <R1 extends ResourceManagement> B subtask(Class<R1> childrenType, BaseBuilder<S, R1, ?, ?> taskBuilder) {
+        public <R1 extends ManageableResource> B subtask(Class<R1> childrenType, BaseBuilder<S, R1, ?, ?> taskBuilder) {
             return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
                 // collect all children
                 List<R1> children = new ArrayList<>();
@@ -166,7 +166,7 @@ public class ResourceManagementTask<S, R extends ResourceManagement> extends Par
         public abstract ServerMigrationTask build(S source, List<R> resourceManagements);
     }
 
-    public static class Builder<S, R extends ResourceManagement> extends BaseBuilder<S, R, ResourceManagementSubtaskExecutor<S, R>, Builder<S, R>> {
+    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<S, R, ResourceManagementSubtaskExecutor<S, R>, Builder<S, R>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);

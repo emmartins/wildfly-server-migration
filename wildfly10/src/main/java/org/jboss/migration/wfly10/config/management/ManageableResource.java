@@ -21,8 +21,21 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public interface ResourceManagement {
+public interface ManageableResource {
+
+    String getResourceName();
     ManageableServerConfiguration getServerConfiguration();
-    List<ResourceManagement> getChildren();
-    <T extends ResourceManagement> List<T> getChildrenByType(Class<T> type);
+
+    interface Parent {
+        List<ManageableResource> getChildResources(boolean recursive);
+        <T extends ManageableResource> List<T> getChildResourcesByType(Class<T> resourceType, boolean recursive);
+        <T extends ManageableResource> List<T> getChildResources(Query<T> query);
+    }
+
+    interface Query<T extends ManageableResource> {
+        Class<T> getResourceType();
+        String getResourceName();
+        boolean isRecursive();
+        Query<?> getParentsQuery();
+    }
 }

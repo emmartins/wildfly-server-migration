@@ -21,7 +21,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.ResourceManagement;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
 
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ public class ManageableServerConfigurationTask<S, T extends ManageableServerConf
             });
         }
 
-        public <R extends ResourceManagement> B subtask(Class<R> childrenType, ResourceManagementTask.BaseBuilder<S, R, ?, ?> taskBuilder) {
+        public <R extends ManageableResource> B subtask(Class<R> childrenType, ResourceManagementTask.BaseBuilder<S, R, ?, ?> taskBuilder) {
             return subtask((Subtasks<S, C>) (source, configuration, context) -> {
                 final List<R> children = configuration.getResourcesByType(childrenType);
                 if (!children.isEmpty()) {
