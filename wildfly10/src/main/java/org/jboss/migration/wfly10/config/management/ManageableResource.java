@@ -16,26 +16,17 @@
 
 package org.jboss.migration.wfly10.config.management;
 
-import java.util.List;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.dmr.ModelNode;
 
 /**
  * @author emmartins
  */
 public interface ManageableResource {
-
     String getResourceName();
+    PathAddress getPathAddress();
+    <T extends ManageableResource> Class<T> getResourceType();
+    ModelNode getResourceConfiguration();
     ManageableServerConfiguration getServerConfiguration();
-
-    interface Parent {
-        List<ManageableResource> getChildResources(boolean recursive);
-        <T extends ManageableResource> List<T> getChildResourcesByType(Class<T> resourceType, boolean recursive);
-        <T extends ManageableResource> List<T> getChildResources(Query<T> query);
-    }
-
-    interface Query<T extends ManageableResource> {
-        Class<T> getResourceType();
-        String getResourceName();
-        boolean isRecursive();
-        Query<?> getParentsQuery();
-    }
+    ManageableResources getResourceChildren();
 }

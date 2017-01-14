@@ -19,6 +19,6 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface ProfilesManagement extends ResourcesManagement, ManageableResource.Parent {
+public interface ProfilesManagement extends ResourcesManagement, ManageableResources {
     ProfileManagement getProfileManagement(String profileName);
 }

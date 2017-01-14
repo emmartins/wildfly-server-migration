@@ -22,12 +22,11 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * @author emmartins
  */
-public interface ManageableServerConfiguration extends ManageableResource.Parent {
+public interface ManageableServerConfiguration extends ManageableResources {
     void start();
     void stop();
     boolean isStarted();
