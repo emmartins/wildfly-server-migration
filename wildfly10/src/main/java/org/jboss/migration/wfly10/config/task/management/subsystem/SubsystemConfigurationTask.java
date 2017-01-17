@@ -117,7 +117,7 @@ public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S
 
         @Override
         public ModelNode getSubsystemConfiguration() throws IOException {
-            return resourceConfigurations.getResource(subsystemName);
+            return resourceConfigurations.getResourceConfiguration(subsystemName);
         }
 
         @Override

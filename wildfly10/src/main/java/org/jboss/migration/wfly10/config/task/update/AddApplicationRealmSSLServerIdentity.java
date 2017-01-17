@@ -22,7 +22,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
@@ -32,8 +31,6 @@ import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.management.DomainConfigurationTask;
-import org.jboss.migration.wfly10.config.task.management.StandaloneServerConfigurationTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -73,7 +70,7 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> impl
 
             @Override
             public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                final ModelNode resourceConfig = resourcesManagement.getResource(RESOURCE_NAME);
+                final ModelNode resourceConfig = resourcesManagement.getResourceConfiguration(RESOURCE_NAME);
                 if (resourceConfig == null) {
                     context.getLogger().debugf("Security realm %s not defined, skipping task to add SSL server identity", RESOURCE_NAME);
                     return ServerMigrationTaskResult.SKIPPED;

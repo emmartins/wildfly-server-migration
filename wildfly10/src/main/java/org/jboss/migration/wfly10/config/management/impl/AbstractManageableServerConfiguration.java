@@ -22,16 +22,14 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.ManagementOperationException;
-import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -40,12 +38,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
+public abstract class AbstractManageableServerConfiguration extends AbstractManageableNode<ManageableServerConfiguration> implements ManageableServerConfiguration {
 
     private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
 
     protected AbstractManageableServerConfiguration(WildFlyServer10 server) {
+        super(ManageableServerConfiguration.class);
         this.server = server;
     }
 
@@ -129,28 +128,51 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
         }
     }
 
-    public List<ManageableResource> getResources() {
-        final List<ManageableResource> result = new ArrayList<>();
-        result.add(getExtensionsManagement());
-        result.addAll(getExtensionsManagement().getChildren());
-
-        if (type == ExtensionsManagement.class)
-            return null;
-
-    }
-
     @Override
-    public <T extends ManageableResource> List<T> getResources(Class<T> type) {
-        final List<T> result = new ArrayList<>();
-        if (type.isAssignableFrom(ExtensionsManagement.class)) {
-            result.add((T) getExtensionsManagement());
-        } else
-        return null;
-        /*
-        .subtask(SubsystemsManagement.class, )
-         */
+    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
+        final List<C> result = new ArrayList<C>();
+        if (select.getType().isInstance(ManageableResource.class)) {
+            if (select.getType() == SocketBindingGroupManagement.class) {
+                for (String s : (Set<String>) getSocketBindingGroupsManagement().getResourceNames()) {
+                    SocketBindingGroupManagement socketBindingGroupManagement = getSocketBindingGroupsManagement().getSocketBindingGroupManagement(s);
+                    C c = (C) socketBindingGroupManagement;
+                    if (select.test(c)) {
+                        result.add(c);
+                    }
+                }
+            }
+        } else if (select.getType().isInstance(ManageableResources.class)) {
+            if (select.getType() == ExtensionsManagement.class) {
+                C c = (C) getExtensionsManagement();
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == InterfacesManagement.class) {
+                C c = (C) getInterfacesManagement();
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == SystemPropertiesManagement.class) {
+                C c = (C) getSystemPropertiesManagement();
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == SocketBindingGroupsManagement.class) {
+                C c = (C) getSocketBindingGroupsManagement();
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == SocketBindingsManagement.class) {
+                for (String s : (Set<String>) getSocketBindingGroupsManagement().getResourceNames()) {
+                    SocketBindingGroupManagement socketBindingGroupManagement = getSocketBindingGroupsManagement().getSocketBindingGroupManagement(s);
+                    C c = (C) socketBindingGroupManagement.getSocketBindingsManagement();
+                    if (select.test(c)) {
+                        result.add(c);
+                    }
+                }
 
+            }
+        }
+        return result;
     }
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,25 @@
 
 package org.jboss.migration.wfly10.config.management;
 
-import org.jboss.as.controller.PathAddress;
-import org.jboss.dmr.ModelNode;
-
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
- * Interface to manage children resources of a specific type
  * @author emmartins
-  */
-public interface ResourcesManagement extends ManageableResource {
-    PathAddress getParentPathAddress();
-    String getResourceType();
-    PathAddress getResourcePathAddress(String resourceName);
-    Set<String> getResourceNames() throws IOException;
-    ModelNode getResource(String resourceName) throws IOException;
-    void removeResource(String resourceName) throws IOException;
+ */
+public interface ManageableNode<T extends ManageableNode> {
+
+    Class<T> getType();
+    <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException;
+    <C extends ManageableNode> List<C> findChildren(Query<C> query) throws IOException;
+
+    interface Query<T extends ManageableNode> {
+        Select<T> getChildSelector();
+        Query<?> getParentsQuery();
+    }
+
+    interface Select<T extends ManageableNode> extends Predicate<T> {
+        Class<T> getType();
+    }
 }

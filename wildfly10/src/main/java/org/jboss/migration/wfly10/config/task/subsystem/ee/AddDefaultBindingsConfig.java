@@ -20,7 +20,6 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
@@ -117,7 +116,7 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
             }
             private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, SubsystemsManagement subsystemsManagement, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it
-                final ModelNode subsystemConfig = subsystemsManagement.getResource(SubsystemNames.MESSAGING_ACTIVEMQ);
+                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(SubsystemNames.MESSAGING_ACTIVEMQ);
                 if (subsystemConfig == null) {
                     return;
                 }
@@ -223,7 +222,7 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
             }
             private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, SubsystemsManagement subsystemsManagement, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it
-                final ModelNode subsystemConfig = subsystemsManagement.getResource(SubsystemNames.DATASOURCES);
+                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(SubsystemNames.DATASOURCES);
                 if (subsystemConfig == null) {
                     return;
                 }

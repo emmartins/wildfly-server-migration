@@ -121,7 +121,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                 }
                 @Override
                 public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                    final ModelNode subsystemConfig = subsystemsManagement.getResource(subsystemName);
+                    final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(subsystemName);
                     if (subsystemConfig == null) {
                         return ServerMigrationTaskResult.SKIPPED;
                     }

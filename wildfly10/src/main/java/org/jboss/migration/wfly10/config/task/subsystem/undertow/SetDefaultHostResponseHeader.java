@@ -22,7 +22,6 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
@@ -81,7 +80,7 @@ public class SetDefaultHostResponseHeader implements UpdateSubsystemTaskFactory.
             protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 // TODO get ridden of pre-fetched subsystem config, if not an issue for any existent subsystem task
                 // refresh subsystem config to see any changes possibly made during migration
-                config = subsystemsManagement.getResource(subsystem.getName());
+                config = subsystemsManagement.getResourceConfiguration(subsystem.getName());
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

@@ -19,6 +19,6 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface HostsManagement extends ResourcesManagement {
+public interface HostsManagement extends ManageableResources {
     HostControllerConfiguration getHostControllerConfiguration();
 }

@@ -25,7 +25,6 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
@@ -114,7 +113,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
         @Override
         public ServerMigrationTaskResult run(TaskContext context) throws Exception {
             // retrieve resource config
-            final ModelNode resource = resourceManagement.getResource(resourceName);
+            final ModelNode resource = resourceManagement.getResourceConfiguration(resourceName);
             if (resource == null) {
                 context.getLogger().debugf("Socket binding %s does not exists, task to add multicast address property skipped.", resourceName);
                 return ServerMigrationTaskResult.SKIPPED;

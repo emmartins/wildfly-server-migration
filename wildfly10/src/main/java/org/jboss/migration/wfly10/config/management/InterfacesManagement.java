@@ -19,5 +19,5 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface InterfacesManagement extends ResourcesManagement {
+public interface InterfacesManagement extends ManageableResources {
 }

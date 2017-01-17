@@ -23,7 +23,6 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
@@ -116,7 +115,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
                     }
                     @Override
                     public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                        final ModelNode config = resourceManagement.getResource(resourceName);
+                        final ModelNode config = resourceManagement.getResourceConfiguration(resourceName);
                         final PathAddress pathAddress = resourceManagement.getResourcePathAddress(resourceName);
                         boolean updated = false;
                         if (config.hasDefined("permgen-size")) {

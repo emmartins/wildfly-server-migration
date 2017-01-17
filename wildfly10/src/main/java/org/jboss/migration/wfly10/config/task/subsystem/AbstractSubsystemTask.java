@@ -57,7 +57,7 @@ public abstract class AbstractSubsystemTask<S> extends AbstractServerMigrationTa
     }
 
     protected ModelNode getConfig() throws IOException {
-        return getSubsystemsManagement().getResource(getSubsystem());
+        return getSubsystemsManagement().getResourceConfiguration(getSubsystem());
     }
 
     protected String getConfigName() {

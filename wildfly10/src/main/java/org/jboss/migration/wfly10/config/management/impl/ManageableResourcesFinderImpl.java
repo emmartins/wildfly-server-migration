@@ -16,30 +16,24 @@
 
 package org.jboss.migration.wfly10.config.management.impl;
 
+import org.jboss.migration.wfly10.config.management.ManageableNode;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResources;
+import org.jboss.migration.wfly10.config.management.ChildResources;
 import org.jboss.migration.wfly10.config.management.ManageableResourceWithChildren;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * @author emmartins
  */
-public class ManageableResourcesImpl implements ManageableResources {
+public abstract class ManageableResourcesFinderImpl implements ChildResources {
 
-    protected final List<ChildrenCollection> collections;
-    protected final Map<Class<? extends ManageableResource>, List<ChildrenCollection>> collectionsByType;
 
-    protected ManageableResourcesImpl(List<ChildrenCollection> collections) {
-        this.collections = Collections.unmodifiableList(collections);
-        this.collectionsByType = collections.stream().collect(Collectors.groupingBy(ChildrenCollection::getResourcesType));
-    }
-
-    protected <T extends ManageableResource> List<ChildrenCollection> getChildrenCollections(Class<T> resourceType) {
+    protected <T extends ManageableResource> List<ChildResources> getChildrenCollections(Class<T> resourceType) {
         if (resourceType == null || resourceType == ManageableResource.class) {
             // return all
             return collections;
@@ -48,37 +42,28 @@ public class ManageableResourcesImpl implements ManageableResources {
         }
     }
 
-    @Override
-    public List<ManageableResource> getAllChildResources() {
-        return getChildResources(null);
-    }
-
-    @Override
-    public <T extends ManageableResource> List<T> getByName(String resourceName) {
-        return getChildResourcesByTypeAndName(null, resourceName);
-    }
 
     @Override
     public <T extends ManageableResource> List<T> getChildResourcesByType(Class<T> resourceType) {
-        return getChildResourcesByTypeAndName(resourceType, null);
+        return findResources(resourceType, null);
     }
 
     @Override
-    public <T extends ManageableResource> List<T> getChildResourcesByTypeAndName(Class<T> resourceType, String resourceName) {
-        List<T> childResources = getChildResources(getChildrenCollections(resourceType));
+    public <T extends ManageableResource> List<T> findResources(Class<T> type, String resourceName) {
+        List<T> childResources = getChildResources(getChildrenCollections(type));
         if (resourceName != null) {
             childResources = childResources.stream().filter(child -> child.getResourceName().equals(resourceName)).collect(Collectors.toList());
         }
         return childResources;
     }
 
-    protected <T extends ManageableResource> List<T> getChildResources(List<ChildrenCollection> childrenCollections) {
-        if (childrenCollections == null) {
+    protected <T extends ManageableResource> List<T> getChildResources(List<ChildResources> childResources) {
+        if (childResources == null) {
             return Collections.emptyList();
         }
-        return (List<T>) childrenCollections.stream()
+        return (List<T>) childResources.stream()
                 // get resources for each children
-                .map(childrenCollection -> childrenCollection.getResources())
+                .map(manageableResourcesFinder -> manageableResourcesFinder.getResources())
                 // merge each children results
                 .collect(ArrayList::new, List::addAll, List::addAll);
     }
@@ -94,12 +79,17 @@ public class ManageableResourcesImpl implements ManageableResources {
                 return parents.stream().map(parent -> parent.get(query)).collect(ArrayList::new, List::addAll, List::addAll);
             }
         } else {
-            return getChildResourcesByTypeAndName(query.getResourceType(), query.getResourceName(), query.isRecursive());
+            return findResources(query.getResourceType(), query.getResourceName(), query.isRecursive());
         }
     }
 
-    protected interface ChildrenCollection<T extends ManageableResource> {
-        Class<T> getResourcesType();
-        List<T> getResources();
+    @Override
+    public <T extends ManageableResources> List<T> findResources(Class<T> type) {
+        return null;
+    }
+
+    @Override
+    public <T extends ManageableNode> List<T> findResources(Query<T> query) {
+        return null;
     }
 }

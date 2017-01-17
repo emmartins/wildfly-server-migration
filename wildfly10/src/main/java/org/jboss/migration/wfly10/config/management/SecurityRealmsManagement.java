@@ -19,5 +19,5 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface SecurityRealmsManagement extends ResourcesManagement {
+public interface SecurityRealmsManagement extends ManageableResources {
 }

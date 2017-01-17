@@ -24,7 +24,6 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
@@ -106,7 +105,7 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
                 @Override
                 public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                     // retrieve resource config
-                    final ModelNode resource = resourceManagement.getResource(INTERFACE_NAME);
+                    final ModelNode resource = resourceManagement.getResourceConfiguration(INTERFACE_NAME);
                     if (resource == null) {
                         context.getLogger().debugf("Interface %s does not exists.", INTERFACE_NAME);
                         return ServerMigrationTaskResult.SKIPPED;

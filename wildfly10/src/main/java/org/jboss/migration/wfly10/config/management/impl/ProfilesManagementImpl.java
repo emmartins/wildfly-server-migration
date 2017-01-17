@@ -17,9 +17,13 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
+import org.jboss.migration.wfly10.config.management.ChildResources;
+import org.jboss.migration.wfly10.config.management.ManageableNode;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
+
+import java.util.List;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
 
@@ -34,6 +38,22 @@ public class ProfilesManagementImpl extends ResourcesManagementImpl implements P
 
     @Override
     public ProfileManagement getProfileManagement(String profileName) {
-        return new ProfileManagementImpl(profileName, getParentPathAddress(), getServerConfiguration());
+        return new ProfileManagementImpl(profileName, parentPathAddress, getServerConfiguration());
+    }
+
+    @Override
+    public Class getType() {
+        return ProfilesManagement.class;
+    }
+
+    @Override
+    public List findChildren(Select select) {
+        select.getType()
+        return null;
+    }
+
+    @Override
+    public List findChildren(ManageableNode.Query query) {
+        return null;
     }
 }

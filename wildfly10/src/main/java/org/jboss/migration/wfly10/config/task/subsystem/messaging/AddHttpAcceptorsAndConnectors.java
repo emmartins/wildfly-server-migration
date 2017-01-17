@@ -20,7 +20,6 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
@@ -89,7 +88,7 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
                 final String undertowHttpListenerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME, DEFAULT_UNDERTOW_HTTP_LISTENER_NAME);
                 final String undertowServerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_SERVER_NAME, DEFAULT_UNDERTOW_SERVER_NAME);
                 // ensure undertow's default http listener is configured
-                final ModelNode undertowConfig = subsystemsManagement.getResource(SubsystemNames.UNDERTOW);
+                final ModelNode undertowConfig = subsystemsManagement.getResourceConfiguration(SubsystemNames.UNDERTOW);
                 if (undertowConfig == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 } else {

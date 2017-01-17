@@ -20,13 +20,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.wfly10.config.management.ManageableNode;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
-import org.jboss.migration.wfly10.config.management.ResourcesManagement;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -41,35 +43,25 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RES
 /**
  * @author emmartins
  */
-public class ResourcesManagementImpl implements ResourcesManagement {
+public class ResourcesManagementImpl implements ManageableResources {
 
-    private final ManageableServerConfiguration configurationManagement;
-    private final PathAddress parentPathAddress;
+    private final ManageableServerConfiguration serverConfiguration;
+    protected final PathAddress parentPathAddress;
     private final String type;
 
-    public ResourcesManagementImpl(String type, PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
+    public ResourcesManagementImpl(String type, PathAddress parentPathAddress, ManageableServerConfiguration serverConfiguration) {
         this.type = type;
         this.parentPathAddress = parentPathAddress;
-        this.configurationManagement = configurationManagement;
+        this.serverConfiguration = serverConfiguration;
     }
 
     @Override
     public ManageableServerConfiguration getServerConfiguration() {
-        return configurationManagement;
-    }
-
-    @Override
-    public PathAddress getParentPathAddress() {
-        return parentPathAddress;
-    }
-
-    @Override
-    public String getResourceType() {
-        return type;
+        return serverConfiguration;
     }
 
     protected PathAddress getPathAddress(PathElement... elements) {
-        final PathAddress parentAddress = getParentPathAddress();
+        final PathAddress parentAddress = parentPathAddress;
         return parentAddress != null ? parentAddress.append(elements) : pathAddress(elements);
     }
 
@@ -81,9 +73,9 @@ public class ResourcesManagementImpl implements ResourcesManagement {
     @Override
     public Set<String> getResourceNames() throws IOException {
         try {
-            final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, getParentPathAddress());
+            final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, parentPathAddress);
             op.get(CHILD_TYPE).set(type);
-            final ModelNode opResult = configurationManagement.executeManagementOperation(op);
+            final ModelNode opResult = serverConfiguration.executeManagementOperation(op);
             Set<String> result = new HashSet<>();
             for (ModelNode resultNode : opResult.get(RESULT).asList()) {
                 result.add(resultNode.asString());
@@ -91,8 +83,8 @@ public class ResourcesManagementImpl implements ResourcesManagement {
             return result;
         } catch (ManagementOperationException e) {
             try {
-                final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_TYPES_OPERATION, getParentPathAddress());
-                final ModelNode opResult = configurationManagement.executeManagementOperation(op);
+                final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_TYPES_OPERATION, parentPathAddress);
+                final ModelNode opResult = serverConfiguration.executeManagementOperation(op);
                 boolean childrenTypeFound = false;
                 for (ModelNode resultNode : opResult.get(RESULT).asList()) {
                     if (type.equals(resultNode.asString())) {
@@ -111,14 +103,14 @@ public class ResourcesManagementImpl implements ResourcesManagement {
     }
 
     @Override
-    public ModelNode getResource(String name) throws IOException {
+    public ModelNode getResourceConfiguration(String name) throws IOException {
         if (!getResourceNames().contains(name)) {
             return null;
         }
         final PathAddress address = getResourcePathAddress(name);
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
         op.get(RECURSIVE).set(true);
-        final ModelNode result = configurationManagement.executeManagementOperation(op);
+        final ModelNode result = serverConfiguration.executeManagementOperation(op);
         return result.get(RESULT);
     }
 
@@ -126,7 +118,16 @@ public class ResourcesManagementImpl implements ResourcesManagement {
     public void removeResource(String resourceName) throws IOException {
         final PathAddress address = getResourcePathAddress(resourceName);
         final ModelNode op = Util.createRemoveOperation(address);
-        configurationManagement.executeManagementOperation(op);
+        serverConfiguration.executeManagementOperation(op);
     }
 
+    @Override
+    public Class<ManageableResources> getType() {
+        return ManageableResources.class;
+    }
+
+    @Override
+    public List findChildren(ManageableNode.Select select) throws IOException {
+        return null;
+    }
 }

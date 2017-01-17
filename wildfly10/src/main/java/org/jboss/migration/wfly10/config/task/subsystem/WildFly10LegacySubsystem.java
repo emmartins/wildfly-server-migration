@@ -20,7 +20,6 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
@@ -66,7 +65,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                 if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final ModelNode subsystemConfig = subsystemsManagement.getResource(subsystemName);
+                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(subsystemName);
                 if (subsystemConfig == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }

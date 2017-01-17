@@ -137,4 +137,36 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
             return new EmbeddedHostConfiguration(hostController, host);
         }
     }
+
+    @Override
+    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
+        List<C> result = super.findChildren(select);
+        if (result == null) {
+            result = new ArrayList<>();
+        }
+        if (select.getType().isInstance(ManageableResources.class)) {
+            if (select.getType() == SecurityRealmsManagement.class) {
+                C c = (C) securityRealmsManagement;
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == SubsystemsManagement.class) {
+                C c = (C) subsystemsManagement;
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == ManagementInterfacesManagement.class) {
+                C c = (C) managementInterfacesManagement;
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == JVMsManagement.class) {
+                C c = (C) getJVMsManagement();
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            }
+        }
+        return result;
+    }
 }

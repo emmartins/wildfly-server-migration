@@ -26,7 +26,6 @@ import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
@@ -119,7 +118,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
         @Override
         public ServerMigrationTaskResult run(TaskContext context) throws Exception {
             context.getLogger().debugf("Security realm %s migration starting...", securityRealmName);
-            final ModelNode securityRealmConfig = securityRealmsManagement.getResource(securityRealmName);
+            final ModelNode securityRealmConfig = securityRealmsManagement.getResourceConfiguration(securityRealmName);
             if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
                 copyPropertiesFile(AUTHENTICATION, securityRealmName, securityRealmConfig, source, securityRealmsManagement, context);
             }

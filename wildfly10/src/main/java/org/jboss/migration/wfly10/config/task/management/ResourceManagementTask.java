@@ -96,12 +96,12 @@ public class ResourceManagementTask<S, R extends ManageableResource> extends Par
             });
         }
 
-        public <R1 extends ManageableResource> B subtask(Class<R1> childrenType, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
+        public <R1 extends ManageableResource> B subtask(ManageableResource.Query<R1> query, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
             return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
                 // collect all children
                 List<R1> children = new ArrayList<>();
                 for (R r : resourceManagements) {
-                    children.addAll(r.getChildrenByType(childrenType));
+                    children.addAll(r.findChildren(query));
                 }
                 // execute for all children
                 for (R1 child : children) {

@@ -34,6 +34,6 @@ public class ServerGroupsManagementImpl extends ResourcesManagementImpl implemen
 
     @Override
     public ServerGroupManagement getServerGroupManagement(String serverGroup) {
-        return new ServerGroupManagementImpl(serverGroup, getParentPathAddress(), getServerConfiguration());
+        return new ServerGroupManagementImpl(serverGroup, parentPathAddress, getServerConfiguration());
     }
 }

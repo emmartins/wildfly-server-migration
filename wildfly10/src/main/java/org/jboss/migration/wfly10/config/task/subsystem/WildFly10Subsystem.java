@@ -18,7 +18,6 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
@@ -91,7 +90,7 @@ public class WildFly10Subsystem {
                 if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final ModelNode subsystemConfig = subsystemsManagement.getResource(name);
+                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(name);
                 for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
                     context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, subsystemsManagement));
                 }

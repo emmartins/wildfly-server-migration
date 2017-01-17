@@ -26,16 +26,22 @@ import java.nio.file.Path;
 /**
  * @author emmartins
  */
-public interface ManageableServerConfiguration extends ManageableResources {
+public interface ManageableServerConfiguration extends ManageableNode<ManageableServerConfiguration> {
+
     void start();
     void stop();
     boolean isStarted();
     ModelNode executeManagementOperation(ModelNode operation) throws IOException, ManagementOperationException;
     WildFlyServer10 getServer();
+    Path resolvePath(String path)  throws IOException, ManagementOperationException;
+    ModelControllerClient getModelControllerClient();
+
     ExtensionsManagement getExtensionsManagement();
     InterfacesManagement getInterfacesManagement();
     SocketBindingGroupsManagement getSocketBindingGroupsManagement();
     SystemPropertiesManagement getSystemPropertiesManagement();
-    Path resolvePath(String path)  throws IOException, ManagementOperationException;
-    ModelControllerClient getModelControllerClient();
+
+    interface Node<T extends Node> extends ManageableNode<T> {
+        ManageableServerConfiguration getServerConfiguration();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc.
+ * Copyright 2016 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,23 @@
 
 package org.jboss.migration.wfly10.config.management;
 
-import java.util.List;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.dmr.ModelNode;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
+ * Interface to manage children resources of a specific type
  * @author emmartins
- */
-public interface ManageableResourcesChildren {
+  */
+public interface ManageableResources<T extends ManageableResources> extends ManageableServerConfiguration.Node<T> {
 
-    List<ManageableResource> getAllChildResources();
+    ModelNode getResourceConfiguration(String resourceName) throws IOException;
+    PathAddress getResourcePathAddress(String resourceName);
+    Set<String> getResourceNames() throws IOException;
+    void removeResource(String resourceName) throws IOException;
 
-    List<ManageableResource> getChildResourcesByName(String resourceName);
-
-    <T extends ManageableResource> List<T> getChildResourcesByType(Class<T> resourceType);
-
-    <T extends ManageableResource> List<T> getChildResourcesByTypeAndName(Class<T> resourceType, String resourceName);
-
-    <T extends ManageableResource> List<T> queryChildResources(Query<T> query);
-
-    interface Query<T extends ManageableResource> {
-        Class<T> getResourceType();
-        String getResourceName();
-        Query<?> getParentsQuery();
+    interface Select<T extends ManageableResources> extends ManageableNode.Select<T> {
     }
 }

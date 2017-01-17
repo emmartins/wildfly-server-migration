@@ -111,7 +111,7 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
         @Override
         public void executeSubtasks(final S source, final SubsystemsManagement subsystemsManagement, final TaskContext context) throws Exception {
             final String configName = subsystemsManagement.getResourcePathAddress(name).toCLIStyleString();
-            final ModelNode subsystemConfig = subsystemsManagement.getResource(name);
+            final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(name);
             if (subsystemConfig != null) {
                 context.getLogger().infof("Updating subsystem %s configuration...", configName);
             }

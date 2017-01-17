@@ -19,15 +19,7 @@ package org.jboss.migration.wfly10.config.management.impl;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
+import org.jboss.migration.wfly10.config.management.*;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -35,6 +27,10 @@ import org.wildfly.core.embedded.StandaloneServer;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
@@ -140,5 +136,42 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         public StandaloneServerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
             return new EmbeddedStandaloneServerConfiguration(configFile.getFileName().toString(), server);
         }
+    }
+
+    @Override
+    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
+        List<C> result = super.findChildren(select);
+        if (result == null) {
+            result = new ArrayList<>();
+        }
+        if (select.getType().isInstance(ManageableResources.class)) {
+            if (select.getType() == DeploymentsManagement.class) {
+                C c = (C) deploymentsManagement;
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            } else if (select.getType() == InterfacesManagement.class) {
+                C c = (C) interfacesManagement;
+                if (select.test(c)) {
+                    result.add(c);
+                }
+            }
+        } else if (select.getType() == SecurityRealmsManagement.class) {
+            C c = (C) securityRealmsManagement;
+            if (select.test(c)) {
+                result.add(c);
+            }
+        } else if (select.getType() == SubsystemsManagement.class) {
+            C c = (C) subsystemsManagement;
+            if (select.test(c)) {
+                result.add(c);
+            }
+        } else if (select.getType() == ManagementInterfacesManagement.class) {
+            C c = (C) managementInterfacesManagement;
+            if (select.test(c)) {
+                result.add(c);
+            }
+        }
+        return result;
     }
 }

@@ -24,7 +24,6 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
@@ -157,7 +156,7 @@ public class AddPrivateInterface<S> implements ManageableServerConfigurationTask
                     final List<String> updated = new ArrayList<>();
                     final SocketBindingsManagement resourceManagement = socketBindingGroupManagement.getSocketBindingsManagement();
                     for (String socketBinding : SOCKET_BINDING_NAMES) {
-                        ModelNode config = resourceManagement.getResource(socketBinding);
+                        ModelNode config = resourceManagement.getResourceConfiguration(socketBinding);
                         if (config != null) {
                             if (!config.hasDefined(INTERFACE) || !config.get(INTERFACE).asString().equals(INTERFACE_NAME)) {
                                 final PathAddress pathAddress = resourceManagement.getResourcePathAddress(socketBinding);

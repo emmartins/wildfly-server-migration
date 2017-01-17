@@ -22,11 +22,19 @@ import org.jboss.dmr.ModelNode;
 /**
  * @author emmartins
  */
-public interface ManageableResource {
+public interface ManageableResource extends ManageableServerConfiguration.Node {
+
     String getResourceName();
-    PathAddress getPathAddress();
     <T extends ManageableResource> Class<T> getResourceType();
+    PathAddress getResourcePathAddress();
     ModelNode getResourceConfiguration();
-    ManageableServerConfiguration getServerConfiguration();
-    ManageableResources getResourceChildren();
+
+    interface Query<T extends ManageableResource> extends ManageableNode.Query<T> {
+        @Override
+        Select<T> getChildrenSelector();
+    }
+
+    interface Select<T extends ManageableResource> extends ManageableNode.Select<T> {
+        String getResourceName();
+    }
 }

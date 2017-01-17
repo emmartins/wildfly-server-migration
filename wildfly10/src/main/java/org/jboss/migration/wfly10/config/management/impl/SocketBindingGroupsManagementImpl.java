@@ -34,6 +34,6 @@ public class SocketBindingGroupsManagementImpl extends ResourcesManagementImpl i
 
     @Override
     public SocketBindingGroupManagement getSocketBindingGroupManagement(String socketBindingGroupName) {
-        return new SocketBindingGroupManagementImpl(socketBindingGroupName, getParentPathAddress(), getServerConfiguration());
+        return new SocketBindingGroupManagementImpl(socketBindingGroupName, parentPathAddress, getServerConfiguration());
     }
 }

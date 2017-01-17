@@ -19,5 +19,5 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface SubsystemsManagement extends ResourcesManagement {
+public interface SubsystemsManagement extends ManageableResources {
 }

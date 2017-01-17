@@ -18,15 +18,7 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
-import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.HostsManagement;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
-import org.jboss.migration.wfly10.config.management.ProfilesManagement;
-import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
+import org.jboss.migration.wfly10.config.management.*;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -159,5 +151,70 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
             return new EmbeddedHostControllerConfiguration(null, configFile.getFileName().toString(), server);
         }
+    }
+
+    @Override
+    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
+            List<C> result = super.findChildren(select);
+            /*
+            DeploymentsManagement deploymentsManagement;
+    private final ExtensionsManagement extensionsManagement;
+    private final InterfacesManagement interfacesManagement;
+    private final HostsManagement hostsManagement;
+    private final ProfilesManagement profilesManagement;
+    private final ServerGroupsManagement serverGroupsManagement;
+    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
+    private final SystemPropertiesManagement systemPropertiesManagement;
+             */
+
+
+            if (select.getType().isInstance(ManageableResource.class)) {
+                if (select.getType() == ServerGroupManagement.class) {
+                    for (String s : (Set<String>) serverGroupsManagement.getResourceNames()) {
+                        ServerGroupManagement serverGroupManagement = serverGroupsManagement.getServerGroupManagement(s);
+                        C c = (C) serverGroupManagement;
+                        if (select.test(c)) {
+                            result.add(c);
+                        }
+                    }
+                } else if (select.getType() == ProfileManagement.class) {
+                    for (String s : (Set<String>) profilesManagement.getResourceNames()) {
+                        ProfileManagement profileManagement = profilesManagement.getProfileManagement(s);
+                        C c = (C) profileManagement;
+                        if (select.test(c)) {
+                            result.add(c);
+                        }
+                    }
+                }
+            } else if (select.getType().isInstance(ManageableResources.class)) {
+                if (select.getType() == DeploymentsManagement.class) {
+                    C c = (C) deploymentsManagement;
+                    if (select.test(c)) {
+                        result.add(c);
+                    }
+                } else if (select.getType() == HostsManagement.class) {
+                    C c = (C) hostsManagement;
+                    if (select.test(c)) {
+                        result.add(c);
+                    }
+                } else if (select.getType() == SubsystemsManagement.class) {
+                    for (String p : getProfilesManagement().getResourceNames()) {
+                        ProfileManagement profileManagement = getProfilesManagement().getProfileManagement(p);
+                        C c = (C) profileManagement.getSubsystemsManagement();
+                        if (select.test(c)) {
+                            result.add(c);
+                        }
+                    }
+                } else if (select.getType() == JVMsManagement.class) {
+                    for (String p : getServerGroupsManagement().getResourceNames()) {
+                        ServerGroupManagement serverGroupManagement = getServerGroupsManagement().;
+                        C c = (C) profileManagement.getSubsystemsManagement();
+                        if (select.test(c)) {
+                            result.add(c);
+                        }
+                    }
+                }
+            }
+            return result;
     }
 }

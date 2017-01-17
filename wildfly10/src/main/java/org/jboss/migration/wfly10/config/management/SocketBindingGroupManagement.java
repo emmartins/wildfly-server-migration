@@ -19,7 +19,7 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface SocketBindingGroupManagement extends ManageableResource, ManageableResources {
+public interface SocketBindingGroupManagement extends ManageableResource, ChildResources {
     String getSocketBindingGroupName();
     SocketBindingsManagement getSocketBindingsManagement();
 }

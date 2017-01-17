@@ -41,7 +41,7 @@ public class ManageableResourceImpl implements ManageableResource {
     }
 
     @Override
-    public PathAddress getPathAddress() {
+    public PathAddress getResourcePathAddress() {
         return pathAddress;
     }
 
