@@ -20,12 +20,12 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.management.ResourceManagementTask;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class ManagementInterfacesManagementTask<S> extends ResourceManagementTask<S, ManagementInterfacesManagement> {
+public class ManagementInterfacesManagementTask<S> extends ManageableResourceTask<S, ManagementInterfacesManagement> {
 
     protected ManagementInterfacesManagementTask(Builder<S> builder, S source, ManagementInterfacesManagement... resourceManagements) {
         super(builder, source, resourceManagements);
@@ -34,7 +34,7 @@ public class ManagementInterfacesManagementTask<S> extends ResourceManagementTas
     public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ManagementInterfacesManagement> {
     }
 
-    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, ManagementInterfacesManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ManagementInterfacesManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);

@@ -23,5 +23,4 @@ import java.util.Set;
  * @author emmartins
  */
 public interface ExtensionsManagement extends ManageableResources {
-    Set<String> getSubsystems() throws IOException;
 }

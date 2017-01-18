@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MAN
 /**
  * @author emmartins
  */
-public class ManagementInterfacesManagementImpl extends ResourcesManagementImpl implements ManagementInterfacesManagement {
+public class ManagementInterfacesManagementImpl extends ManageableResourcesImpl implements ManagementInterfacesManagement {
     public ManagementInterfacesManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(MANAGEMENT_INTERFACE, parentPathAddress, configurationManagement);
     }

@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SEC
 /**
  * @author emmartins
  */
-public class SecurityRealmsManagementImpl extends ResourcesManagementImpl implements SecurityRealmsManagement {
+public class SecurityRealmsManagementImpl extends ManageableResourcesImpl implements SecurityRealmsManagement {
     public SecurityRealmsManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(SECURITY_REALM, parentPathAddress, configurationManagement);
     }

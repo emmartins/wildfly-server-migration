@@ -19,20 +19,20 @@ package org.jboss.migration.wfly10.config.task.management.subsystem;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.management.ResourceManagementTask;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 import java.util.List;
 
 /**
  * @author emmartins
  */
-public class SubsystemsConfigurationTask<S> extends ResourceManagementTask<S, SubsystemsManagement> {
+public class SubsystemsConfigurationTask<S> extends ManageableResourceTask<S, SubsystemsManagement> {
 
     protected SubsystemsConfigurationTask(BaseBuilder<S, ?> builder, S source, List<SubsystemsManagement> resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ResourceManagementTask.BaseBuilder<S, SubsystemsManagement, SubsystemsConfigurationSubtasks<S>, B> {
+    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemsManagement, SubsystemsConfigurationSubtasks<S>, B> {
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
         }

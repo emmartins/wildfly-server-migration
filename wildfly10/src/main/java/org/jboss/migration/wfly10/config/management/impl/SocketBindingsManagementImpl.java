@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOC
 /**
  * @author emmartins
  */
-public class SocketBindingsManagementImpl extends ResourcesManagementImpl implements SocketBindingsManagement {
+public class SocketBindingsManagementImpl extends ManageableResourcesImpl implements SocketBindingsManagement {
     public SocketBindingsManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(SOCKET_BINDING, parentPathAddress, configurationManagement);
     }

@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.JVM
 /**
  * @author emmartins
  */
-public class JVMsManagementImpl extends ResourcesManagementImpl implements JVMsManagement {
+public class JVMsManagementImpl extends ManageableResourcesImpl implements JVMsManagement {
     public JVMsManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(JVM, parentPathAddress, configurationManagement);
     }

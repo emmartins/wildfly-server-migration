@@ -20,12 +20,12 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.management.ResourceManagementTask;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class SocketBindingGroupsManagementTask<S> extends ResourceManagementTask<S, SocketBindingGroupsManagement> {
+public class SocketBindingGroupsManagementTask<S> extends ManageableResourceTask<S, SocketBindingGroupsManagement> {
 
     protected SocketBindingGroupsManagementTask(Builder<S> builder, S source, SocketBindingGroupsManagement... resourceManagements) {
         super(builder, source, resourceManagements);
@@ -34,7 +34,7 @@ public class SocketBindingGroupsManagementTask<S> extends ResourceManagementTask
     public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, SocketBindingGroupsManagement> {
     }
 
-    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SocketBindingGroupsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, SocketBindingGroupsManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);

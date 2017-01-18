@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOS
 /**
  * @author emmartins
  */
-public class HostsManagementImpl extends ResourcesManagementImpl implements HostsManagement {
+public class HostsManagementImpl extends ManageableResourcesImpl implements HostsManagement {
     private final HostControllerConfiguration hostControllerConfiguration;
     public HostsManagementImpl(PathAddress parentPathAddress, HostControllerConfiguration hostControllerConfiguration) {
         super(HOST, parentPathAddress, hostControllerConfiguration);

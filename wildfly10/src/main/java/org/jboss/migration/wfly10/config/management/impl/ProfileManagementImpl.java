@@ -17,29 +17,24 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.PathElement;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileManagement;
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author emmartins
  */
-public class ProfileManagementImpl implements ProfileManagement {
+public class ProfileManagementImpl extends ManageableResourceImpl implements ProfileManagement {
 
-    private final String profileName;
-    private final ManageableServerConfiguration configuration;
-    private final PathAddress pathAddress;
     private final SubsystemsManagement subsystemsManagement;
 
-    public ProfileManagementImpl(String profileName, PathAddress parentPathAddress, ManageableServerConfiguration configuration) {
-        this.profileName = profileName;
-        this.configuration = configuration;
-        final PathElement pathElement = PathElement.pathElement(PROFILE, profileName);
-        this.pathAddress = parentPathAddress != null ? parentPathAddress.append(pathElement) : PathAddress.pathAddress(pathElement);
-        this.subsystemsManagement = new SubsystemsManagementImpl(pathAddress, configuration);
+    public ProfileManagementImpl(String resourceName, PathAddress pathAddress, ManageableServerConfiguration serverConfiguration) {
+        super(resourceName, pathAddress, serverConfiguration);
+        this.subsystemsManagement = new SubsystemsManagementImpl(pathAddress, serverConfiguration);
     }
 
     public SubsystemsManagement getSubsystemsManagement() {
@@ -47,12 +42,16 @@ public class ProfileManagementImpl implements ProfileManagement {
     }
 
     @Override
-    public ManageableServerConfiguration getServerConfiguration() {
-        return configuration;
+    public String getProfileName() {
+        return getResourceName();
     }
 
     @Override
-    public String getProfileName() {
-        return profileName;
+    public List findResources(Class resourcesType) throws IOException {
+        if (resourcesType.isAssignableFrom(SubsystemsManagement.class)) {
+            return Collections.singletonList(getSubsystemsManagement());
+        } else {
+            return Collections.emptyList();
+        }
     }
 }

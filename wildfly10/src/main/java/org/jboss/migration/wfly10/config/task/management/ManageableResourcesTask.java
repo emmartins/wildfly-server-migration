@@ -20,10 +20,12 @@ import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ResourcesManagementSubtaskExecutor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,31 +35,31 @@ import java.util.Set;
 /**
  * @author emmartins
  */
-public class ResourceManagementTask<S, R extends ManageableResource> extends ParentTask {
+public class ManageableResourcesTask<S, R extends ManageableResources> extends ParentTask {
 
     protected final SubtasksExecutor<S, R>[] subtasks;
     protected final S source;
-    protected final List<R> resourceManagements;
+    protected final List<R> manageableResources;
 
-    protected ResourceManagementTask(BaseBuilder<S, R, ?, ?> builder, S source, List<R> resourceManagements) {
+    protected ManageableResourcesTask(BaseBuilder<S, R, ?, ?> builder, S source, List<R> manageableResources) {
         super(builder);
         this.subtasks = builder.subtasks.stream().toArray(SubtasksExecutor[]::new);
         this.source = source;
-        this.resourceManagements = resourceManagements;
+        this.manageableResources = manageableResources;
     }
 
     @Override
     protected void runSubtasks(TaskContext context) throws Exception {
         for (SubtasksExecutor<S, R> subtaskExecutor : subtasks) {
-            subtaskExecutor.run(source, resourceManagements, context);
+            subtaskExecutor.run(source, manageableResources, context);
         }
     }
 
-    private interface SubtasksExecutor<S, R extends ManageableResource> {
+    private interface SubtasksExecutor<S, R extends ManageableResources> {
         void run(S source, List<R> resourceManagements, TaskContext context) throws Exception;
     }
 
-    protected abstract static class BaseBuilder<S, R extends ManageableResource, T extends ResourceManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
+    protected abstract static class BaseBuilder<S, R extends ManageableResources, T extends ResourcesManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
 
         protected final List<SubtasksExecutor<S, R>> subtasks;
 
@@ -96,7 +98,7 @@ public class ResourceManagementTask<S, R extends ManageableResource> extends Par
             });
         }
 
-        public <R1 extends ManageableResource> B subtask(ManageableResource.Query<R1> query, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
+        public <R1 extends ManageableResources> B subtask(ManageableResources.Query<R1> query, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
             return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
                 // collect all children
                 List<R1> children = new ArrayList<>();
@@ -110,7 +112,7 @@ public class ResourceManagementTask<S, R extends ManageableResource> extends Par
             });
         }
 
-        public <R1 extends ManageableResource> B subtask(Class<R1> childrenType, BaseBuilder<S, R1, ?, ?> taskBuilder) {
+        public <R1 extends ManageableResources> B subtask(Class<R1> childrenType, BaseBuilder<S, R1, ?, ?> taskBuilder) {
             return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
                 // collect all children
                 List<R1> children = new ArrayList<>();
@@ -166,7 +168,7 @@ public class ResourceManagementTask<S, R extends ManageableResource> extends Par
         public abstract ServerMigrationTask build(S source, List<R> resourceManagements);
     }
 
-    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<S, R, ResourceManagementSubtaskExecutor<S, R>, Builder<S, R>> {
+    public static class Builder<S, R extends ManageableResources> extends BaseBuilder<S, R, ResourcesManagementSubtaskExecutor<S, R>, Builder<S, R>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
@@ -174,7 +176,7 @@ public class ResourceManagementTask<S, R extends ManageableResource> extends Par
 
         @Override
         public ServerMigrationTask build(S source, List<R> resourceManagements) {
-            return new ResourceManagementTask<>(this, source, resourceManagements);
+            return new ManageableResourcesTask<>(this, source, resourceManagements);
         }
     }
 }

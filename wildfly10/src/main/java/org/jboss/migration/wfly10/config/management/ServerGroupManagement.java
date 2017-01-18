@@ -19,7 +19,7 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface ServerGroupManagement extends ManageableResource, ChildResources {
+public interface ServerGroupManagement extends ManageableResource {
     String getServerGroupName();
     JVMsManagement getJVMsManagement();
 }

@@ -19,22 +19,17 @@ package org.jboss.migration.wfly10.config.management;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
  * @author emmartins
  */
-public interface ManageableResource extends ManageableServerConfiguration.Node {
-
+public interface ManageableResource {
+    <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException;
+    <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException;
     String getResourceName();
-    <T extends ManageableResource> Class<T> getResourceType();
     PathAddress getResourcePathAddress();
-    ModelNode getResourceConfiguration();
-
-    interface Query<T extends ManageableResource> extends ManageableNode.Query<T> {
-        @Override
-        Select<T> getChildrenSelector();
-    }
-
-    interface Select<T extends ManageableResource> extends ManageableNode.Select<T> {
-        String getResourceName();
-    }
+    ModelNode getResourceConfiguration() throws IOException;
+    ManageableServerConfiguration getServerConfiguration();
 }

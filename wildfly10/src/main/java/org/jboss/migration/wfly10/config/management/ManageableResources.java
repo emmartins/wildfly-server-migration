@@ -20,19 +20,19 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Interface to manage children resources of a specific type
  * @author emmartins
   */
-public interface ManageableResources<T extends ManageableResources> extends ManageableServerConfiguration.Node<T> {
-
+public interface ManageableResources {
+    <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException;
+    <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException;
     ModelNode getResourceConfiguration(String resourceName) throws IOException;
     PathAddress getResourcePathAddress(String resourceName);
     Set<String> getResourceNames() throws IOException;
     void removeResource(String resourceName) throws IOException;
-
-    interface Select<T extends ManageableResources> extends ManageableNode.Select<T> {
-    }
+    ManageableServerConfiguration getServerConfiguration();
 }

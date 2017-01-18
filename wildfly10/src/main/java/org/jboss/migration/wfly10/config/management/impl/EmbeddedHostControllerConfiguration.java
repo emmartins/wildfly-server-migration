@@ -16,9 +16,15 @@
 
 package org.jboss.migration.wfly10.config.management.impl;
 
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.*;
+import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
+import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
+import org.jboss.migration.wfly10.config.management.HostsManagement;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
+import org.jboss.migration.wfly10.config.management.ProfilesManagement;
+import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -27,9 +33,7 @@ import org.wildfly.core.embedded.HostController;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author emmartins
@@ -40,35 +44,18 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     private final String hostConfig;
     private HostController hostController;
     private final DeploymentsManagement deploymentsManagement;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
     private final HostsManagement hostsManagement;
     private final ProfilesManagement profilesManagement;
     private final ServerGroupsManagement serverGroupsManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
 
     protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, WildFlyServer10 server) {
-        super(server);
+        super(server, PathAddress.EMPTY_ADDRESS);
         this.domainConfig = domainConfig;
-        this.extensionsManagement = new ExtensionsManagementImpl(null, this) {
-            @Override
-            public Set<String> getSubsystems() throws IOException {
-                Set<String> subsystems = new HashSet<>();
-                for (String profile : getProfilesManagement().getResourceNames()) {
-                    subsystems.addAll(profilesManagement.getProfileManagement(profile).getSubsystemsManagement().getResourceNames());
-                }
-                return subsystems;
-            }
-        };
         this.hostConfig = hostConfig;
-        this.deploymentsManagement = new DeploymentsManagementImpl(null, this);
-        this.hostsManagement = new HostsManagementImpl(null, this);
-        this.profilesManagement = new ProfilesManagementImpl(null, this);
-        this.serverGroupsManagement = new ServerGroupsManagementImpl(null, this);
-        this.interfacesManagement = new InterfacesManagementImpl(null, this);
-        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
-        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
+        this.deploymentsManagement = new DeploymentsManagementImpl(pathAddress, this);
+        this.hostsManagement = new HostsManagementImpl(pathAddress, this);
+        this.profilesManagement = new ProfilesManagementImpl(pathAddress, this);
+        this.serverGroupsManagement = new ServerGroupsManagementImpl(pathAddress, this);
     }
 
     @Override
@@ -105,33 +92,13 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         return deploymentsManagement;
     }
 
-    @Override
-    public ExtensionsManagement getExtensionsManagement() {
-        return extensionsManagement;
-    }
-
     public HostsManagement getHostsManagement() {
         return hostsManagement;
     }
 
     @Override
-    public InterfacesManagement getInterfacesManagement() {
-        return interfacesManagement;
-    }
-
-    @Override
     public ProfilesManagement getProfilesManagement() {
         return profilesManagement;
-    }
-
-    @Override
-    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
-        return socketBindingGroupsManagement;
-    }
-
-    @Override
-    public SystemPropertiesManagement getSystemPropertiesManagement() {
-        return systemPropertiesManagement;
     }
 
     @Override
@@ -154,67 +121,12 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     }
 
     @Override
-    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
-            List<C> result = super.findChildren(select);
-            /*
-            DeploymentsManagement deploymentsManagement;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
-    private final HostsManagement hostsManagement;
-    private final ProfilesManagement profilesManagement;
-    private final ServerGroupsManagement serverGroupsManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
-             */
-
-
-            if (select.getType().isInstance(ManageableResource.class)) {
-                if (select.getType() == ServerGroupManagement.class) {
-                    for (String s : (Set<String>) serverGroupsManagement.getResourceNames()) {
-                        ServerGroupManagement serverGroupManagement = serverGroupsManagement.getServerGroupManagement(s);
-                        C c = (C) serverGroupManagement;
-                        if (select.test(c)) {
-                            result.add(c);
-                        }
-                    }
-                } else if (select.getType() == ProfileManagement.class) {
-                    for (String s : (Set<String>) profilesManagement.getResourceNames()) {
-                        ProfileManagement profileManagement = profilesManagement.getProfileManagement(s);
-                        C c = (C) profileManagement;
-                        if (select.test(c)) {
-                            result.add(c);
-                        }
-                    }
-                }
-            } else if (select.getType().isInstance(ManageableResources.class)) {
-                if (select.getType() == DeploymentsManagement.class) {
-                    C c = (C) deploymentsManagement;
-                    if (select.test(c)) {
-                        result.add(c);
-                    }
-                } else if (select.getType() == HostsManagement.class) {
-                    C c = (C) hostsManagement;
-                    if (select.test(c)) {
-                        result.add(c);
-                    }
-                } else if (select.getType() == SubsystemsManagement.class) {
-                    for (String p : getProfilesManagement().getResourceNames()) {
-                        ProfileManagement profileManagement = getProfilesManagement().getProfileManagement(p);
-                        C c = (C) profileManagement.getSubsystemsManagement();
-                        if (select.test(c)) {
-                            result.add(c);
-                        }
-                    }
-                } else if (select.getType() == JVMsManagement.class) {
-                    for (String p : getServerGroupsManagement().getResourceNames()) {
-                        ServerGroupManagement serverGroupManagement = getServerGroupsManagement().;
-                        C c = (C) profileManagement.getSubsystemsManagement();
-                        if (select.test(c)) {
-                            result.add(c);
-                        }
-                    }
-                }
-            }
-            return result;
+    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
+        final List<T> result = super.findResources(resourcesType);
+        findResources(getDeploymentsManagement(), resourcesType, result);
+        findResources(getHostsManagement(), resourcesType, result);
+        findResources(getProfilesManagement(), resourcesType, result);
+        findResources(getServerGroupsManagement(), resourcesType, result);
+        return result;
     }
 }

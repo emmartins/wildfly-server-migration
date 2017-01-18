@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEP
 /**
  * @author emmartins
  */
-public class DeploymentsManagementImpl extends ResourcesManagementImpl implements DeploymentsManagement {
+public class DeploymentsManagementImpl extends ManageableResourcesImpl implements DeploymentsManagement {
     public DeploymentsManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(DEPLOYMENT, parentPathAddress, configurationManagement);
     }

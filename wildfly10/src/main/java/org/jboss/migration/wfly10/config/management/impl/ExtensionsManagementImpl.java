@@ -25,8 +25,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.EXT
 /**
  * @author emmartins
  */
-public abstract class ExtensionsManagementImpl extends ResourcesManagementImpl implements ExtensionsManagement {
+public class ExtensionsManagementImpl extends ManageableResourcesImpl implements ExtensionsManagement {
     public ExtensionsManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(EXTENSION, parentPathAddress, configurationManagement);
     }
+
+
 }

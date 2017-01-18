@@ -17,20 +17,23 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.ChildResources;
-import org.jboss.migration.wfly10.config.management.ManageableNode;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileManagement;
 import org.jboss.migration.wfly10.config.management.ProfilesManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
 
 /**
  * @author emmartins
  */
-public class ProfilesManagementImpl extends ResourcesManagementImpl implements ProfilesManagement {
+public class ProfilesManagementImpl extends ManageableResourcesImpl implements ProfilesManagement {
 
     public ProfilesManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configuration) {
         super(PROFILE, parentPathAddress, configuration);
@@ -42,18 +45,29 @@ public class ProfilesManagementImpl extends ResourcesManagementImpl implements P
     }
 
     @Override
-    public Class getType() {
-        return ProfilesManagement.class;
+    public List findResources(Class resourcesType) throws IOException {
+        if (resourcesType.isAssignableFrom(SubsystemsManagement.class)) {
+            final Set<String> resourceNames = getResourceNames();
+            if (resourceNames.isEmpty()) {
+                return Collections.emptyList();
+            } else {
+                final List<SubsystemsManagement> result = new ArrayList<>();
+                for (String resourceName : resourceNames) {
+                    result.add(getProfileManagement(resourceName).getSubsystemsManagement());
+                }
+                return result;
+            }
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
-    public List findChildren(Select select) {
-        select.getType()
-        return null;
-    }
-
-    @Override
-    public List findChildren(ManageableNode.Query query) {
-        return null;
+    public List findResources(Class resourceType, String resourceName) throws IOException {
+        if (resourceType.isAssignableFrom(ProfileManagement.class) && getResourceNames().contains(resourceName)) {
+            return Collections.singletonList(getProfileManagement(resourceName));
+        } else {
+            return Collections.emptyList();
+        }
     }
 }

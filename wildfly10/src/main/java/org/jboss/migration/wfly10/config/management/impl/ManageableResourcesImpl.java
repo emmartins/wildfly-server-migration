@@ -20,10 +20,10 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.wfly10.config.management.ManageableNode;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
-import org.jboss.migration.wfly10.config.management.ManageableResources;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -33,23 +33,18 @@ import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CHILD_TYPE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_CHILDREN_NAMES_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_CHILDREN_TYPES_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RECURSIVE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
  */
-public class ResourcesManagementImpl implements ManageableResources {
+public class ManageableResourcesImpl implements ManageableResources {
 
     private final ManageableServerConfiguration serverConfiguration;
     protected final PathAddress parentPathAddress;
     private final String type;
 
-    public ResourcesManagementImpl(String type, PathAddress parentPathAddress, ManageableServerConfiguration serverConfiguration) {
+    public ManageableResourcesImpl(String type, PathAddress parentPathAddress, ManageableServerConfiguration serverConfiguration) {
         this.type = type;
         this.parentPathAddress = parentPathAddress;
         this.serverConfiguration = serverConfiguration;
@@ -122,12 +117,12 @@ public class ResourcesManagementImpl implements ManageableResources {
     }
 
     @Override
-    public Class<ManageableResources> getType() {
-        return ManageableResources.class;
+    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
+        return Collections.emptyList();
     }
 
     @Override
-    public List findChildren(ManageableNode.Select select) throws IOException {
-        return null;
+    public <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException {
+        return Collections.emptyList();
     }
 }

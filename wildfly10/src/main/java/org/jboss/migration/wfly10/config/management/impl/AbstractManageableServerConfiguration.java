@@ -28,9 +28,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -38,14 +40,47 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public abstract class AbstractManageableServerConfiguration extends AbstractManageableNode<ManageableServerConfiguration> implements ManageableServerConfiguration {
+public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
 
     private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
 
-    protected AbstractManageableServerConfiguration(WildFlyServer10 server) {
-        super(ManageableServerConfiguration.class);
+    protected final PathAddress pathAddress;
+    private final ExtensionsManagement extensionsManagement;
+    private final InterfacesManagement interfacesManagement;
+    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
+    private final SystemPropertiesManagement systemPropertiesManagement;
+
+
+    protected AbstractManageableServerConfiguration(WildFlyServer10 server, PathAddress pathAddress) {
         this.server = server;
+        this.pathAddress = pathAddress;
+        this.extensionsManagement = new ExtensionsManagementImpl(pathAddress, this);
+        this.interfacesManagement = new InterfacesManagementImpl(pathAddress, this);
+        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(pathAddress, this);
+        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(pathAddress, this);
+
+    }
+
+    @Override
+    public ExtensionsManagement getExtensionsManagement() {
+        return extensionsManagement;
+    }
+
+    @Override
+    public InterfacesManagement getInterfacesManagement() {
+        return interfacesManagement;
+    }
+
+    @Override
+    public SystemPropertiesManagement getSystemPropertiesManagement() {
+        return systemPropertiesManagement;
+    }
+
+
+    @Override
+    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
+        return socketBindingGroupsManagement;
     }
 
     @Override
@@ -129,50 +164,26 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
     }
 
     @Override
-    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
-        final List<C> result = new ArrayList<C>();
-        if (select.getType().isInstance(ManageableResource.class)) {
-            if (select.getType() == SocketBindingGroupManagement.class) {
-                for (String s : (Set<String>) getSocketBindingGroupsManagement().getResourceNames()) {
-                    SocketBindingGroupManagement socketBindingGroupManagement = getSocketBindingGroupsManagement().getSocketBindingGroupManagement(s);
-                    C c = (C) socketBindingGroupManagement;
-                    if (select.test(c)) {
-                        result.add(c);
-                    }
-                }
-            }
-        } else if (select.getType().isInstance(ManageableResources.class)) {
-            if (select.getType() == ExtensionsManagement.class) {
-                C c = (C) getExtensionsManagement();
-                if (select.test(c)) {
-                    result.add(c);
-                }
-            } else if (select.getType() == InterfacesManagement.class) {
-                C c = (C) getInterfacesManagement();
-                if (select.test(c)) {
-                    result.add(c);
-                }
-            } else if (select.getType() == SystemPropertiesManagement.class) {
-                C c = (C) getSystemPropertiesManagement();
-                if (select.test(c)) {
-                    result.add(c);
-                }
-            } else if (select.getType() == SocketBindingGroupsManagement.class) {
-                C c = (C) getSocketBindingGroupsManagement();
-                if (select.test(c)) {
-                    result.add(c);
-                }
-            } else if (select.getType() == SocketBindingsManagement.class) {
-                for (String s : (Set<String>) getSocketBindingGroupsManagement().getResourceNames()) {
-                    SocketBindingGroupManagement socketBindingGroupManagement = getSocketBindingGroupsManagement().getSocketBindingGroupManagement(s);
-                    C c = (C) socketBindingGroupManagement.getSocketBindingsManagement();
-                    if (select.test(c)) {
-                        result.add(c);
-                    }
-                }
-
-            }
-        }
+    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
+        final List<T> result = new ArrayList<>();
+        findResources(getExtensionsManagement(), resourcesType, result);
+        findResources(getInterfacesManagement(), resourcesType, result);
+        findResources(getSocketBindingGroupsManagement(), resourcesType, result);
+        findResources(getSystemPropertiesManagement(), resourcesType, result);
         return result;
     }
+
+    protected <T extends ManageableResources> void findResources(ManageableResources child, Class<T> resourcesType, List<T> result) throws IOException {
+        if (resourcesType.isAssignableFrom(child.getClass())) {
+            result.add((T) child);
+        } else {
+            result.addAll(child.findResources(resourcesType));
+        }
+    }
+
+    @Override
+    public <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException {
+        return null;
+    }
+
 }

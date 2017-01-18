@@ -19,7 +19,12 @@ package org.jboss.migration.wfly10.config.management.impl;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.*;
+import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
+import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
+import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
+import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -27,11 +32,7 @@ import org.wildfly.core.embedded.StandaloneServer;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -46,28 +47,15 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     private final String config;
     private StandaloneServer standaloneServer;
     private final DeploymentsManagement deploymentsManagement;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
     private final ManagementInterfacesManagement managementInterfacesManagement;
     private final SecurityRealmsManagement securityRealmsManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
     private final SubsystemsManagement subsystemsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
 
     public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
-        super(server);
+        super(server, PathAddress.EMPTY_ADDRESS);
         this.config = config;
-        this.deploymentsManagement = new DeploymentsManagementImpl(null, this);
-        this.extensionsManagement = new ExtensionsManagementImpl(null, this) {
-            @Override
-            public Set<String> getSubsystems() throws IOException {
-                return getSubsystemsManagement().getResourceNames();
-            }
-        };
-        this.subsystemsManagement = new SubsystemsManagementImpl(null, this);
-        this.interfacesManagement = new InterfacesManagementImpl(null, this);
-        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
-        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
+        this.deploymentsManagement = new DeploymentsManagementImpl(pathAddress, this);
+        this.subsystemsManagement = new SubsystemsManagementImpl(pathAddress, this);
         final PathAddress managementCoreServicePathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT));
         this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
         this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
@@ -98,18 +86,8 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     }
 
     @Override
-    public ExtensionsManagement getExtensionsManagement() {
-        return extensionsManagement;
-    }
-
-    @Override
-    public InterfacesManagement getInterfacesManagement() {
-        return interfacesManagement;
-    }
-
-    @Override
-    public SystemPropertiesManagement getSystemPropertiesManagement() {
-        return systemPropertiesManagement;
+    public ManagementInterfacesManagement getManagementInterfacesManagement() {
+        return managementInterfacesManagement;
     }
 
     @Override
@@ -117,19 +95,10 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         return securityRealmsManagement;
     }
 
-    @Override
-    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
-        return socketBindingGroupsManagement;
-    }
-
     public SubsystemsManagement getSubsystemsManagement() {
         return subsystemsManagement;
     }
 
-    @Override
-    public ManagementInterfacesManagement getManagementInterfacesManagement() {
-        return managementInterfacesManagement;
-    }
 
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
@@ -139,39 +108,12 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     }
 
     @Override
-    public <C extends ManageableNode> List<C> findChildren(Select<C> select) throws IOException {
-        List<C> result = super.findChildren(select);
-        if (result == null) {
-            result = new ArrayList<>();
-        }
-        if (select.getType().isInstance(ManageableResources.class)) {
-            if (select.getType() == DeploymentsManagement.class) {
-                C c = (C) deploymentsManagement;
-                if (select.test(c)) {
-                    result.add(c);
-                }
-            } else if (select.getType() == InterfacesManagement.class) {
-                C c = (C) interfacesManagement;
-                if (select.test(c)) {
-                    result.add(c);
-                }
-            }
-        } else if (select.getType() == SecurityRealmsManagement.class) {
-            C c = (C) securityRealmsManagement;
-            if (select.test(c)) {
-                result.add(c);
-            }
-        } else if (select.getType() == SubsystemsManagement.class) {
-            C c = (C) subsystemsManagement;
-            if (select.test(c)) {
-                result.add(c);
-            }
-        } else if (select.getType() == ManagementInterfacesManagement.class) {
-            C c = (C) managementInterfacesManagement;
-            if (select.test(c)) {
-                result.add(c);
-            }
-        }
+    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
+        final List<T> result = super.findResources(resourcesType);
+        findResources(getDeploymentsManagement(), resourcesType, result);
+        findResources(getManagementInterfacesManagement(), resourcesType, result);
+        findResources(getSecurityRealmsManagement(), resourcesType, result);
+        findResources(getSubsystemsManagement(), resourcesType, result);
         return result;
     }
 }

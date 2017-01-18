@@ -17,34 +17,24 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.PathElement;
 import org.jboss.migration.wfly10.config.management.JVMsManagement;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ServerGroupManagement;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author emmartins
  */
-public class ServerGroupManagementImpl implements ServerGroupManagement {
+public class ServerGroupManagementImpl extends ManageableResourceImpl implements ServerGroupManagement {
 
-    private final String serverGroupName;
-    private final ManageableServerConfiguration configurationManagement;
-    private final PathAddress pathAddress;
     private final JVMsManagement JVMsManagement;
 
-    public ServerGroupManagementImpl(String serverGroupName, PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
-        this.serverGroupName = serverGroupName;
-        this.configurationManagement = configurationManagement;
-        final PathElement pathElement = PathElement.pathElement(SERVER_GROUP, serverGroupName);
-        this.pathAddress = parentPathAddress != null ? parentPathAddress.append(pathElement) : PathAddress.pathAddress(pathElement);
-        this.JVMsManagement = new JVMsManagementImpl(pathAddress, configurationManagement);
-    }
-
-    @Override
-    public ManageableServerConfiguration getServerConfiguration() {
-        return configurationManagement;
+    public ServerGroupManagementImpl(String serverGroupName, PathAddress pathAddress, ManageableServerConfiguration serverConfiguration) {
+        super(serverGroupName, pathAddress, serverConfiguration);
+        this.JVMsManagement = new JVMsManagementImpl(pathAddress, serverConfiguration);
     }
 
     public JVMsManagement getJVMsManagement() {
@@ -53,6 +43,15 @@ public class ServerGroupManagementImpl implements ServerGroupManagement {
 
     @Override
     public String getServerGroupName() {
-        return serverGroupName;
+        return getResourceName();
+    }
+
+    @Override
+    public List findResources(Class resourcesType) throws IOException {
+        if (resourcesType.isAssignableFrom(JVMsManagement.class)) {
+            return Collections.singletonList(getJVMsManagement());
+        } else {
+            return Collections.emptyList();
+        }
     }
 }

@@ -20,12 +20,12 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.management.ResourceManagementTask;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class SecurityRealmsManagementTask<S> extends ResourceManagementTask<S, SecurityRealmsManagement> {
+public class SecurityRealmsManagementTask<S> extends ManageableResourceTask<S, SecurityRealmsManagement> {
 
     protected SecurityRealmsManagementTask(Builder<S> builder, S source, SecurityRealmsManagement... resourceManagements) {
         super(builder, source, resourceManagements);
@@ -34,7 +34,7 @@ public class SecurityRealmsManagementTask<S> extends ResourceManagementTask<S, S
     public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, SecurityRealmsManagement> {
     }
 
-    public static class Builder<S> extends ResourceManagementTask.BaseBuilder<S, SecurityRealmsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, SecurityRealmsManagement, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);

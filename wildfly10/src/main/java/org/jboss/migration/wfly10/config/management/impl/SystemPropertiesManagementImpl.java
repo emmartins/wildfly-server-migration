@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SYS
 /**
  * @author emmartins
  */
-public class SystemPropertiesManagementImpl extends ResourcesManagementImpl implements SystemPropertiesManagement {
+public class SystemPropertiesManagementImpl extends ManageableResourcesImpl implements SystemPropertiesManagement {
     public SystemPropertiesManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(SYSTEM_PROPERTY, parentPathAddress, configurationManagement);
     }

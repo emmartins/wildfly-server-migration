@@ -25,7 +25,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
 /**
  * @author emmartins
  */
-public class SubsystemsManagementImpl extends ResourcesManagementImpl implements SubsystemsManagement {
+public class SubsystemsManagementImpl extends ManageableResourcesImpl implements SubsystemsManagement {
     public SubsystemsManagementImpl(PathAddress parentPathAddress, ManageableServerConfiguration configurationManagement) {
         super(SUBSYSTEM, parentPathAddress, configurationManagement);
     }

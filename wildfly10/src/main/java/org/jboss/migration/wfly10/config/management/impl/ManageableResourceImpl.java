@@ -17,8 +17,19 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RECURSIVE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
 
 /**
  * @author emmartins
@@ -46,12 +57,26 @@ public class ManageableResourceImpl implements ManageableResource {
     }
 
     @Override
-    public Class<ManageableResource> getResourceType() {
-        return ManageableResource.class;
+    public ManageableServerConfiguration getServerConfiguration() {
+        return serverConfiguration;
     }
 
     @Override
-    public ManageableServerConfiguration getServerConfiguration() {
-        return serverConfiguration;
+    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ModelNode getResourceConfiguration() throws IOException {
+        final PathAddress address = getResourcePathAddress();
+        final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
+        op.get(RECURSIVE).set(true);
+        final ModelNode result = serverConfiguration.executeManagementOperation(op);
+        return result.get(RESULT);
     }
 }
