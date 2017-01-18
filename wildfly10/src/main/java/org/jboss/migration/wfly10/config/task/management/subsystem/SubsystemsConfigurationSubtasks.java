@@ -17,10 +17,10 @@
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
 import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourcesManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourcesSubtaskExecutor;
 
 /**
  * @author emmartins
  */
-public interface SubsystemsConfigurationSubtasks<S> extends ResourcesManagementSubtaskExecutor<S, SubsystemsManagement> {
+public interface SubsystemsConfigurationSubtasks<S> extends ManageableResourcesSubtaskExecutor<S, SubsystemsManagement> {
 }

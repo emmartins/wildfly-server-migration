@@ -47,7 +47,7 @@ public class ProfileManagementImpl extends ManageableResourceImpl implements Pro
     }
 
     @Override
-    public List findResources(Class resourcesType) throws IOException {
+    public List findChildResources(Class resourcesType) throws IOException {
         if (resourcesType.isAssignableFrom(SubsystemsManagement.class)) {
             return Collections.singletonList(getSubsystemsManagement());
         } else {

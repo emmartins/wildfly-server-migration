@@ -21,5 +21,5 @@ import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
 /**
  * @author emmartins
  */
-public interface DeploymentsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, DeploymentsManagement> {
+public interface DeploymentsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, DeploymentsManagement> {
 }

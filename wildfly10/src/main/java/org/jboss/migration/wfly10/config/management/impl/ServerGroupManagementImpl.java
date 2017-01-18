@@ -47,7 +47,7 @@ public class ServerGroupManagementImpl extends ManageableResourceImpl implements
     }
 
     @Override
-    public List findResources(Class resourcesType) throws IOException {
+    public List findChildResources(Class resourcesType) throws IOException {
         if (resourcesType.isAssignableFrom(JVMsManagement.class)) {
             return Collections.singletonList(getJVMsManagement());
         } else {

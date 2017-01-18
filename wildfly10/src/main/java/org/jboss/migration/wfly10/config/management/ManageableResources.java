@@ -27,12 +27,16 @@ import java.util.Set;
  * Interface to manage children resources of a specific type
  * @author emmartins
   */
-public interface ManageableResources {
+public interface ManageableResources<T extends ManageableResource> {
+
+    T getResource(String resourceName) throws IOException;
+    PathAddress getResourcePathAddress(String resourceName);
+
+    Set<String> getResourceNames() throws IOException;
+    Set<T> getResources() throws IOException;
+
     <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException;
     <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException;
-    ModelNode getResourceConfiguration(String resourceName) throws IOException;
-    PathAddress getResourcePathAddress(String resourceName);
-    Set<String> getResourceNames() throws IOException;
-    void removeResource(String resourceName) throws IOException;
+
     ManageableServerConfiguration getServerConfiguration();
 }

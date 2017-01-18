@@ -21,5 +21,5 @@ import org.jboss.migration.wfly10.config.management.InterfacesManagement;
 /**
  * @author emmartins
  */
-public interface InterfacesManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, InterfacesManagement> {
+public interface InterfacesManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, InterfacesManagement> {
 }

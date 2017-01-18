@@ -21,5 +21,5 @@ import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
 /**
  * @author emmartins
  */
-public interface ServerGroupsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, ServerGroupsManagement> {
+public interface ServerGroupsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, ServerGroupsManagement> {
 }

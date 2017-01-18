@@ -21,5 +21,5 @@ import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 /**
  * @author emmartins
  */
-public interface ExtensionsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, ExtensionsManagement> {
+public interface ExtensionsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, ExtensionsManagement> {
 }

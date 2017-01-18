@@ -20,12 +20,11 @@ import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResources;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.ResourcesManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourcesSubtaskExecutor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -59,7 +58,7 @@ public class ManageableResourcesTask<S, R extends ManageableResources> extends P
         void run(S source, List<R> resourceManagements, TaskContext context) throws Exception;
     }
 
-    protected abstract static class BaseBuilder<S, R extends ManageableResources, T extends ResourcesManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
+    protected abstract static class BaseBuilder<S, R extends ManageableResources, T extends ManageableResourcesSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
 
         protected final List<SubtasksExecutor<S, R>> subtasks;
 
@@ -168,7 +167,7 @@ public class ManageableResourcesTask<S, R extends ManageableResources> extends P
         public abstract ServerMigrationTask build(S source, List<R> resourceManagements);
     }
 
-    public static class Builder<S, R extends ManageableResources> extends BaseBuilder<S, R, ResourcesManagementSubtaskExecutor<S, R>, Builder<S, R>> {
+    public static class Builder<S, R extends ManageableResources> extends BaseBuilder<S, R, ManageableResourcesSubtaskExecutor<S, R>, Builder<S, R>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);

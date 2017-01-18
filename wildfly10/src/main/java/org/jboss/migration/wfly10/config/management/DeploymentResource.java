@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.executor;
-
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+package org.jboss.migration.wfly10.config.management;
 
 /**
  * @author emmartins
  */
-public interface SecurityRealmsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SecurityRealmsManagement> {
+public interface DeploymentResource extends ManageableResource {
 }

@@ -21,5 +21,5 @@ import org.jboss.migration.wfly10.config.management.JVMsManagement;
 /**
  * @author emmartins
  */
-public interface JVMsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, JVMsManagement> {
+public interface JVMsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, JVMsManagement> {
 }

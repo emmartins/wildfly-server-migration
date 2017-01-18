@@ -21,5 +21,5 @@ import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagemen
 /**
  * @author emmartins
  */
-public interface SocketBindingGroupsManagementSubtaskExecutor<S> extends ResourcesManagementSubtaskExecutor<S, SocketBindingGroupsManagement> {
+public interface SocketBindingGroupsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SocketBindingGroupsManagement> {
 }

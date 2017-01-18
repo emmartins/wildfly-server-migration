@@ -48,7 +48,7 @@ public class SocketBindingGroupManagementImpl extends ManageableResourceImpl imp
     }
 
     @Override
-    public List findResources(Class resourcesType) throws IOException {
+    public List findChildResources(Class resourcesType) throws IOException {
         if (resourcesType.isAssignableFrom(SocketBindingsManagement.class)) {
             return Collections.singletonList(getSocketBindingsManagement());
         } else {

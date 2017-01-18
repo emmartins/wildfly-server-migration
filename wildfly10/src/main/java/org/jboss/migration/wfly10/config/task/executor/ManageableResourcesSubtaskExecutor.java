@@ -16,10 +16,13 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
 
 /**
  * @author emmartins
  */
-public interface SecurityRealmsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SecurityRealmsManagement> {
+public interface ManageableResourcesSubtaskExecutor<S, T extends ManageableResource>  {
+    void run(S source, ManageableResources<T> manageableResources, TaskContext context) throws Exception;
 }
