@@ -18,30 +18,30 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.JVMsManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.JvmResources;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class JVMsManagementTask<S> extends ManageableResourceTask<S, JVMsManagement> {
+public class JVMsManagementTask<S> extends ManageableResourceTask<S, JvmResources> {
 
-    protected JVMsManagementTask(Builder<S> builder, S source, JVMsManagement... resourceManagements) {
+    protected JVMsManagementTask(Builder<S> builder, S source, JvmResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, JVMsManagement> {
+    public interface Subtasks<S> extends ManageableResourceSubtaskExecutor<S, JvmResources> {
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, JVMsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, JvmResources, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, JVMsManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, JvmResources... resourceManagements) {
             return new JVMsManagementTask<>(this, source, resourceManagements);
         }
     }

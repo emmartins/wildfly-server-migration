@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
+import org.jboss.migration.wfly10.config.management.InterfaceResources;
 
 /**
  * @author emmartins
  */
-public interface InterfacesManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, InterfacesManagement> {
+public interface InterfacesManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, InterfaceResources> {
 }

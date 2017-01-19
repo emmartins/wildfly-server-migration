@@ -21,7 +21,7 @@ import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 import java.util.List;
 
@@ -76,7 +76,7 @@ public class WildFly10Subsystem {
         return name;
     }
 
-    public ServerMigrationTask getServerMigrationTask(final SubsystemsManagement subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(final SubsystemResources subsystemResources) {
         if (subsystemMigrationTasks == null || subsystemMigrationTasks.isEmpty()) {
             return null;
         }
@@ -90,9 +90,9 @@ public class WildFly10Subsystem {
                 if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(name);
+                final ModelNode subsystemConfig = subsystemResources.getResourceConfiguration(name);
                 for (final WildFly10SubsystemMigrationTaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
-                    context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, subsystemsManagement));
+                    context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, WildFly10Subsystem.this, subsystemResources));
                 }
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }

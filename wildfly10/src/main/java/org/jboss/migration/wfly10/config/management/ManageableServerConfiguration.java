@@ -22,12 +22,11 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * @author emmartins
  */
-public interface ManageableServerConfiguration {
+public interface ManageableServerConfiguration extends ManageableResourcesParent {
 
     void start();
     void stop();
@@ -37,11 +36,8 @@ public interface ManageableServerConfiguration {
     Path resolvePath(String path)  throws IOException, ManagementOperationException;
     ModelControllerClient getModelControllerClient();
 
-    ExtensionsManagement getExtensionsManagement();
-    InterfacesManagement getInterfacesManagement();
-    SocketBindingGroupsManagement getSocketBindingGroupsManagement();
-    SystemPropertiesManagement getSystemPropertiesManagement();
-
-    <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException;
-    <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException;
+    ManageableResources<ExtensionResource> getExtensionResources();
+    ManageableResources<InterfaceResource> getInterfaceResources();
+    ManageableResources<SocketBindingGroupResource> getSocketBindingGroupResources();
+    ManageableResources<SystemPropertyResource> getSystemPropertyResources();
 }

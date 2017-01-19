@@ -29,7 +29,7 @@ import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.management.extension.RemoveExtension;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
@@ -109,8 +109,8 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
         }
 
         @Override
-        public void executeSubtasks(S source, final SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
-            final String configName = subsystemsManagement.getResourcePathAddress(subsystemName).toCLIStyleString();
+        public void executeSubtasks(S source, final SubsystemResources subsystemResources, TaskContext context) throws Exception {
+            final String configName = subsystemResources.getResourcePathAddress(subsystemName).toCLIStyleString();
             final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("migrate-config")
                     .addAttribute("name", configName)
                     .build();
@@ -121,14 +121,14 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                 }
                 @Override
                 public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                    final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(subsystemName);
+                    final ModelNode subsystemConfig = subsystemResources.getResourceConfiguration(subsystemName);
                     if (subsystemConfig == null) {
                         return ServerMigrationTaskResult.SKIPPED;
                     }
                     context.getLogger().debugf("Migrating subsystem %s config %s...", subsystemName, configName);
-                    final PathAddress address = subsystemsManagement.getResourcePathAddress(subsystemName);
+                    final PathAddress address = subsystemResources.getResourcePathAddress(subsystemName);
                     final ModelNode op = Util.createEmptyOperation("migrate", address);
-                    final ModelNode result = subsystemsManagement.getServerConfiguration().getModelControllerClient().execute(op);
+                    final ModelNode result = subsystemResources.getServerConfiguration().getModelControllerClient().execute(op);
                     context.getLogger().debugf("Op result: %s", result.asString());
                     final String outcome = result.get(OUTCOME).asString();
                     if(!SUCCESS.equals(outcome)) {
@@ -141,7 +141,7 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                                 migrateWarnings.add(modelNode.asString());
                             }
                         }
-                        processWarnings(migrateWarnings, subsystemsManagement, context);
+                        processWarnings(migrateWarnings, subsystemResources, context);
                         if (migrateWarnings.isEmpty()) {
                             context.getLogger().infof("Subsystem config %s migrated.", configName);
                         } else {
@@ -149,9 +149,9 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
                             resultBuilder.addAttribute("migration-warnings", migrateWarnings);
                         }
                         // FIXME tmp workaround for legacy subsystems which do not remove itself
-                        if (subsystemsManagement.getResourceNames().contains(subsystemName)) {
+                        if (subsystemResources.getResourceNames().contains(subsystemName)) {
                             // remove itself after migration
-                            subsystemsManagement.removeResource(subsystemName);
+                            subsystemResources.removeResource(subsystemName);
                             context.getLogger().debugf("Subsystem config %s removed after migration.", configName);
                         }
                         return resultBuilder.build();
@@ -164,11 +164,11 @@ public class MigrateSubsystemTaskFactory<S> implements StandaloneServerConfigura
         /**
          * Post migration processing.
          * @param migrationWarnings the warnings that resulted from doing the migration
-         * @param subsystemsManagement the subsystem management
+         * @param subsystemResources the subsystem management
          * @param context the task context
          * @throws Exception if there was a failure processing the warnings
          */
-        protected void processWarnings(List<String> migrationWarnings, SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
+        protected void processWarnings(List<String> migrationWarnings, SubsystemResources subsystemResources, TaskContext context) throws Exception {
         }
     }
 }

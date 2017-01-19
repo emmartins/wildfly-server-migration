@@ -18,16 +18,13 @@ package org.jboss.migration.wfly10.config.task.management;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.ProfileManagement;
-import org.jboss.migration.wfly10.config.management.ProfilesManagement;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.ProfileResource;
+import org.jboss.migration.wfly10.config.management.ProfileResources;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationTask;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,10 +47,10 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
 
         public Builder<S> subtask(SubsystemsConfigurationSubtasks<S> subtask) {
             return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
-                final ProfilesManagement profilesManagement = configuration.getProfilesManagement();
-                for (String profileNames : profilesManagement.getResourceNames()) {
-                    final ProfileManagement profileManagement = profilesManagement.getProfileManagement(profileNames);
-                    subtask.executeSubtasks(source, profileManagement.getSubsystemsManagement(), taskContext);
+                final ProfileResources profileResources = configuration.getProfileResources();
+                for (String profileNames : profileResources.getResourceNames()) {
+                    final ProfileResource profileResource = profileResources.getResource(profileNames);
+                    subtask.executeSubtasks(source, profileResource.getSubsystemsManagement(), taskContext);
                 }
             });
         }
@@ -61,7 +58,7 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
         public Builder<S> subtask(SubsystemsConfigurationTask.Builder<S> builder) {
             return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
                 // replace with non generic resource retriever
-                final List<SubsystemsManagement> resourceManagements = configuration.getResourcesByType(SubsystemsManagement.class);
+                final List<SubsystemResources> resourceManagements = configuration.getResources(SubsystemResources.class);
                 final ServerMigrationTask subtask = builder.build(source, resourceManagements);
                 if (subtask != null) {
                     taskContext.execute(subtask);

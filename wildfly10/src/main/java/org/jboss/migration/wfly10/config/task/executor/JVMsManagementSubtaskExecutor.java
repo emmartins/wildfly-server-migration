@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.JVMsManagement;
+import org.jboss.migration.wfly10.config.management.JvmResources;
 
 /**
  * @author emmartins
  */
-public interface JVMsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, JVMsManagement> {
+public interface JVMsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, JvmResources> {
 }

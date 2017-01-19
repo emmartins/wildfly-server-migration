@@ -20,35 +20,25 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
-import org.jboss.migration.wfly10.config.management.ManageableResources;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_RESOURCE_OPERATION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RECURSIVE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
  */
-public class ManageableResourceImpl implements ManageableResource {
+public class ManageableResourceImpl extends AbstractManageableResourcesParent implements ManageableResource {
 
     private final String resourceName;
     private final PathAddress pathAddress;
     private final ManageableServerConfiguration serverConfiguration;
-    protected final Map<Type, ManageableResources> childResources;
 
     public ManageableResourceImpl(String resourceName, PathAddress pathAddress, ManageableServerConfiguration serverConfiguration) {
         this.resourceName = resourceName;
         this.pathAddress = pathAddress;
         this.serverConfiguration = serverConfiguration;
-        this.childResources = new HashMap<>();
     }
 
     @Override
@@ -64,36 +54,6 @@ public class ManageableResourceImpl implements ManageableResource {
     @Override
     public ManageableServerConfiguration getServerConfiguration() {
         return serverConfiguration;
-    }
-
-    @Override
-    public <T extends ManageableResource> List<ManageableResources<T>> findChildResources(Class<T> resourceType) throws IOException {
-        final List<ManageableResources<T>> result = new ArrayList<>();
-        for (Type type : childResources.keySet()) {
-            if (resourceType.isAssignableFrom(type.getType())) {
-                result.add(childResources.get(type));
-            } else {
-                final List<Type<?>> childTypes = type.getChildTypes(true);
-                for (Type<?> childType : childTypes) {
-                    if (resourceType.isAssignableFrom(childType.getType())) {
-                        result.addAll(childResources.get(type).findResources(resourceType));
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public <T extends ManageableResource> List<T> findChildResources(Class<T> resourceType, String resourceName) throws IOException {
-        final List<T> result = new ArrayList<>();
-        for (ManageableResources<T> resources : findChildResources(resourceType)) {
-            final T resource = resources.getResource(resourceName);
-            if (resource != null) {
-                result.add(resource);
-            }
-        }
-        return result;
     }
 
     @Override

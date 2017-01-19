@@ -18,11 +18,10 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class SubsystemsMigration<S> {
         this.supportedExtensions = Collections.unmodifiableList(builder.supportedExtensions);
     }
 
-    public ServerMigrationTask getSubsystemsManagementTask(S source, final SubsystemsManagement subsystemsManagement) {
+    public ServerMigrationTask getSubsystemsManagementTask(S source, final SubsystemResources subsystemResources) {
         return new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -54,17 +53,17 @@ public class SubsystemsMigration<S> {
             public ServerMigrationTaskResult run(TaskContext context) throws Exception {
                 //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
                 context.getLogger().infof("Subsystems resources migration starting...");
-                migrateExtensions(subsystemsManagement, context);
+                migrateExtensions(subsystemResources, context);
                 context.getLogger().infof("Subsystems resources migration done.");
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
     }
 
-    protected void migrateExtensions(final SubsystemsManagement subsystemsManagement, TaskContext context) throws IOException {
+    protected void migrateExtensions(final SubsystemResources subsystemResources, TaskContext context) throws IOException {
         final List<Extension> extensionsToMigrate = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         for (Extension extensionToMigrate : extensionsToMigrate) {
-            extensionToMigrate.migrate(subsystemsManagement, context);
+            extensionToMigrate.migrate(subsystemResources, context);
         }
     }
 

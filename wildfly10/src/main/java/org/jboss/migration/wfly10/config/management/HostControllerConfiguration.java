@@ -20,8 +20,8 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface HostControllerConfiguration extends ManageableServerConfiguration {
-    DeploymentsManagement getDeploymentsManagement();
-    HostsManagement getHostsManagement();
-    ProfilesManagement getProfilesManagement();
-    ServerGroupsManagement getServerGroupsManagement();
+    DeploymentResources getDeploymentResources();
+    HostResources getHostResources();
+    ProfileResources getProfileResources();
+    ServerGroupResources getServerGroupResources();
 }

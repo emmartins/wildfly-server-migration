@@ -24,7 +24,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
@@ -82,10 +82,10 @@ public class AddSubsystemTaskFactory<S> implements StandaloneServerConfiguration
                 SubtaskExecutorAdapters.of(source, configuration, addSubsystemConfigSubtask));
     }
 
-    public ServerMigrationTask getTask(S source, SubsystemsManagement subsystemsManagement) throws Exception {
+    public ServerMigrationTask getTask(S source, SubsystemResources subsystemResources) throws Exception {
         return getTask(source,
-                SubtaskExecutorAdapters.of(source, subsystemsManagement.getServerConfiguration(), addExtensionSubtask),
-                SubtaskExecutorAdapters.of(source, subsystemsManagement, addSubsystemConfigSubtask));
+                SubtaskExecutorAdapters.of(source, subsystemResources.getServerConfiguration(), addExtensionSubtask),
+                SubtaskExecutorAdapters.of(source, subsystemResources, addSubsystemConfigSubtask));
     }
 
     private ServerMigrationTask getTask(S source, ParentServerMigrationTask.SubtaskExecutor addExtensionSubtask, ParentServerMigrationTask.SubtaskExecutor addSubsystemSubtask) throws Exception {

@@ -18,30 +18,30 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class SecurityRealmsManagementTask<S> extends ManageableResourceTask<S, SecurityRealmsManagement> {
+public class SecurityRealmsManagementTask<S> extends ManageableResourceTask<S, SecurityRealmResources> {
 
-    protected SecurityRealmsManagementTask(Builder<S> builder, S source, SecurityRealmsManagement... resourceManagements) {
+    protected SecurityRealmsManagementTask(Builder<S> builder, S source, SecurityRealmResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, SecurityRealmsManagement> {
+    public interface Subtasks<S> extends ManageableResourceSubtaskExecutor<S, SecurityRealmResources> {
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, SecurityRealmsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, SecurityRealmResources, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, SecurityRealmsManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, SecurityRealmResources... resourceManagements) {
             return new SecurityRealmsManagementTask<>(this, source, resourceManagements);
         }
     }

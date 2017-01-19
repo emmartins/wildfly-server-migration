@@ -18,10 +18,9 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 /**
  * Abstract implementation for a subsystem config migration task.
@@ -30,12 +29,12 @@ import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
 public abstract class WildFly10SubsystemMigrationTask implements ServerMigrationTask {
     private final ModelNode config;
     private final WildFly10Subsystem subsystem;
-    private final SubsystemsManagement subsystemsManagement;
+    private final SubsystemResources subsystemResources;
 
-    protected WildFly10SubsystemMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement) {
+    protected WildFly10SubsystemMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemResources subsystemResources) {
         this.config = config;
         this.subsystem = subsystem;
-        this.subsystemsManagement = subsystemsManagement;
+        this.subsystemResources = subsystemResources;
     }
 
     @Override
@@ -45,8 +44,8 @@ public abstract class WildFly10SubsystemMigrationTask implements ServerMigration
         if (taskEnvironment.isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
-        return run(config, subsystem, subsystemsManagement, context, taskEnvironment);
+        return run(config, subsystem, subsystemResources, context, taskEnvironment);
     }
 
-    protected abstract ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception;
+    protected abstract ServerMigrationTaskResult run(ModelNode config, WildFly10Subsystem subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception;
 }

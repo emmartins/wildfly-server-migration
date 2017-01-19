@@ -21,11 +21,10 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -50,22 +49,22 @@ public class SetDefaultHttpListenerRedirectSocket implements UpdateSubsystemTask
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
 
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 if (config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME) && !config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME, REDIRECT_SOCKET_ATTR_NAME)) {
-                    final PathAddress pathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(SERVER, SERVER_NAME), PathElement.pathElement(HTTP_LISTENER, HTTP_LISTENER_NAME));
+                    final PathAddress pathAddress = subsystemResources.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(SERVER, SERVER_NAME), PathElement.pathElement(HTTP_LISTENER, HTTP_LISTENER_NAME));
                     final ModelNode op = Util.getWriteAttributeOperation(pathAddress, REDIRECT_SOCKET_ATTR_NAME, REDIRECT_SOCKET_ATTR_VALUE);
-                    subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
                     context.getLogger().infof("Undertow's default HTTP listener 'redirect-socket' set as 'https'.");
                     return ServerMigrationTaskResult.SUCCESS;
                 } else {

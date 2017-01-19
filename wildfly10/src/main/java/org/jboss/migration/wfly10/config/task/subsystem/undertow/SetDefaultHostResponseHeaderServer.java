@@ -19,9 +19,8 @@ package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 /**
@@ -35,12 +34,12 @@ public class SetDefaultHostResponseHeaderServer extends SetDefaultHostResponseHe
         super("server-header", "Server", headerValue);
     }
     @Override
-    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) {
+    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) {
         if (headerValue != null) {
             return headerValue;
         } else {
             // compute from product info
-            final ProductInfo productInfo = subsystemsManagement.getServerConfiguration().getServer().getProductInfo();
+            final ProductInfo productInfo = subsystemResources.getServerConfiguration().getServer().getProductInfo();
             // TODO this should come instead, from the "subsystem" in extensions, exposed by target server
             final String serverName;
             if (productInfo.getName().contains("WildFly")) {

@@ -21,12 +21,11 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -58,14 +57,14 @@ public class AddServerCache implements UpdateSubsystemTaskFactory.SubtaskFactory
     private static final String MODE_ATTR_VALUE = "BATCH";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
@@ -76,8 +75,8 @@ public class AddServerCache implements UpdateSubsystemTaskFactory.SubtaskFactory
                 if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
+                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
                 /*
         <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
                 <local-cache name="default">

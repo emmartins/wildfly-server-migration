@@ -22,17 +22,17 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.*;
+import org.jboss.migration.wfly10.config.management.ExtensionResources;
+import org.jboss.migration.wfly10.config.management.InterfaceResources;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.ManagementOperationException;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
+import org.jboss.migration.wfly10.config.management.SystemPropertyResources;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
-import static java.util.stream.Collectors.toList;
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -40,47 +40,48 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
+public abstract class AbstractManageableServerConfiguration extends AbstractManageableResourcesParent implements ManageableServerConfiguration {
 
     private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
-
     protected final PathAddress pathAddress;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
 
+    private final ExtensionResources extensionResources;
+    private final InterfaceResources interfaceResources;
+    private final SocketBindingGroupResources socketBindingGroupResources;
+    private final SystemPropertyResources systemPropertyResources;
 
     protected AbstractManageableServerConfiguration(WildFlyServer10 server, PathAddress pathAddress) {
         this.server = server;
         this.pathAddress = pathAddress;
-        this.extensionsManagement = new ExtensionsManagementImpl(pathAddress, this);
-        this.interfacesManagement = new InterfacesManagementImpl(pathAddress, this);
-        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(pathAddress, this);
-        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(pathAddress, this);
-
+        extensionResources = new ExtensionResourcesImpl(pathAddress, this);
+        interfaceResources = new InterfaceResourcesImpl(pathAddress, this);
+        socketBindingGroupResources = new SocketBindingGroupResourcesImpl(pathAddress, this);
+        systemPropertyResources = new SystemPropertyResourcesImpl(pathAddress, this);
+        addChildResources(extensionResources);
+        addChildResources(interfaceResources);
+        addChildResources(socketBindingGroupResources);
+        addChildResources(systemPropertyResources);
     }
 
     @Override
-    public ExtensionsManagement getExtensionsManagement() {
-        return extensionsManagement;
+    public ExtensionResources getExtensionResources() {
+        return extensionResources;
     }
 
     @Override
-    public InterfacesManagement getInterfacesManagement() {
-        return interfacesManagement;
+    public InterfaceResources getInterfaceResources() {
+        return interfaceResources;
     }
 
     @Override
-    public SystemPropertiesManagement getSystemPropertiesManagement() {
-        return systemPropertiesManagement;
+    public SystemPropertyResources getSystemPropertyResources() {
+        return systemPropertyResources;
     }
 
-
     @Override
-    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
-        return socketBindingGroupsManagement;
+    public SocketBindingGroupResources getSocketBindingGroupResources() {
+        return socketBindingGroupResources;
     }
 
     @Override
@@ -154,7 +155,7 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     protected void writeConfiguration() {
         // force write of xml config by tmp setting a system property
         final String systemPropertyName = "org.jboss.migration.tmp."+System.nanoTime();
-        final PathAddress pathAddress = getSystemPropertiesManagement().getResourcePathAddress(systemPropertyName);
+        final PathAddress pathAddress = getSystemPropertyResources().getResourcePathAddress(systemPropertyName);
         try {
             executeManagementOperation(Util.createAddOperation(pathAddress));
             executeManagementOperation(Util.createRemoveOperation(pathAddress));
@@ -162,28 +163,4 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
-        final List<T> result = new ArrayList<>();
-        findResources(getExtensionsManagement(), resourcesType, result);
-        findResources(getInterfacesManagement(), resourcesType, result);
-        findResources(getSocketBindingGroupsManagement(), resourcesType, result);
-        findResources(getSystemPropertiesManagement(), resourcesType, result);
-        return result;
-    }
-
-    protected <T extends ManageableResources> void findResources(ManageableResources child, Class<T> resourcesType, List<T> result) throws IOException {
-        if (resourcesType.isAssignableFrom(child.getClass())) {
-            result.add((T) child);
-        } else {
-            result.addAll(child.findResources(resourcesType));
-        }
-    }
-
-    @Override
-    public <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException {
-        return null;
-    }
-
 }

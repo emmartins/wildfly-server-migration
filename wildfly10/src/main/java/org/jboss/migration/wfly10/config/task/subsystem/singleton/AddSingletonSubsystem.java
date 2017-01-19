@@ -20,9 +20,8 @@ import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
@@ -49,7 +48,7 @@ public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
     private static final String ELECTION_POLICY_NAME = "simple";
 
     @Override
-    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
         // add subsystem with default config
                 /*
             <subsystem xmlns="urn:jboss:domain:singleton:1.0">
@@ -60,9 +59,9 @@ public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
             </singleton-policies>
             </subsystem>
             */
-        final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+        final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
         final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+        final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         subsystemAddOperation.get(DEFAULT_ATTR_NAME).set(DEFAULT_ATTR_VALUE);
         compositeOperationBuilder.addStep(subsystemAddOperation);

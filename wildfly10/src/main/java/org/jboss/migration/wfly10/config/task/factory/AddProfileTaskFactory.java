@@ -23,11 +23,10 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.ProfileManagement;
+import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
 
 import java.util.ArrayList;
@@ -94,7 +93,7 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
 
         @Override
         public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-            final PathAddress pathAddress = configuration.getProfilesManagement().getResourcePathAddress(profileName);
+            final PathAddress pathAddress = configuration.getProfileResources().getResourcePathAddress(profileName);
             final ModelNode op = Util.createAddOperation(pathAddress);
             configuration.executeManagementOperation(op);
             context.getLogger().infof("Profile %s created.", profileName);
@@ -129,11 +128,11 @@ public class AddProfileTaskFactory<S> implements DomainConfigurationTaskFactory<
             return subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
                 @Override
                 public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-                    final ProfileManagement profileManagement = configuration.getProfilesManagement().getProfileManagement(profileName);
-                    if (profileManagement == null) {
+                    final ProfileResource profileResource = configuration.getProfileResources().getResource(profileName);
+                    if (profileResource == null) {
                         return null;
                     }
-                    return subtaskFactory.getTask(source, profileManagement.getSubsystemsManagement());
+                    return subtaskFactory.getTask(source, profileResource.getSubsystemsManagement());
                 }
             });
         }

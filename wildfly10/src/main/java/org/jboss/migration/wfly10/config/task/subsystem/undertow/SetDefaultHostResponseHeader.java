@@ -25,7 +25,7 @@ import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
@@ -63,28 +63,28 @@ public class SetDefaultHostResponseHeader implements UpdateSubsystemTaskFactory.
         this.headerValue = headerValue;
     }
 
-    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) {
+    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) {
         return headerValue;
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
         final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).addAttribute(RESPONSE_HEADER, filterName).build();
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return TASK_NAME;
             }
 
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 // TODO get ridden of pre-fetched subsystem config, if not an issue for any existent subsystem task
                 // refresh subsystem config to see any changes possibly made during migration
-                config = subsystemsManagement.getResourceConfiguration(subsystem.getName());
+                config = subsystemResources.getResourceConfiguration(subsystem.getName());
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress configPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
+                final PathAddress configPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
                 // check if server is defined
                 final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));
                 if (!config.hasDefined(SERVER, SERVER_NAME)) {
@@ -100,7 +100,7 @@ public class SetDefaultHostResponseHeader implements UpdateSubsystemTaskFactory.
                 }
                 final ModelNode defaultHost = server.get(HOST, HOST_NAME);
                 // add/update the response header
-                final String headerValue = getHeaderValue(config, subsystem, subsystemsManagement, context, taskEnvironment);
+                final String headerValue = getHeaderValue(config, subsystem, subsystemResources, context, taskEnvironment);
                 if (headerValue == null) {
                     context.getLogger().debugf("Skipping task, null header-value");
                     return ServerMigrationTaskResult.SKIPPED;
@@ -110,22 +110,22 @@ public class SetDefaultHostResponseHeader implements UpdateSubsystemTaskFactory.
                     // response header not defined, add it
                     if (!config.hasDefined(CONFIGURATION, FILTER)) {
                         final ModelNode op = Util.createAddOperation(configPathAddress.append(CONFIGURATION, FILTER));
-                        subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                        subsystemResources.getServerConfiguration().executeManagementOperation(op);
                     }
                     final ModelNode op = Util.createAddOperation(responseHeaderPathAddress);
                     op.get(HEADER_NAME).set(headerName);
                     op.get(HEADER_VALUE).set(headerValue);
-                    subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
                 } else {
                     // response header exists, update its header-value attr
                     final ModelNode op = Util.getWriteAttributeOperation(responseHeaderPathAddress, HEADER_VALUE, headerValue);
-                    subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
                 }
                 // add filter-ref to default host, if missing
                 if (!defaultHost.hasDefined(FILTER_REF, filterName)) {
                     final PathAddress filterRefPathAddress = defaultHostPathAddress.append(FILTER_REF, filterName);
                     final ModelNode op = Util.createAddOperation(filterRefPathAddress);
-                    subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
                 }
                 context.getLogger().infof("Response header '%s' set as '%s: %s' in Undertow's config %s", filterName, headerName, headerValue, configPathAddress.toCLIStyleString());
                 return new ServerMigrationTaskResult.Builder()

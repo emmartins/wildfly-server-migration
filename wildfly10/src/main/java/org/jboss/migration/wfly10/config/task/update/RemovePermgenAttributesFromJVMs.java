@@ -27,8 +27,8 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.JVMsManagement;
-import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
+import org.jboss.migration.wfly10.config.management.JvmResources;
+import org.jboss.migration.wfly10.config.management.ServerGroupResources;
 import org.jboss.migration.wfly10.config.task.executor.JVMsManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
@@ -49,7 +49,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
 
     @Override
     public ServerMigrationTask getTask(S source, HostConfiguration configuration) throws Exception {
-        return getTask(getSubtasks(source, configuration.getJVMsManagement()));
+        return getTask(getSubtasks(source, configuration.getJvmResources()));
     }
 
     protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
@@ -68,26 +68,26 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
                 .build();
     }
 
-    protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final JVMsManagement jvMsManagement) throws Exception {
+    protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final JvmResources JvmResources) throws Exception {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(final TaskContext context) throws Exception {
-                JVMsSubtaskExecutor.INSTANCE.executeSubtasks(source, jvMsManagement, context);
+                JVMsSubtaskExecutor.INSTANCE.executeSubtasks(source, JvmResources, context);
             }
         };
     }
 
     @Override
     public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-        return getTask(getSubtasks(source, configuration.getServerGroupsManagement()));
+        return getTask(getSubtasks(source, configuration.getServerGroupResources()));
     }
 
-    protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final ServerGroupsManagement serverGroupsManagement) throws Exception {
+    protected ParentServerMigrationTask.SubtaskExecutor getSubtasks(final S source, final ServerGroupResources serverGroupResources) throws Exception {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(final TaskContext context) throws Exception {
-                for (String serverGroupName : serverGroupsManagement.getResourceNames()) {
-                    getSubtasks(source, serverGroupsManagement.getServerGroupManagement(serverGroupName).getJVMsManagement()).executeSubtasks(context);
+                for (String serverGroupName : serverGroupResources.getResourceNames()) {
+                    getSubtasks(source, serverGroupResources.getResource(serverGroupName).getJvmResources()).executeSubtasks(context);
                 }
             }
         };
@@ -103,7 +103,7 @@ public class RemovePermgenAttributesFromJVMs<S> implements HostConfigurationTask
         }
 
         @Override
-        public void executeSubtasks(S source, final JVMsManagement resourceManagement, TaskContext context) throws Exception {
+        public void executeSubtasks(S source, final JvmResources resourceManagement, TaskContext context) throws Exception {
             for (final String resourceName : resourceManagement.getResourceNames()) {
                 final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME)
                         .addAttribute("resource", resourceManagement.getResourcePathAddress(resourceName).toCLIStyleString())

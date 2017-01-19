@@ -19,9 +19,8 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
@@ -44,7 +43,7 @@ public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S>
     private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
 
     @Override
-    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
         // add subsystem with default config
             /*
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
@@ -55,8 +54,8 @@ public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S>
                 </deployment-permissions>
             </subsystem>
              */
-        final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
-        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+        final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
+        final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         configurationManagement.executeManagementOperation(subsystemAddOperation);
         // add default deployment permissions

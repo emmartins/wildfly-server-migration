@@ -29,7 +29,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
+import org.jboss.migration.wfly10.config.management.InterfaceResources;
 import org.jboss.migration.wfly10.config.task.executor.InterfacesManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
@@ -96,7 +96,7 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
         private static final String INTERFACE_NAME = "unsecure";
 
         @Override
-        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, TaskContext context) throws Exception {
+        public void executeSubtasks(S source, final InterfaceResources resourceManagement, TaskContext context) throws Exception {
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {
@@ -137,7 +137,7 @@ public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactor
         private static final String INTERFACE_NAME = "unsecure";
 
         @Override
-        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, TaskContext context) throws Exception {
+        public void executeSubtasks(S source, final InterfaceResources resourceManagement, TaskContext context) throws Exception {
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {

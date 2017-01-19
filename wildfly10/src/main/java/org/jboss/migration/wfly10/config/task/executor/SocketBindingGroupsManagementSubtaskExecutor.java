@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
 
 /**
  * @author emmartins
  */
-public interface SocketBindingGroupsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SocketBindingGroupsManagement> {
+public interface SocketBindingGroupsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SocketBindingGroupResources> {
 }

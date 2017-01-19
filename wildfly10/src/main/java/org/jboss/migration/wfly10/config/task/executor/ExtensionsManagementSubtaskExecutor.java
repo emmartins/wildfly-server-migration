@@ -16,10 +16,11 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
+import org.jboss.migration.wfly10.config.management.ExtensionResource;
+import org.jboss.migration.wfly10.config.management.ExtensionResources;
 
 /**
  * @author emmartins
  */
-public interface ExtensionsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, ExtensionsManagement> {
+public interface ExtensionsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, ExtensionResource> {
 }

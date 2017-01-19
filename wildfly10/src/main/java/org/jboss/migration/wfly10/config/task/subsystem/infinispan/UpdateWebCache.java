@@ -23,11 +23,10 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 /**
@@ -59,14 +58,14 @@ public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory
     private static final String PURGE = "purge";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
@@ -79,7 +78,7 @@ public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 final ModelNode cacheContainerConfig = config.get(CACHE_CONTAINER, CACHE_CONTAINER_NAME);
-                final PathAddress cacheContainerPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(CACHE_CONTAINER, CACHE_CONTAINER_NAME));
+                final PathAddress cacheContainerPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(CACHE_CONTAINER, CACHE_CONTAINER_NAME));
                 final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
 
                 if (cacheContainerConfig.hasDefined(DISTRIBUTED_CACHE)) {
@@ -138,7 +137,7 @@ public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory
                     cacheFileStoreAddOperation.get(PURGE).set(false);
                     compositeOperationBuilder.addStep(cacheFileStoreAddOperation);
                 }
-                subsystemsManagement.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
+                subsystemResources.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
                 context.getLogger().infof("Cache '%s' added to cache container '%s'.", CACHE_NAME, CACHE_CONTAINER_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             }

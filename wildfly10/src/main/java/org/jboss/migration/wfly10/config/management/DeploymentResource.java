@@ -20,4 +20,5 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface DeploymentResource extends ManageableResource {
+    ManageableResource.Type TYPE = new BasicManageableResourceType<>(DeploymentResource.class);
 }

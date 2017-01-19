@@ -25,7 +25,7 @@ import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import java.util.HashSet;
@@ -53,22 +53,22 @@ public class EnableHttp2 implements UpdateSubsystemTaskFactory.SubtaskFactory {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return TASK_NAME;
             }
 
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 // TODO get ridden of pre-fetched subsystem config, if not an issue for any existent subsystem task
                 // refresh subsystem config to see any changes possibly made during migration
-                config = subsystemsManagement.getResourceConfiguration(subsystem.getName());
+                config = subsystemResources.getResourceConfiguration(subsystem.getName());
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress configPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
+                final PathAddress configPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
                 final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));
                 if (!config.hasDefined(SERVER, SERVER_NAME)) {
                     context.getLogger().debugf("Skipping task, server '%s' not found in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
@@ -84,7 +84,7 @@ public class EnableHttp2 implements UpdateSubsystemTaskFactory.SubtaskFactory {
                             final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, listenerPathAddress);
                             op.get(NAME).set(ENABLE_HTTP2);
                             op.get(VALUE).set(true);
-                            subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                            subsystemResources.getServerConfiguration().executeManagementOperation(op);
                             context.getLogger().infof("HTTP2 enabled for Undertow's HTTP Listener %s.", listenerPathAddress.toCLIStyleString());
                             updatedHttpListeners.add(listenerName);
                         }
@@ -99,7 +99,7 @@ public class EnableHttp2 implements UpdateSubsystemTaskFactory.SubtaskFactory {
                             final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, listenerPathAddress);
                             op.get(NAME).set(ENABLE_HTTP2);
                             op.get(VALUE).set(true);
-                            subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+                            subsystemResources.getServerConfiguration().executeManagementOperation(op);
                             context.getLogger().infof("HTTP2 enabled for Undertow's HTTPS Listener %s.", listenerPathAddress.toCLIStyleString());
                             updatedHttpsListeners.add(listenerName);
                         }

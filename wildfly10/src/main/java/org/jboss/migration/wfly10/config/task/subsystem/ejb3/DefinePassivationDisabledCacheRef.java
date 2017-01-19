@@ -20,12 +20,11 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -47,22 +46,22 @@ public class DefinePassivationDisabledCacheRef implements UpdateSubsystemTaskFac
     private static final String DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME = "default-sfsb-passivation-disabled-cache";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 if (!config.hasDefined(DEFAULT_SFSB_CACHE_ATTR_NAME) || config.hasDefined(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
+                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
                 // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=defaultSFSBCache)
                 final String defaultSFSBCache = config.get(DEFAULT_SFSB_CACHE_ATTR_NAME).asString();
                 final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, subsystemPathAddress);

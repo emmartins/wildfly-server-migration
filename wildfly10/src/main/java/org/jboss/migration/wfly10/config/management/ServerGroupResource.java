@@ -20,4 +20,6 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface ServerGroupResource extends ManageableResource {
+    ManageableResource.Type TYPE = new BasicManageableResourceType<>(ServerGroupResource.class, JvmResource.TYPE);
+    JvmResources getJvmResources();
 }

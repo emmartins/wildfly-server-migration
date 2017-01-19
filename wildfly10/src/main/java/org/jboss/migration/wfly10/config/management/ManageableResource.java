@@ -20,15 +20,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author emmartins
  */
-public interface ManageableResource {
+public interface ManageableResource extends ManageableResourcesParent {
 
-    <T extends ManageableResource> List<ManageableResources<T>> findChildResources(Class<T> resourceType) throws IOException;
-    <T extends ManageableResource> List<T> findChildResources(Class<T> resourceType, String resourceName) throws IOException;
     String getResourceName();
     PathAddress getResourcePathAddress();
     ModelNode getResourceConfiguration() throws IOException;
@@ -37,6 +34,6 @@ public interface ManageableResource {
     //<T extends ManageableResource> Type<T> getResourceType();
     interface Type<T extends ManageableResource> {
         Class<T> getType();
-        List<Type<?>> getChildTypes(boolean recursive);
+        Type<?>[] getChildTypes(boolean recursive);
     }
 }

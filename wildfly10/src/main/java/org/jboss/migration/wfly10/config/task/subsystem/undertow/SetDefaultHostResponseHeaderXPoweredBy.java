@@ -18,9 +18,8 @@ package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 /**
@@ -34,7 +33,7 @@ public class SetDefaultHostResponseHeaderXPoweredBy extends SetDefaultHostRespon
         this(null);
     }
     @Override
-    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) {
+    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) {
         if (headerValue != null) {
             return headerValue;
         } else {

@@ -20,4 +20,5 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface SubsystemResource extends ManageableResource {
+    ManageableResource.Type TYPE = new BasicManageableResourceType<>(SubsystemResource.class);
 }

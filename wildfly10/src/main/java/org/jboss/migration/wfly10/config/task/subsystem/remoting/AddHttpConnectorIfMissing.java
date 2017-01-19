@@ -21,12 +21,11 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -59,19 +58,19 @@ public class AddHttpConnectorIfMissing implements UpdateSubsystemTaskFactory.Sub
     private static final String SECURITY_REALM = "security-realm";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
+                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
                 // read env properties
                 final String httpConnectorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_CONNECTOR_NAME, DEFAULT_HTTP_CONNECTOR_NAME);
                 final String connectorRefName = taskEnvironment.getPropertyAsString(EnvironmentProperties.CONNECTOR_REF_NAME, DEFAULT_CONNECTOR_REF_NAME);

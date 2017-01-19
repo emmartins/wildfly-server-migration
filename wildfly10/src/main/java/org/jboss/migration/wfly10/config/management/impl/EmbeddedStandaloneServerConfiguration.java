@@ -19,20 +19,17 @@ package org.jboss.migration.wfly10.config.management.impl;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
-import org.jboss.migration.wfly10.config.management.ManageableResources;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.wfly10.config.management.DeploymentResources;
+import org.jboss.migration.wfly10.config.management.ManagementInterfaceResources;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
 import org.wildfly.core.embedded.StandaloneServer;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -46,19 +43,23 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
 
     private final String config;
     private StandaloneServer standaloneServer;
-    private final DeploymentsManagement deploymentsManagement;
-    private final ManagementInterfacesManagement managementInterfacesManagement;
-    private final SecurityRealmsManagement securityRealmsManagement;
-    private final SubsystemsManagement subsystemsManagement;
+    private final DeploymentResources deploymentResources;
+    private final ManagementInterfaceResources managementInterfaceResources;
+    private final SecurityRealmResources securityRealmResources;
+    private final SubsystemResources subsystemResources;
 
     public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
         super(server, PathAddress.EMPTY_ADDRESS);
         this.config = config;
-        this.deploymentsManagement = new DeploymentsManagementImpl(pathAddress, this);
-        this.subsystemsManagement = new SubsystemsManagementImpl(pathAddress, this);
+        this.deploymentResources = new DeploymentResourcesImpl(pathAddress, this);
+        addChildResources(deploymentResources);
+        this.subsystemResources = new SubsystemResourcesImpl(pathAddress, this);
+        addChildResources(subsystemResources);
         final PathAddress managementCoreServicePathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT));
-        this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
-        this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
+        this.securityRealmResources = new SecurityRealmResourcesImpl(managementCoreServicePathAddress, this);
+        addChildResources(securityRealmResources);
+        this.managementInterfaceResources = new ManagementInterfaceResourcesImpl(managementCoreServicePathAddress, this);
+        addChildResources(managementInterfaceResources);
     }
 
     @Override
@@ -81,39 +82,26 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         standaloneServer = null;
     }
 
-    public DeploymentsManagement getDeploymentsManagement() {
-        return deploymentsManagement;
+    public DeploymentResources getDeploymentResources() {
+        return deploymentResources;
     }
 
-    @Override
-    public ManagementInterfacesManagement getManagementInterfacesManagement() {
-        return managementInterfacesManagement;
+    public ManagementInterfaceResources getManagementInterfaceResources() {
+        return managementInterfaceResources;
     }
 
-    @Override
-    public SecurityRealmsManagement getSecurityRealmsManagement() {
-        return securityRealmsManagement;
+    public SecurityRealmResources getSecurityRealmResources() {
+        return securityRealmResources;
     }
 
-    public SubsystemsManagement getSubsystemsManagement() {
-        return subsystemsManagement;
+    public SubsystemResources getSubsystemResources() {
+        return subsystemResources;
     }
-
 
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
         public StandaloneServerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
             return new EmbeddedStandaloneServerConfiguration(configFile.getFileName().toString(), server);
         }
-    }
-
-    @Override
-    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
-        final List<T> result = super.findResources(resourcesType);
-        findResources(getDeploymentsManagement(), resourcesType, result);
-        findResources(getManagementInterfacesManagement(), resourcesType, result);
-        findResources(getSecurityRealmsManagement(), resourcesType, result);
-        findResources(getSubsystemsManagement(), resourcesType, result);
-        return result;
     }
 }

@@ -18,30 +18,30 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.ServerGroupResources;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class ServerGroupsManagementTask<S> extends ManageableResourceTask<S, ServerGroupsManagement> {
+public class ServerGroupsManagementTask<S> extends ManageableResourceTask<S, ServerGroupResources> {
 
-    protected ServerGroupsManagementTask(Builder<S> builder, S source, ServerGroupsManagement... resourceManagements) {
+    protected ServerGroupsManagementTask(Builder<S> builder, S source, ServerGroupResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ServerGroupsManagement> {
+    public interface Subtasks<S> extends ManageableResourceSubtaskExecutor<S, ServerGroupResources> {
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ServerGroupsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ServerGroupResources, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, ServerGroupsManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, ServerGroupResources... resourceManagements) {
             return new ServerGroupsManagementTask<>(this, source, resourceManagements);
         }
     }

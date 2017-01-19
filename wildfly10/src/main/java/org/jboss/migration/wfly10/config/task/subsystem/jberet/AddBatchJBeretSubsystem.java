@@ -20,8 +20,7 @@ import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
@@ -54,7 +53,7 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
     private static final String KEEPALIVE_TIME_UNIT_ATTR_VALUE = "seconds";
 
     @Override
-    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
+    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
         /*
             <subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">
                 <default-job-repository name="in-memory"/>
@@ -69,7 +68,7 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
             </subsystem>
              */
         final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+        final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         subsystemAddOperation.get(DEFAULT_JOB_REPOSITORY_ATTR_NAME).set(DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
         subsystemAddOperation.get(DEFAULT_THREAD_POOL_ATTR_NAME).set(DEFAULT_THREAD_POOL_ATTR_VALUE);
@@ -87,6 +86,6 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
         keepAliveTime.get(KEEPALIVE_TIME_UNIT_ATTR_NAME).set(KEEPALIVE_TIME_UNIT_ATTR_VALUE);
         threadPoolAddOperation.get(KEEPALIVE_TIME).set(keepAliveTime);
         compositeOperationBuilder.addStep(threadPoolAddOperation);
-        subsystemsManagement.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
+        subsystemResources.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
     }
 }

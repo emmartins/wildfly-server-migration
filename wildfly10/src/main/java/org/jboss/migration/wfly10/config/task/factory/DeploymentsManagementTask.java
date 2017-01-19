@@ -18,27 +18,27 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
+import org.jboss.migration.wfly10.config.management.DeploymentResources;
 import org.jboss.migration.wfly10.config.task.executor.DeploymentsManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class DeploymentsManagementTask<S> extends ManageableResourceTask<S, DeploymentsManagement> {
+public class DeploymentsManagementTask<S> extends ManageableResourceTask<S, DeploymentResources> {
 
-    protected DeploymentsManagementTask(Builder<S> builder, S source, DeploymentsManagement... resourceManagements) {
+    protected DeploymentsManagementTask(Builder<S> builder, S source, DeploymentResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, DeploymentsManagement, DeploymentsManagementSubtaskExecutor<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, DeploymentResources, DeploymentsManagementSubtaskExecutor<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, DeploymentsManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, DeploymentResources... resourceManagements) {
             return new DeploymentsManagementTask<>(this, source, resourceManagements);
         }
     }

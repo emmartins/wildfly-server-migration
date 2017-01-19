@@ -20,15 +20,21 @@ import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.wfly10.config.management.ManageableResourceUtils;
+import org.jboss.migration.wfly10.config.management.ManageableResources;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourcesSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author emmartins
@@ -54,10 +60,10 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Par
     }
 
     private interface SubtasksExecutor<S, R extends ManageableResource> {
-        void run(S source, List<R> resourceManagements, TaskContext context) throws Exception;
+        void run(S source, List<R> resources, TaskContext context) throws Exception;
     }
 
-    protected abstract static class BaseBuilder<S, R extends ManageableResource, T extends ResourceManagementSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
+    protected abstract static class BaseBuilder<S, R extends ManageableResource, T extends ManageableResourceSubtaskExecutor<S, R>, B extends BaseBuilder<S, R, T, B>> extends ParentTask.BaseBuilder<B> {
 
         protected final List<SubtasksExecutor<S, R>> subtasks;
 
@@ -87,22 +93,19 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Par
             });
         }
 
-        public B subtask(ResourceManagementSubtaskExecutor<S, R> subtaskExecutor) {
-            return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
+        public B subtask(ManageableResourceSubtaskExecutor<S, R> subtaskExecutor) {
+            return subtask((SubtasksExecutor<S, R>) (source, resourcesList, context) -> {
                 // execute for all
-                for (R r : resourceManagements) {
-                    subtaskExecutor.executeSubtasks(source, r, context);
+                for (R resources : resourcesList) {
+                    subtaskExecutor.executeSubtasks(source, resources, context);
                 }
             });
         }
 
-        public <R1 extends ManageableResource> B subtask(ManageableResource.Query<R1> query, ResourceManagementSubtaskExecutor<S, R1> subtaskExecutor) {
-            return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
+        public <R1 extends ManageableResource> B subtask(ManageableResource.Type<R1> childrenType, ManageableResourceSubtaskExecutor<S, R1> subtaskExecutor) {
+            return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
                 // collect all children
-                List<R1> children = new ArrayList<>();
-                for (R r : resourceManagements) {
-                    children.addAll(r.findChildren(query));
-                }
+                final List<R1> children = ManageableResourceUtils.findChildResources(resources, childrenType);
                 // execute for all children
                 for (R1 child : children) {
                     subtaskExecutor.executeSubtasks(source, child, context);
@@ -110,12 +113,38 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Par
             });
         }
 
-        public <R1 extends ManageableResource> B subtask(Class<R1> childrenType, BaseBuilder<S, R1, ?, ?> taskBuilder) {
+        public <R1 extends ManageableResource> B subtask(ManageableResource.Type<R1> childrenType, BaseBuilder<S, R1, ?, ?> taskBuilder) {
             return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
                 // collect all children
-                List<R1> children = new ArrayList<>();
+                final List<R1> children = ManageableResourceUtils.findChildResources(resources, childrenType);
+                // build for all children, and execute
+                final ServerMigrationTask subtask = taskBuilder.build(source, children);
+                if (subtask != null) {
+                    context.execute(subtask);
+                }
+            });
+        }
+
+        public <R1 extends ManageableResource> B subtask(ManageableResource.Type<R1> childrenType, ManageableResourcesSubtaskExecutor<S, R1> subtaskExecutor) {
+            return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
+                // collect all children
+                List<ManageableResources<R1>> children = new ArrayList<>();
                 for (R r : resources) {
-                    children.addAll(r.getChildrenByType(childrenType));
+                    children.addAll(r.findResources(childrenType));
+                }
+                // execute for all children
+                for (ManageableResources<R1> child : children) {
+                    subtaskExecutor.run(source, child, context);
+                }
+            });
+        }
+
+        public <R1 extends ManageableResource> B subtask(ManageableResource.Type<R1> childrenType, ManageableResourcesTask.BaseBuilder<S, R1, ?, ?> taskBuilder) {
+            return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
+                // collect all children
+                List<ManageableResources<R1>> children = new ArrayList<>();
+                for (R resource : resources) {
+                    children.addAll(resource.findResources(childrenType));
                 }
                 // build for all children, and execute
                 final ServerMigrationTask subtask = taskBuilder.build(source, children);
@@ -126,12 +155,11 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Par
         }
 
         public B subtask(final ManageableServerConfigurationSubtaskExecutor<S, ManageableServerConfiguration> subtaskExecutor) {
-            return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
-                // execute per server config, not resources config
-                Set<ManageableServerConfiguration> configs = new HashSet<>();
-                for (R r : resourceManagements) {
-                    configs.add(r.getServerConfiguration());
-                }
+            return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
+                // execute per server config, not resources
+                final Set<ManageableServerConfiguration> configs = resources.stream()
+                        .map(resource -> resource.getServerConfiguration())
+                        .collect(toSet());
                 for (ManageableServerConfiguration config : configs) {
                     subtaskExecutor.run(source, config, context);
                 }
@@ -139,12 +167,11 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Par
         }
 
         public B subtask(final ManageableServerConfigurationTask.BaseBuilder<S, ManageableServerConfiguration, ?, ?> taskBuilder) {
-            return subtask((SubtasksExecutor<S, R>) (source, resourceManagements, context) -> {
-                // build and execute per server config, not resources config
-                Set<ManageableServerConfiguration> configs = new HashSet<>();
-                for (R r : resourceManagements) {
-                    configs.add(r.getServerConfiguration());
-                }
+            return subtask((SubtasksExecutor<S, R>) (source, resources, context) -> {
+                // build and execute per server config, not resources
+                final Set<ManageableServerConfiguration> configs = resources.stream()
+                        .map(resource -> resource.getServerConfiguration())
+                        .collect(toSet());
                 for (ManageableServerConfiguration config : configs) {
                     final ServerMigrationTask subtask = taskBuilder.build(source, config);
                     if (subtask != null) {
@@ -166,15 +193,15 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Par
         public abstract ServerMigrationTask build(S source, List<R> resourceManagements);
     }
 
-    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<S, R, ResourceManagementSubtaskExecutor<S, R>, Builder<S, R>> {
+    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<S, R, ManageableResourceSubtaskExecutor<S, R>, Builder<S, R>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, List<R> resourceManagements) {
-            return new ManageableResourceTask<>(this, source, resourceManagements);
+        public ServerMigrationTask build(S source, List<R> resources) {
+            return new ManageableResourceTask<>(this, source, resources);
         }
     }
 }

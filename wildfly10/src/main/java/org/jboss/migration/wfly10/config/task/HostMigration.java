@@ -20,12 +20,11 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.HostsManagement;
+import org.jboss.migration.wfly10.config.management.HostResources;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedHostConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostsManagementTaskFactory;
@@ -53,7 +52,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
         this.subtaskFactories = Collections.unmodifiableList(builder.subtaskFactories);
     }
 
-    protected ServerMigrationTask getResourceSubtask(final String resourceName, final S source, final HostsManagement resourceManagement) throws Exception {
+    protected ServerMigrationTask getResourceSubtask(final String resourceName, final S source, final HostResources resourceManagement) throws Exception {
         final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(HOST).addAttribute(MIGRATION_REPORT_TASK_ATTR_NAME, resourceName).build();
         return new ServerMigrationTask() {
             @Override
@@ -84,7 +83,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
     }
 
     @Override
-    public ServerMigrationTask getTask(final S source, final HostsManagement hostsManagement) throws Exception {
+    public ServerMigrationTask getTask(final S source, final HostResources hostResources) throws Exception {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(HOSTS).build();
         return new ParentServerMigrationTask.Builder(taskName)
                 .listener(new AbstractServerMigrationTask.Listener() {
@@ -100,8 +99,8 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
                 .subtask(new ParentServerMigrationTask.SubtaskExecutor() {
                     @Override
                     public void executeSubtasks(TaskContext context) throws Exception {
-                        for (String resourceName : hostsManagement.getResourceNames()) {
-                            final ServerMigrationTask subtask = getResourceSubtask(resourceName, source, hostsManagement);
+                        for (String resourceName : hostResources.getResourceNames()) {
+                            final ServerMigrationTask subtask = getResourceSubtask(resourceName, source, hostResources);
                             if (subtask != null) {
                                 context.execute(subtask);
                             }

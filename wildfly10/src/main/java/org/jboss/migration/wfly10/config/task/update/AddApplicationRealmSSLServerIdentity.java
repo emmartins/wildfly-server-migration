@@ -27,7 +27,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
@@ -53,15 +53,15 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> impl
 
     @Override
     public ServerMigrationTask getTask(ServerPath<S> source, StandaloneServerConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getSecurityRealmsManagement(),"jboss.server.config.dir");
+        return getTask(source, configuration.getSecurityRealmResources(),"jboss.server.config.dir");
     }
 
     @Override
     public ServerMigrationTask getTask(ServerPath<S> source, HostConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getSecurityRealmsManagement(), "jboss.domain.config.dir");
+        return getTask(source, configuration.getSecurityRealmResources(), "jboss.domain.config.dir");
     }
 
-    public ServerMigrationTask getTask(ServerPath<S> source, final SecurityRealmsManagement resourcesManagement, final String keystoreRelativeTo) throws Exception {
+    public ServerMigrationTask getTask(ServerPath<S> source, final SecurityRealmResources resourcesManagement, final String keystoreRelativeTo) throws Exception {
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {

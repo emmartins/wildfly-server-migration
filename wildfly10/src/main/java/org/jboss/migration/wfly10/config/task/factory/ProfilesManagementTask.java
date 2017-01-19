@@ -18,30 +18,30 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.ProfilesManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.ProfileResources;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class ProfilesManagementTask<S> extends ManageableResourceTask<S, ProfilesManagement> {
+public class ProfilesManagementTask<S> extends ManageableResourceTask<S, ProfileResources> {
 
-    protected ProfilesManagementTask(Builder<S> builder, S source, ProfilesManagement... resourceManagements) {
+    protected ProfilesManagementTask(Builder<S> builder, S source, ProfileResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ProfilesManagement> {
+    public interface Subtasks<S> extends ManageableResourceSubtaskExecutor<S, ProfileResources> {
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ProfilesManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ProfileResources, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, ProfilesManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, ProfileResources... resourceManagements) {
             return new ProfilesManagementTask<>(this, source, resourceManagements);
         }
     }

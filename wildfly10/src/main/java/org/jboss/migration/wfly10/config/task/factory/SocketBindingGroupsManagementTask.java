@@ -18,30 +18,30 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class SocketBindingGroupsManagementTask<S> extends ManageableResourceTask<S, SocketBindingGroupsManagement> {
+public class SocketBindingGroupsManagementTask<S> extends ManageableResourceTask<S, SocketBindingGroupResources> {
 
-    protected SocketBindingGroupsManagementTask(Builder<S> builder, S source, SocketBindingGroupsManagement... resourceManagements) {
+    protected SocketBindingGroupsManagementTask(Builder<S> builder, S source, SocketBindingGroupResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, SocketBindingGroupsManagement> {
+    public interface Subtasks<S> extends ManageableResourceSubtaskExecutor<S, SocketBindingGroupResources> {
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, SocketBindingGroupsManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, SocketBindingGroupResources, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, SocketBindingGroupsManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, SocketBindingGroupResources... resourceManagements) {
             return new SocketBindingGroupsManagementTask<>(this, source, resourceManagements);
         }
     }

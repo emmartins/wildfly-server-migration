@@ -17,7 +17,6 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
@@ -28,25 +27,24 @@ import org.jboss.migration.wfly10.config.management.ManagementOperationException
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
  */
-public class ManageableResourcesImpl implements ManageableResources {
+public abstract class ManageableResourcesImpl<T extends ManageableResource> implements ManageableResources<T> {
 
     private final ManageableServerConfiguration serverConfiguration;
     protected final PathAddress parentPathAddress;
-    private final String type;
+    private final String pathAddressChildType;
+    private final ManageableResource.Type<T> resourceType;
 
-    public ManageableResourcesImpl(String type, PathAddress parentPathAddress, ManageableServerConfiguration serverConfiguration) {
-        this.type = type;
-        this.parentPathAddress = parentPathAddress;
+    public ManageableResourcesImpl(ManageableResource.Type<T> resourceType, PathAddress parentPathAddress, String pathAddressChildType, ManageableServerConfiguration serverConfiguration) {
+        this.resourceType = resourceType;
+        this.parentPathAddress = parentPathAddress == null ? PathAddress.EMPTY_ADDRESS : parentPathAddress;
+        this.pathAddressChildType = pathAddressChildType;
         this.serverConfiguration = serverConfiguration;
     }
 
@@ -55,21 +53,16 @@ public class ManageableResourcesImpl implements ManageableResources {
         return serverConfiguration;
     }
 
-    protected PathAddress getPathAddress(PathElement... elements) {
-        final PathAddress parentAddress = parentPathAddress;
-        return parentAddress != null ? parentAddress.append(elements) : pathAddress(elements);
-    }
-
     @Override
     public PathAddress getResourcePathAddress(String resourceName) {
-        return getPathAddress(pathElement(type, resourceName));
+        return parentPathAddress.append(pathAddressChildType, resourceName);
     }
 
     @Override
     public Set<String> getResourceNames() throws IOException {
         try {
             final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, parentPathAddress);
-            op.get(CHILD_TYPE).set(type);
+            op.get(CHILD_TYPE).set(pathAddressChildType);
             final ModelNode opResult = serverConfiguration.executeManagementOperation(op);
             Set<String> result = new HashSet<>();
             for (ModelNode resultNode : opResult.get(RESULT).asList()) {
@@ -82,7 +75,7 @@ public class ManageableResourcesImpl implements ManageableResources {
                 final ModelNode opResult = serverConfiguration.executeManagementOperation(op);
                 boolean childrenTypeFound = false;
                 for (ModelNode resultNode : opResult.get(RESULT).asList()) {
-                    if (type.equals(resultNode.asString())) {
+                    if (pathAddressChildType.equals(resultNode.asString())) {
                         childrenTypeFound = true;
                         break;
                     }
@@ -117,12 +110,28 @@ public class ManageableResourcesImpl implements ManageableResources {
     }
 
     @Override
-    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
-        return Collections.emptyList();
+    public ManageableResource.Type<T> getResourceType() {
+        return resourceType;
     }
 
     @Override
-    public <T extends ManageableResource> List<T> findResources(Class<T> resourceType, String resourceName) throws IOException {
-        return Collections.emptyList();
+    public T getResource(String resourceName) throws IOException {
+        return getResourceNames().contains(resourceName) ? getResourceInstance(resourceName) : null;
     }
+
+    @Override
+    public Set<T> getResources() throws IOException {
+        final Set<String> resourceNames = getResourceNames();
+        if (resourceNames.isEmpty()) {
+            return Collections.emptySet();
+        } else {
+            final Set<T> result = new HashSet<>();
+            for (String resourceName : resourceNames) {
+                result.add(getResource(resourceName));
+            }
+            return result;
+        }
+    }
+
+    public abstract T getResourceInstance(String resourceName);
 }

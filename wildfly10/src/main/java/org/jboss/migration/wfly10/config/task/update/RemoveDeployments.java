@@ -20,10 +20,9 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
+import org.jboss.migration.wfly10.config.management.DeploymentResources;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.DeploymentsManagementSubtaskExecutor;
@@ -47,17 +46,17 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
 
     @Override
     public ServerMigrationTask getTask(S source, StandaloneServerConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getDeploymentsManagement());
+        return getTask(source, configuration.getDeploymentResources());
     }
 
     @Override
     public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getDeploymentsManagement());
+        return getTask(source, configuration.getDeploymentResources());
     }
 
-    protected ServerMigrationTask getTask(S source, DeploymentsManagement deploymentsManagement) throws Exception {
+    protected ServerMigrationTask getTask(S source, DeploymentResources deploymentResources) throws Exception {
         return new ParentServerMigrationTask.Builder(TASK_NAME)
-                .subtask(SubtaskExecutorAdapters.of(source, deploymentsManagement, new SubtaskExecutor()))
+                .subtask(SubtaskExecutorAdapters.of(source, deploymentResources, new SubtaskExecutor()))
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(TaskContext context) {
@@ -74,8 +73,8 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
     public static class SubtaskExecutor<S> implements DeploymentsManagementSubtaskExecutor<S> {
         private static final String SUBTASK_NAME_NAME = "remove-deployment";
         @Override
-        public void executeSubtasks(S source, final DeploymentsManagement deploymentsManagement, TaskContext context) throws Exception {
-            for (final String resourceName : deploymentsManagement.getResourceNames()) {
+        public void executeSubtasks(S source, final DeploymentResources deploymentResources, TaskContext context) throws Exception {
+            for (final String resourceName : deploymentResources.getResourceNames()) {
                 final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME)
                         .addAttribute("name", resourceName)
                         .build();
@@ -86,7 +85,7 @@ public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFa
                     }
                     @Override
                     public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                        deploymentsManagement.removeResource(resourceName);
+                        deploymentResources.removeResource(resourceName);
                         context.getLogger().infof("Removed deployment %s", resourceName);
                         return ServerMigrationTaskResult.SUCCESS;
                     }

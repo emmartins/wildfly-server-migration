@@ -20,15 +20,11 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.JVMsManagement;
-import org.jboss.migration.wfly10.config.management.ManageableResources;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.JvmResources;
+import org.jboss.migration.wfly10.config.management.ManagementInterfaceResources;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.HostMigration;
-
-import java.io.IOException;
-import java.util.List;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -41,20 +37,24 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
 
     private final String host;
     private final HostControllerConfiguration hostController;
-    private final SubsystemsManagement subsystemsManagement;
-    private final SecurityRealmsManagement securityRealmsManagement;
-    private final ManagementInterfacesManagement managementInterfacesManagement;
-    private final JVMsManagement JVMsManagement;
+    private final SubsystemResources subsystemResources;
+    private final SecurityRealmResources securityRealmResources;
+    private final ManagementInterfaceResources managementInterfaceResources;
+    private final JvmResources jvmResources;
 
     public EmbeddedHostConfiguration(HostControllerConfiguration hostController, String host) {
         super(hostController.getServer(), pathAddress(pathElement(HOST, host)));
         this.hostController = hostController;
         this.host = host;
-        this.subsystemsManagement = new SubsystemsManagementImpl(pathAddress, this);
-        this.JVMsManagement = new JVMsManagementImpl(pathAddress, this);
+        this.subsystemResources = new SubsystemResourcesImpl(pathAddress, this);
+        addChildResources(subsystemResources);
+        this.jvmResources = new JvmResourcesImpl(pathAddress, this);
+        addChildResources(jvmResources);
         final PathAddress managementCoreServicePathAddress = pathAddress.append(pathElement(CORE_SERVICE, MANAGEMENT));
-        this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
-        this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
+        this.securityRealmResources = new SecurityRealmResourcesImpl(managementCoreServicePathAddress, this);
+        addChildResources(securityRealmResources);
+        this.managementInterfaceResources = new ManagementInterfaceResourcesImpl(managementCoreServicePathAddress, this);
+        addChildResources(managementInterfaceResources);
     }
 
     @Override
@@ -67,23 +67,20 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
         writeConfiguration();
     }
 
-    @Override
-    public SecurityRealmsManagement getSecurityRealmsManagement() {
-        return securityRealmsManagement;
+    public SecurityRealmResources getSecurityRealmResources() {
+        return securityRealmResources;
     }
 
-    @Override
-    public SubsystemsManagement getSubsystemsManagement() {
-        return subsystemsManagement;
+    public SubsystemResources getSubsystemResources() {
+        return subsystemResources;
     }
 
-    public JVMsManagement getJVMsManagement() {
-        return JVMsManagement;
+    public JvmResources getJvmResources() {
+        return jvmResources;
     }
 
-    @Override
-    public ManagementInterfacesManagement getManagementInterfacesManagement() {
-        return managementInterfacesManagement;
+    public ManagementInterfaceResources getManagementInterfaceResources() {
+        return managementInterfaceResources;
     }
 
     @Override
@@ -96,15 +93,5 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
         public EmbeddedHostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) throws Exception {
             return new EmbeddedHostConfiguration(hostController, host);
         }
-    }
-
-    @Override
-    public <T extends ManageableResources> List<T> findResources(Class<T> resourcesType) throws IOException {
-        final List<T> result = super.findResources(resourcesType);
-        findResources(getJVMsManagement(), resourcesType, result);
-        findResources(getManagementInterfacesManagement(), resourcesType, result);
-        findResources(getSecurityRealmsManagement(), resourcesType, result);
-        findResources(getSubsystemsManagement(), resourcesType, result);
-        return result;
     }
 }

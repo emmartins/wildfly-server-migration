@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
 
 /**
  * @author emmartins
  */
-public interface SecurityRealmsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SecurityRealmsManagement> {
+public interface SecurityRealmsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, SecurityRealmResources> {
 }

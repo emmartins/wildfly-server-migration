@@ -24,7 +24,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
@@ -68,19 +68,19 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
     private static final String ENDPOINT = "endpoint";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
+                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
                 // read env properties
                 final String httpAcceptorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_ACCEPTOR_NAME, DEFAULT_HTTP_ACCEPTOR_NAME);
                 final String httpConnectorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_CONNECTOR_NAME, DEFAULT_HTTP_CONNECTOR_NAME);
@@ -88,7 +88,7 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
                 final String undertowHttpListenerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME, DEFAULT_UNDERTOW_HTTP_LISTENER_NAME);
                 final String undertowServerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_SERVER_NAME, DEFAULT_UNDERTOW_SERVER_NAME);
                 // ensure undertow's default http listener is configured
-                final ModelNode undertowConfig = subsystemsManagement.getResourceConfiguration(SubsystemNames.UNDERTOW);
+                final ModelNode undertowConfig = subsystemResources.getResourceConfiguration(SubsystemNames.UNDERTOW);
                 if (undertowConfig == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 } else {

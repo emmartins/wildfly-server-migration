@@ -9,7 +9,7 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S> {
 
-    protected SubsystemConfigurationTask(SubsystemsConfigurationTask.BaseBuilder<S, ?> builder, S source, List<SubsystemsManagement> resourceManagements) {
+    protected SubsystemConfigurationTask(SubsystemsConfigurationTask.BaseBuilder<S, ?> builder, S source, List<SubsystemResources> resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
@@ -32,7 +32,7 @@ public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S
         ModelNode getSubsystemConfiguration() throws IOException;
         String getSubsystemConfigurationName();
         PathAddress getSubsystemConfigurationPathAddress();
-        SubsystemsManagement getSubsystemsConfiguration();
+        SubsystemResources getSubsystemsConfiguration();
         void removeSubsystemConfiguration() throws IOException;
     }
 
@@ -82,18 +82,18 @@ public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S
             super(extension, subsystem, taskName);
         }
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemsManagement> resourceManagements) {
+        public ServerMigrationTask build(S source, List<SubsystemResources> resourceManagements) {
             return new SubsystemConfigurationTask<>(this, source, resourceManagements);
         }
     }
 
     private static class ContextImpl<S> implements Context<S> {
         final String extensionModule;
-        final SubsystemsManagement resourceConfigurations;
+        final SubsystemResources resourceConfigurations;
         final S serverConfigurationSource;
         final String subsystemName;
 
-        ContextImpl(String extension, SubsystemsManagement resourceConfigurations, S serverConfigurationSource, String subsystem) {
+        ContextImpl(String extension, SubsystemResources resourceConfigurations, S serverConfigurationSource, String subsystem) {
             this.extensionModule = extension;
             this.resourceConfigurations = resourceConfigurations;
             this.serverConfigurationSource = serverConfigurationSource;
@@ -131,7 +131,7 @@ public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S
         }
 
         @Override
-        public SubsystemsManagement getSubsystemsConfiguration() {
+        public SubsystemResources getSubsystemsConfiguration() {
             return resourceConfigurations;
         }
 

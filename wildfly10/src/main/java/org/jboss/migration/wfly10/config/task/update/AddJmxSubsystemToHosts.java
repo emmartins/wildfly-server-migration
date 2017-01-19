@@ -22,9 +22,8 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
 import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
@@ -67,8 +66,8 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
         }
 
         @Override
-        protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
-            super.addSubsystem(subsystemsManagement, context);
+        protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
+            super.addSubsystem(subsystemResources, context);
             // add jmx subsystem default config
             /*
             <profile>
@@ -79,8 +78,8 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemTaskFactory<S> {
         </subsystem>
     </profile>
              */
-            final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
-            final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystemName);
+            final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
+            final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
             final ModelNode exposeResolvedModelAddOperation = Util.createAddOperation(subsystemPathAddress.append(PathElement.pathElement(EXPOSE_MODEL, RESOLVED)));
             configurationManagement.executeManagementOperation(exposeResolvedModelAddOperation);
             final ModelNode exposeExpressionModelAddOperation = Util.createAddOperation(subsystemPathAddress.append(PathElement.pathElement(EXPOSE_MODEL, EXPRESSION)));

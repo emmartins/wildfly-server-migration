@@ -28,7 +28,7 @@ import org.jboss.migration.core.console.UserConfirmation;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
@@ -73,19 +73,19 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
     private static final String DATA_SOURCE_JNDI_NAME = "jndi-name";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(final ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(final ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
                 if (config == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
+                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
                 // read env properties
                 final MigrationEnvironment migrationEnvironment = context.getServerMigrationContext().getMigrationEnvironment();
                 final String defaultDataSourceJndiName = taskEnvironment.getPropertyAsString(EnvironmentProperties.DEFAULT_DATA_SOURCE_JNDI_NAME);
@@ -108,15 +108,15 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
                     addOp.get("managed-thread-factory").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
                     taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
                 }
-                setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, subsystemsManagement, context, taskEnvironment, taskResultBuilder);
-                setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, subsystemsManagement, context, taskEnvironment, taskResultBuilder);
+                setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, subsystemResources, context, taskEnvironment, taskResultBuilder);
+                setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, subsystemResources, context, taskEnvironment, taskResultBuilder);
                 configurationManagement.executeManagementOperation(addOp);
                 context.getLogger().infof("Java EE Default Bindings configured.");
                 return taskResultBuilder.sucess().build();
             }
-            private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, SubsystemsManagement subsystemsManagement, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
+            private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, SubsystemResources subsystemResources, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it
-                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(SubsystemNames.MESSAGING_ACTIVEMQ);
+                final ModelNode subsystemConfig = subsystemResources.getResourceConfiguration(SubsystemNames.MESSAGING_ACTIVEMQ);
                 if (subsystemConfig == null) {
                     return;
                 }
@@ -220,9 +220,9 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
                     new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Factory, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Factory: ", resultHandler).execute();
                 }
             }
-            private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, SubsystemsManagement subsystemsManagement, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
+            private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, SubsystemResources subsystemResources, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it
-                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(SubsystemNames.DATASOURCES);
+                final ModelNode subsystemConfig = subsystemResources.getResourceConfiguration(SubsystemNames.DATASOURCES);
                 if (subsystemConfig == null) {
                     return;
                 }

@@ -20,12 +20,11 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -44,15 +43,15 @@ public class WorkaroundForWFLY5520 implements UpdateSubsystemTaskFactory.Subtask
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
+        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
             @Override
             public ServerMigrationTaskName getName() {
                 return SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
+            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
                 // this tmp workaround only needed when migrating into EAP 7.0.0.Beta1
                 if (!configurationManagement.getServer().getProductInfo().getName().equals("EAP") || !configurationManagement.getServer().getProductInfo().getVersion().equals("7.0.0.Beta1")) {
                     return ServerMigrationTaskResult.SKIPPED;
@@ -61,7 +60,7 @@ public class WorkaroundForWFLY5520 implements UpdateSubsystemTaskFactory.Subtask
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 // /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
-                final PathAddress address = subsystemsManagement.getResourcePathAddress(subsystem.getName());
+                final PathAddress address = subsystemResources.getResourcePathAddress(subsystem.getName());
                 ModelNode op = Util.createEmptyOperation(UNDEFINE_ATTRIBUTE_OPERATION, address);
                 op.get(NAME).set("default-clustered-sfsb-cache");
                 configurationManagement.executeManagementOperation(op);

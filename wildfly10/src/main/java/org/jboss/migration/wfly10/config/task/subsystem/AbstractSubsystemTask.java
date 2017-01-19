@@ -22,7 +22,7 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystems.AbstractSubsystemConfigurationTask;
 
 import java.io.IOException;
@@ -35,14 +35,14 @@ public abstract class AbstractSubsystemTask<S> extends AbstractServerMigrationTa
     private final S source;
     private final String extension;
     private final String subsystem;
-    private final SubsystemsManagement subsystemsManagement;
+    private final SubsystemResources subsystemResources;
     private final TaskEnvironment taskEnvironment;
 
     protected AbstractSubsystemTask(ServerMigrationTaskName taskName, AbstractSubsystemConfigurationTask.Context<S> parentContext) {
         this(taskName, parentContext.getSource(), parentContext.getExtension(), parentContext.getSubsystem(), parentContext.getResourcesManagement(), new TaskEnvironment(parentContext.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(parentContext.getSubsystem(), taskName.getName())));
     }
 
-    protected AbstractSubsystemTask(ServerMigrationTaskName taskName, S source, String extension, String subsystem, SubsystemsManagement subsystemsManagement, final TaskEnvironment taskEnvironment) {
+    protected AbstractSubsystemTask(ServerMigrationTaskName taskName, S source, String extension, String subsystem, SubsystemResources subsystemResources, final TaskEnvironment taskEnvironment) {
         super(new AbstractServerMigrationTask.Builder(taskName).skipper(new Skipper() {
             @Override
             public boolean isSkipped(TaskContext context) {
@@ -52,12 +52,12 @@ public abstract class AbstractSubsystemTask<S> extends AbstractServerMigrationTa
         this.source = source;
         this.extension = extension;
         this.subsystem = subsystem;
-        this.subsystemsManagement = subsystemsManagement;
+        this.subsystemResources = subsystemResources;
         this.taskEnvironment = taskEnvironment;
     }
 
     protected ModelNode getConfig() throws IOException {
-        return getSubsystemsManagement().getResourceConfiguration(getSubsystem());
+        return getSubsystemResources().getResourceConfiguration(getSubsystem());
     }
 
     protected String getConfigName() {
@@ -69,14 +69,14 @@ public abstract class AbstractSubsystemTask<S> extends AbstractServerMigrationTa
     }
 
     protected PathAddress getPathAddress() {
-        return getSubsystemsManagement().getResourcePathAddress(getSubsystem());
+        return getSubsystemResources().getResourcePathAddress(getSubsystem());
     }
 
     protected String getSubsystem() {
         return subsystem;
     }
 
-    protected SubsystemsManagement getSubsystemsManagement() {
-        return subsystemsManagement;
+    protected SubsystemResources getSubsystemResources() {
+        return subsystemResources;
     }
 }

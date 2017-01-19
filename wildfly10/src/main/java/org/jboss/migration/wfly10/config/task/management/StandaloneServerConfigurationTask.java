@@ -46,7 +46,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {
-                    subtask.executeSubtasks(source, configuration.getSubsystemsManagement(), taskContext);
+                    subtask.executeSubtasks(source, configuration.getSubsystemResources(), taskContext);
                 }
             });
         }
@@ -55,7 +55,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {
-                    final ServerMigrationTask subtask = subtaskBuilder.build(source, configuration.getSubsystemsManagement());
+                    final ServerMigrationTask subtask = subtaskBuilder.build(source, configuration.getSubsystemResources());
                     if (subtask != null) {
                         taskContext.execute(subtask);
                     }

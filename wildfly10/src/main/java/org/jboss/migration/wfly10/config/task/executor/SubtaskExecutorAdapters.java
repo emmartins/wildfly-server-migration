@@ -19,14 +19,14 @@ package org.jboss.migration.wfly10.config.task.executor;
 import org.jboss.migration.core.ParentServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.TaskContextImpl;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
+import org.jboss.migration.wfly10.config.management.DeploymentResources;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.ProfilesManagement;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
+import org.jboss.migration.wfly10.config.management.ProfileResources;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
 /**
@@ -40,7 +40,7 @@ public class SubtaskExecutorAdapters {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
-                subtaskExecutor.executeSubtasks(source, configuration.getSocketBindingGroupsManagement(), context);
+                subtaskExecutor.executeSubtasks(source, configuration.getSocketBindingGroupResources(), context);
             }
         };
     }
@@ -58,12 +58,12 @@ public class SubtaskExecutorAdapters {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
-                subtaskExecutor.executeSubtasks(source, configuration.getExtensionsManagement(), context);
+                subtaskExecutor.executeSubtasks(source, configuration.getExtensionResources(), context);
             }
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final DeploymentsManagement resourcesManagement, final DeploymentsManagementSubtaskExecutor<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final DeploymentResources resourcesManagement, final DeploymentsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContextImpl context) throws Exception {
@@ -72,7 +72,7 @@ public class SubtaskExecutorAdapters {
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SubsystemsManagement resourcesManagement, final SubsystemsConfigurationSubtasks<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SubsystemResources resourcesManagement, final SubsystemsConfigurationSubtasks<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
@@ -81,7 +81,7 @@ public class SubtaskExecutorAdapters {
         };
     }
 
-    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SecurityRealmsManagement resourcesManagement, final SecurityRealmsManagementSubtaskExecutor<S> subtaskExecutor) {
+    public static <S> ParentServerMigrationTask.SubtaskExecutor of(final S source, final SecurityRealmResources resourcesManagement, final SecurityRealmsManagementSubtaskExecutor<S> subtaskExecutor) {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
@@ -94,7 +94,7 @@ public class SubtaskExecutorAdapters {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
-                subtaskExecutor.executeSubtasks(source, configuration.getSubsystemsManagement(), context);
+                subtaskExecutor.executeSubtasks(source, configuration.getSubsystemResources(), context);
             }
         };
     }
@@ -103,7 +103,7 @@ public class SubtaskExecutorAdapters {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
-                subtaskExecutor.executeSubtasks(source, configuration.getSubsystemsManagement(), context);
+                subtaskExecutor.executeSubtasks(source, configuration.getSubsystemResources(), context);
             }
         };
     }
@@ -112,10 +112,10 @@ public class SubtaskExecutorAdapters {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
-                final ProfilesManagement profilesManagement = configuration.getProfilesManagement();
-                for(String profileName : profilesManagement.getResourceNames()) {
+                final ProfileResources profileResources = configuration.getProfileResources();
+                for(String profileName : profileResources.getResourceNames()) {
                     context.getLogger().debugf("Processing profile %s...", profileName);
-                    subtaskExecutor.executeSubtasks(source, profilesManagement.getProfileManagement(profileName).getSubsystemsManagement(), context);
+                    subtaskExecutor.executeSubtasks(source, profileResources.getResource(profileName).getSubsystemsManagement(), context);
                 }
             }
         };
@@ -125,7 +125,7 @@ public class SubtaskExecutorAdapters {
         return new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(TaskContext context) throws Exception {
-                subtaskExecutor.executeSubtasks(source, configuration.getJVMsManagement(), context);
+                subtaskExecutor.executeSubtasks(source, configuration.getJvmResources(), context);
             }
         };
     }

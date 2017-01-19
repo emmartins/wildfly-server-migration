@@ -22,7 +22,7 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +44,15 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
     /**
      * Post migration processing.
      * @param migrationWarnings the warnings that resulted from doing the migration
-     * @param subsystemsManagement the subsystem management
+     * @param subsystemResources the subsystem management
      * @param context the task context
      * @throws Exception if there was a failure processing the warnings
      */
-    protected void processWarnings(List<String> migrationWarnings, SubsystemsManagement subsystemsManagement, TaskContext context) throws Exception {
+    protected void processWarnings(List<String> migrationWarnings, SubsystemResources subsystemResources, TaskContext context) throws Exception {
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(final SubsystemsManagement subsystemsManagement) {
+    public ServerMigrationTask getServerMigrationTask(final SubsystemResources subsystemResources) {
         final String subsystemName = getName();
         return new ServerMigrationTask() {
             @Override
@@ -65,14 +65,14 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                 if (skipExecution(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(subsystemName);
+                final ModelNode subsystemConfig = subsystemResources.getResourceConfiguration(subsystemName);
                 if (subsystemConfig == null) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 context.getLogger().debugf("Migrating subsystem %s...", subsystemName);
-                final PathAddress address = subsystemsManagement.getResourcePathAddress(subsystemName);
+                final PathAddress address = subsystemResources.getResourcePathAddress(subsystemName);
                 final ModelNode op = Util.createEmptyOperation("migrate", address);
-                final ModelNode result = subsystemsManagement.getServerConfiguration().getModelControllerClient().execute(op);
+                final ModelNode result = subsystemResources.getServerConfiguration().getModelControllerClient().execute(op);
                 context.getLogger().debugf("Op result: %s", result.asString());
                 final String outcome = result.get(OUTCOME).asString();
                 if(!SUCCESS.equals(outcome)) {
@@ -85,7 +85,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                             migrateWarnings.add(modelNode.asString());
                         }
                     }
-                    processWarnings(migrateWarnings, subsystemsManagement, context);
+                    processWarnings(migrateWarnings, subsystemResources, context);
                     if (migrateWarnings.isEmpty()) {
                         context.getLogger().infof("Subsystem %s migrated.", subsystemName);
                     } else {
@@ -93,9 +93,9 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                         resultBuilder.addAttribute("migration-warnings", migrateWarnings);
                     }
                     // FIXME tmp workaround for legacy subsystems which do not remove itself
-                    if (subsystemsManagement.getResourceNames().contains(subsystemName)) {
+                    if (subsystemResources.getResourceNames().contains(subsystemName)) {
                         // remove itself after migration
-                        subsystemsManagement.removeResource(subsystemName);
+                        subsystemResources.removeResource(subsystemName);
                         context.getLogger().debugf("Subsystem %s removed after migration.", subsystemName);
                     }
                     return resultBuilder.build();

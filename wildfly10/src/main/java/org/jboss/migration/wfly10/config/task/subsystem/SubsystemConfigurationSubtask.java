@@ -20,7 +20,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 /**
  * @author emmartins
@@ -51,7 +51,7 @@ public interface SubsystemConfigurationSubtask<S> {
         String getExtension();
         String getSubsystem();
         S getSource();
-        SubsystemsManagement getSubsystemsManagement();
+        SubsystemResources getSubsystemsManagement();
         String getConfigName();
     }
 }

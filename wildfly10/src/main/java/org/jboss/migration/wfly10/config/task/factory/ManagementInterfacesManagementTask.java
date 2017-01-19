@@ -18,30 +18,30 @@ package org.jboss.migration.wfly10.config.task.factory;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.task.executor.ResourceManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.management.ManagementInterfaceResources;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
  * @author emmartins
  */
-public class ManagementInterfacesManagementTask<S> extends ManageableResourceTask<S, ManagementInterfacesManagement> {
+public class ManagementInterfacesManagementTask<S> extends ManageableResourceTask<S, ManagementInterfaceResources> {
 
-    protected ManagementInterfacesManagementTask(Builder<S> builder, S source, ManagementInterfacesManagement... resourceManagements) {
+    protected ManagementInterfacesManagementTask(Builder<S> builder, S source, ManagementInterfaceResources... resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
-    public interface Subtasks<S> extends ResourceManagementSubtaskExecutor<S, ManagementInterfacesManagement> {
+    public interface Subtasks<S> extends ManageableResourceSubtaskExecutor<S, ManagementInterfaceResources> {
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ManagementInterfacesManagement, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ManagementInterfaceResources, Subtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, ManagementInterfacesManagement... resourceManagements) {
+        public ServerMigrationTask build(S source, ManagementInterfaceResources... resourceManagements) {
             return new ManagementInterfacesManagementTask<>(this, source, resourceManagements);
         }
     }

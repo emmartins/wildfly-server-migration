@@ -26,7 +26,7 @@ import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
@@ -109,14 +109,14 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
 
     class SubtaskExecutor<S> implements SubsystemsConfigurationSubtasks<S> {
         @Override
-        public void executeSubtasks(final S source, final SubsystemsManagement subsystemsManagement, final TaskContext context) throws Exception {
-            final String configName = subsystemsManagement.getResourcePathAddress(name).toCLIStyleString();
-            final ModelNode subsystemConfig = subsystemsManagement.getResourceConfiguration(name);
+        public void executeSubtasks(final S source, final SubsystemResources subsystemResources, final TaskContext context) throws Exception {
+            final String configName = subsystemResources.getResourcePathAddress(name).toCLIStyleString();
+            final ModelNode subsystemConfig = subsystemResources.getResourceConfiguration(name);
             if (subsystemConfig != null) {
                 context.getLogger().infof("Updating subsystem %s configuration...", configName);
             }
             for (final SubtaskFactory subsystemMigrationTaskFactory : subsystemMigrationTasks) {
-                context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, UpdateSubsystemTaskFactory.this, subsystemsManagement));
+                context.execute(subsystemMigrationTaskFactory.getServerMigrationTask(subsystemConfig, UpdateSubsystemTaskFactory.this, subsystemResources));
             }
             if (subsystemConfig != null) {
                 context.getLogger().infof("Subsystem %s configuration updated.", configName);
@@ -133,10 +133,10 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
          * Retrieves the server migration task's runnable.
          * @param config the subsystem configuration
          * @param parentTask the parent task
-         * @param subsystemsManagement the target configuration subsystem management
+         * @param subsystemResources the target configuration subsystem management
          * @return
          */
-        ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory parentTask, SubsystemsManagement subsystemsManagement);
+        ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory parentTask, SubsystemResources subsystemResources);
     }
 
     public static class Builder {
@@ -199,12 +199,12 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
     public abstract static class Subtask implements ServerMigrationTask {
         private final ModelNode config;
         private final UpdateSubsystemTaskFactory subsystem;
-        private final SubsystemsManagement subsystemsManagement;
+        private final SubsystemResources subsystemResources;
 
-        protected Subtask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
+        protected Subtask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
             this.config = config;
             this.subsystem = subsystem;
-            this.subsystemsManagement = subsystemsManagement;
+            this.subsystemResources = subsystemResources;
         }
 
         @Override
@@ -214,9 +214,9 @@ public class UpdateSubsystemTaskFactory<S> implements StandaloneServerConfigurat
             if (taskEnvironment.isSkippedByEnvironment()) {
                 return ServerMigrationTaskResult.SKIPPED;
             }
-            return run(config, subsystem, subsystemsManagement, context, taskEnvironment);
+            return run(config, subsystem, subsystemResources, context, taskEnvironment);
         }
 
-        protected abstract ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, TaskContext context, TaskEnvironment taskEnvironment) throws Exception;
+        protected abstract ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception;
     }
 }

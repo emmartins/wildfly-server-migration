@@ -17,7 +17,7 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 /**
  * The factory of a task which is part of a subsystem's migration logic.
@@ -28,8 +28,8 @@ public interface WildFly10SubsystemMigrationTaskFactory {
      * Retrieves the server migration task's runnable.
      * @param config the subsystem configuration
      * @param subsystem the subsystem
-     * @param subsystemsManagement the target configuration subsystem management
+     * @param subsystemResources the target configuration subsystem management
      * @return
      */
-    ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemsManagement subsystemsManagement);
+    ServerMigrationTask getServerMigrationTask(ModelNode config, WildFly10Subsystem subsystem, SubsystemResources subsystemResources);
 }

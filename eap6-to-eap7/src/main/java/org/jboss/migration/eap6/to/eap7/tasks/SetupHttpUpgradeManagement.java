@@ -28,10 +28,10 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
+import org.jboss.migration.wfly10.config.management.ManagementInterfaceResources;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingsManagement;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
+import org.jboss.migration.wfly10.config.management.SocketBindingResources;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ManagementInterfacesManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
@@ -59,8 +59,8 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(final TaskContext context) throws Exception {
-                new SetManagementInterfacesHttpUpgradeEnabled().executeSubtasks(source, configuration.getManagementInterfacesManagement(), context);
-                new UpdateManagementHttpsSocketBindingPort().executeSubtasks(source, configuration.getSocketBindingGroupsManagement(), context);
+                new SetManagementInterfacesHttpUpgradeEnabled().executeSubtasks(source, configuration.getManagementInterfaceResources(), context);
+                new UpdateManagementHttpsSocketBindingPort().executeSubtasks(source, configuration.getSocketBindingGroupResources(), context);
             }
         };
         return getTask(subtaskExecutor);
@@ -72,7 +72,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
             @Override
             public void executeSubtasks(final TaskContext context) throws Exception {
-                new SetManagementInterfacesHttpUpgradeEnabled().executeSubtasks(source, configuration.getManagementInterfacesManagement(), context);
+                new SetManagementInterfacesHttpUpgradeEnabled().executeSubtasks(source, configuration.getManagementInterfaceResources(), context);
             }
         };
         return getTask(subtaskExecutor);
@@ -101,7 +101,7 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         private static final String MANAGEMENT_INTERFACE_NAME = "http-interface";
 
         @Override
-        public void executeSubtasks(final S source, final ManagementInterfacesManagement resourceManagement, final TaskContext context) throws Exception {
+        public void executeSubtasks(final S source, final ManagementInterfaceResources resourceManagement, final TaskContext context) throws Exception {
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {
@@ -153,10 +153,10 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
         private final String SOCKET_BINDING_PORT_ATTR = "port";
 
         @Override
-        public void executeSubtasks(S source, SocketBindingGroupsManagement socketBindingGroupsManagement, TaskContext context) throws Exception {
-            for (String socketBindingGroup : socketBindingGroupsManagement.getResourceNames()) {
-                final SocketBindingGroupManagement socketBindingGroupManagement = socketBindingGroupsManagement.getSocketBindingGroupManagement(socketBindingGroup);
-                final SocketBindingsManagement socketBindingsManagement = socketBindingGroupManagement.getSocketBindingsManagement();
+        public void executeSubtasks(S source, SocketBindingGroupResources socketBindingGroupResources, TaskContext context) throws Exception {
+            for (String socketBindingGroup : socketBindingGroupResources.getResourceNames()) {
+                final SocketBindingGroupManagement socketBindingGroupManagement = socketBindingGroupResources.getSocketBindingGroupManagement(socketBindingGroup);
+                final SocketBindingResources socketBindingResources = socketBindingGroupManagement.getSocketBindingsManagement();
                 final ServerMigrationTask subtask = new ServerMigrationTask() {
                     @Override
                     public ServerMigrationTaskName getName() {
@@ -169,15 +169,15 @@ public class SetupHttpUpgradeManagement<S> implements StandaloneServerConfigurat
                         if (envPropertyPort == null || envPropertyPort.isEmpty()) {
                             envPropertyPort = DEFAULT_PORT;
                         }
-                        if (!socketBindingsManagement.getResourceNames().contains(SOCKET_BINDING_NAME)) {
+                        if (!socketBindingResources.getResourceNames().contains(SOCKET_BINDING_NAME)) {
                             return ServerMigrationTaskResult.SKIPPED;
                         }
                         // management-https binding found, update port
-                        final PathAddress pathAddress = socketBindingsManagement.getResourcePathAddress(SOCKET_BINDING_NAME);
+                        final PathAddress pathAddress = socketBindingResources.getResourcePathAddress(SOCKET_BINDING_NAME);
                         final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
                         writeAttrOp.get(NAME).set(SOCKET_BINDING_PORT_ATTR);
                         writeAttrOp.get(VALUE).set(envPropertyPort);
-                        socketBindingsManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
+                        socketBindingResources.getServerConfiguration().executeManagementOperation(writeAttrOp);
                         context.getLogger().infof("Socket binding '%s' port set to "+envPropertyPort+".", SOCKET_BINDING_NAME);
                         return ServerMigrationTaskResult.SUCCESS;
                     }

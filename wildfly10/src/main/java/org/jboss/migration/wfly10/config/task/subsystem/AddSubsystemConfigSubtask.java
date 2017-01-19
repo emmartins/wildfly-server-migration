@@ -21,7 +21,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystems.AbstractSubsystemConfigurationTask;
 
 /**
@@ -47,8 +47,8 @@ public class AddSubsystemConfigSubtask<S> extends AbstractSubsystemConfiguration
         return ServerMigrationTaskResult.SUCCESS;
     }
 
-    protected void addSubsystem(SubsystemsManagement subsystemsManagement, TaskContext taskContext) throws Exception {
-        final ModelNode op = Util.createAddOperation(subsystemsManagement.getResourcePathAddress(getSubsystem()));
-        subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
+    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext taskContext) throws Exception {
+        final ModelNode op = Util.createAddOperation(subsystemResources.getResourcePathAddress(getSubsystem()));
+        subsystemResources.getServerConfiguration().executeManagementOperation(op);
     }
 }

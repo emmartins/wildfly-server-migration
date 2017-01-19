@@ -21,7 +21,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
+import org.jboss.migration.wfly10.config.management.ExtensionResources;
 
 /**
  * A task which creates an extension if its missing from the server's config.
@@ -34,16 +34,16 @@ public class RemoveExtensionSubtask<S> extends AbstractExtensionSubtask<S> {
     }
 
     @Override
-    protected ServerMigrationTaskName getName(S source, ExtensionsManagement extensionsManagement, TaskContext parentContext) {
+    protected ServerMigrationTaskName getName(S source, ExtensionResources extensionResources, TaskContext parentContext) {
         return new ServerMigrationTaskName.Builder("remove-extension").addAttribute("name", extensionModule).build();
     }
 
     @Override
-    protected ServerMigrationTaskResult runTask(S source, ExtensionsManagement extensionsManagement, TaskContext context) throws Exception {
-        if (extensionsManagement.getResourceNames().contains(extensionModule)) {
+    protected ServerMigrationTaskResult runTask(S source, ExtensionResources extensionResources, TaskContext context) throws Exception {
+        if (extensionResources.getResourceNames().contains(extensionModule)) {
             context.getLogger().debugf("Removing Extension %s...", extensionModule);
-            final ModelNode op = Util.createRemoveOperation(extensionsManagement.getResourcePathAddress(extensionModule));
-            extensionsManagement.getServerConfiguration().executeManagementOperation(op);
+            final ModelNode op = Util.createRemoveOperation(extensionResources.getResourcePathAddress(extensionModule));
+            extensionResources.getServerConfiguration().executeManagementOperation(op);
             context.getLogger().infof("Extension %s removed.",extensionModule);
             return ServerMigrationTaskResult.SUCCESS;
         } else {

@@ -22,9 +22,9 @@ import org.jboss.as.controller.PathAddress;
  * @author emmartins
  */
 public interface HostConfiguration extends ManageableServerConfiguration {
-    SubsystemsManagement getSubsystemsManagement();
-    SecurityRealmsManagement getSecurityRealmsManagement();
-    JVMsManagement getJVMsManagement();
-    ManagementInterfacesManagement getManagementInterfacesManagement();
+    SubsystemResources getSubsystemResources();
+    SecurityRealmResources getSecurityRealmResources();
+    JvmResources getJvmResources();
+    ManagementInterfaceResources getManagementInterfaceResources();
     PathAddress getPathAddress();
 }

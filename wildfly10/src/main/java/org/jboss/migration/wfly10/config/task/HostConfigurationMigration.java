@@ -56,7 +56,7 @@ public class HostConfigurationMigration<S> extends ServerConfigurationMigration<
             builder.subtask(new ManageableServerConfigurationTaskFactory<S, HostControllerConfiguration>() {
                 @Override
                 public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-                    return taskFactory.getTask(source, configuration.getHostsManagement());
+                    return taskFactory.getTask(source, configuration.getHostResources());
                 }
             });
             return this;

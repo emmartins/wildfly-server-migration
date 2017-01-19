@@ -20,4 +20,6 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface SecurityRealmResource extends ManageableResource {
+    ManageableResource.Type TYPE = new BasicManageableResourceType<>(SecurityRealmResource.class);
+
 }

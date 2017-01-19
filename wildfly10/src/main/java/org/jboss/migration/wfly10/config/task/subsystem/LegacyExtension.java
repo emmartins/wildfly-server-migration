@@ -16,8 +16,8 @@
 package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.ExtensionResources;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 import java.io.IOException;
 import java.util.Set;
@@ -32,12 +32,12 @@ public class LegacyExtension extends Extension {
     }
 
     @Override
-    public void migrate(SubsystemsManagement subsystemsManagement, TaskContext context) throws IOException {
-        super.migrate(subsystemsManagement, context);
+    public void migrate(SubsystemResources subsystemResources, TaskContext context) throws IOException {
+        super.migrate(subsystemResources, context);
         // remove extension if none of its subsystems are in config
-        final ExtensionsManagement extensionsManagement = subsystemsManagement.getServerConfiguration().getExtensionsManagement();
-        if (extensionsManagement.getResourceNames().contains(getName())) {
-            final Set<String> subsystems = extensionsManagement.getSubsystems();
+        final ExtensionResources extensionResources = subsystemResources.getServerConfiguration().getExtensionResources();
+        if (extensionResources.getResourceNames().contains(getName())) {
+            final Set<String> subsystems = extensionResources.getSubsystems();
             boolean remove = true;
             for (WildFly10Subsystem subsystem : getSubsystems()) {
                 if (subsystems.contains(subsystem.getName())) {
@@ -46,7 +46,7 @@ public class LegacyExtension extends Extension {
                 }
             }
             if (remove) {
-                extensionsManagement.removeResource(getName());
+                extensionResources.removeResource(getName());
                 context.getLogger().debugf("Extension %s removed.", getName());
             }
         }

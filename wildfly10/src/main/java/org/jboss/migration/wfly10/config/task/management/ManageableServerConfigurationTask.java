@@ -20,6 +20,7 @@ import org.jboss.migration.core.ParentTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResources;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
@@ -88,9 +89,9 @@ public class ManageableServerConfigurationTask<S, T extends ManageableServerConf
             });
         }
 
-        public <R extends ManageableResources> B subtask(Class<R> childrenType, ManageableResourcesTask.BaseBuilder<S, R, ?, ?> taskBuilder) {
+        public <R extends ManageableResource> B subtask(ManageableResource.Type<R> childrenType, ManageableResourcesTask.BaseBuilder<S, R, ?, ?> taskBuilder) {
             return subtask((Subtasks<S, C>) (source, configuration, context) -> {
-                final List<R> children = configuration.findResourcesByType(childrenType);
+                final List<ManageableResources<R>> children = configuration.findResources(childrenType);
                 if (!children.isEmpty()) {
                     final ServerMigrationTask subtask = taskBuilder.build(source, children);
                     if (subtask != null) {
@@ -101,7 +102,7 @@ public class ManageableServerConfigurationTask<S, T extends ManageableServerConf
         }
 
         public B subtask(ExtensionsManagementSubtaskExecutor<S> subtask) {
-            return subtask((Subtasks<S, C>) (source, configuration, taskContext) -> subtask.executeSubtasks(source, configuration.getExtensionsManagement(), taskContext));
+            return subtask((Subtasks<S, C>) (source, configuration, taskContext) -> subtask.run(source, configuration.getExtensionResources(), taskContext));
         }
 
         public abstract ServerMigrationTask build(S source, C configuration);

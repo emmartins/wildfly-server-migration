@@ -30,8 +30,8 @@ import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingsManagement;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
+import org.jboss.migration.wfly10.config.management.SocketBindingResources;
 import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
@@ -77,7 +77,7 @@ public class AddSocketBindingPortExpressions<S> implements ManageableServerConfi
 
     public static class SubtaskExecutor<S> implements SocketBindingGroupsManagementSubtaskExecutor<S> {
         @Override
-        public void executeSubtasks(S source, SocketBindingGroupsManagement resourceManagement, TaskContext context) throws Exception {
+        public void executeSubtasks(S source, SocketBindingGroupResources resourceManagement, TaskContext context) throws Exception {
             for (String socketBindingGroupName : resourceManagement.getResourceNames()) {
                 context.getLogger().debugf("Processing socket binding group %s...", socketBindingGroupName);
                 final SocketBindingGroupManagement socketBindingGroupManagement = resourceManagement.getSocketBindingGroupManagement(socketBindingGroupName);
@@ -98,9 +98,9 @@ public class AddSocketBindingPortExpressions<S> implements ManageableServerConfi
         private final String resourceName;
         private final String propertyName;
         private final ServerMigrationTaskName taskName;
-        private final SocketBindingsManagement resourceManagement;
+        private final SocketBindingResources resourceManagement;
 
-        AddSocketBindingPortExpression(String resourceName, ServerMigrationTaskName taskName, String propertyName, SocketBindingsManagement resourceManagement) {
+        AddSocketBindingPortExpression(String resourceName, ServerMigrationTaskName taskName, String propertyName, SocketBindingResources resourceManagement) {
             this.resourceName = resourceName;
             this.propertyName = propertyName;
             this.resourceManagement = resourceManagement;

@@ -19,7 +19,7 @@ package org.jboss.migration.wfly10.config.task.management.subsystem;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
+import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.management.extension.RemoveExtensionSubtask;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class MigrateSubsystemConfigurationTask<S> extends SubsystemConfigurationTask<S> {
 
-    protected MigrateSubsystemConfigurationTask(Builder<S> builder, S source, List<SubsystemsManagement> resourceManagements) {
+    protected MigrateSubsystemConfigurationTask(Builder<S> builder, S source, List<SubsystemResources> resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
@@ -60,7 +60,7 @@ public class MigrateSubsystemConfigurationTask<S> extends SubsystemConfiguration
         }
 
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemsManagement> resourceManagements) {
+        public ServerMigrationTask build(S source, List<SubsystemResources> resourceManagements) {
             return new MigrateSubsystemConfigurationTask<>(this, source, resourceManagements);
         }
     }
