@@ -20,20 +20,38 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author emmartins
  */
-public interface ManageableResource extends ManageableResourcesParent {
+public interface ManageableResource {
 
+    // resource
     String getResourceName();
     PathAddress getResourcePathAddress();
     ModelNode getResourceConfiguration() throws IOException;
+
+    // children
+    <T extends ManageableResource> T getChildResource(Class<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> Set<T> getChildResources(Class<T> resourceType) throws IOException;
+    Set<Class<? extends ManageableResource>> getChildResourceTypes();
+    Set<String> getChildResourceNames(Class<? extends ManageableResource> resourceType) throws IOException;
+    <T extends ManageableResource> PathAddress getChildResourcePathAddress(Class<T> resourceType, String resourceName);
+    <T extends ManageableResource> Set<T> findChildResources(Class<T> resourceType) throws IOException;
+    <T extends ManageableResource> Set<T> findChildResources(Class<T> resourceType, String resourceName) throws IOException;
+    void removeResource(Class<? extends ManageableResource> resourceType, String resourceName) throws IOException;
+    //ModelNode getResourceConfiguration(String name) throws IOException;
+
+    // parent
+    ManageableResource getParent();
     ManageableServerConfiguration getServerConfiguration();
 
-    //<T extends ManageableResource> Type<T> getResourceType();
+    // TODO move to impl
     interface Type<T extends ManageableResource> {
         Class<T> getType();
         Type<?>[] getChildTypes(boolean recursive);
     }
+
 }
