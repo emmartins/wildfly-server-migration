@@ -23,14 +23,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * A manageable Subsystem configuration.
  * @author emmartins
  */
-public interface JvmResource extends ManageableResource {
+public interface SubsystemConfiguration extends ManageableResource {
+
+    /**
+     * A {@link ManageableResource} which has {@link SubsystemConfiguration} children.
+     */
     interface Parent extends ManageableResource {
-        JvmResource getJvmResource(String resourceName) throws IOException;
-        List<JvmResource> getJvmResources() throws IOException;
-        Set<String> getJvmResourceNames() throws IOException;
-        PathAddress getJvmResourcePathAddress(String resourceName);
-        void removeJvmResource(String resourceName) throws IOException;
+        SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException;
+        List<SubsystemConfiguration> getSubsystemConfigurations() throws IOException;
+        Set<String> getSubsystemConfigurationNames() throws IOException;
+        PathAddress getSubsystemConfigurationPathAddress(String resourceName);
+        void removeSubsystemConfiguration(String resourceName) throws IOException;
     }
 }

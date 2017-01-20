@@ -20,7 +20,9 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
+import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration.Parent;
 import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionSubtask;
 
 import java.util.List;
@@ -30,8 +32,8 @@ import java.util.List;
  */
 public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationTask<S> {
 
-    protected AddSubsystemConfigurationTask(Builder<S> builder, S source, List<SubsystemResources> resourceManagements) {
-        super(builder, source, resourceManagements);
+    protected AddSubsystemConfigurationTask(Builder<S> builder, S source, List<SubsystemConfiguration.Parent> parents) {
+        super(builder, source, parents);
     }
 
     public static class Builder<S> extends SubsystemConfigurationTask.BaseBuilder<S, Builder<S>> {
@@ -56,12 +58,12 @@ public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationTask
                     }
                 }
             });
-            subtask(new AddExtensionSubtask<S>(extension));
+            subtask(ExtensionConfiguration.Parent.class, new AddExtensionSubtask<S>(extension));
             subtask(subtask);
         }
 
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemResources> resourceManagements) {
+        public ServerMigrationTask build(S source, List<SubsystemConfiguration.Parent> resourceManagements) {
             return new AddSubsystemConfigurationTask<>(this, source, resourceManagements);
         }
     }

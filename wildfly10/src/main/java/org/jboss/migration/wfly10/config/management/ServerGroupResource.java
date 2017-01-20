@@ -16,10 +16,21 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import org.jboss.as.controller.PathAddress;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author emmartins
  */
-public interface ServerGroupResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(ServerGroupResource.class, JvmResource.TYPE);
-    JvmResources getJvmResources();
+public interface ServerGroupResource extends ManageableResource, JvmResource.Parent {
+    interface Parent extends ManageableResource {
+        ServerGroupResource getServerGroupResource(String resourceName) throws IOException;
+        List<ServerGroupResource> getServerGroupResources() throws IOException;
+        Set<String> getServerGroupResourceNames() throws IOException;
+        PathAddress getServerGroupResourcePathAddress(String resourceName);
+        void removeServerGroupResource(String resourceName) throws IOException;
+    }
 }

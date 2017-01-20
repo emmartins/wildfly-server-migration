@@ -35,10 +35,8 @@ public interface ManageableServerConfiguration {
     WildFlyServer10 getServer();
     Path resolvePath(String path)  throws IOException, ManagementOperationException;
     ModelControllerClient getModelControllerClient();
-    RootResource getResource();
+    RootResource getRootResource();
 
-    interface RootResource extends ExtensionResource.Parent, InterfaceResource.Parent {
-        ManageableResources<SocketBindingGroupResource> getSocketBindingGroupResources();
-        ManageableResources<SystemPropertyResource> getSystemPropertyResources();
+    interface RootResource extends ManageableResource, ExtensionConfiguration.Parent, InterfaceResource.Parent, SocketBindingGroupResource.Parent, SystemPropertyResource.Parent {
     }
 }

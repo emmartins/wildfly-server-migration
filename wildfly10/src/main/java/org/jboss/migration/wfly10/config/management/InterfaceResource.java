@@ -19,18 +19,18 @@ package org.jboss.migration.wfly10.config.management;
 import org.jboss.as.controller.PathAddress;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
  * @author emmartins
  */
 public interface InterfaceResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(InterfaceResource.class);
     interface Parent extends ManageableResource {
-        InterfaceResource getChildInterfaceResource(String resourceName) throws IOException;
-        Set<InterfaceResource> getChildInterfaceResources() throws IOException;
-        Set<String> getChildInterfaceResourceNames() throws IOException;
-        PathAddress getChildInterfaceResourcePathAddress(String resourceName);
+        InterfaceResource getInterfaceResource(String resourceName) throws IOException;
+        List<InterfaceResource> getInterfaceResources() throws IOException;
+        Set<String> getInterfaceResourceNames() throws IOException;
+        PathAddress getInterfaceResourcePathAddress(String resourceName);
         void removeInterfaceResource(String resourceName) throws IOException;
     }
 }

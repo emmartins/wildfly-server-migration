@@ -16,15 +16,12 @@
 
 package org.jboss.migration.wfly10.config.management;
 
-import org.jboss.as.controller.PathAddress;
-
 /**
  * @author emmartins
  */
 public interface HostConfiguration extends ManageableServerConfiguration {
-    SubsystemResources getSubsystemResources();
-    SecurityRealmResources getSecurityRealmResources();
-    JvmResources getJvmResources();
-    ManagementInterfaceResources getManagementInterfaceResources();
-    PathAddress getPathAddress();
+    @Override
+    RootResource getRootResource();
+    interface RootResource extends ManageableServerConfiguration.RootResource, JvmResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemConfiguration.Parent {
+    }
 }

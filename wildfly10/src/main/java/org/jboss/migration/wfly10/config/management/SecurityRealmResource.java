@@ -16,10 +16,21 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import org.jboss.as.controller.PathAddress;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author emmartins
  */
 public interface SecurityRealmResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(SecurityRealmResource.class);
-
+    interface Parent extends ManageableResource {
+        SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException;
+        List<SecurityRealmResource> getSecurityRealmResources() throws IOException;
+        Set<String> getSecurityRealmResourceNames() throws IOException;
+        PathAddress getSecurityRealmResourcePathAddress(String resourceName);
+        void removeSecurityRealmResource(String resourceName) throws IOException;
+    }
 }

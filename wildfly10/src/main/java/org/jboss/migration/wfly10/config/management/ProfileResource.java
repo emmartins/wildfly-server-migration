@@ -16,10 +16,21 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import org.jboss.as.controller.PathAddress;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author emmartins
  */
-public interface ProfileResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(ProfileResource.class, SubsystemResource.TYPE);
-    SubsystemResources getSubsystemResources();
+public interface ProfileResource extends ManageableResource, SubsystemConfiguration.Parent {
+    interface Parent extends ManageableResource {
+        ProfileResource getProfileResource(String resourceName) throws IOException;
+        List<ProfileResource> getProfileResources() throws IOException;
+        Set<String> getProfileResourceNames() throws IOException;
+        PathAddress getProfileResourcePathAddress(String resourceName);
+        void removeProfileResource(String resourceName) throws IOException;
+    }
 }

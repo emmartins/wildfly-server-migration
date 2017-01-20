@@ -22,16 +22,18 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.ExtensionResources;
-import org.jboss.migration.wfly10.config.management.InterfaceResources;
+import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
+import org.jboss.migration.wfly10.config.management.InterfaceResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
-import org.jboss.migration.wfly10.config.management.SystemPropertyResources;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
+import org.jboss.migration.wfly10.config.management.SystemPropertyResource;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -40,48 +42,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public abstract class AbstractManageableServerConfiguration extends AbstractManageableResourcesParent implements ManageableServerConfiguration {
+public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
 
     private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
-    protected final PathAddress pathAddress;
 
-    private final ExtensionResources extensionResources;
-    private final InterfaceResources interfaceResources;
-    private final SocketBindingGroupResources socketBindingGroupResources;
-    private final SystemPropertyResources systemPropertyResources;
-
-    protected AbstractManageableServerConfiguration(WildFlyServer10 server, PathAddress pathAddress) {
+    protected AbstractManageableServerConfiguration(WildFlyServer10 server) {
         this.server = server;
-        this.pathAddress = pathAddress;
-        extensionResources = new ExtensionResourcesImpl(pathAddress, this);
-        interfaceResources = new InterfaceResourcesImpl(pathAddress, this);
-        socketBindingGroupResources = new SocketBindingGroupResourcesImpl(pathAddress, this);
-        systemPropertyResources = new SystemPropertyResourcesImpl(pathAddress, this);
-        addChildResources(extensionResources);
-        addChildResources(interfaceResources);
-        addChildResources(socketBindingGroupResources);
-        addChildResources(systemPropertyResources);
-    }
-
-    @Override
-    public ExtensionResources getExtensionResources() {
-        return extensionResources;
-    }
-
-    @Override
-    public InterfaceResources getInterfaceResources() {
-        return interfaceResources;
-    }
-
-    @Override
-    public SystemPropertyResources getSystemPropertyResources() {
-        return systemPropertyResources;
-    }
-
-    @Override
-    public SocketBindingGroupResources getSocketBindingGroupResources() {
-        return socketBindingGroupResources;
     }
 
     @Override
@@ -155,12 +122,132 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
     protected void writeConfiguration() {
         // force write of xml config by tmp setting a system property
         final String systemPropertyName = "org.jboss.migration.tmp."+System.nanoTime();
-        final PathAddress pathAddress = getSystemPropertyResources().getResourcePathAddress(systemPropertyName);
+        final PathAddress pathAddress = getRootResource().getSystemPropertyResourcePathAddress(systemPropertyName);
         try {
             executeManagementOperation(Util.createAddOperation(pathAddress));
             executeManagementOperation(Util.createRemoveOperation(pathAddress));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    protected static class RootResource extends ManageableResourceImpl implements ManageableServerConfiguration.RootResource {
+
+        private final ExtensionConfigurationImpl.Factory extensionConfigurations;
+        private final InterfaceResourceImpl.Factory interfaceResources;
+        private final SocketBindingGroupResourceImpl.Factory socketBindingGroupResources;
+        private final SystemPropertyResourceImpl.Factory systemPropertyResources;
+
+        public RootResource(String resourceName, PathAddress pathAddress, ManageableServerConfiguration serverConfiguration) {
+            super(resourceName, pathAddress, null, serverConfiguration);
+            extensionConfigurations = new ExtensionConfigurationImpl.Factory(pathAddress, this, serverConfiguration);
+            interfaceResources = new InterfaceResourceImpl.Factory(pathAddress, this, serverConfiguration);
+            socketBindingGroupResources = new SocketBindingGroupResourceImpl.Factory(pathAddress, this, serverConfiguration);
+            systemPropertyResources = new SystemPropertyResourceImpl.Factory(pathAddress, this, serverConfiguration);
+            addChildResourceFactory(extensionConfigurations);
+            addChildResourceFactory(interfaceResources);
+            addChildResourceFactory(socketBindingGroupResources);
+            addChildResourceFactory(systemPropertyResources);
+        }
+
+        @Override
+        public ExtensionConfiguration getExtensionConfiguration(String resourceName) throws IOException {
+            return extensionConfigurations.getResource(resourceName);
+        }
+
+        @Override
+        public List<ExtensionConfiguration> getExtensionConfigurations() throws IOException {
+            return extensionConfigurations.getResources();
+        }
+
+        @Override
+        public Set<String> getExtensionConfigurationNames() throws IOException {
+            return extensionConfigurations.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getExtensionConfigurationPathAddress(String resourceName) {
+            return extensionConfigurations.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeExtensionConfiguration(String resourceName) throws IOException {
+            extensionConfigurations.removeResource(resourceName);
+        }
+
+        @Override
+        public InterfaceResource getInterfaceResource(String resourceName) throws IOException {
+            return interfaceResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<InterfaceResource> getInterfaceResources() throws IOException {
+            return interfaceResources.getResources();
+        }
+
+        @Override
+        public Set<String> getInterfaceResourceNames() throws IOException {
+            return interfaceResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getInterfaceResourcePathAddress(String resourceName) {
+            return interfaceResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeInterfaceResource(String resourceName) throws IOException {
+            interfaceResources.removeResource(resourceName);
+        }
+
+        @Override
+        public SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException {
+            return socketBindingGroupResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException {
+            return socketBindingGroupResources.getResources();
+        }
+
+        @Override
+        public Set<String> getSocketBindingGroupResourceNames() throws IOException {
+            return socketBindingGroupResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getSocketBindingGroupResourcePathAddress(String resourceName) {
+            return socketBindingGroupResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeSocketBindingGroupResource(String resourceName) throws IOException {
+            socketBindingGroupResources.removeResource(resourceName);
+        }
+
+        @Override
+        public SystemPropertyResource getSystemPropertyResource(String resourceName) throws IOException {
+            return systemPropertyResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<SystemPropertyResource> getSystemPropertyResources() throws IOException {
+            return systemPropertyResources.getResources();
+        }
+
+        @Override
+        public Set<String> getSystemPropertyResourceNames() throws IOException {
+            return systemPropertyResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getSystemPropertyResourcePathAddress(String resourceName) {
+            return systemPropertyResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeSystemPropertyResource(String resourceName) throws IOException {
+            systemPropertyResources.removeResource(resourceName);
         }
     }
 }

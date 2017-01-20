@@ -23,5 +23,5 @@ import org.jboss.migration.wfly10.config.management.ManageableResource;
  * @author emmartins
  */
 public interface ManageableResourceSubtaskExecutor<S, T extends ManageableResource> {
-    void executeSubtasks(S source, T resource, TaskContext context) throws Exception;
+    void run(S source, T resource, TaskContext context) throws Exception;
 }

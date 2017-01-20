@@ -17,24 +17,64 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.JvmResources;
+import org.jboss.migration.wfly10.config.management.JvmResource;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ServerGroupResource;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
 
 /**
  * @author emmartins
  */
 public class ServerGroupResourceImpl extends ManageableResourceImpl implements ServerGroupResource {
 
-    private final JvmResources jvmResources;
-    public ServerGroupResourceImpl(String serverGroupName, PathAddress pathAddress, ManageableServerConfiguration serverConfiguration) {
-        super(serverGroupName, pathAddress, serverConfiguration);
-        jvmResources = new JvmResourcesImpl(pathAddress, serverConfiguration);
-        addChildResources(jvmResources);
+    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(ServerGroupResource.class, JvmResourceImpl.TYPE);
+
+    public static class Factory extends ManageableResourceImpl.Factory<ServerGroupResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
+            super(TYPE, pathAddressBase, SERVER_GROUP, parentResource, serverConfiguration);
+        }
+        @Override
+        public ServerGroupResource newResourceInstance(String resourceName) {
+            return new ServerGroupResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+        }
+    }
+
+    private final JvmResourceImpl.Factory jvmResources;
+
+    private ServerGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
+        super(resourceName, pathAddress, parent, serverConfiguration);
+        jvmResources = new JvmResourceImpl.Factory(pathAddress, this, serverConfiguration);
+        addChildResourceFactory(jvmResources);
     }
 
     @Override
-    public JvmResources getJvmResources() {
-        return jvmResources;
+    public JvmResource getJvmResource(String resourceName) throws IOException {
+        return jvmResources.getResource(resourceName);
+    }
+
+    @Override
+    public List<JvmResource> getJvmResources() throws IOException {
+        return jvmResources.getResources();
+    }
+
+    @Override
+    public Set<String> getJvmResourceNames() throws IOException {
+        return jvmResources.getResourceNames();
+    }
+
+    @Override
+    public PathAddress getJvmResourcePathAddress(String resourceName) {
+        return jvmResources.getResourcePathAddress(resourceName);
+    }
+
+    @Override
+    public void removeJvmResource(String resourceName) throws IOException {
+        jvmResources.removeResource(resourceName);
     }
 }

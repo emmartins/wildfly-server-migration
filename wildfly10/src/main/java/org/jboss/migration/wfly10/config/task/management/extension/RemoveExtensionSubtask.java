@@ -16,12 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.management.extension;
 
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ExtensionResources;
+import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
 
 /**
  * A task which creates an extension if its missing from the server's config.
@@ -34,16 +32,15 @@ public class RemoveExtensionSubtask<S> extends AbstractExtensionSubtask<S> {
     }
 
     @Override
-    protected ServerMigrationTaskName getName(S source, ExtensionResources extensionResources, TaskContext parentContext) {
+    protected ServerMigrationTaskName getName(S source, ExtensionConfiguration.Parent extensionResourceParent, TaskContext parentContext) {
         return new ServerMigrationTaskName.Builder("remove-extension").addAttribute("name", extensionModule).build();
     }
 
     @Override
-    protected ServerMigrationTaskResult runTask(S source, ExtensionResources extensionResources, TaskContext context) throws Exception {
-        if (extensionResources.getResourceNames().contains(extensionModule)) {
+    protected ServerMigrationTaskResult runTask(S source, ExtensionConfiguration.Parent extensionResourceParent, TaskContext context) throws Exception {
+        if (extensionResourceParent.getExtensionConfigurationNames().contains(extensionModule)) {
             context.getLogger().debugf("Removing Extension %s...", extensionModule);
-            final ModelNode op = Util.createRemoveOperation(extensionResources.getResourcePathAddress(extensionModule));
-            extensionResources.getServerConfiguration().executeManagementOperation(op);
+            extensionResourceParent.removeExtensionConfiguration(extensionModule);
             context.getLogger().infof("Extension %s removed.",extensionModule);
             return ServerMigrationTaskResult.SUCCESS;
         } else {

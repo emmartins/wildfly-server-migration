@@ -16,9 +16,21 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import org.jboss.as.controller.PathAddress;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author emmartins
  */
 public interface HostResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(HostResource.class);
+    interface Parent extends ManageableResource {
+        HostResource getHostResource(String resourceName) throws IOException;
+        List<HostResource> getHostResources() throws IOException;
+        Set<String> getHostResourceNames() throws IOException;
+        PathAddress getHostResourcePathAddress(String resourceName);
+        void removeHostResource(String resourceName) throws IOException;
+    }
 }

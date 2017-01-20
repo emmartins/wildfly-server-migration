@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.task.management.subsystem;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 import java.util.List;
@@ -26,13 +26,13 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class SubsystemsConfigurationTask<S> extends ManageableResourceTask<S, SubsystemResources> {
+public class SubsystemConfigurationsTask<S> extends ManageableResourceTask<S, SubsystemConfiguration.Parent> {
 
-    protected SubsystemsConfigurationTask(BaseBuilder<S, ?> builder, S source, List<SubsystemResources> resourceManagements) {
-        super(builder, source, resourceManagements);
+    protected SubsystemConfigurationsTask(BaseBuilder<S, ?> builder, S source, List<SubsystemConfiguration.Parent> parents) {
+        super(builder, source, parents);
     }
 
-    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemResources, SubsystemsConfigurationSubtasks<S>, B> {
+    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration.Parent, SubsystemsConfigurationSubtasks<S>, B> {
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
@@ -43,8 +43,8 @@ public class SubsystemsConfigurationTask<S> extends ManageableResourceTask<S, Su
             super(taskName);
         }
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemResources> resources) {
-            return new SubsystemsConfigurationTask<>(this, source, resources);
+        public ServerMigrationTask build(S source, List<SubsystemConfiguration.Parent> resources) {
+            return new SubsystemConfigurationsTask<>(this, source, resources);
         }
     }
 }

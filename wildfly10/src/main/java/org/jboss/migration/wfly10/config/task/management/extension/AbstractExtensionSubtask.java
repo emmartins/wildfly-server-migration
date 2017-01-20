@@ -21,15 +21,14 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ExtensionResources;
+import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationTask;
 
 /**
  * @author emmartins
  */
-public abstract class AbstractExtensionSubtask<S> implements ExtensionsManagementSubtaskExecutor<S>, ManageableServerConfigurationTask.Subtasks<S, ManageableServerConfiguration> {
+public abstract class AbstractExtensionSubtask<S> implements ExtensionResourcesSubtasks<S>, ManageableServerConfigurationTask.Subtasks<S, ManageableServerConfiguration> {
 
     protected final String extensionModule;
 
@@ -39,24 +38,24 @@ public abstract class AbstractExtensionSubtask<S> implements ExtensionsManagemen
 
     @Override
     public void run(S source, ManageableServerConfiguration configuration, TaskContext parentContext) throws Exception {
-        executeSubtasks(source, configuration.getExtensionResources(), parentContext);
+        run(source, configuration.getRootResource(), parentContext);
     }
 
     @Override
-    public void executeSubtasks(final S source, final ExtensionResources extensionResources, final TaskContext parentContext) throws Exception {
-        final ServerMigrationTaskName taskName = getName(source, extensionResources, parentContext);
+    public void run(S source, ExtensionConfiguration.Parent extensionResourceParent, TaskContext parentContext) throws Exception {
+        final ServerMigrationTaskName taskName = getName(source, extensionResourceParent, parentContext);
         if (taskName != null) {
             final ServerMigrationTask task = new AbstractServerMigrationTask(taskName) {
                 @Override
                 protected ServerMigrationTaskResult runTask(TaskContext context) throws Exception {
-                    return AbstractExtensionSubtask.this.runTask(source, extensionResources, context);
+                    return AbstractExtensionSubtask.this.runTask(source, extensionResourceParent, context);
                 }
             };
             parentContext.execute(task);
         }
     }
 
-    protected abstract ServerMigrationTaskName getName(S source, ExtensionResources extensionResources, TaskContext parentContext);
+    protected abstract ServerMigrationTaskName getName(S source, ExtensionConfiguration.Parent extensionResourceParent, TaskContext parentContext);
 
-    protected abstract ServerMigrationTaskResult runTask(S source, ExtensionResources extensionResources, TaskContext context) throws Exception;
+    protected abstract ServerMigrationTaskResult runTask(S source, ExtensionConfiguration.Parent extensionResourceParent, TaskContext context) throws Exception;
 }

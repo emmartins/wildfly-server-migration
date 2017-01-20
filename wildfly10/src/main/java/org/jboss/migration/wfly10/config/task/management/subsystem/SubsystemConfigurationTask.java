@@ -18,9 +18,9 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S> {
+public class SubsystemConfigurationTask<S> extends SubsystemConfigurationsTask<S> {
 
-    protected SubsystemConfigurationTask(SubsystemsConfigurationTask.BaseBuilder<S, ?> builder, S source, List<SubsystemResources> resourceManagements) {
+    protected SubsystemConfigurationTask(SubsystemConfigurationsTask.BaseBuilder<S, ?> builder, S source, List<SubsystemResources> resourceManagements) {
         super(builder, source, resourceManagements);
     }
 
@@ -41,7 +41,7 @@ public class SubsystemConfigurationTask<S> extends SubsystemsConfigurationTask<S
         ServerMigrationTaskResult run(Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
     }
 
-    protected static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends SubsystemsConfigurationTask.BaseBuilder<S, B> {
+    protected static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends SubsystemConfigurationsTask.BaseBuilder<S, B> {
         private final String extension;
         private final String subsystem;
 

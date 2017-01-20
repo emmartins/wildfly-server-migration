@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.DeploymentResources;
+import org.jboss.migration.wfly10.config.management.DeploymentResource;
 
 /**
  * @author emmartins
  */
-public interface DeploymentsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, DeploymentResources> {
+public interface DeploymentsManagementSubtaskExecutor<S> extends ManageableResourceSubtaskExecutor<S, DeploymentResource.Parent> {
 }

@@ -20,14 +20,17 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.JvmResources;
-import org.jboss.migration.wfly10.config.management.ManagementInterfaceResources;
-import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
+import org.jboss.migration.wfly10.config.management.JvmResource;
+import org.jboss.migration.wfly10.config.management.ManagementInterfaceResource;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.HostMigration;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
@@ -35,26 +38,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EmbeddedHostConfiguration extends AbstractManageableServerConfiguration implements HostConfiguration {
 
-    private final String host;
     private final HostControllerConfiguration hostController;
-    private final SubsystemResources subsystemResources;
-    private final SecurityRealmResources securityRealmResources;
-    private final ManagementInterfaceResources managementInterfaceResources;
-    private final JvmResources jvmResources;
+    private final RootResource rootResource;
 
     public EmbeddedHostConfiguration(HostControllerConfiguration hostController, String host) {
-        super(hostController.getServer(), pathAddress(pathElement(HOST, host)));
+        super(hostController.getServer());
         this.hostController = hostController;
-        this.host = host;
-        this.subsystemResources = new SubsystemResourcesImpl(pathAddress, this);
-        addChildResources(subsystemResources);
-        this.jvmResources = new JvmResourcesImpl(pathAddress, this);
-        addChildResources(jvmResources);
-        final PathAddress managementCoreServicePathAddress = pathAddress.append(pathElement(CORE_SERVICE, MANAGEMENT));
-        this.securityRealmResources = new SecurityRealmResourcesImpl(managementCoreServicePathAddress, this);
-        addChildResources(securityRealmResources);
-        this.managementInterfaceResources = new ManagementInterfaceResourcesImpl(managementCoreServicePathAddress, this);
-        addChildResources(managementInterfaceResources);
+        this.rootResource = new RootResource(host, this);
     }
 
     @Override
@@ -67,31 +57,136 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
         writeConfiguration();
     }
 
-    public SecurityRealmResources getSecurityRealmResources() {
-        return securityRealmResources;
-    }
-
-    public SubsystemResources getSubsystemResources() {
-        return subsystemResources;
-    }
-
-    public JvmResources getJvmResources() {
-        return jvmResources;
-    }
-
-    public ManagementInterfaceResources getManagementInterfaceResources() {
-        return managementInterfaceResources;
-    }
-
-    @Override
-    public PathAddress getPathAddress() {
-        return pathAddress;
-    }
-
     public static class HostConfigFileMigrationFactory implements HostMigration.HostConfigurationProvider {
         @Override
         public EmbeddedHostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) throws Exception {
             return new EmbeddedHostConfiguration(hostController, host);
+        }
+    }
+
+    @Override
+    public RootResource getRootResource() {
+        return rootResource;
+    }
+
+    protected static class RootResource extends AbstractManageableServerConfiguration.RootResource implements HostConfiguration.RootResource {
+
+        private final JvmResourceImpl.Factory jvmResources;
+        private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
+        private final SecurityRealmResourceImpl.Factory securityRealmResources;
+        private final SubsystemConfigurationImpl.Factory subsystemResources;
+
+        protected RootResource(String host, HostConfiguration serverConfiguration) {
+            super(host, pathAddress(HOST, host), serverConfiguration);
+            jvmResources = new JvmResourceImpl.Factory(getResourcePathAddress(), this, serverConfiguration);
+            addChildResourceFactory(jvmResources);
+            subsystemResources = new SubsystemConfigurationImpl.Factory(getResourcePathAddress(), this, serverConfiguration);
+            addChildResourceFactory(subsystemResources);
+            final PathAddress managementCoreServicePathAddress = getResourcePathAddress().append(CORE_SERVICE, MANAGEMENT);
+            managementInterfaceResources = new ManagementInterfaceResourceImpl.Factory(managementCoreServicePathAddress, this, serverConfiguration);
+            addChildResourceFactory(managementInterfaceResources);
+            securityRealmResources = new SecurityRealmResourceImpl.Factory(managementCoreServicePathAddress, this, serverConfiguration);
+            addChildResourceFactory(securityRealmResources);
+        }
+
+        @Override
+        public JvmResource getJvmResource(String resourceName) throws IOException {
+            return jvmResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<JvmResource> getJvmResources() throws IOException {
+            return jvmResources.getResources();
+        }
+
+        @Override
+        public Set<String> getJvmResourceNames() throws IOException {
+            return jvmResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getJvmResourcePathAddress(String resourceName) {
+            return jvmResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeJvmResource(String resourceName) throws IOException {
+            jvmResources.removeResource(resourceName);
+        }
+
+        @Override
+        public ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException {
+            return managementInterfaceResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException {
+            return managementInterfaceResources.getResources();
+        }
+
+        @Override
+        public Set<String> getManagementInterfaceResourceNames() throws IOException {
+            return managementInterfaceResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getManagementInterfaceResourcePathAddress(String resourceName) {
+            return managementInterfaceResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeManagementInterfaceResource(String resourceName) throws IOException {
+            managementInterfaceResources.removeResource(resourceName);
+        }
+
+        @Override
+        public SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException {
+            return securityRealmResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<SecurityRealmResource> getSecurityRealmResources() throws IOException {
+            return securityRealmResources.getResources();
+        }
+
+        @Override
+        public Set<String> getSecurityRealmResourceNames() throws IOException {
+            return securityRealmResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getSecurityRealmResourcePathAddress(String resourceName) {
+            return securityRealmResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeSecurityRealmResource(String resourceName) throws IOException {
+            securityRealmResources.removeResource(resourceName);
+        }
+
+        @Override
+        public SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException {
+            return subsystemResources.getResource(resourceName);
+        }
+
+        @Override
+        public List<SubsystemConfiguration> getSubsystemConfiguration() throws IOException {
+            return subsystemResources.getResources();
+        }
+
+        @Override
+        public Set<String> getSubsystemConfigurationNames() throws IOException {
+            return subsystemResources.getResourceNames();
+        }
+
+        @Override
+        public PathAddress getSubsystemConfigurationPathAddress(String resourceName) {
+            return subsystemResources.getResourcePathAddress(resourceName);
+        }
+
+        @Override
+        public void removeSubsystemConfiguration(String resourceName) throws IOException {
+            subsystemResources.removeResource(resourceName);
         }
     }
 }

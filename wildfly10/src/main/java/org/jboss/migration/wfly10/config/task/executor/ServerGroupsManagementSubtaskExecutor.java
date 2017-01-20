@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.wfly10.config.management.ServerGroupResources;
+import org.jboss.migration.wfly10.config.management.ServerGroupResource;
 
 /**
  * @author emmartins
  */
-public interface ServerGroupsManagementSubtaskExecutor<S> extends ManageableResourcesSubtaskExecutor<S, ServerGroupResources> {
+public interface ServerGroupsManagementSubtaskExecutor<S> extends ManageableResourceSubtaskExecutor<S, ServerGroupResource.Parent> {
 }

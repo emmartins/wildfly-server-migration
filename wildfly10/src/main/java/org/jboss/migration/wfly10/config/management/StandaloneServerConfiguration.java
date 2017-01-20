@@ -20,8 +20,8 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface StandaloneServerConfiguration extends ManageableServerConfiguration {
-    DeploymentResources getDeploymentResources();
-    ManagementInterfaceResources getManagementInterfaceResources();
-    SecurityRealmResources getSecurityRealmResources();
-    SubsystemResources getSubsystemResources();
+    @Override
+    RootResource getRootResource();
+    interface RootResource extends ManageableServerConfiguration.RootResource, DeploymentResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemConfiguration.Parent {
+    }
 }

@@ -19,18 +19,22 @@ package org.jboss.migration.wfly10.config.management;
 import org.jboss.as.controller.PathAddress;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
+ * A manageable Extension configuration.
  * @author emmartins
  */
-public interface ExtensionResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(ExtensionResource.class);
+public interface ExtensionConfiguration extends ManageableResource {
+    /**
+     * A {@link ManageableResource} which has {@link ExtensionConfiguration} children.
+     */
     interface Parent extends ManageableResource {
-        ExtensionResource getChildExtensionResource(String resourceName) throws IOException;
-        Set<ExtensionResource> getChildExtensionResources() throws IOException;
-        Set<String> getChildExtensionResourceNames() throws IOException;
-        <T extends ManageableResource> PathAddress getChildExtensionResourcePathAddress(String resourceName);
-        void removeExtensionResource(String resourceName) throws IOException;
+        ExtensionConfiguration getExtensionConfiguration(String resourceName) throws IOException;
+        List<ExtensionConfiguration> getExtensionConfigurations() throws IOException;
+        Set<String> getExtensionConfigurationNames() throws IOException;
+        PathAddress getExtensionConfigurationPathAddress(String resourceName);
+        void removeExtensionConfiguration(String resourceName) throws IOException;
     }
 }

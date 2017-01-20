@@ -35,12 +35,13 @@ public interface ManageableResource {
 
     // children
     <T extends ManageableResource> T getChildResource(Class<T> resourceType, String resourceName) throws IOException;
-    <T extends ManageableResource> Set<T> getChildResources(Class<T> resourceType) throws IOException;
+    <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) throws IOException;
     Set<Class<? extends ManageableResource>> getChildResourceTypes();
     Set<String> getChildResourceNames(Class<? extends ManageableResource> resourceType) throws IOException;
     <T extends ManageableResource> PathAddress getChildResourcePathAddress(Class<T> resourceType, String resourceName);
-    <T extends ManageableResource> Set<T> findChildResources(Class<T> resourceType) throws IOException;
-    <T extends ManageableResource> Set<T> findChildResources(Class<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> List<T> findChildResources(Class<T> resourceType) throws IOException;
+    <T extends ManageableResource> List<T> findChildResources(Class<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> List<T> findChildResources(Query<T> query) throws IOException;
     void removeResource(Class<? extends ManageableResource> resourceType, String resourceName) throws IOException;
     //ModelNode getResourceConfiguration(String name) throws IOException;
 
@@ -48,10 +49,10 @@ public interface ManageableResource {
     ManageableResource getParent();
     ManageableServerConfiguration getServerConfiguration();
 
-    // TODO move to impl
-    interface Type<T extends ManageableResource> {
-        Class<T> getType();
-        Type<?>[] getChildTypes(boolean recursive);
+    interface Query<T extends ManageableResource> {
+        boolean isRunFromRoot();
+        Class<T> getResourceType();
+        String getResourceName();
+        Query<?> getParent();
     }
-
 }

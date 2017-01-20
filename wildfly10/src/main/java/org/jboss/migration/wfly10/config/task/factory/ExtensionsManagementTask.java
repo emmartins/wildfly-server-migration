@@ -19,7 +19,7 @@ package org.jboss.migration.wfly10.config.task.factory;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.ExtensionResources;
-import org.jboss.migration.wfly10.config.task.executor.ExtensionsManagementSubtaskExecutor;
+import org.jboss.migration.wfly10.config.task.management.extension.ExtensionResourcesSubtasks;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
 /**
@@ -31,7 +31,7 @@ public class ExtensionsManagementTask<S> extends ManageableResourceTask<S, Exten
         super(builder, source, resourceManagements);
     }
 
-    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ExtensionResources, ExtensionsManagementSubtaskExecutor<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableResourceTask.BaseBuilder<S, ExtensionResources, ExtensionResourcesSubtasks<S>, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);

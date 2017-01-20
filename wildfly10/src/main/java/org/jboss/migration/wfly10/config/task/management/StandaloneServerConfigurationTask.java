@@ -21,7 +21,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationTask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConfigurationsTask;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
 /**
@@ -51,7 +51,7 @@ public class StandaloneServerConfigurationTask<S> extends ManageableServerConfig
             });
         }
 
-        public Builder<S> subtask(final SubsystemsConfigurationTask.Builder<S> subtaskBuilder) {
+        public Builder<S> subtask(final SubsystemConfigurationsTask.Builder<S> subtaskBuilder) {
             return subtask(new Subtasks<S>() {
                 @Override
                 public void run(S source, StandaloneServerConfiguration configuration, TaskContext taskContext) throws Exception {

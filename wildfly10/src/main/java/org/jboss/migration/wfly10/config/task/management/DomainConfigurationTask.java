@@ -22,7 +22,7 @@ import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.management.ProfileResources;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationTask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConfigurationsTask;
 import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class DomainConfigurationTask<S> extends ManageableServerConfigurationTas
             });
         }
 
-        public Builder<S> subtask(SubsystemsConfigurationTask.Builder<S> builder) {
+        public Builder<S> subtask(SubsystemConfigurationsTask.Builder<S> builder) {
             return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
                 // replace with non generic resource retriever
                 final List<SubsystemResources> resourceManagements = configuration.getResources(SubsystemResources.class);

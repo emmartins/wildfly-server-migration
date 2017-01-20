@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.management;
+package org.jboss.migration.wfly10.config.task.management.extension;
+
+import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
+import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
 
 /**
  * @author emmartins
  */
-public interface ManagementInterfaceResources extends ManageableResources<ManagementInterfaceResource> {
+public interface ExtensionResourcesSubtasks<S> extends ManageableResourceSubtaskExecutor<S, ExtensionConfiguration.Parent> {
 }

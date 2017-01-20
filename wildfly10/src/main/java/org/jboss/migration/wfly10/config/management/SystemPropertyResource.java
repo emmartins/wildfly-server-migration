@@ -16,9 +16,21 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import org.jboss.as.controller.PathAddress;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author emmartins
  */
 public interface SystemPropertyResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(SystemPropertyResource.class);
+    interface Parent extends ManageableResource {
+        SystemPropertyResource getSystemPropertyResource(String resourceName) throws IOException;
+        List<SystemPropertyResource> getSystemPropertyResources() throws IOException;
+        Set<String> getSystemPropertyResourceNames() throws IOException;
+        PathAddress getSystemPropertyResourcePathAddress(String resourceName);
+        void removeSystemPropertyResource(String resourceName) throws IOException;
+    }
 }

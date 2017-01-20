@@ -17,24 +17,64 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
-import org.jboss.migration.wfly10.config.management.SocketBindingResources;
+import org.jboss.migration.wfly10.config.management.SocketBindingResource;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
 
 /**
  * @author emmartins
  */
 public class SocketBindingGroupResourceImpl extends ManageableResourceImpl implements SocketBindingGroupResource {
-    private final SocketBindingResources socketBindingResources;
 
-    protected SocketBindingGroupResourceImpl(String socketBindingGroupName, PathAddress pathAddress, ManageableServerConfiguration serverConfiguration) {
-        super(socketBindingGroupName, pathAddress, serverConfiguration);
-        socketBindingResources = new SocketBindingResourcesImpl(pathAddress, serverConfiguration);
-        addChildResources(socketBindingResources);
+    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(SocketBindingGroupResource.class, SocketBindingResourceImpl.TYPE);
+
+    public static class Factory extends ManageableResourceImpl.Factory<SocketBindingGroupResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
+            super(TYPE, pathAddressBase, SERVER_GROUP, parentResource, serverConfiguration);
+        }
+        @Override
+        public SocketBindingGroupResource newResourceInstance(String resourceName) {
+            return new SocketBindingGroupResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+        }
+    }
+
+    private final SocketBindingResourceImpl.Factory socketBindingResources;
+
+    private SocketBindingGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
+        super(resourceName, pathAddress, parent, serverConfiguration);
+        socketBindingResources = new SocketBindingResourceImpl.Factory(pathAddress, this, serverConfiguration);
+        addChildResourceFactory(socketBindingResources);
     }
 
     @Override
-    public SocketBindingResources getSocketBindingResources() {
-        return socketBindingResources;
+    public SocketBindingResource getSocketBindingResource(String resourceName) throws IOException {
+        return socketBindingResources.getResource(resourceName);
+    }
+
+    @Override
+    public List<SocketBindingResource> getSocketBindingResources() throws IOException {
+        return socketBindingResources.getResources();
+    }
+
+    @Override
+    public Set<String> getSocketBindingResourceNames() throws IOException {
+        return socketBindingResources.getResourceNames();
+    }
+
+    @Override
+    public PathAddress getSocketBindingResourcePathAddress(String resourceName) {
+        return socketBindingResources.getResourcePathAddress(resourceName);
+    }
+
+    @Override
+    public void removeSocketBindingResource(String resourceName) throws IOException {
+        socketBindingResources.removeResource(resourceName);
     }
 }

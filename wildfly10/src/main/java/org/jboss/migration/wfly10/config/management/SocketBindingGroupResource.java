@@ -16,10 +16,21 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import org.jboss.as.controller.PathAddress;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author emmartins
  */
-public interface SocketBindingGroupResource extends ManageableResource {
-    ManageableResource.Type TYPE = new BasicManageableResourceType<>(SocketBindingGroupResource.class, SocketBindingResource.TYPE);
-    SocketBindingResources getSocketBindingResources();
+public interface SocketBindingGroupResource extends ManageableResource, SocketBindingResource.Parent {
+    interface Parent extends ManageableResource {
+        SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException;
+        List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException;
+        Set<String> getSocketBindingGroupResourceNames() throws IOException;
+        PathAddress getSocketBindingGroupResourcePathAddress(String resourceName);
+        void removeSocketBindingGroupResource(String resourceName) throws IOException;
+    }
 }

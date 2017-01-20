@@ -20,8 +20,8 @@ package org.jboss.migration.wfly10.config.management;
  * @author emmartins
  */
 public interface HostControllerConfiguration extends ManageableServerConfiguration {
-    DeploymentResources getDeploymentResources();
-    HostResources getHostResources();
-    ProfileResources getProfileResources();
-    ServerGroupResources getServerGroupResources();
+    @Override
+    RootResource getRootResource();
+    interface RootResource extends ManageableServerConfiguration.RootResource, DeploymentResource.Parent, HostResource.Parent, ProfileResource.Parent, ServerGroupResource.Parent {
+    }
 }
