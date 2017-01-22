@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface SecurityRealmResource extends ManageableResource {
+
+    Type<SecurityRealmResource> RESOURCE_TYPE = new Type<>(SecurityRealmResource.class);
+
+    @Override
+    default Type<SecurityRealmResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException;
         List<SecurityRealmResource> getSecurityRealmResources() throws IOException;

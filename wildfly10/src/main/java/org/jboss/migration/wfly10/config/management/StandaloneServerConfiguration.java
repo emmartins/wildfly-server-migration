@@ -19,9 +19,12 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface StandaloneServerConfiguration extends ManageableServerConfiguration {
+public interface StandaloneServerConfiguration extends ManageableServerConfiguration, DeploymentResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemConfiguration.Parent {
+
+    Type<StandaloneServerConfiguration> RESOURCE_TYPE = new Type<>(StandaloneServerConfiguration.class, DeploymentResource.RESOURCE_TYPE, ManagementInterfaceResource.RESOURCE_TYPE, SecurityRealmResource.RESOURCE_TYPE, SubsystemConfiguration.RESOURCE_TYPE);
+
     @Override
-    RootResource getRootResource();
-    interface RootResource extends ManageableServerConfiguration.RootResource, DeploymentResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemConfiguration.Parent {
+    default Type<StandaloneServerConfiguration> getResourceType() {
+        return RESOURCE_TYPE;
     }
 }

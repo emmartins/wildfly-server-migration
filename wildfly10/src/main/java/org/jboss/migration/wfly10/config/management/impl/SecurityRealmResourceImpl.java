@@ -10,21 +10,20 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SEC
 /**
  * @author emmartins
  */
-public class SecurityRealmResourceImpl extends ManageableResourceImpl implements SecurityRealmResource {
+public class SecurityRealmResourceImpl extends AbstractManageableResource implements SecurityRealmResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(SecurityRealmResource.class);
 
-    private SecurityRealmResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
+    private SecurityRealmResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends ManageableResourceImpl.Factory<SecurityRealmResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, SECURITY_REALM, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<SecurityRealmResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, SECURITY_REALM, parentResource);
         }
         @Override
         public SecurityRealmResource newResourceInstance(String resourceName) {
-            return new SecurityRealmResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new SecurityRealmResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 }

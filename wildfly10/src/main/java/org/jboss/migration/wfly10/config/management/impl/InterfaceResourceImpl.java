@@ -10,21 +10,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INT
 /**
  * @author emmartins
  */
-public class InterfaceResourceImpl extends ManageableResourceImpl implements InterfaceResource {
+public class InterfaceResourceImpl extends AbstractManageableResource implements InterfaceResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(InterfaceResource.class);
-
-    private InterfaceResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
+    private InterfaceResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends ManageableResourceImpl.Factory<InterfaceResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, INTERFACE, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<InterfaceResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, INTERFACE, parentResource);
         }
         @Override
         public InterfaceResource newResourceInstance(String resourceName) {
-            return new InterfaceResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new InterfaceResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 }

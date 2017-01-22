@@ -21,18 +21,18 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author emmartins
  */
-public class SubsystemConfigurationsTask<S> extends ManageableResourceTask<S, SubsystemConfiguration.Parent> {
+public class SubsystemConfigurationParentTask<S> extends ManageableResourceTask<S, SubsystemConfiguration.Parent> {
 
-    protected SubsystemConfigurationsTask(BaseBuilder<S, ?> builder, S source, List<SubsystemConfiguration.Parent> parents) {
-        super(builder, source, parents);
+    protected SubsystemConfigurationParentTask(ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration.Parent, ?> builder, S source, Collection<? extends SubsystemConfiguration.Parent> manageableResources) {
+        super(builder, source, manageableResources);
     }
 
-    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration.Parent, SubsystemsConfigurationSubtasks<S>, B> {
+    public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration.Parent, B> {
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
@@ -42,9 +42,10 @@ public class SubsystemConfigurationsTask<S> extends ManageableResourceTask<S, Su
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
+
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemConfiguration.Parent> resources) {
-            return new SubsystemConfigurationsTask<>(this, source, resources);
+        public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration.Parent> resources) {
+            return new SubsystemConfigurationParentTask<>(this, source, resources);
         }
     }
 }

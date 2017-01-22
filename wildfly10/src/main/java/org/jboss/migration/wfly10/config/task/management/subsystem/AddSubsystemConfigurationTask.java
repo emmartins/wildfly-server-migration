@@ -63,8 +63,8 @@ public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationTask
         }
 
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemConfiguration.Parent> resourceManagements) {
-            return new AddSubsystemConfigurationTask<>(this, source, resourceManagements);
+        public ServerMigrationTask build(S source, List<SubsystemConfiguration.Parent> resources) {
+            return new AddSubsystemConfigurationTask<>(this, source, resources);
         }
     }
 }

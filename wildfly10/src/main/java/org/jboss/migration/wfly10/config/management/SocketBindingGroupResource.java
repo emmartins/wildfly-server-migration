@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface SocketBindingGroupResource extends ManageableResource, SocketBindingResource.Parent {
+
+    Type<SocketBindingGroupResource> RESOURCE_TYPE = new Type<>(SocketBindingGroupResource.class, SocketBindingResource.RESOURCE_TYPE);
+
+    @Override
+    default Type<SocketBindingGroupResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException;
         List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException;

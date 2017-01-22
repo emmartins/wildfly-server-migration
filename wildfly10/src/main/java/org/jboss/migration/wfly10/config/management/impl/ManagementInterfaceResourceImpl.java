@@ -10,20 +10,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MAN
 /**
  * @author emmartins
  */
-public class ManagementInterfaceResourceImpl extends ManageableResourceImpl implements ManagementInterfaceResource {
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(ManagementInterfaceResource.class);
+public class ManagementInterfaceResourceImpl extends AbstractManageableResource implements ManagementInterfaceResource {
 
-    private ManagementInterfaceResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
+    private ManagementInterfaceResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends ManageableResourceImpl.Factory<ManagementInterfaceResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, MANAGEMENT_INTERFACE, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<ManagementInterfaceResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, MANAGEMENT_INTERFACE, parentResource);
         }
         @Override
         public ManagementInterfaceResource newResourceInstance(String resourceName) {
-            return new ManagementInterfaceResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new ManagementInterfaceResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 }

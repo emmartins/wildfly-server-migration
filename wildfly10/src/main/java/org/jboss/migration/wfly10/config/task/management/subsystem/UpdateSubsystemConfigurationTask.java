@@ -20,20 +20,22 @@ import org.jboss.migration.core.AbstractServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author emmartins
  */
 public class UpdateSubsystemConfigurationTask<S> extends SubsystemConfigurationTask<S> {
 
-    protected UpdateSubsystemConfigurationTask(Builder<S> builder, S source, List<SubsystemResources> resourceManagements) {
-        super(builder, source, resourceManagements);
+    public UpdateSubsystemConfigurationTask(ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration, ?> builder, S source, Collection<? extends SubsystemConfiguration> manageableResources) {
+        super(builder, source, manageableResources);
     }
 
     public static class Builder<S> extends SubsystemConfigurationTask.BaseBuilder<S, Builder<S>> {
+
         public Builder(final String extension, final String subsystem) {
             super(extension, subsystem, new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
             listener(new AbstractServerMigrationTask.Listener() {
@@ -52,9 +54,11 @@ public class UpdateSubsystemConfigurationTask<S> extends SubsystemConfigurationT
             });
         }
 
+
+
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemResources> resourceManagements) {
-            return new UpdateSubsystemConfigurationTask<>(this, source, resourceManagements);
+        public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration> manageableResources) {
+            return new UpdateSubsystemConfigurationTask<>(this, source, manageableResources);
         }
     }
 }

@@ -19,56 +19,30 @@ package org.jboss.migration.wfly10.config.task.management;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.ProfileResource;
-import org.jboss.migration.wfly10.config.management.ProfileResources;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConfigurationsTask;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author emmartins
  */
 public class DomainConfigurationTask<S> extends ManageableServerConfigurationTask<S, HostControllerConfiguration> {
 
-    protected DomainConfigurationTask(Builder<S> builder, S source, HostControllerConfiguration configuration) {
-        super(builder, source, configuration);
+    protected DomainConfigurationTask(BaseBuilder<S, HostControllerConfiguration, ?> builder, S source, Collection<? extends HostControllerConfiguration> resources) {
+        super(builder, source, resources);
     }
 
-    public interface Subtasks<S> extends ManageableServerConfigurationTask.Subtasks<S, HostControllerConfiguration> {
+    public interface SubtaskExecutor<S> extends ManageableServerConfigurationTask.SubtaskExecutor<S, HostControllerConfiguration> {
     }
 
-    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, HostControllerConfiguration, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, HostControllerConfiguration, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
-        public Builder<S> subtask(SubsystemsConfigurationSubtasks<S> subtask) {
-            return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
-                final ProfileResources profileResources = configuration.getProfileResources();
-                for (String profileNames : profileResources.getResourceNames()) {
-                    final ProfileResource profileResource = profileResources.getResource(profileNames);
-                    subtask.executeSubtasks(source, profileResource.getSubsystemsManagement(), taskContext);
-                }
-            });
-        }
-
-        public Builder<S> subtask(SubsystemConfigurationsTask.Builder<S> builder) {
-            return subtask((Subtasks<S>) (source, configuration, taskContext) -> {
-                // replace with non generic resource retriever
-                final List<SubsystemResources> resourceManagements = configuration.getResources(SubsystemResources.class);
-                final ServerMigrationTask subtask = builder.build(source, resourceManagements);
-                if (subtask != null) {
-                    taskContext.execute(subtask);
-                }
-            });
-        }
-
         @Override
-        public ServerMigrationTask build(S source, HostControllerConfiguration configuration) {
-            return new DomainConfigurationTask<>(this, source, configuration);
+        public ServerMigrationTask build(S source, Collection<? extends HostControllerConfiguration> resources) {
+            return new DomainConfigurationTask<>(this, source, resources);
         }
     }
 }

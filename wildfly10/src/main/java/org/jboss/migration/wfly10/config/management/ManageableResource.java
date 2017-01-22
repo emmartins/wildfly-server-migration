@@ -22,6 +22,9 @@ import org.jboss.dmr.ModelNode;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author emmartins
@@ -29,30 +32,57 @@ import java.util.Set;
 public interface ManageableResource {
 
     // resource
+    <T extends ManageableResource> Type<T> getResourceType();
     String getResourceName();
     PathAddress getResourcePathAddress();
     ModelNode getResourceConfiguration() throws IOException;
 
     // children
-    <T extends ManageableResource> T getChildResource(Class<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) throws IOException;
     <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) throws IOException;
-    Set<Class<? extends ManageableResource>> getChildResourceTypes();
-    Set<String> getChildResourceNames(Class<? extends ManageableResource> resourceType) throws IOException;
-    <T extends ManageableResource> PathAddress getChildResourcePathAddress(Class<T> resourceType, String resourceName);
-    <T extends ManageableResource> List<T> findChildResources(Class<T> resourceType) throws IOException;
-    <T extends ManageableResource> List<T> findChildResources(Class<T> resourceType, String resourceName) throws IOException;
-    <T extends ManageableResource> List<T> findChildResources(Query<T> query) throws IOException;
-    void removeResource(Class<? extends ManageableResource> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) throws IOException;
+    Set<Type<?>> getChildResourceTypes();
+    Set<String> getChildResourceNames(Type<?> resourceType) throws IOException;
+    <T extends ManageableResource> PathAddress getChildResourcePathAddress(Type<T> resourceType, String resourceName);
+    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) throws IOException;
+    <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) throws IOException;
+    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) throws IOException;
+
+    void removeResource(Type<?> resourceType, String resourceName) throws IOException;
     //ModelNode getResourceConfiguration(String name) throws IOException;
 
     // parent
-    ManageableResource getParent();
+    ManageableResource getParentResource();
     ManageableServerConfiguration getServerConfiguration();
 
-    interface Query<T extends ManageableResource> {
-        boolean isRunFromRoot();
-        Class<T> getResourceType();
-        String getResourceName();
-        Query<?> getParent();
+    class Type<T extends ManageableResource> {
+
+        private final Class<T> type;
+        private final Set<Type<?>> childTypes;
+        private final Set<Type<?>> descendantTypes;
+
+        protected Type(Class<T> type, Type<?>... childTypes) {
+            this.type = type;
+            final Stream<Type<?>> childTypesStream = Stream.of(childTypes);
+            this.childTypes = childTypesStream.collect(toSet());
+            this.descendantTypes = childTypesStream
+                    .flatMap(childType -> Stream.concat(Stream.of(childType), childType.getDescendantTypes().stream()))
+                    .collect(toSet());
+        }
+
+        public Class<T> getType() {
+            return type;
+        }
+
+        public Set<Type<?>> getChildTypes() {
+            return childTypes;
+        }
+
+        public Set<Type<?>> getDescendantTypes() {
+            return descendantTypes;
+        }
     }
+
 }

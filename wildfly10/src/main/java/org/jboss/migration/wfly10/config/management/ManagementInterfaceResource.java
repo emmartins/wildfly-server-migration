@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface ManagementInterfaceResource extends ManageableResource {
+
+    Type<ManagementInterfaceResource> RESOURCE_TYPE = new Type<>(ManagementInterfaceResource.class);
+
+    @Override
+    default Type<ManagementInterfaceResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException;
         List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException;

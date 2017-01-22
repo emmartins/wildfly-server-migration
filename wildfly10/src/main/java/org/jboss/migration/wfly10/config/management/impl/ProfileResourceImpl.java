@@ -31,25 +31,23 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PRO
 /**
  * @author emmartins
  */
-public class ProfileResourceImpl extends ManageableResourceImpl implements ProfileResource {
+public class ProfileResourceImpl extends AbstractManageableResource implements ProfileResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(ProfileResource.class, SubsystemConfigurationImpl.TYPE);
-
-    public static class Factory extends ManageableResourceImpl.Factory<ProfileResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, PROFILE, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<ProfileResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, PROFILE, parentResource);
         }
         @Override
         public ProfileResource newResourceInstance(String resourceName) {
-            return new ProfileResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new ProfileResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 
     private final SubsystemConfigurationImpl.Factory subsystemResources;
 
-    private ProfileResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
-        subsystemResources = new SubsystemConfigurationImpl.Factory(pathAddress, this, serverConfiguration);
+    private ProfileResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
+        subsystemResources = new SubsystemConfigurationImpl.Factory(pathAddress, this);
         addChildResourceFactory(subsystemResources);
     }
 
@@ -59,7 +57,7 @@ public class ProfileResourceImpl extends ManageableResourceImpl implements Profi
     }
 
     @Override
-    public List<SubsystemConfiguration> getSubsystemConfiguration() throws IOException {
+    public List<SubsystemConfiguration> getSubsystemConfigurations() throws IOException {
         return subsystemResources.getResources();
     }
 

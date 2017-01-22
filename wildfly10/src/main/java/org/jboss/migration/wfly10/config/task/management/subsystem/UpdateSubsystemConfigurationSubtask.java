@@ -21,6 +21,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 
 /**
  * @author emmartins
@@ -28,21 +29,21 @@ import org.jboss.migration.core.env.TaskEnvironment;
 public abstract class UpdateSubsystemConfigurationSubtask<S> implements SubsystemConfigurationTask.Subtask<S> {
 
     @Override
-    public abstract ServerMigrationTaskName getName(SubsystemConfigurationTask.Context<S> parentContext);
+    public abstract ServerMigrationTaskName getName(SubsystemConfiguration subsystemConfiguration, TaskContext parentContext);
 
     @Override
-    public ServerMigrationTaskResult run(SubsystemConfigurationTask.Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
-        final String configName = parentContext.getSubsystemConfigurationName();
-        final ModelNode config = parentContext.getSubsystemConfiguration();
+    public ServerMigrationTaskResult run(SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
+        final String configName = subsystemConfiguration.getResourcePathAddress().toCLIStyleString();
+        final ModelNode config = subsystemConfiguration.getResourceConfiguration();
         if (config == null) {
             taskContext.getLogger().infof("Skipped subsystem config %s update, not found.", configName);
             return ServerMigrationTaskResult.SKIPPED;
         }
-        taskContext.getLogger().debugf("Updating subsystem config %s...", parentContext.getSubsystemConfigurationName());
-        final ServerMigrationTaskResult taskResult = updateConfiguration(config, parentContext, taskContext, taskEnvironment);
+        taskContext.getLogger().debugf("Updating subsystem config %s...", configName);
+        final ServerMigrationTaskResult taskResult = updateConfiguration(config, subsystemConfiguration, taskContext, taskEnvironment);
         taskContext.getLogger().infof("Subsystem config %s updated.", configName);
         return taskResult;
     }
 
-    protected abstract ServerMigrationTaskResult updateConfiguration(ModelNode config, SubsystemConfigurationTask.Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
+    protected abstract ServerMigrationTaskResult updateConfiguration(ModelNode config, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
 }

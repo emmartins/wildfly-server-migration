@@ -31,25 +31,23 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
 /**
  * @author emmartins
  */
-public class ServerGroupResourceImpl extends ManageableResourceImpl implements ServerGroupResource {
+public class ServerGroupResourceImpl extends AbstractManageableResource implements ServerGroupResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(ServerGroupResource.class, JvmResourceImpl.TYPE);
-
-    public static class Factory extends ManageableResourceImpl.Factory<ServerGroupResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, SERVER_GROUP, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<ServerGroupResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, SERVER_GROUP, parentResource);
         }
         @Override
         public ServerGroupResource newResourceInstance(String resourceName) {
-            return new ServerGroupResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new ServerGroupResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 
     private final JvmResourceImpl.Factory jvmResources;
 
-    private ServerGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
-        jvmResources = new JvmResourceImpl.Factory(pathAddress, this, serverConfiguration);
+    private ServerGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
+        jvmResources = new JvmResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(jvmResources);
     }
 

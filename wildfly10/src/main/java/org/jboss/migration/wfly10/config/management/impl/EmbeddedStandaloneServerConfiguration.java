@@ -44,12 +44,24 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
 
     private final String config;
     private StandaloneServer standaloneServer;
-    private final RootResource rootResource;
+
+    private final DeploymentResourceImpl.Factory deploymentResources;
+    private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
+    private final SecurityRealmResourceImpl.Factory securityRealmResources;
+    private final SubsystemConfigurationImpl.Factory subsystemResources;
 
     public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
-        super(server);
+        super("", PathAddress.EMPTY_ADDRESS, server);
         this.config = config;
-        this.rootResource = new RootResource(this);
+        deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(deploymentResources);
+        subsystemResources = new SubsystemConfigurationImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(subsystemResources);
+        final PathAddress managementCoreServicePathAddress = getResourcePathAddress().append(CORE_SERVICE, MANAGEMENT);
+        managementInterfaceResources = new ManagementInterfaceResourceImpl.Factory(managementCoreServicePathAddress, this);
+        addChildResourceFactory(managementInterfaceResources);
+        securityRealmResources = new SecurityRealmResourceImpl.Factory(managementCoreServicePathAddress, this);
+        addChildResourceFactory(securityRealmResources);
     }
 
     @Override
@@ -72,6 +84,106 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         standaloneServer = null;
     }
 
+    @Override
+    public DeploymentResource getDeploymentResource(String resourceName) throws IOException {
+        return deploymentResources.getResource(resourceName);
+    }
+
+    @Override
+    public List<DeploymentResource> getDeploymentResources() throws IOException {
+        return deploymentResources.getResources();
+    }
+
+    @Override
+    public Set<String> getDeploymentResourceNames() throws IOException {
+        return deploymentResources.getResourceNames();
+    }
+
+    @Override
+    public PathAddress getDeploymentResourcePathAddress(String resourceName) {
+        return deploymentResources.getResourcePathAddress(resourceName);
+    }
+
+    @Override
+    public void removeDeploymentResource(String resourceName) throws IOException {
+        deploymentResources.removeResource(resourceName);
+    }
+
+    @Override
+    public ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException {
+        return managementInterfaceResources.getResource(resourceName);
+    }
+
+    @Override
+    public List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException {
+        return managementInterfaceResources.getResources();
+    }
+
+    @Override
+    public Set<String> getManagementInterfaceResourceNames() throws IOException {
+        return managementInterfaceResources.getResourceNames();
+    }
+
+    @Override
+    public PathAddress getManagementInterfaceResourcePathAddress(String resourceName) {
+        return managementInterfaceResources.getResourcePathAddress(resourceName);
+    }
+
+    @Override
+    public void removeManagementInterfaceResource(String resourceName) throws IOException {
+        managementInterfaceResources.removeResource(resourceName);
+    }
+
+    @Override
+    public SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException {
+        return securityRealmResources.getResource(resourceName);
+    }
+
+    @Override
+    public List<SecurityRealmResource> getSecurityRealmResources() throws IOException {
+        return securityRealmResources.getResources();
+    }
+
+    @Override
+    public Set<String> getSecurityRealmResourceNames() throws IOException {
+        return securityRealmResources.getResourceNames();
+    }
+
+    @Override
+    public PathAddress getSecurityRealmResourcePathAddress(String resourceName) {
+        return securityRealmResources.getResourcePathAddress(resourceName);
+    }
+
+    @Override
+    public void removeSecurityRealmResource(String resourceName) throws IOException {
+        securityRealmResources.removeResource(resourceName);
+    }
+
+    @Override
+    public SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException {
+        return subsystemResources.getResource(resourceName);
+    }
+
+    @Override
+    public List<SubsystemConfiguration> getSubsystemConfigurations() throws IOException {
+        return subsystemResources.getResources();
+    }
+
+    @Override
+    public Set<String> getSubsystemConfigurationNames() throws IOException {
+        return subsystemResources.getResourceNames();
+    }
+
+    @Override
+    public PathAddress getSubsystemConfigurationPathAddress(String resourceName) {
+        return subsystemResources.getResourcePathAddress(resourceName);
+    }
+
+    @Override
+    public void removeSubsystemConfiguration(String resourceName) throws IOException {
+        subsystemResources.removeResource(resourceName);
+    }
+
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
         public StandaloneServerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
@@ -79,129 +191,5 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         }
     }
 
-    @Override
-    public RootResource getRootResource() {
-        return rootResource;
-    }
 
-    protected static class RootResource extends AbstractManageableServerConfiguration.RootResource implements StandaloneServerConfiguration.RootResource {
-
-        private final DeploymentResourceImpl.Factory deploymentResources;
-        private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
-        private final SecurityRealmResourceImpl.Factory securityRealmResources;
-        private final SubsystemConfigurationImpl.Factory subsystemResources;
-
-        protected RootResource(StandaloneServerConfiguration serverConfiguration) {
-            super("", PathAddress.EMPTY_ADDRESS, serverConfiguration);
-            deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this, serverConfiguration);
-            addChildResourceFactory(deploymentResources);
-            subsystemResources = new SubsystemConfigurationImpl.Factory(getResourcePathAddress(), this, serverConfiguration);
-            addChildResourceFactory(subsystemResources);
-            final PathAddress managementCoreServicePathAddress = getResourcePathAddress().append(CORE_SERVICE, MANAGEMENT);
-            managementInterfaceResources = new ManagementInterfaceResourceImpl.Factory(managementCoreServicePathAddress, this, serverConfiguration);
-            addChildResourceFactory(managementInterfaceResources);
-            securityRealmResources = new SecurityRealmResourceImpl.Factory(managementCoreServicePathAddress, this, serverConfiguration);
-            addChildResourceFactory(securityRealmResources);
-        }
-
-        @Override
-        public DeploymentResource getDeploymentResource(String resourceName) throws IOException {
-            return deploymentResources.getResource(resourceName);
-        }
-
-        @Override
-        public List<DeploymentResource> getDeploymentResources() throws IOException {
-            return deploymentResources.getResources();
-        }
-
-        @Override
-        public Set<String> getDeploymentResourceNames() throws IOException {
-            return deploymentResources.getResourceNames();
-        }
-
-        @Override
-        public PathAddress getDeploymentResourcePathAddress(String resourceName) {
-            return deploymentResources.getResourcePathAddress(resourceName);
-        }
-
-        @Override
-        public void removeDeploymentResource(String resourceName) throws IOException {
-            deploymentResources.removeResource(resourceName);
-        }
-
-        @Override
-        public ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException {
-            return managementInterfaceResources.getResource(resourceName);
-        }
-
-        @Override
-        public List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException {
-            return managementInterfaceResources.getResources();
-        }
-
-        @Override
-        public Set<String> getManagementInterfaceResourceNames() throws IOException {
-            return managementInterfaceResources.getResourceNames();
-        }
-
-        @Override
-        public PathAddress getManagementInterfaceResourcePathAddress(String resourceName) {
-            return managementInterfaceResources.getResourcePathAddress(resourceName);
-        }
-
-        @Override
-        public void removeManagementInterfaceResource(String resourceName) throws IOException {
-            managementInterfaceResources.removeResource(resourceName);
-        }
-
-        @Override
-        public SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException {
-            return securityRealmResources.getResource(resourceName);
-        }
-
-        @Override
-        public List<SecurityRealmResource> getSecurityRealmResources() throws IOException {
-            return securityRealmResources.getResources();
-        }
-
-        @Override
-        public Set<String> getSecurityRealmResourceNames() throws IOException {
-            return securityRealmResources.getResourceNames();
-        }
-
-        @Override
-        public PathAddress getSecurityRealmResourcePathAddress(String resourceName) {
-            return securityRealmResources.getResourcePathAddress(resourceName);
-        }
-
-        @Override
-        public void removeSecurityRealmResource(String resourceName) throws IOException {
-            securityRealmResources.removeResource(resourceName);
-        }
-
-        @Override
-        public SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException {
-            return subsystemResources.getResource(resourceName);
-        }
-
-        @Override
-        public List<SubsystemConfiguration> getSubsystemConfiguration() throws IOException {
-            return subsystemResources.getResources();
-        }
-
-        @Override
-        public Set<String> getSubsystemConfigurationNames() throws IOException {
-            return subsystemResources.getResourceNames();
-        }
-
-        @Override
-        public PathAddress getSubsystemConfigurationPathAddress(String resourceName) {
-            return subsystemResources.getResourcePathAddress(resourceName);
-        }
-
-        @Override
-        public void removeSubsystemConfiguration(String resourceName) throws IOException {
-            subsystemResources.removeResource(resourceName);
-        }
-    }
 }

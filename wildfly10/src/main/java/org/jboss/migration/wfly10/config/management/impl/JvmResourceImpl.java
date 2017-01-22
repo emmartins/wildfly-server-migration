@@ -10,21 +10,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.JVM
 /**
  * @author emmartins
  */
-public class JvmResourceImpl extends ManageableResourceImpl implements JvmResource {
+public class JvmResourceImpl extends AbstractManageableResource implements JvmResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(JvmResource.class);
-
-    private JvmResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
+    private JvmResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends ManageableResourceImpl.Factory<JvmResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, JVM, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<JvmResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, JVM, parentResource);
         }
         @Override
         public JvmResource newResourceInstance(String resourceName) {
-            return new JvmResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new JvmResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 }

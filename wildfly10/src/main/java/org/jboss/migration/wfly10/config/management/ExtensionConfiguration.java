@@ -27,6 +27,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface ExtensionConfiguration extends ManageableResource {
+
+    Type<ExtensionConfiguration> RESOURCE_TYPE = new Type<>(ExtensionConfiguration.class);
+
+    @Override
+    default Type<ExtensionConfiguration> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     /**
      * A {@link ManageableResource} which has {@link ExtensionConfiguration} children.
      */

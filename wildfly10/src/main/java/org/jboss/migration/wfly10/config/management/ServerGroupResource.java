@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface ServerGroupResource extends ManageableResource, JvmResource.Parent {
+
+    Type<ServerGroupResource> RESOURCE_TYPE = new Type<>(ServerGroupResource.class, JvmResource.RESOURCE_TYPE);
+
+    @Override
+    default Type<ServerGroupResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         ServerGroupResource getServerGroupResource(String resourceName) throws IOException;
         List<ServerGroupResource> getServerGroupResources() throws IOException;

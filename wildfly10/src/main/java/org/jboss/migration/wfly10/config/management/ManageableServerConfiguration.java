@@ -22,11 +22,12 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author emmartins
  */
-public interface ManageableServerConfiguration {
+public interface ManageableServerConfiguration extends ManageableResource, ExtensionConfiguration.Parent, InterfaceResource.Parent, SocketBindingGroupResource.Parent, SystemPropertyConfiguration.Parent {
 
     void start();
     void stop();
@@ -35,8 +36,13 @@ public interface ManageableServerConfiguration {
     WildFlyServer10 getServer();
     Path resolvePath(String path)  throws IOException, ManagementOperationException;
     ModelControllerClient getModelControllerClient();
-    RootResource getRootResource();
 
-    interface RootResource extends ManageableResource, ExtensionConfiguration.Parent, InterfaceResource.Parent, SocketBindingGroupResource.Parent, SystemPropertyResource.Parent {
+    class Type<T extends ManageableServerConfiguration> extends ManageableResource.Type<T> {
+
+        static final ManageableResource.Type<?>[] CHILD_TYPES =  { ExtensionConfiguration.RESOURCE_TYPE, InterfaceResource.RESOURCE_TYPE, SocketBindingGroupResource.RESOURCE_TYPE, SystemPropertyConfiguration.RESOURCE_TYPE };
+
+        protected Type(Class<T> type, ManageableResource.Type<?>... childTypes) {
+            super(type, Stream.concat(Stream.of(CHILD_TYPES), Stream.of(childTypes)).toArray(ManageableResource.Type<?>[]::new));
+        }
     }
 }

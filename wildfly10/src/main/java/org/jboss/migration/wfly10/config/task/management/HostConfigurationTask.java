@@ -18,54 +18,31 @@ package org.jboss.migration.wfly10.config.task.management;
 
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
-import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConfigurationsTask;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemsConfigurationSubtasks;
+
+import java.util.Collection;
 
 /**
  * @author emmartins
  */
 public class HostConfigurationTask<S> extends ManageableServerConfigurationTask<S, HostConfiguration> {
 
-    protected HostConfigurationTask(Builder<S> builder, S source, HostConfiguration configuration) {
-        super(builder, source, configuration);
+    protected HostConfigurationTask(BaseBuilder<S, HostConfiguration, ?> builder, S source, Collection<? extends HostConfiguration> resources) {
+        super(builder, source, resources);
     }
 
-    public interface Subtasks<S> extends ManageableServerConfigurationSubtaskExecutor<S, HostConfiguration> {
+    public interface SubtaskExecutor<S> extends ManageableServerConfigurationTask.SubtaskExecutor<S, HostConfiguration> {
     }
 
-    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, HostConfiguration, Subtasks<S>, Builder<S>> {
+    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, HostConfiguration, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
-        public Builder<S> subtask(final SubsystemsConfigurationSubtasks<S> subtask) {
-            return subtask(new Subtasks<S>() {
-                @Override
-                public void run(S source, HostConfiguration configuration, TaskContext taskContext) throws Exception {
-                    subtask.executeSubtasks(source, configuration.getSubsystemResources(), taskContext);
-                }
-            });
-        }
-
-        public Builder<S> subtask(final SubsystemConfigurationsTask.Builder<S> subtaskBuilder) {
-            return subtask(new Subtasks<S>() {
-                @Override
-                public void run(S source, HostConfiguration configuration, TaskContext taskContext) throws Exception {
-                    final ServerMigrationTask subtask = subtaskBuilder.build(source, configuration.getSubsystemResources());
-                    if (subtask != null) {
-                        taskContext.execute(subtask);
-                    }
-                }
-            });
-        }
-
         @Override
-        public ServerMigrationTask build(S source, HostConfiguration configuration) {
-            return new HostConfigurationTask<>(this, source, configuration);
+        public ServerMigrationTask build(S source, Collection<? extends HostConfiguration> resources) {
+            return new HostConfigurationTask<>(this, source, resources);
         }
     }
 }

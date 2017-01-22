@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface HostResource extends ManageableResource {
+
+    Type<HostResource> RESOURCE_TYPE = new Type<>(HostResource.class);
+
+    @Override
+    default Type<HostResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         HostResource getHostResource(String resourceName) throws IOException;
         List<HostResource> getHostResources() throws IOException;

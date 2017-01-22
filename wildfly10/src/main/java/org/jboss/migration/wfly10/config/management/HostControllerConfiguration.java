@@ -19,9 +19,12 @@ package org.jboss.migration.wfly10.config.management;
 /**
  * @author emmartins
  */
-public interface HostControllerConfiguration extends ManageableServerConfiguration {
+public interface HostControllerConfiguration extends ManageableServerConfiguration, DeploymentResource.Parent, HostResource.Parent, ProfileResource.Parent, ServerGroupResource.Parent {
+
+    Type<HostControllerConfiguration> RESOURCE_TYPE = new Type<>(HostControllerConfiguration.class, DeploymentResource.RESOURCE_TYPE, HostResource.RESOURCE_TYPE, ProfileResource.RESOURCE_TYPE, ServerGroupResource.RESOURCE_TYPE);
+
     @Override
-    RootResource getRootResource();
-    interface RootResource extends ManageableServerConfiguration.RootResource, DeploymentResource.Parent, HostResource.Parent, ProfileResource.Parent, ServerGroupResource.Parent {
+    default Type<HostControllerConfiguration> getResourceType() {
+        return RESOURCE_TYPE;
     }
 }

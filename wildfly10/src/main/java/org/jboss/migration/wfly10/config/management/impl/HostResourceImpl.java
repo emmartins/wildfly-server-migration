@@ -10,21 +10,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOS
 /**
  * @author emmartins
  */
-public class HostResourceImpl extends ManageableResourceImpl implements HostResource {
+public class HostResourceImpl extends AbstractManageableResource implements HostResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(HostResource.class);
-
-    private HostResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
+    private HostResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends ManageableResourceImpl.Factory<HostResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, HOST, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<HostResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, HOST, parentResource);
         }
         @Override
         public HostResource newResourceInstance(String resourceName) {
-            return new HostResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new HostResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 }

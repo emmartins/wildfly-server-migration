@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface JvmResource extends ManageableResource {
+
+    Type<JvmResource> RESOURCE_TYPE = new Type<>(JvmResource.class);
+
+    @Override
+    default Type<JvmResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         JvmResource getJvmResource(String resourceName) throws IOException;
         List<JvmResource> getJvmResources() throws IOException;

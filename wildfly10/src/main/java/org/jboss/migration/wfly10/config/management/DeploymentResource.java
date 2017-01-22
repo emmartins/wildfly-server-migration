@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface DeploymentResource extends ManageableResource {
+
+    Type<DeploymentResource> RESOURCE_TYPE = new Type<>(DeploymentResource.class);
+
+    @Override
+    default Type<DeploymentResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         DeploymentResource getDeploymentResource(String resourceName) throws IOException;
         List<DeploymentResource> getDeploymentResources() throws IOException;

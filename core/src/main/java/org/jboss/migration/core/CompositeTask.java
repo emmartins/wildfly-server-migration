@@ -17,18 +17,17 @@
 package org.jboss.migration.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * A {@link ServerMigrationTask} which delegates to subtask executors.
  * @author emmartins
  */
-public abstract class ParentTask extends AbstractServerMigrationTask {
+public abstract class CompositeTask extends AbstractServerMigrationTask {
 
     protected final boolean succeedIfHasSuccessfulSubtasks;
 
-    protected ParentTask(BaseBuilder builder) {
+    protected CompositeTask(BaseBuilder builder) {
         super(builder);
         this.succeedIfHasSuccessfulSubtasks = builder.succeedIfHasSuccessfulSubtasks;
     }
@@ -44,7 +43,7 @@ public abstract class ParentTask extends AbstractServerMigrationTask {
     /**
      *
      */
-    public interface Subtasks {
+    public interface SubtaskExecutor {
         void run(TaskContext context) throws Exception;
     }
 
@@ -71,7 +70,7 @@ public abstract class ParentTask extends AbstractServerMigrationTask {
 
         public abstract B subtask(ServerMigrationTask subtask);
 
-        public abstract B subtask(Subtasks subtasks);
+        public abstract B subtask(SubtaskExecutor subtaskExecutor);
     }
 
     /**
@@ -79,8 +78,8 @@ public abstract class ParentTask extends AbstractServerMigrationTask {
      */
     public static class Builder extends BaseBuilder<Builder> {
 
-        private static final Subtasks[] EMPTY = {};
-        protected final List<Subtasks> subtasks;
+        private static final SubtaskExecutor[] EMPTY = {};
+        protected final List<SubtaskExecutor> subtasks;
 
         public Builder(ServerMigrationTaskName name) {
             super(name);
@@ -89,7 +88,7 @@ public abstract class ParentTask extends AbstractServerMigrationTask {
 
         @Override
         public Builder subtask(final ServerMigrationTask subtask) {
-            return subtask(new Subtasks() {
+            return subtask(new SubtaskExecutor() {
                 @Override
                 public void run(TaskContext context) throws Exception {
                     context.execute(subtask);
@@ -97,17 +96,17 @@ public abstract class ParentTask extends AbstractServerMigrationTask {
             });
         }
 
-        public Builder subtask(Subtasks subtasks) {
-            this.subtasks.add(subtasks);
+        public Builder subtask(SubtaskExecutor subtaskExecutor) {
+            this.subtasks.add(subtaskExecutor);
             return this;
         }
 
-        public ParentTask build() {
-            final Subtasks[] subtasks = this.subtasks.toArray(EMPTY);
-            return new ParentTask(this) {
+        public CompositeTask build() {
+            final SubtaskExecutor[] subtasks = this.subtasks.toArray(EMPTY);
+            return new CompositeTask(this) {
                 @Override
                 protected void runSubtasks(TaskContext context) throws Exception {
-                    for (Subtasks subtask : subtasks) {
+                    for (SubtaskExecutor subtask : subtasks) {
                         subtask.run(context);
                     }
                 }

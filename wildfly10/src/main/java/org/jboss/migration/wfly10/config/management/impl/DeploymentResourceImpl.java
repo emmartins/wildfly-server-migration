@@ -10,21 +10,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEP
 /**
  * @author emmartins
  */
-public class DeploymentResourceImpl extends ManageableResourceImpl implements DeploymentResource {
+public class DeploymentResourceImpl extends AbstractManageableResource implements DeploymentResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(DeploymentResource.class);
-
-    private DeploymentResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
+    private DeploymentResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends ManageableResourceImpl.Factory<DeploymentResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, DEPLOYMENT, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<DeploymentResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, DEPLOYMENT, parentResource);
         }
         @Override
         public DeploymentResource newResourceInstance(String resourceName) {
-            return new DeploymentResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new DeploymentResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 }

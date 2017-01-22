@@ -27,29 +27,28 @@ import java.util.List;
 import java.util.Set;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING_GROUP;
 
 /**
  * @author emmartins
  */
-public class SocketBindingGroupResourceImpl extends ManageableResourceImpl implements SocketBindingGroupResource {
+public class SocketBindingGroupResourceImpl extends AbstractManageableResource implements SocketBindingGroupResource {
 
-    public static final ManageableResourceImpl.Type TYPE = new ManageableResourceImpl.Type<>(SocketBindingGroupResource.class, SocketBindingResourceImpl.TYPE);
-
-    public static class Factory extends ManageableResourceImpl.Factory<SocketBindingGroupResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource, ManageableServerConfiguration serverConfiguration) {
-            super(TYPE, pathAddressBase, SERVER_GROUP, parentResource, serverConfiguration);
+    public static class Factory extends AbstractManageableResource.Factory<SocketBindingGroupResource> {
+        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+            super(RESOURCE_TYPE, pathAddressBase, SOCKET_BINDING_GROUP, parentResource);
         }
         @Override
         public SocketBindingGroupResource newResourceInstance(String resourceName) {
-            return new SocketBindingGroupResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource, serverConfiguration);
+            return new SocketBindingGroupResourceImpl(resourceName, getResourcePathAddress(resourceName), parentResource);
         }
     }
 
     private final SocketBindingResourceImpl.Factory socketBindingResources;
 
-    private SocketBindingGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent, ManageableServerConfiguration serverConfiguration) {
-        super(resourceName, pathAddress, parent, serverConfiguration);
-        socketBindingResources = new SocketBindingResourceImpl.Factory(pathAddress, this, serverConfiguration);
+    private SocketBindingGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+        super(resourceName, pathAddress, parent);
+        socketBindingResources = new SocketBindingResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(socketBindingResources);
     }
 

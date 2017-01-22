@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.management.subsystem;
-
-import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
+package org.jboss.migration.core;
 
 /**
+ * A basic parent task.
  * @author emmartins
  */
-public interface SubsystemsConfigurationSubtasks<S> extends ManageableResourceSubtaskExecutor<S, SubsystemConfiguration.Parent> {
+public class SimpleCompositeTask extends CompositeTask {
+
+    public SimpleCompositeTask(Builder builder) {
+        super(builder);
+    }
+
+    public static class Builder extends BaseBuilder<TaskContext, Builder> {
+        public Builder(ServerMigrationTaskName name) {
+            super(name);
+        }
+
+        public SimpleCompositeTask build() {
+            return new SimpleCompositeTask(this);
+        }
+    }
 }

@@ -25,12 +25,20 @@ import java.util.Set;
 /**
  * @author emmartins
  */
-public interface SystemPropertyResource extends ManageableResource {
+public interface SystemPropertyConfiguration extends ManageableResource {
+
+    Type<SystemPropertyConfiguration> RESOURCE_TYPE = new Type<>(SystemPropertyConfiguration.class);
+
+    @Override
+    default Type<SystemPropertyConfiguration> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
-        SystemPropertyResource getSystemPropertyResource(String resourceName) throws IOException;
-        List<SystemPropertyResource> getSystemPropertyResources() throws IOException;
-        Set<String> getSystemPropertyResourceNames() throws IOException;
-        PathAddress getSystemPropertyResourcePathAddress(String resourceName);
-        void removeSystemPropertyResource(String resourceName) throws IOException;
+        SystemPropertyConfiguration getSystemPropertyConfiguration(String resourceName) throws IOException;
+        List<SystemPropertyConfiguration> getSystemPropertyConfigurations() throws IOException;
+        Set<String> getSystemPropertyConfigurationNames() throws IOException;
+        PathAddress getSystemPropertyConfigurationPathAddress(String resourceName);
+        void removeSystemPropertyConfiguration(String resourceName) throws IOException;
     }
 }

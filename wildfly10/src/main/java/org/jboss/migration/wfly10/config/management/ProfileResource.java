@@ -26,6 +26,14 @@ import java.util.Set;
  * @author emmartins
  */
 public interface ProfileResource extends ManageableResource, SubsystemConfiguration.Parent {
+
+    Type<ProfileResource> RESOURCE_TYPE = new Type<>(ProfileResource.class, SubsystemConfiguration.RESOURCE_TYPE);
+
+    @Override
+    default Type<ProfileResource> getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
     interface Parent extends ManageableResource {
         ProfileResource getProfileResource(String resourceName) throws IOException;
         List<ProfileResource> getProfileResources() throws IOException;
