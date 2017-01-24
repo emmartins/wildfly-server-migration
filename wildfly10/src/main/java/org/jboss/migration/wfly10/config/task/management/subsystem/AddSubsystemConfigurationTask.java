@@ -62,13 +62,13 @@ public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationPare
                     }
                 }
             });
-            subtask(new AddExtensionTask<S>(extension));
+            subtask(new AddExtensionTask<>(extension));
             subtask(subtask);
         }
 
         @Override
         public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration.Parent> resources) {
-            return new AddSubsystemConfigurationTask<S>(this, source, resources);
+            return new AddSubsystemConfigurationTask<>(this, source, resources);
         }
     }
 }

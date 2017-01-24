@@ -22,6 +22,7 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,10 +84,18 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Com
             return subtask(subtaskExecutor);
         }
 
+        public <R1 extends ManageableResource> B subtask(Class<R1> resourceType, SubtaskExecutor<S, R1> subtaskExecutor) {
+            return subtask(ManageableResourceSelectors.selectResources(resourceType), subtaskExecutor);
+        }
+
         public <R1 extends ManageableResource> B subtask(ManageableResourceSelector<R1> resourceSelector, SubtaskExecutor<S, R1> subtaskExecutor) {
             // apply selector and run for all resources selected
             final SubtaskExecutor<S, R> subtasksExecutor = (source, resources, context) -> subtaskExecutor.run(source, resourceSelector.collect(resources), context);
             return subtask(subtasksExecutor);
+        }
+
+        public <R1 extends ManageableResource> B subtask(Class<R1> resourceType, BaseBuilder<S, R1, ?> taskBuilder) {
+            return subtask(ManageableResourceSelectors.selectResources(resourceType), taskBuilder);
         }
 
         public <R1 extends ManageableResource> B subtask(ManageableResourceSelector<R1> resourceSelector, BaseBuilder<S, R1, ?> taskBuilder) {
