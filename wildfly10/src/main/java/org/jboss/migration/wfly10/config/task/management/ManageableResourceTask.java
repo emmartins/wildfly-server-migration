@@ -22,10 +22,6 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
-import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.executor.ManageableResourceSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.ManageableServerConfigurationSubtaskExecutor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,14 +57,14 @@ public class ManageableResourceTask<S, R extends ManageableResource> extends Com
 
     protected abstract static class BaseBuilder<S, R extends ManageableResource, B extends BaseBuilder<S, R, B>> extends CompositeTask.BaseBuilder<B> {
 
-        protected final List<SubtaskExecutor<S, R>> subtasks;
+        protected final List<SubtaskExecutor<S, ? super R>> subtasks;
 
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);
             this.subtasks = new ArrayList<>();
         }
 
-        public B subtask(SubtaskExecutor<S, R> subtaskExecutor) {
+        public B subtask(SubtaskExecutor<S, ? super R> subtaskExecutor) {
             subtasks.add(subtaskExecutor);
             return (B) this;
         }

@@ -27,7 +27,7 @@ import org.jboss.migration.core.env.TaskEnvironment;
  * A task which creates a subsystem if its missing from the server's config.
  * @author emmartins
  */
-public class AddSubsystemConfigurationSubtask<S> implements SubsystemConfigurationTask.Subtask<S> {
+public class AddSubsystemConfigurationSubtask<S> implements SubsystemConfigurationParentTask.SubtaskExecutor<S> {
 
     @Override
     public ServerMigrationTaskName getName(SubsystemConfigurationTask.Context<S> parentContext) {

@@ -32,6 +32,9 @@ public class SubsystemConfigurationParentTask<S> extends ManageableResourceTask<
         super(builder, source, manageableResources);
     }
 
+    public interface SubtaskExecutor<S> extends ManageableResourceTask.SubtaskExecutor<S, SubsystemConfiguration.Parent> {
+    }
+
     public static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration.Parent, B> {
         public BaseBuilder(ServerMigrationTaskName taskName) {
             super(taskName);

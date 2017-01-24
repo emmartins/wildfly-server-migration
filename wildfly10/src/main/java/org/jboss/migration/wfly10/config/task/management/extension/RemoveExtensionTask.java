@@ -25,9 +25,9 @@ import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
  * A task which creates an extension if its missing from the server's config.
  * @author emmartins
  */
-public class RemoveExtensionSubtask<S> extends AbstractExtensionSubtask<S> {
+public class RemoveExtensionTask<S> extends AbstractExtensionTask<S> {
 
-    public RemoveExtensionSubtask(String extensionModule) {
+    public RemoveExtensionTask(String extensionModule) {
         super(extensionModule);
     }
 

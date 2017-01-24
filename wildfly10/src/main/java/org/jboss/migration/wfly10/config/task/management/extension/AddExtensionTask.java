@@ -29,9 +29,9 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MOD
  * A task which creates an extension if its missing from the server's config.
  * @author emmartins
  */
-public class AddExtensionSubtask<S> extends AbstractExtensionSubtask<S> {
+public class AddExtensionTask<S> extends AbstractExtensionTask<S> {
 
-    public AddExtensionSubtask(String extensionModule) {
+    public AddExtensionTask(String extensionModule) {
         super(extensionModule);
     }
 

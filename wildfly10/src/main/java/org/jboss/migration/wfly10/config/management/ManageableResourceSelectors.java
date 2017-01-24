@@ -35,11 +35,11 @@ public interface ManageableResourceSelectors {
         };
     }
 
-    static <T extends ManageableResource> ManageableResourceSelector<T> toResources(Class<T> resourceType) {
+    static <T extends ManageableResource> ManageableResourceSelector<T> selectResources(Class<T> resourceType) {
         return resource -> resource.findResources(resourceType);
     }
 
-    static <T extends ManageableResource> ManageableResourceSelector<T> toResources(Class<T> resourceType, String resourceName) {
+    static <T extends ManageableResource> ManageableResourceSelector<T> selectResources(Class<T> resourceType, String resourceName) {
         return resource -> resource.findResources(resourceType, resourceName);
     }
 

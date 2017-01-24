@@ -22,36 +22,38 @@ import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationTask;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author emmartins
  */
-public abstract class AbstractExtensionSubtask<S> implements ExtensionResourcesSubtasks<S>, ManageableServerConfigurationTask.Subtasks<S, ManageableServerConfiguration> {
+public abstract class AbstractExtensionTask<S> implements ManageableResourceTask.SubtaskExecutor<S, ManageableResource> {
 
     protected final String extensionModule;
 
-    protected AbstractExtensionSubtask(String extensionModule) {
+    protected AbstractExtensionTask(String extensionModule) {
         this.extensionModule = extensionModule;
     }
 
     @Override
-    public void run(S source, ManageableServerConfiguration configuration, TaskContext parentContext) throws Exception {
-        run(source, configuration.getRootResource(), parentContext);
-    }
-
-    @Override
-    public void run(S source, ExtensionConfiguration.Parent extensionResourceParent, TaskContext parentContext) throws Exception {
-        final ServerMigrationTaskName taskName = getName(source, extensionResourceParent, parentContext);
-        if (taskName != null) {
-            final ServerMigrationTask task = new AbstractServerMigrationTask(taskName) {
-                @Override
-                protected ServerMigrationTaskResult runTask(TaskContext context) throws Exception {
-                    return AbstractExtensionSubtask.this.runTask(source, extensionResourceParent, context);
-                }
-            };
-            parentContext.execute(task);
+    public void run(S source, Collection<? extends ManageableResource> resources, TaskContext context) throws Exception {
+        final Set<ExtensionConfiguration.Parent> parents = ManageableResourceSelectors.toServerConfiguration().andThen(ManageableResourceSelectors.selectResources(ExtensionConfiguration.Parent.class)).collect(resources);
+        for (ExtensionConfiguration.Parent parent : parents) {
+            final ServerMigrationTaskName taskName = getName(source, parent, context);
+            if (taskName != null) {
+                final ServerMigrationTask task = new AbstractServerMigrationTask(taskName) {
+                    @Override
+                    protected ServerMigrationTaskResult runTask(TaskContext context) throws Exception {
+                        return AbstractExtensionTask.this.runTask(source, parent, context);
+                    }
+                };
+                context.execute(task);
+            }
         }
     }
 

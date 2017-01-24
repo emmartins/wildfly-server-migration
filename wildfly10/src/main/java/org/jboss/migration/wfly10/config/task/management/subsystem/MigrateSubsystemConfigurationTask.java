@@ -19,15 +19,13 @@ package org.jboss.migration.wfly10.config.task.management.subsystem;
 import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
 import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
-import org.jboss.migration.wfly10.config.task.management.extension.RemoveExtensionSubtask;
+import org.jboss.migration.wfly10.config.task.management.extension.RemoveExtensionTask;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author emmartins
@@ -61,12 +59,12 @@ public class MigrateSubsystemConfigurationTask<S> extends SubsystemConfiguration
                 }
             });
             subtask(subtask);
-            subtask(ManageableResourceSelectors.toServerConfiguration(), new RemoveExtensionSubtask<S>(extension));
+            subtask(new RemoveExtensionTask<S>(extension));
         }
 
         @Override
         public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration> resources) {
-            return new MigrateSubsystemConfigurationTask<>(this, source, resourceManagements);
+            return new MigrateSubsystemConfigurationTask<>(this, source, resources);
         }
     }
 }

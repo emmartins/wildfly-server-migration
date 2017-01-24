@@ -21,29 +21,33 @@ import org.jboss.migration.core.ServerMigrationTask;
 import org.jboss.migration.core.ServerMigrationTaskName;
 import org.jboss.migration.core.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemConfiguration.Parent;
-import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionSubtask;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
+import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTask;
+import org.jboss.migration.wfly10.config.task.management.extension.ExtensionConfigurationSelectors;
+import org.jboss.migration.wfly10.config.task.management.extension.XXX;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * @author emmartins
  */
-public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationTask<S> {
+public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationParentTask<S> {
 
-    protected AddSubsystemConfigurationTask(Builder<S> builder, S source, List<SubsystemConfiguration.Parent> parents) {
-        super(builder, source, parents);
+    public AddSubsystemConfigurationTask(ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration.Parent, ?> builder, S source, Collection<? extends SubsystemConfiguration.Parent> manageableResources) {
+        super(builder, source, manageableResources);
     }
 
-    public static class Builder<S> extends SubsystemConfigurationTask.BaseBuilder<S, Builder<S>> {
+    public static class Builder<S> extends SubsystemConfigurationParentTask.BaseBuilder<S, Builder<S>> {
 
         public Builder(String extension, String subsystem) {
             this(extension, subsystem, new AddSubsystemConfigurationSubtask<S>());
         }
 
         public Builder(final String extension, final String subsystem, AddSubsystemConfigurationSubtask<S> subtask) {
-            super(extension, subsystem, new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subsystem).build());
+            super(new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subsystem).build());
             listener(new AbstractServerMigrationTask.Listener() {
                 @Override
                 public void started(TaskContext context) {
@@ -58,13 +62,13 @@ public class AddSubsystemConfigurationTask<S> extends SubsystemConfigurationTask
                     }
                 }
             });
-            subtask(ExtensionConfiguration.Parent.class, new AddExtensionSubtask<S>(extension));
+            subtask(new AddExtensionTask<S>(extension));
             subtask(subtask);
         }
 
         @Override
-        public ServerMigrationTask build(S source, List<SubsystemConfiguration.Parent> resources) {
-            return new AddSubsystemConfigurationTask<>(this, source, resources);
+        public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration.Parent> resources) {
+            return new AddSubsystemConfigurationTask<S>(this, source, resources);
         }
     }
 }
