@@ -17,14 +17,8 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.JvmResource;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ServerGroupResource;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
 
@@ -49,30 +43,5 @@ public class ServerGroupResourceImpl extends AbstractManageableResource implemen
         super(resourceName, pathAddress, parent);
         jvmResources = new JvmResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(jvmResources);
-    }
-
-    @Override
-    public JvmResource getJvmResource(String resourceName) throws IOException {
-        return jvmResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<JvmResource> getJvmResources() throws IOException {
-        return jvmResources.getResources();
-    }
-
-    @Override
-    public Set<String> getJvmResourceNames() throws IOException {
-        return jvmResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getJvmResourcePathAddress(String resourceName) {
-        return jvmResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeJvmResource(String resourceName) throws IOException {
-        jvmResources.removeResource(resourceName);
     }
 }

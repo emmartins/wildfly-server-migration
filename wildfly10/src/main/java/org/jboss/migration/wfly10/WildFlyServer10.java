@@ -15,12 +15,11 @@
  */
 package org.jboss.migration.wfly10;
 
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.TaskContextImpl;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
 
 import java.nio.file.Path;

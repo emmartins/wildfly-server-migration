@@ -1,75 +1,42 @@
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
-import org.jboss.migration.core.AbstractServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
-import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
+import org.jboss.migration.wfly10.config.task.management.resource.composite.ManageableResourceCompositeTask;
 
 import java.util.Collection;
 
 /**
  * @author emmartins
  */
-public class SubsystemConfigurationTask<S> extends ManageableResourceTask<S, SubsystemConfiguration> {
+public class SubsystemConfigurationTask<S> extends ManageableResourceCompositeTask<S, SubsystemConfiguration> {
 
-    public SubsystemConfigurationTask(ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration, ?> builder, S source, Collection<? extends SubsystemConfiguration> manageableResources) {
-        super(builder, source, manageableResources);
+    protected SubsystemConfigurationTask(BaseBuilder<S, ?> builder, S source, Collection<? extends ManageableResource> resources) {
+        super(builder, source, resources);
     }
 
-    public interface Subtask<S> {
-        ServerMigrationTaskName getName(SubsystemConfiguration subsystemConfiguration, TaskContext parentContext);
-        ServerMigrationTaskResult run(SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
+    public interface SubtaskFactory<S> extends ManageableResourceCompositeTask.SubtaskFactory<S, SubsystemConfiguration> {
     }
 
-    protected static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration, B> {
-        private final String extension;
-        private final String subsystem;
-
-        protected BaseBuilder(String extension, String subsystem, ServerMigrationTaskName taskName) {
-            super(taskName);
-            this.extension = extension;
-            this.subsystem = subsystem;
+    protected static abstract class BaseBuilder<S, B extends BaseBuilder<S, B>> extends ManageableResourceCompositeTask.BaseBuilder<S, SubsystemConfiguration, B> {
+        protected BaseBuilder(String subsystem, ServerMigrationTaskName taskName) {
+            super(taskName, ManageableResourceSelectors.selectResources(SubsystemConfiguration.class, subsystem));
         }
-
-        public B subtask(final Subtask<S> subtask) {
-            final ManageableResourceTask.SubtaskExecutor<S, SubsystemConfiguration> subtasks = (source, resources, context) -> {
-                for (final SubsystemConfiguration subsystemConfiguration : resources) {
-                    final ServerMigrationTaskName subtaskName = subtask.getName(subsystemConfiguration, context);
-                    if (subtaskName != null) {
-                        final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(subsystem, subtaskName.getName()));
-                        final AbstractServerMigrationTask.Builder builder = new AbstractServerMigrationTask.Builder(subtaskName)
-                                .skipper(new Skipper() {
-                                    @Override
-                                    public boolean isSkipped(TaskContext context) {
-                                        return taskEnvironment.isSkippedByEnvironment();
-                                    }
-                                });
-                        final ServerMigrationTask task = new AbstractServerMigrationTask(builder) {
-                            @Override
-                            protected ServerMigrationTaskResult runTask(TaskContext taskContext) throws Exception {
-                                return subtask.run(subsystemConfiguration, taskContext, taskEnvironment);
-                            }
-                        };
-                        context.execute(task);
-                    }
-                }
-            };
-            return subtask(subtasks);
+        public B subtask(SubtaskFactory<S> subtaskFactory) {
+            return super.subtask(subtaskFactory);
         }
     }
 
     public static class Builder<S> extends BaseBuilder<S, Builder<S>> {
-        public Builder(String extension, String subsystem, ServerMigrationTaskName taskName) {
-            super(extension, subsystem, taskName);
+        public Builder(String subsystem, ServerMigrationTaskName taskName) {
+            super(subsystem, taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration> resources) {
+        public ServerMigrationTask build(S source, Collection<? extends ManageableResource> resources) {
             return new SubsystemConfigurationTask<>(this, source, resources);
         }
     }

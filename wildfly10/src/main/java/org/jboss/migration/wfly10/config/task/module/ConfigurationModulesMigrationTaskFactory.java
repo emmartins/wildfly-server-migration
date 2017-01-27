@@ -16,10 +16,9 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
-import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;

@@ -16,7 +16,7 @@
 package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 /**

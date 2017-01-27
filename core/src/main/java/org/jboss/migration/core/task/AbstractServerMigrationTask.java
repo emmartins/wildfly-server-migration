@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core;
+package org.jboss.migration.core.task;
 
 /**
  * An abstract {@link ServerMigrationTask} implementation.
@@ -102,14 +102,8 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
             return (B) this;
         }
 
-        @SuppressWarnings("unchecked")
-        public B skipTaskPropertyName(final String skipTaskPropertyName) {
-            return skipper(new Skipper() {
-                @Override
-                public boolean isSkipped(TaskContext context) {
-                    return skipTaskPropertyName != null ? context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(skipTaskPropertyName, Boolean.FALSE) : false;
-                }
-            });
+        public B skipTaskPropertyName(String skipTaskPropertyName) {
+            return skipper(context -> skipTaskPropertyName != null ? context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(skipTaskPropertyName, Boolean.FALSE) : false);
         }
 
         @SuppressWarnings("unchecked")

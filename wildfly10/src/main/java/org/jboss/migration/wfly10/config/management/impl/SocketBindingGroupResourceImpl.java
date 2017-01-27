@@ -18,15 +18,8 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
-import org.jboss.migration.wfly10.config.management.SocketBindingResource;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING_GROUP;
 
 /**
@@ -50,30 +43,5 @@ public class SocketBindingGroupResourceImpl extends AbstractManageableResource i
         super(resourceName, pathAddress, parent);
         socketBindingResources = new SocketBindingResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(socketBindingResources);
-    }
-
-    @Override
-    public SocketBindingResource getSocketBindingResource(String resourceName) throws IOException {
-        return socketBindingResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<SocketBindingResource> getSocketBindingResources() throws IOException {
-        return socketBindingResources.getResources();
-    }
-
-    @Override
-    public Set<String> getSocketBindingResourceNames() throws IOException {
-        return socketBindingResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getSocketBindingResourcePathAddress(String resourceName) {
-        return socketBindingResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeSocketBindingResource(String resourceName) throws IOException {
-        socketBindingResources.removeResource(resourceName);
     }
 }

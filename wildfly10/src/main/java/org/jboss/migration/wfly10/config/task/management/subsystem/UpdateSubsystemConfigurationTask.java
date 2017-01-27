@@ -16,12 +16,11 @@
 
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
-import org.jboss.migration.core.AbstractServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
+import org.jboss.migration.core.task.AbstractServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 
 import java.util.Collection;
 
@@ -30,14 +29,13 @@ import java.util.Collection;
  */
 public class UpdateSubsystemConfigurationTask<S> extends SubsystemConfigurationTask<S> {
 
-    public UpdateSubsystemConfigurationTask(ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration, ?> builder, S source, Collection<? extends SubsystemConfiguration> manageableResources) {
-        super(builder, source, manageableResources);
+    private UpdateSubsystemConfigurationTask(Builder<S> builder, S source, Collection<? extends ManageableResource> resources) {
+        super(builder, source, resources);
     }
 
     public static class Builder<S> extends SubsystemConfigurationTask.BaseBuilder<S, Builder<S>> {
-
-        public Builder(final String extension, final String subsystem) {
-            super(extension, subsystem, new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
+        public Builder(final String subsystem) {
+            super(subsystem, new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
             listener(new AbstractServerMigrationTask.Listener() {
                 @Override
                 public void started(TaskContext context) {
@@ -53,12 +51,9 @@ public class UpdateSubsystemConfigurationTask<S> extends SubsystemConfigurationT
                 }
             });
         }
-
-
-
         @Override
-        public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration> manageableResources) {
-            return new UpdateSubsystemConfigurationTask<>(this, source, manageableResources);
+        public ServerMigrationTask build(S source, Collection<? extends ManageableResource> resources) {
+            return new UpdateSubsystemConfigurationTask<>(this, source, resources);
         }
     }
 }

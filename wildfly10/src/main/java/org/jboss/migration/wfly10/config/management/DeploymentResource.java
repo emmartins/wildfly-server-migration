@@ -34,11 +34,27 @@ public interface DeploymentResource extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link DeploymentResource} children.
+     */
     interface Parent extends ManageableResource {
-        DeploymentResource getDeploymentResource(String resourceName) throws IOException;
-        List<DeploymentResource> getDeploymentResources() throws IOException;
-        Set<String> getDeploymentResourceNames() throws IOException;
-        PathAddress getDeploymentResourcePathAddress(String resourceName);
-        void removeDeploymentResource(String resourceName) throws IOException;
+        default DeploymentResource getDeploymentResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<DeploymentResource> getDeploymentResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getDeploymentResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getDeploymentResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getDeploymentResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeDeploymentResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

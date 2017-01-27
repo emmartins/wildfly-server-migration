@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.core;
+
+package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
+import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationFailedException;
 
 import java.util.List;
 
@@ -32,7 +35,7 @@ public class TaskContextDelegate implements TaskContext {
     }
 
     @Override
-    public List<? extends ServerMigrationTaskExecution> getSubtasks() {
+    public List<? extends TaskExecutionImpl> getSubtasks() {
         return taskContext.getSubtasks();
     }
 
@@ -42,7 +45,7 @@ public class TaskContextDelegate implements TaskContext {
     }
 
     @Override
-    public ServerMigrationTaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
+    public TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
         return taskContext.execute(subtask);
     }
 

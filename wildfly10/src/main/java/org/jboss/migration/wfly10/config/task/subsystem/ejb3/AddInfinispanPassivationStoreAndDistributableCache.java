@@ -18,10 +18,10 @@ package org.jboss.migration.wfly10.config.task.subsystem.ejb3;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
@@ -147,7 +147,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements Updat
                     distributableCacheAdded = true;
                 }
                 if (configUpdated) {
-                    taskResultBuilder.sucess();
+                    taskResultBuilder.success();
                 } else {
                     taskResultBuilder.skipped();
                 }

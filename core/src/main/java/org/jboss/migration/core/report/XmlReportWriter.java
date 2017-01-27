@@ -18,9 +18,9 @@ package org.jboss.migration.core.report;
 import org.jboss.logging.Logger;
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTaskExecution;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.task.TaskExecution;
 import org.jboss.migration.core.util.xml.AttributeValue;
 import org.jboss.migration.core.util.xml.ElementNode;
 import org.jboss.staxmapper.XMLElementWriter;
@@ -114,7 +114,7 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
     }
 
 
-    protected void processTask(ServerMigrationTaskExecution task, ElementNode parentElementNode) {
+    protected void processTask(TaskExecution task, ElementNode parentElementNode) {
         final ElementNode taskNode = new ElementNode(parentElementNode, "task");
         taskNode.addAttribute("number", new AttributeValue(String.valueOf(task.getTaskNumber())));
         taskNode.addAttribute("name", new AttributeValue(task.getTaskName().toString()));
@@ -150,10 +150,10 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
         taskNode.addChild(resultNode);
     }
 
-    protected void processSubtasks(List<ServerMigrationTaskExecution> subtasks, ElementNode taskNode) {
+    protected void processSubtasks(List<TaskExecution> subtasks, ElementNode taskNode) {
         if (subtasks != null && !subtasks.isEmpty()) {
             final ElementNode subtasksNode = new ElementNode(taskNode, "subtasks");
-            for (ServerMigrationTaskExecution subtask : subtasks) {
+            for (TaskExecution subtask : subtasks) {
                 processTask(subtask, subtasksNode);
             }
             taskNode.addChild(subtasksNode);

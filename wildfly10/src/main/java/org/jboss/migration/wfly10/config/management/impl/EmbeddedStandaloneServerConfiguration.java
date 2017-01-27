@@ -20,10 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
-import org.jboss.migration.wfly10.config.management.ManagementInterfaceResource;
-import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
@@ -107,81 +104,6 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     @Override
     public void removeDeploymentResource(String resourceName) throws IOException {
         deploymentResources.removeResource(resourceName);
-    }
-
-    @Override
-    public ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException {
-        return managementInterfaceResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException {
-        return managementInterfaceResources.getResources();
-    }
-
-    @Override
-    public Set<String> getManagementInterfaceResourceNames() throws IOException {
-        return managementInterfaceResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getManagementInterfaceResourcePathAddress(String resourceName) {
-        return managementInterfaceResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeManagementInterfaceResource(String resourceName) throws IOException {
-        managementInterfaceResources.removeResource(resourceName);
-    }
-
-    @Override
-    public SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException {
-        return securityRealmResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<SecurityRealmResource> getSecurityRealmResources() throws IOException {
-        return securityRealmResources.getResources();
-    }
-
-    @Override
-    public Set<String> getSecurityRealmResourceNames() throws IOException {
-        return securityRealmResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getSecurityRealmResourcePathAddress(String resourceName) {
-        return securityRealmResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeSecurityRealmResource(String resourceName) throws IOException {
-        securityRealmResources.removeResource(resourceName);
-    }
-
-    @Override
-    public SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException {
-        return subsystemResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<SubsystemConfiguration> getSubsystemConfigurations() throws IOException {
-        return subsystemResources.getResources();
-    }
-
-    @Override
-    public Set<String> getSubsystemConfigurationNames() throws IOException {
-        return subsystemResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getSubsystemConfigurationPathAddress(String resourceName) {
-        return subsystemResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeSubsystemConfiguration(String resourceName) throws IOException {
-        subsystemResources.removeResource(resourceName);
     }
 
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {

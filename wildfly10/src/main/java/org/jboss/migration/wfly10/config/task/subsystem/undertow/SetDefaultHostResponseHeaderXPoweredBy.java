@@ -17,23 +17,23 @@
 package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 
 /**
  * @author emmartins
  */
-public class SetDefaultHostResponseHeaderXPoweredBy extends SetDefaultHostResponseHeader {
+public class SetDefaultHostResponseHeaderXPoweredBy<S> extends SetDefaultHostResponseHeader<S> {
     public SetDefaultHostResponseHeaderXPoweredBy(String headerValue) {
         super("x-powered-by-header", "X-Powered-By", headerValue);
     }
     public SetDefaultHostResponseHeaderXPoweredBy() {
         this(null);
     }
+
     @Override
-    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) {
+    protected String getHeaderValue(ModelNode config, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         if (headerValue != null) {
             return headerValue;
         } else {

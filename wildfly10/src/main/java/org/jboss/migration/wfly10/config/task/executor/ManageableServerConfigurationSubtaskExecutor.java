@@ -16,7 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.executor;
 
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 /**

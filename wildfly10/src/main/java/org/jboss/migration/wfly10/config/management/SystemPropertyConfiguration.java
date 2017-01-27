@@ -34,11 +34,27 @@ public interface SystemPropertyConfiguration extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link SystemPropertyConfiguration} children.
+     */
     interface Parent extends ManageableResource {
-        SystemPropertyConfiguration getSystemPropertyConfiguration(String resourceName) throws IOException;
-        List<SystemPropertyConfiguration> getSystemPropertyConfigurations() throws IOException;
-        Set<String> getSystemPropertyConfigurationNames() throws IOException;
-        PathAddress getSystemPropertyConfigurationPathAddress(String resourceName);
-        void removeSystemPropertyConfiguration(String resourceName) throws IOException;
+        default SystemPropertyConfiguration getSystemPropertyConfiguration(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<SystemPropertyConfiguration> getSystemPropertyConfigurations() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getSystemPropertyConfigurationNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getSystemPropertyConfigurationPathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getSystemPropertyConfigurationAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeSystemPropertyConfiguration(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

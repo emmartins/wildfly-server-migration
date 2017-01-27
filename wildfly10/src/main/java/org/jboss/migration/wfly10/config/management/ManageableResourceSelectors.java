@@ -24,8 +24,8 @@ import java.util.HashSet;
  */
 public interface ManageableResourceSelectors {
 
-    static ManageableResourceSelector<ManageableServerConfiguration> toServerConfiguration() {
-        return resource -> Collections.singleton(resource.getServerConfiguration());
+    static <T extends ManageableServerConfiguration> ManageableResourceSelector<T> selectServerConfiguration() {
+        return resource -> Collections.singleton((T) resource.getServerConfiguration());
     }
 
     static ManageableResourceSelector<ManageableResource> toParent() {

@@ -18,28 +18,28 @@ package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ProductInfo;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 
 /**
  * @author emmartins
  */
-public class SetDefaultHostResponseHeaderServer extends SetDefaultHostResponseHeader {
+public class SetDefaultHostResponseHeaderServer<S> extends SetDefaultHostResponseHeader<S> {
     public SetDefaultHostResponseHeaderServer() {
         super("server-header", "Server");
     }
     public SetDefaultHostResponseHeaderServer(String headerValue) {
         super("server-header", "Server", headerValue);
     }
+
     @Override
-    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) {
+    protected String getHeaderValue(ModelNode config, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         if (headerValue != null) {
             return headerValue;
         } else {
             // compute from product info
-            final ProductInfo productInfo = subsystemResources.getServerConfiguration().getServer().getProductInfo();
+            final ProductInfo productInfo = subsystemConfiguration.getServerConfiguration().getServer().getProductInfo();
             // TODO this should come instead, from the "subsystem" in extensions, exposed by target server
             final String serverName;
             if (productInfo.getName().contains("WildFly")) {

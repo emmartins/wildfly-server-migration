@@ -34,11 +34,27 @@ public interface SocketBindingGroupResource extends ManageableResource, SocketBi
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link SocketBindingGroupResource} children.
+     */
     interface Parent extends ManageableResource {
-        SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException;
-        List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException;
-        Set<String> getSocketBindingGroupResourceNames() throws IOException;
-        PathAddress getSocketBindingGroupResourcePathAddress(String resourceName);
-        void removeSocketBindingGroupResource(String resourceName) throws IOException;
+        default SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getSocketBindingGroupResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getSocketBindingGroupResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getSocketBindingGroupResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeSocketBindingGroupResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

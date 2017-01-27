@@ -16,8 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.TaskContextImpl;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.jboss.ModuleIdentifier;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;

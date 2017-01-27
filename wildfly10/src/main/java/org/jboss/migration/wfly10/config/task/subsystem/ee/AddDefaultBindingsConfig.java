@@ -18,10 +18,10 @@ package org.jboss.migration.wfly10.config.task.subsystem.ee;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserChoiceWithOtherOption;
 import org.jboss.migration.core.console.UserConfirmation;
@@ -112,7 +112,7 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
                 setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, subsystemResources, context, taskEnvironment, taskResultBuilder);
                 configurationManagement.executeManagementOperation(addOp);
                 context.getLogger().infof("Java EE Default Bindings configured.");
-                return taskResultBuilder.sucess().build();
+                return taskResultBuilder.success().build();
             }
             private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, SubsystemResources subsystemResources, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {
                 // if the subsystem config defines expected default resource then use it

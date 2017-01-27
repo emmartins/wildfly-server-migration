@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core;
+package org.jboss.migration.core.task.composite;
+
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
 
 /**
  * @author emmartins
  */
-public abstract class SimpleServerMigrationTask extends AbstractServerMigrationTask {
-    protected SimpleServerMigrationTask(ServerMigrationTaskName taskName) {
-        super(new AbstractServerMigrationTask.Builder(taskName));
-    }
+public interface SubtaskFactory<T extends CompositeTask> {
+    ServerMigrationTask getTask(T parentTask, TaskContext parentTaskContext) throws Exception;
 }

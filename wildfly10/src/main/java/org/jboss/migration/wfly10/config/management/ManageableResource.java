@@ -34,6 +34,11 @@ public interface ManageableResource {
     // resource
     <T extends ManageableResource> Type<T> getResourceType();
     String getResourceName();
+
+    default String getResourceAbsoluteName() {
+        return getResourcePathAddress().toCLIStyleString();
+    }
+
     PathAddress getResourcePathAddress();
     ModelNode getResourceConfiguration() throws IOException;
 
@@ -44,6 +49,10 @@ public interface ManageableResource {
     <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) throws IOException;
     Set<Type<?>> getChildResourceTypes();
     Set<String> getChildResourceNames(Type<?> resourceType) throws IOException;
+
+    default <T extends ManageableResource> String getChildResourceAbsoluteName(Type<T> resourceType, String resourceName) {
+        return getChildResourcePathAddress(resourceType, resourceName).toCLIStyleString();
+    }
     <T extends ManageableResource> PathAddress getChildResourcePathAddress(Type<T> resourceType, String resourceName);
     <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) throws IOException;
     <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) throws IOException;

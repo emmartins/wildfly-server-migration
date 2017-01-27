@@ -16,10 +16,10 @@
 
 package org.jboss.migration.core.jboss;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.TaskEnvironment;
 
@@ -127,7 +127,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
                     context.getServerMigrationContext().getMigrationFiles().copy(sourceModule.getModuleDir(), targetModules.getModuleDir(moduleIdentifier));
                     context.getLogger().infof("Module %s migrated.", moduleIdentifier);
                     return new ServerMigrationTaskResult.Builder()
-                            .sucess()
+                            .success()
                             .addAttribute("reason", reason)
                             .build();
                 }

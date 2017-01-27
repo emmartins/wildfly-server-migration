@@ -16,6 +16,8 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTask;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
@@ -40,9 +42,10 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpL
  */
 public class EAPSubsystemUpdates7_0 {
 
-    public static final UpdateSubsystemTaskFactory INFINISPAN = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.INFINISPAN, ExtensionNames.INFINISPAN)
-                                .subtasks(AddServerCache.INSTANCE, AddEjbCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE)
-                                .build();
+    public static final UpdateSubsystemConfigurationTask.Builder INFINISPAN = new UpdateSubsystemConfigurationTask.Builder(SubsystemNames.INFINISPAN)
+            .subtask(AddServerCache.INSTANCE)
+            .subtask(AddEjbCache.INSTANCE)
+            .subtask(FixHibernateCacheModuleName.INSTANCE);
 
     public static final UpdateSubsystemTaskFactory EE = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.EE, ExtensionNames.EE)
                                 .subtasks(AddConcurrencyUtilitiesDefaultConfig.INSTANCE, AddDefaultBindingsConfig.INSTANCE)
@@ -56,9 +59,12 @@ public class EAPSubsystemUpdates7_0 {
                                 .subtasks(AddHttpConnectorIfMissing.INSTANCE)
                                 .build();
 
-    public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
-                                .subtasks(AddBufferCache.INSTANCE, SetDefaultHttpListenerRedirectSocket.INSTANCE, AddWebsockets.INSTANCE, new SetDefaultHostResponseHeaderServer(), new SetDefaultHostResponseHeaderXPoweredBy())
-                                .build();
+    public static final UpdateSubsystemConfigurationTask.Builder UNDERTOW = new UpdateSubsystemConfigurationTask.Builder<>(SubsystemNames.UNDERTOW)
+            .subtask(new AddBufferCache<>())
+            .subtask(new SetDefaultHttpListenerRedirectSocket<>())
+            .subtask(new AddWebsockets<>())
+            .subtask(new SetDefaultHostResponseHeaderServer<>())
+            .subtask(new SetDefaultHostResponseHeaderXPoweredBy<>());
 
     public static final UpdateSubsystemTaskFactory MESSAGING_ACTIVEMQ = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.MESSAGING_ACTIVEMQ, ExtensionNames.MESSAGING_ACTIVEMQ)
                                 .subtasks(AddHttpAcceptorsAndConnectors.INSTANCE)

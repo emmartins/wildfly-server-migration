@@ -16,13 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
-import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.task.management.extension.RemoveExtensionTask;
 
 import java.util.Collection;
@@ -32,8 +29,8 @@ import java.util.Collection;
  */
 public class MigrateSubsystemConfigurationTask<S> extends SubsystemConfigurationTask<S> {
 
-    protected MigrateSubsystemConfigurationTask(ManageableResourceTask.BaseBuilder<S, SubsystemConfiguration, ?> builder, S source, Collection<? extends SubsystemConfiguration> manageableResources) {
-        super(builder, source, manageableResources);
+    private MigrateSubsystemConfigurationTask(Builder<S> builder, S source, Collection<? extends ManageableResource> resources) {
+        super(builder, source, resources);
     }
 
     public static class Builder<S> extends BaseBuilder<S, Builder<S>> {
@@ -43,7 +40,7 @@ public class MigrateSubsystemConfigurationTask<S> extends SubsystemConfiguration
         }
 
         public Builder(final String extension, final String subsystem, MigrateSubsystemConfigurationSubtask<S> subtask) {
-            super(extension, subsystem, new ServerMigrationTaskName.Builder("migrate-subsystem").addAttribute("name", subsystem).build());
+            super(subsystem, new ServerMigrationTaskName.Builder("migrate-subsystem").addAttribute("name", subsystem).build());
             listener(new Listener() {
                 @Override
                 public void started(TaskContext context) {
@@ -63,7 +60,7 @@ public class MigrateSubsystemConfigurationTask<S> extends SubsystemConfiguration
         }
 
         @Override
-        public ServerMigrationTask build(S source, Collection<? extends SubsystemConfiguration> resources) {
+        public ServerMigrationTask build(S source, Collection<? extends ManageableResource> resources) {
             return new MigrateSubsystemConfigurationTask<>(this, source, resources);
         }
     }

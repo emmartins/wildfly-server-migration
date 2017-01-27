@@ -16,8 +16,9 @@
 
 package org.jboss.migration.wfly10.config.task.management;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 
 import java.util.Collection;
@@ -25,24 +26,24 @@ import java.util.Collection;
 /**
  * @author emmartins
  */
-public class StandaloneServerConfigurationTask<S> extends ManageableServerConfigurationTask<S, StandaloneServerConfiguration> {
+public class StandaloneServerConfigurationCompositeTask<S> extends ManageableServerConfigurationCompositeTask<S, StandaloneServerConfiguration> {
 
-    protected StandaloneServerConfigurationTask(BaseBuilder<S, StandaloneServerConfiguration, ?> builder, S source, Collection<? extends StandaloneServerConfiguration> resources) {
+    private StandaloneServerConfigurationCompositeTask(BaseBuilder<S, StandaloneServerConfiguration, ?> builder, S source, Collection<? extends ManageableResource> resources) {
         super(builder, source, resources);
     }
 
-    public interface SubtaskExecutor<S> extends ManageableServerConfigurationTask.SubtaskExecutor<S, StandaloneServerConfiguration> {
+    public interface SubtaskExecutor<S> extends ManageableServerConfigurationCompositeTask.SubtaskExecutor<S, StandaloneServerConfiguration> {
     }
 
-    public static class Builder<S> extends ManageableServerConfigurationTask.BaseBuilder<S, StandaloneServerConfiguration, Builder<S>> {
+    public static class Builder<S> extends BaseBuilder<S, StandaloneServerConfiguration, Builder<S>> {
 
         public Builder(ServerMigrationTaskName taskName) {
             super(taskName);
         }
 
         @Override
-        public ServerMigrationTask build(S source, Collection<? extends StandaloneServerConfiguration> resources) {
-            return new StandaloneServerConfigurationTask<>(this, source, resources);
+        public ServerMigrationTask build(S source, Collection<? extends ManageableResource> resources) {
+            return new StandaloneServerConfigurationCompositeTask<>(this, source, resources);
         }
     }
 }

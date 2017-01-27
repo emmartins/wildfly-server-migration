@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.jboss.migration.core;
+package org.jboss.migration.core.task;
 
 /**
- * A basic parent task.
+ * The server migration task.
  * @author emmartins
  */
-public class SimpleCompositeTask extends CompositeTask {
+public interface ServerMigrationTask {
 
-    public SimpleCompositeTask(Builder builder) {
-        super(builder);
-    }
+    /**
+     * Retrieves the task name.
+     * @return the task name
+     */
+    ServerMigrationTaskName getName();
 
-    public static class Builder extends BaseBuilder<TaskContext, Builder> {
-        public Builder(ServerMigrationTaskName name) {
-            super(name);
-        }
-
-        public SimpleCompositeTask build() {
-            return new SimpleCompositeTask(this);
-        }
-    }
+    /**
+     * Runs the task.
+     * @param context the task context
+     * @return the task result.
+     * @throws Exception if the task failed to run
+     */
+    ServerMigrationTaskResult run(TaskContext context) throws Exception;
 }

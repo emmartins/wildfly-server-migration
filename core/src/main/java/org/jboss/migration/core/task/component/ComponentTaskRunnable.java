@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core;
+package org.jboss.migration.core.task.component;
 
-import java.util.Collection;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 /**
- * An "add only" collection of {@link ServerMigrationTask}s
  * @author emmartins
  */
-public interface ServerMigrationTasks {
-    void add(ServerMigrationTask task);
-    void addAll(Collection<ServerMigrationTask> tasks);
+public interface ComponentTaskRunnable<T extends ComponentTask> {
+    ServerMigrationTaskResult run(T task, TaskContext context) throws Exception;
 }

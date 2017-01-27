@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.core;
+package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
+import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationFailedException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,13 +28,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * The server migration task execution.
  * @author emmartins
  */
-public class ServerMigrationTaskExecution {
+public class TaskExecutionImpl implements TaskExecution {
 
     private static final AtomicLong taskCounter = new AtomicLong(0);
 
     private final ServerMigrationTask task;
-    private final ServerMigrationTaskExecution parent;
-    private final List<ServerMigrationTaskExecution> children;
+    private final TaskExecutionImpl parent;
+    private final List<TaskExecutionImpl> children;
     private final ServerMigrationContext serverMigrationContext;
     private long startTime;
     private volatile ServerMigrationTaskResult result;
@@ -40,15 +42,15 @@ public class ServerMigrationTaskExecution {
     private final long taskNumber;
     private final ServerMigrationTaskPath taskPath;
 
-    ServerMigrationTaskExecution(ServerMigrationTask task, ServerMigrationTaskExecution parent) {
+    TaskExecutionImpl(ServerMigrationTask task, TaskExecutionImpl parent) {
         this(task, parent, parent.serverMigrationContext);
     }
 
-    ServerMigrationTaskExecution(ServerMigrationTask task, ServerMigrationContext serverMigrationContext) {
+    TaskExecutionImpl(ServerMigrationTask task, ServerMigrationContext serverMigrationContext) {
         this(task, null, serverMigrationContext);
     }
 
-    private ServerMigrationTaskExecution(ServerMigrationTask task, ServerMigrationTaskExecution parent, ServerMigrationContext serverMigrationContext) {
+    private TaskExecutionImpl(ServerMigrationTask task, TaskExecutionImpl parent, ServerMigrationContext serverMigrationContext) {
         this.task = task;
         this.parent = parent;
         this.serverMigrationContext = serverMigrationContext;
@@ -110,7 +112,7 @@ public class ServerMigrationTaskExecution {
      * Retrieves the children task executions.
      * @return the children task executions
      */
-    public List<ServerMigrationTaskExecution> getSubtasks() {
+    public List<TaskExecution> getSubtasks() {
         return Collections.unmodifiableList(children);
     }
 
@@ -126,7 +128,7 @@ public class ServerMigrationTaskExecution {
      * Retrieves the server migration context.
      * @return the server migration context
      */
-    ServerMigrationContext getServerMigrationContext() {
+    public ServerMigrationContext getServerMigrationContext() {
         return serverMigrationContext;
     }
 
@@ -134,7 +136,7 @@ public class ServerMigrationTaskExecution {
      * Retrieves the parent task execution.
      * @return the parent task execution
      */
-    ServerMigrationTaskExecution getParent() {
+    TaskExecutionImpl getParent() {
         return parent;
     }
 
@@ -145,20 +147,20 @@ public class ServerMigrationTaskExecution {
      * @throws IllegalStateException if the task result is already set
      * @throws ServerMigrationFailedException if the subtask execution failed
      */
-    ServerMigrationTaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
+    TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
         if (this.result != null) {
             throw new IllegalStateException();
         }
         if (subtask.getName() == null) {
             throw new IllegalArgumentException("substask "+subtask+" has no name");
         }
-        final ServerMigrationTaskExecution child = new ServerMigrationTaskExecution(subtask, this);
+        final TaskExecutionImpl child = new TaskExecutionImpl(subtask, this);
         children.add(child);
         child.run();
         return child;
     }
 
-    synchronized void run() throws IllegalStateException, ServerMigrationFailedException {
+    public synchronized void run() throws IllegalStateException, ServerMigrationFailedException {
         if (this.result != null) {
             throw new IllegalStateException("Task "+ taskPath +" already run");
         }

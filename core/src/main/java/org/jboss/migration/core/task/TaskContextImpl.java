@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.core;
+package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
+import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationFailedException;
 
 import java.util.List;
 
@@ -25,20 +27,20 @@ import java.util.List;
  */
 public class TaskContextImpl implements TaskContext {
 
-    private final ServerMigrationTaskExecution taskExecution;
+    private final TaskExecutionImpl taskExecution;
 
-    TaskContextImpl(ServerMigrationTaskExecution taskExecution) {
+    TaskContextImpl(TaskExecutionImpl taskExecution) {
         this.taskExecution = taskExecution;
     }
 
     @Override
-    public List<? extends ServerMigrationTaskExecution> getSubtasks() {
+    public List<? extends TaskExecution> getSubtasks() {
         return taskExecution.getSubtasks();
     }
 
     @Override
     public boolean hasSucessfulSubtasks() {
-        for (ServerMigrationTaskExecution subtask : getSubtasks()) {
+        for (TaskExecution subtask : getSubtasks()) {
             final ServerMigrationTaskResult result = subtask.getResult();
             if (result != null && result.getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
                 return true;
@@ -48,7 +50,7 @@ public class TaskContextImpl implements TaskContext {
     }
 
     @Override
-    public ServerMigrationTaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
+    public TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
         return taskExecution.execute(subtask);
     }
 

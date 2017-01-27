@@ -16,23 +16,26 @@
 
 package org.jboss.migration.wfly10.config.task.management.extension;
 
-import org.jboss.migration.core.AbstractServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.AbstractServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
-import org.jboss.migration.wfly10.config.task.management.ManageableResourceTask;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.task.management.resource.composite.ManageableResourceCompositeTask;
 
 import java.util.Collection;
 import java.util.Set;
 
 /**
+ * An abstract impl for an extension task.
+ * Note: uses subtask executor to reduce any input resources to server configs, ensuring the task is executed once.
  * @author emmartins
  */
-public abstract class AbstractExtensionTask<S> implements ManageableResourceTask.SubtaskExecutor<S, ManageableResource> {
+public abstract class AbstractExtensionTask<S> implements ManageableResourceCompositeTask.SubtaskExecutor<S, ManageableResource> {
 
     protected final String extensionModule;
 
@@ -42,7 +45,7 @@ public abstract class AbstractExtensionTask<S> implements ManageableResourceTask
 
     @Override
     public void run(S source, Collection<? extends ManageableResource> resources, TaskContext context) throws Exception {
-        final Set<ExtensionConfiguration.Parent> parents = ManageableResourceSelectors.toServerConfiguration().andThen(ManageableResourceSelectors.selectResources(ExtensionConfiguration.Parent.class)).collect(resources);
+        final Set<ManageableServerConfiguration> parents = ManageableResourceSelectors.selectServerConfiguration().fromResources(resources);
         for (ExtensionConfiguration.Parent parent : parents) {
             final ServerMigrationTaskName taskName = getName(source, parent, context);
             if (taskName != null) {

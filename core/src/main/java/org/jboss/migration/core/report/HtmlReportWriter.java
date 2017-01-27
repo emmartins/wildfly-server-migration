@@ -16,8 +16,8 @@
 package org.jboss.migration.core.report;
 
 import org.jboss.migration.core.MigrationData;
-import org.jboss.migration.core.ServerMigrationTaskExecution;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskExecution;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -93,7 +93,7 @@ public class HtmlReportWriter {
         appendTask(migrationData.getRootTask(), sb, maxTaskPathSizeToDisplaySubtasks);
     }
 
-    private void appendTask(ServerMigrationTaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
+    private void appendTask(TaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
         final String tableClass = (task.getTaskPath().size() % 2) == 0 ? "task-map-even" : "task-map-odd";
         sb.append("<table class=\"").append(tableClass).append("\">");
         appendTaskHeader(task, sb, maxTaskPathSizeToDisplaySubtasks);
@@ -102,7 +102,7 @@ public class HtmlReportWriter {
         sb.append("</table>");
     }
 
-    private void appendTaskHeader(ServerMigrationTaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
+    private void appendTaskHeader(TaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
         sb.append("<tr>");
         sb.append("<td class=\"task-map-header\">");
         sb.append("<table class=\"task-header\">");
@@ -140,7 +140,7 @@ public class HtmlReportWriter {
         sb.append("</tr>");
     }
 
-    private void appendTaskDetails(ServerMigrationTaskExecution task, StringBuilder sb) {
+    private void appendTaskDetails(TaskExecution task, StringBuilder sb) {
         sb.append("<tr>");
         sb.append("<td id=\"task").append(task.getTaskNumber()).append("-details\" style=\"display: none\" class=\"task-map-details\"><table class=\"task-details\">");
 
@@ -174,7 +174,7 @@ public class HtmlReportWriter {
         if (!task.getSubtasks().isEmpty()) {
             final StringBuilder temp = new StringBuilder();
             boolean first = true;
-            for (ServerMigrationTaskExecution subtask : task.getSubtasks()) {
+            for (TaskExecution subtask : task.getSubtasks()) {
                 if (first) {
                     first = false;
                 } else {
@@ -188,8 +188,8 @@ public class HtmlReportWriter {
         sb.append("</table></td></tr>");
     }
 
-    private void appendTaskSubtasks(ServerMigrationTaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
-        final List<ServerMigrationTaskExecution> subtasks = task.getSubtasks();
+    private void appendTaskSubtasks(TaskExecution task, StringBuilder sb, int maxTaskPathSizeToDisplaySubtasks) {
+        final List<TaskExecution> subtasks = task.getSubtasks();
         if (!subtasks.isEmpty()) {
             sb.append("<tr>");
             if (task.getTaskPath().size() > maxTaskPathSizeToDisplaySubtasks) {
@@ -198,7 +198,7 @@ public class HtmlReportWriter {
                 sb.append("<td class=\"task-map-subtasks\" id=\"task").append(task.getTaskNumber()).append("-subtasks\">");
             }
             sb.append("<table class=\"task-subtasks\">");
-            for (ServerMigrationTaskExecution subtask : subtasks) {
+            for (TaskExecution subtask : subtasks) {
                 sb.append("<tr>");
                 sb.append("<td>");
                 appendTask(subtask, sb, maxTaskPathSizeToDisplaySubtasks);

@@ -17,6 +17,8 @@ package org.jboss.migration.core;
 
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 import java.nio.file.Path;
 

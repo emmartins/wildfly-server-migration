@@ -18,10 +18,10 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ public class WildFly10LegacySubsystem extends WildFly10Subsystem {
                 if(!SUCCESS.equals(outcome)) {
                     throw new RuntimeException("Subsystem "+subsystemName+" migration failed: "+result.get("migration-error").asString());
                 } else {
-                    final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().sucess();
+                    final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().success();
                     final List<String> migrateWarnings = new ArrayList<>();
                     if (result.get(RESULT).hasDefined("migration-warnings")) {
                         for (ModelNode modelNode : result.get(RESULT).get("migration-warnings").asList()) {

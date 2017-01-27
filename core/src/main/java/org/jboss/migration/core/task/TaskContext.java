@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.core;
+
+package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
+import org.jboss.migration.core.ServerMigrationContext;
+import org.jboss.migration.core.ServerMigrationFailedException;
 
 import java.util.List;
 
@@ -29,7 +32,7 @@ public interface TaskContext {
      * Retrieves the children task executions.
      * @return the children task executions
      */
-    List<? extends ServerMigrationTaskExecution> getSubtasks();
+    List<? extends TaskExecution> getSubtasks();
 
     /**
      * Indicates if there is any subtask that had success status
@@ -44,7 +47,7 @@ public interface TaskContext {
      * @throws IllegalStateException if the task result is already set
      * @throws ServerMigrationFailedException if the subtask execution failed
      */
-    ServerMigrationTaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException;
+    TaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException;
 
     /**
      * Retrieves the server migration context.

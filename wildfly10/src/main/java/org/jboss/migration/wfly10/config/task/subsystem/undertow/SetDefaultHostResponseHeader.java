@@ -20,13 +20,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER;
@@ -35,7 +34,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  * A task which adds a response header filter to Undertow's default host config.
  * @author emmartins
  */
-public class SetDefaultHostResponseHeader implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemConfigurationSubtask<S> {
 
     public static final String TASK_NAME_NAME = "add-default-host-response-header";
 
@@ -63,77 +62,65 @@ public class SetDefaultHostResponseHeader implements UpdateSubsystemTaskFactory.
         this.headerValue = headerValue;
     }
 
-    protected String getHeaderValue(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) {
+    protected String getHeaderValue(ModelNode config, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         return headerValue;
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
-        final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).addAttribute(RESPONSE_HEADER, filterName).build();
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return TASK_NAME;
-            }
+    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
+        return new ServerMigrationTaskName.Builder(TASK_NAME_NAME).addAttribute(RESPONSE_HEADER, filterName).build();
+    }
 
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                // TODO get ridden of pre-fetched subsystem config, if not an issue for any existent subsystem task
-                // refresh subsystem config to see any changes possibly made during migration
-                config = subsystemResources.getResourceConfiguration(subsystem.getName());
-                if (config == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final PathAddress configPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
-                // check if server is defined
-                final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));
-                if (!config.hasDefined(SERVER, SERVER_NAME)) {
-                    context.getLogger().debugf("Skipping task, server '%s' not found in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final ModelNode server = config.get(SERVER, SERVER_NAME);
-                // check if host is defined
-                final PathAddress defaultHostPathAddress = serverPathAddress.append(PathElement.pathElement(HOST, HOST_NAME));
-                if (!server.hasDefined(HOST, HOST_NAME)) {
-                    context.getLogger().debugf("Skipping task, host '%s' not found in Undertow's config %s", defaultHostPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final ModelNode defaultHost = server.get(HOST, HOST_NAME);
-                // add/update the response header
-                final String headerValue = getHeaderValue(config, subsystem, subsystemResources, context, taskEnvironment);
-                if (headerValue == null) {
-                    context.getLogger().debugf("Skipping task, null header-value");
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final PathAddress responseHeaderPathAddress = configPathAddress.append(CONFIGURATION, FILTER).append(RESPONSE_HEADER, filterName);
-                if (!config.hasDefined(CONFIGURATION, FILTER, RESPONSE_HEADER, filterName)) {
-                    // response header not defined, add it
-                    if (!config.hasDefined(CONFIGURATION, FILTER)) {
-                        final ModelNode op = Util.createAddOperation(configPathAddress.append(CONFIGURATION, FILTER));
-                        subsystemResources.getServerConfiguration().executeManagementOperation(op);
-                    }
-                    final ModelNode op = Util.createAddOperation(responseHeaderPathAddress);
-                    op.get(HEADER_NAME).set(headerName);
-                    op.get(HEADER_VALUE).set(headerValue);
-                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
-                } else {
-                    // response header exists, update its header-value attr
-                    final ModelNode op = Util.getWriteAttributeOperation(responseHeaderPathAddress, HEADER_VALUE, headerValue);
-                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
-                }
-                // add filter-ref to default host, if missing
-                if (!defaultHost.hasDefined(FILTER_REF, filterName)) {
-                    final PathAddress filterRefPathAddress = defaultHostPathAddress.append(FILTER_REF, filterName);
-                    final ModelNode op = Util.createAddOperation(filterRefPathAddress);
-                    subsystemResources.getServerConfiguration().executeManagementOperation(op);
-                }
-                context.getLogger().infof("Response header '%s' set as '%s: %s' in Undertow's config %s", filterName, headerName, headerValue, configPathAddress.toCLIStyleString());
-                return new ServerMigrationTaskResult.Builder()
-                        .sucess()
-                        .addAttribute(HEADER_NAME, headerName)
-                        .addAttribute(HEADER_VALUE, headerValue)
-                        .build();
+    @Override
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+        final PathAddress configPathAddress = subsystemConfiguration.getResourcePathAddress();
+        // check if server is defined
+        final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));
+        if (!config.hasDefined(SERVER, SERVER_NAME)) {
+            context.getLogger().debugf("Skipping task, server '%s' not found in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        final ModelNode server = config.get(SERVER, SERVER_NAME);
+        // check if host is defined
+        final PathAddress defaultHostPathAddress = serverPathAddress.append(PathElement.pathElement(HOST, HOST_NAME));
+        if (!server.hasDefined(HOST, HOST_NAME)) {
+            context.getLogger().debugf("Skipping task, host '%s' not found in Undertow's config %s", defaultHostPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        final ModelNode defaultHost = server.get(HOST, HOST_NAME);
+        // add/update the response header
+        final String headerValue = getHeaderValue(config, subsystemConfiguration, context, taskEnvironment);
+        if (headerValue == null) {
+            context.getLogger().debugf("Skipping task, null header-value");
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        final PathAddress responseHeaderPathAddress = configPathAddress.append(CONFIGURATION, FILTER).append(RESPONSE_HEADER, filterName);
+        if (!config.hasDefined(CONFIGURATION, FILTER, RESPONSE_HEADER, filterName)) {
+            // response header not defined, add it
+            if (!config.hasDefined(CONFIGURATION, FILTER)) {
+                final ModelNode op = Util.createAddOperation(configPathAddress.append(CONFIGURATION, FILTER));
+                subsystemConfiguration.getServerConfiguration().executeManagementOperation(op);
             }
-        };
+            final ModelNode op = Util.createAddOperation(responseHeaderPathAddress);
+            op.get(HEADER_NAME).set(headerName);
+            op.get(HEADER_VALUE).set(headerValue);
+            subsystemConfiguration.getServerConfiguration().executeManagementOperation(op);
+        } else {
+            // response header exists, update its header-value attr
+            final ModelNode op = Util.getWriteAttributeOperation(responseHeaderPathAddress, HEADER_VALUE, headerValue);
+            subsystemConfiguration.getServerConfiguration().executeManagementOperation(op);
+        }
+        // add filter-ref to default host, if missing
+        if (!defaultHost.hasDefined(FILTER_REF, filterName)) {
+            final PathAddress filterRefPathAddress = defaultHostPathAddress.append(FILTER_REF, filterName);
+            final ModelNode op = Util.createAddOperation(filterRefPathAddress);
+            subsystemConfiguration.getServerConfiguration().executeManagementOperation(op);
+        }
+        context.getLogger().infof("Response header '%s' set as '%s: %s' in Undertow's config %s", filterName, headerName, headerValue, configPathAddress.toCLIStyleString());
+        return new ServerMigrationTaskResult.Builder()
+                .success()
+                .addAttribute(HEADER_NAME, headerName)
+                .addAttribute(HEADER_VALUE, headerValue)
+                .build();
     }
 }

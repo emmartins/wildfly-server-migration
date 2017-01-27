@@ -18,13 +18,7 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ProfileResource;
-import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
 
@@ -49,30 +43,5 @@ public class ProfileResourceImpl extends AbstractManageableResource implements P
         super(resourceName, pathAddress, parent);
         subsystemResources = new SubsystemConfigurationImpl.Factory(pathAddress, this);
         addChildResourceFactory(subsystemResources);
-    }
-
-    @Override
-    public SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException {
-        return subsystemResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<SubsystemConfiguration> getSubsystemConfigurations() throws IOException {
-        return subsystemResources.getResources();
-    }
-
-    @Override
-    public Set<String> getSubsystemConfigurationNames() throws IOException {
-        return subsystemResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getSubsystemConfigurationPathAddress(String resourceName) {
-        return subsystemResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeSubsystemConfiguration(String resourceName) throws IOException {
-        subsystemResources.removeResource(resourceName);
     }
 }

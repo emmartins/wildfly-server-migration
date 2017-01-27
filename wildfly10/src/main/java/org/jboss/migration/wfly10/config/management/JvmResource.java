@@ -34,11 +34,27 @@ public interface JvmResource extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link JvmResource} children.
+     */
     interface Parent extends ManageableResource {
-        JvmResource getJvmResource(String resourceName) throws IOException;
-        List<JvmResource> getJvmResources() throws IOException;
-        Set<String> getJvmResourceNames() throws IOException;
-        PathAddress getJvmResourcePathAddress(String resourceName);
-        void removeJvmResource(String resourceName) throws IOException;
+        default JvmResource getJvmResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<JvmResource> getJvmResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getJvmResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getJvmResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getJvmResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeJvmResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

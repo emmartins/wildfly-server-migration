@@ -18,8 +18,8 @@ package org.jboss.migration.core.ts;
 import org.jboss.migration.core.AbstractServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

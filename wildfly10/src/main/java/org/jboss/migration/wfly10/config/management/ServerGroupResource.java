@@ -34,11 +34,27 @@ public interface ServerGroupResource extends ManageableResource, JvmResource.Par
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link ServerGroupResource} children.
+     */
     interface Parent extends ManageableResource {
-        ServerGroupResource getServerGroupResource(String resourceName) throws IOException;
-        List<ServerGroupResource> getServerGroupResources() throws IOException;
-        Set<String> getServerGroupResourceNames() throws IOException;
-        PathAddress getServerGroupResourcePathAddress(String resourceName);
-        void removeServerGroupResource(String resourceName) throws IOException;
+        default ServerGroupResource getServerGroupResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<ServerGroupResource> getServerGroupResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getServerGroupResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getServerGroupResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getServerGroupResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeServerGroupResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

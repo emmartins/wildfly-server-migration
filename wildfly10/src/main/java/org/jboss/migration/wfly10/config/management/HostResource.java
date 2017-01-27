@@ -34,11 +34,27 @@ public interface HostResource extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link HostResource} children.
+     */
     interface Parent extends ManageableResource {
-        HostResource getHostResource(String resourceName) throws IOException;
-        List<HostResource> getHostResources() throws IOException;
-        Set<String> getHostResourceNames() throws IOException;
-        PathAddress getHostResourcePathAddress(String resourceName);
-        void removeHostResource(String resourceName) throws IOException;
+        default HostResource getHostResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<HostResource> getHostResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getHostResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getHostResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getHostResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeHostResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

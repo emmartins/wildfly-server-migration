@@ -34,11 +34,27 @@ public interface SocketBindingResource extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link SocketBindingResource} children.
+     */
     interface Parent extends ManageableResource {
-        SocketBindingResource getSocketBindingResource(String resourceName) throws IOException;
-        List<SocketBindingResource> getSocketBindingResources() throws IOException;
-        Set<String> getSocketBindingResourceNames() throws IOException;
-        PathAddress getSocketBindingResourcePathAddress(String resourceName);
-        void removeSocketBindingResource(String resourceName) throws IOException;
+        default SocketBindingResource getSocketBindingResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<SocketBindingResource> getSocketBindingResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getSocketBindingResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getSocketBindingResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getSocketBindingResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeSocketBindingResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

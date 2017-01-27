@@ -34,11 +34,27 @@ public interface ManagementInterfaceResource extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link ManagementInterfaceResource} children.
+     */
     interface Parent extends ManageableResource {
-        ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException;
-        List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException;
-        Set<String> getManagementInterfaceResourceNames() throws IOException;
-        PathAddress getManagementInterfaceResourcePathAddress(String resourceName);
-        void removeManagementInterfaceResource(String resourceName) throws IOException;
+        default ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getManagementInterfaceResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getManagementInterfaceResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getManagementInterfaceResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeManagementInterfaceResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

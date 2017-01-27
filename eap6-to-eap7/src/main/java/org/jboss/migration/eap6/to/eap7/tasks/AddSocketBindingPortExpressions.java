@@ -21,20 +21,16 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.ValueExpression;
-import org.jboss.migration.core.AbstractServerMigrationTask;
-import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupResources;
-import org.jboss.migration.wfly10.config.management.SocketBindingResources;
-import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
-import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.core.task.AbstractServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
+import org.jboss.migration.wfly10.config.management.SocketBindingResource;
+import org.jboss.migration.wfly10.config.task.management.resource.composite.ManageableResourceCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.socketbinding.SocketBindingGroupResourceCompositeTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -42,7 +38,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Set socket binding's ports as value expressions.
  * @author emmartins
  */
-public class AddSocketBindingPortExpressions<S> implements ManageableServerConfigurationTaskFactory<S, ManageableServerConfiguration> {
+public class AddSocketBindingPortExpressions<S> extends SocketBindingGroupResourceCompositeTask.Builder<S> {
 
     public static final String[] SOCKET_BINDINGS = {
             "ajp",
@@ -50,96 +46,58 @@ public class AddSocketBindingPortExpressions<S> implements ManageableServerConfi
             "https"
     };
 
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("add-socket-binding-port-expressions").build();
-
     public static final AddSocketBindingPortExpressions INSTANCE = new AddSocketBindingPortExpressions();
 
     private AddSocketBindingPortExpressions() {
+        super(new ServerMigrationTaskName.Builder("add-socket-binding-port-expressions").build());
+        listener(new AbstractServerMigrationTask.Listener() {
+            @Override
+            public void started(TaskContext context) {
+                context.getLogger().infof("Adding socket binding's port expressions...");
+            }
+
+            @Override
+            public void done(TaskContext context) {
+                context.getLogger().infof("Socket binding's port expressions added.");
+            }
+        });
+        for (String socketBindingName : SOCKET_BINDINGS) {
+            subtask(ManageableResourceSelectors.toChild(SocketBindingResource.RESOURCE_TYPE, socketBindingName), new AddSocketBindingPortExpression<>());
+        }
     }
 
-    @Override
-    public ServerMigrationTask getTask(S source, ManageableServerConfiguration configuration) throws Exception {
-        return new ParentServerMigrationTask.Builder(TASK_NAME)
-                .subtask(SubtaskExecutorAdapters.of(source, configuration, new SubtaskExecutor<S>()))
-                .listener(new AbstractServerMigrationTask.Listener() {
-                    @Override
-                    public void started(TaskContext context) {
-                        context.getLogger().infof("Adding socket binding's port expressions...");
-                    }
-
-                    @Override
-                    public void done(TaskContext context) {
-                        context.getLogger().infof("Socket binding's port expressions added.");
-                    }
-                })
-                .build();
-    }
-
-    public static class SubtaskExecutor<S> implements SocketBindingGroupsManagementSubtaskExecutor<S> {
+    static class AddSocketBindingPortExpression<S> implements ManageableResourceCompositeTask.SubtaskFactory<S, SocketBindingResource> {
         @Override
-        public void executeSubtasks(S source, SocketBindingGroupResources resourceManagement, TaskContext context) throws Exception {
-            for (String socketBindingGroupName : resourceManagement.getResourceNames()) {
-                context.getLogger().debugf("Processing socket binding group %s...", socketBindingGroupName);
-                final SocketBindingGroupManagement socketBindingGroupManagement = resourceManagement.getSocketBindingGroupManagement(socketBindingGroupName);
-                for (String socketBindingName : SOCKET_BINDINGS) {
-                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("add-"+socketBindingName+"-port-expression")
-                            .addAttribute("group", socketBindingGroupManagement.getSocketBindingGroupName())
-                            .build();
-                    final String propertyName = "jboss."+socketBindingName+".port";
-                    final AddSocketBindingPortExpression subtask = new AddSocketBindingPortExpression(socketBindingName, subtaskName, propertyName , socketBindingGroupManagement.getSocketBindingsManagement());
-                    context.execute(new SkippableByEnvServerMigrationTask(subtask, TASK_NAME + "." + subtaskName.getName() + ".skip"));
+        public ServerMigrationTask getTask(S source, SocketBindingResource resource, TaskContext context) throws Exception {
+            final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("add-" + resource.getResourceName() + "-port-expression")
+                    .addAttribute("group", resource.getParentResource().getResourceName())
+                    .build();
+            final String propertyName = "jboss." + resource.getResourceName() + ".port";
+            final ManageableResourceLeafTask.Runnable<S, SocketBindingResource> runnable = (source1, resource1, context1) -> {
+                // retrieve resource config
+                final ModelNode config = resource1.getResourceConfiguration();
+                // check if attribute is defined
+                if (!config.hasDefined(PORT)) {
+                    context1.getLogger().debugf("Socket binding %s has no port defined, task to add port property skipped.", resource1.getResourceAbsoluteName());
+                    return ServerMigrationTaskResult.SKIPPED;
                 }
-            }
-        }
-    }
-
-    static class AddSocketBindingPortExpression implements ServerMigrationTask {
-
-        private final String resourceName;
-        private final String propertyName;
-        private final ServerMigrationTaskName taskName;
-        private final SocketBindingResources resourceManagement;
-
-        AddSocketBindingPortExpression(String resourceName, ServerMigrationTaskName taskName, String propertyName, SocketBindingResources resourceManagement) {
-            this.resourceName = resourceName;
-            this.propertyName = propertyName;
-            this.resourceManagement = resourceManagement;
-            this.taskName = taskName;
-        }
-
-        @Override
-        public ServerMigrationTaskName getName() {
-            return taskName;
-        }
-
-        @Override
-        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-            // retrieve resource config
-            final ModelNode resource = resourceManagement.getResourceConfiguration(resourceName);
-            if (resource == null) {
-                context.getLogger().debugf("Socket binding %s does not exists, task to add port property skipped.", resourceName);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            // check if attribute is defined
-            if (!resource.hasDefined(PORT)) {
-                context.getLogger().debugf("Socket binding %s has no port defined, task to add port property skipped.", resourceName);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            // check current attribute value
-            final ModelNode resourceAttr = resource.get(PORT);
-            if (resourceAttr.getType() == ModelType.EXPRESSION) {
-                context.getLogger().debugf("Socket binding %s unexpected port value %s, task to add port property skipped.", resourceName, resourceAttr.asExpression().getExpressionString());
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            // update attribute value
-            final ValueExpression valueExpression = new ValueExpression("${"+propertyName+":"+resourceAttr.asString()+"}");
-            final PathAddress pathAddress = resourceManagement.getResourcePathAddress(resourceName);
-            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-            writeAttrOp.get(NAME).set(PORT);
-            writeAttrOp.get(VALUE).set(valueExpression);
-            resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-            context.getLogger().infof("Socket binding %s port value expression set as %s.", pathAddress.toCLIStyleString(), valueExpression.getExpressionString());
-            return ServerMigrationTaskResult.SUCCESS;
+                // check current attribute value
+                final ModelNode resourceAttr = config.get(PORT);
+                if (resourceAttr.getType() == ModelType.EXPRESSION) {
+                    context1.getLogger().debugf("Socket binding %s unexpected port value %s, task to add port property skipped.", resource1.getResourceAbsoluteName(), resourceAttr.asExpression().getExpressionString());
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                // update attribute value
+                final ValueExpression valueExpression = new ValueExpression("${" + propertyName + ":" + resourceAttr.asString() + "}");
+                final PathAddress pathAddress = resource1.getResourcePathAddress();
+                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                writeAttrOp.get(NAME).set(PORT);
+                writeAttrOp.get(VALUE).set(valueExpression);
+                resource1.getServerConfiguration().executeManagementOperation(writeAttrOp);
+                context1.getLogger().infof("Socket binding %s port value expression set as %s.", pathAddress.toCLIStyleString(), valueExpression.getExpressionString());
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            return new ManageableResourceLeafTask.Builder<>(subtaskName, runnable).build(source, resource);
         }
     }
 }

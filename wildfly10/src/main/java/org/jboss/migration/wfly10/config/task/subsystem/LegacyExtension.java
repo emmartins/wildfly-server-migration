@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly10.config.task.subsystem;
 
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionResources;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
 

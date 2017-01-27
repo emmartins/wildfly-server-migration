@@ -22,18 +22,12 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.ExtensionConfiguration;
-import org.jboss.migration.wfly10.config.management.InterfaceResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
-import org.jboss.migration.wfly10.config.management.SystemPropertyConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Set;
 
 import static org.jboss.as.controller.PathAddress.pathAddress;
 import static org.jboss.as.controller.PathElement.pathElement;
@@ -142,105 +136,5 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public ExtensionConfiguration getExtensionConfiguration(String resourceName) throws IOException {
-        return extensionConfigurations.getResource(resourceName);
-    }
-
-    @Override
-    public List<ExtensionConfiguration> getExtensionConfigurations() throws IOException {
-        return extensionConfigurations.getResources();
-    }
-
-    @Override
-    public Set<String> getExtensionConfigurationNames() throws IOException {
-        return extensionConfigurations.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getExtensionConfigurationPathAddress(String resourceName) {
-        return extensionConfigurations.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeExtensionConfiguration(String resourceName) throws IOException {
-        extensionConfigurations.removeResource(resourceName);
-    }
-
-    @Override
-    public InterfaceResource getInterfaceResource(String resourceName) throws IOException {
-        return interfaceResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<InterfaceResource> getInterfaceResources() throws IOException {
-        return interfaceResources.getResources();
-    }
-
-    @Override
-    public Set<String> getInterfaceResourceNames() throws IOException {
-        return interfaceResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getInterfaceResourcePathAddress(String resourceName) {
-        return interfaceResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeInterfaceResource(String resourceName) throws IOException {
-        interfaceResources.removeResource(resourceName);
-    }
-
-    @Override
-    public SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException {
-        return socketBindingGroupResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException {
-        return socketBindingGroupResources.getResources();
-    }
-
-    @Override
-    public Set<String> getSocketBindingGroupResourceNames() throws IOException {
-        return socketBindingGroupResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getSocketBindingGroupResourcePathAddress(String resourceName) {
-        return socketBindingGroupResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeSocketBindingGroupResource(String resourceName) throws IOException {
-        socketBindingGroupResources.removeResource(resourceName);
-    }
-
-    @Override
-    public SystemPropertyConfiguration getSystemPropertyConfiguration(String resourceName) throws IOException {
-        return systemPropertyResources.getResource(resourceName);
-    }
-
-    @Override
-    public List<SystemPropertyConfiguration> getSystemPropertyConfigurations() throws IOException {
-        return systemPropertyResources.getResources();
-    }
-
-    @Override
-    public Set<String> getSystemPropertyConfigurationNames() throws IOException {
-        return systemPropertyResources.getResourceNames();
-    }
-
-    @Override
-    public PathAddress getSystemPropertyConfigurationPathAddress(String resourceName) {
-        return systemPropertyResources.getResourcePathAddress(resourceName);
-    }
-
-    @Override
-    public void removeSystemPropertyConfiguration(String resourceName) throws IOException {
-        systemPropertyResources.removeResource(resourceName);
     }
 }

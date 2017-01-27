@@ -18,11 +18,11 @@ package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.task.management.subsystem.SubsystemConfigurationTask;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -33,22 +33,20 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  */
 public class AddBufferCache<S> extends UpdateSubsystemConfigurationSubtask<S> {
 
-    public static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("add-undertow-default-buffer-cache").build();
-
     private static final String BUFFER_CACHE = "buffer-cache";
     private static final String BUFFER_CACHE_NAME = "default";
 
     @Override
-    public ServerMigrationTaskName getName(SubsystemConfigurationTask.Context<S> parentContext) {
-        return TASK_NAME;
+    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
+        return new ServerMigrationTaskName.Builder("add-undertow-default-buffer-cache").build();
     }
 
     @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, SubsystemConfigurationTask.Context<S> parentContext, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
         if (!config.hasDefined(BUFFER_CACHE, BUFFER_CACHE_NAME)) {
-            final PathAddress pathAddress = parentContext.getSubsystemConfigurationPathAddress().append(BUFFER_CACHE, BUFFER_CACHE_NAME);
-            parentContext.getServerConfiguration().executeManagementOperation(Util.createEmptyOperation(ADD, pathAddress));
-            taskContext.getLogger().infof("Undertow's default buffer cache added to config %s.", parentContext.getSubsystemConfigurationName());
+            final PathAddress pathAddress = subsystemConfiguration.getResourcePathAddress().append(BUFFER_CACHE, BUFFER_CACHE_NAME);
+            subsystemConfiguration.getServerConfiguration().executeManagementOperation(Util.createEmptyOperation(ADD, pathAddress));
+            taskContext.getLogger().infof("Undertow's default buffer cache added to config %s.", subsystemConfiguration.getResourceAbsoluteName());
             return ServerMigrationTaskResult.SUCCESS;
         } else {
             return ServerMigrationTaskResult.SKIPPED;

@@ -34,11 +34,27 @@ public interface SecurityRealmResource extends ManageableResource {
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link SecurityRealmResource} children.
+     */
     interface Parent extends ManageableResource {
-        SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException;
-        List<SecurityRealmResource> getSecurityRealmResources() throws IOException;
-        Set<String> getSecurityRealmResourceNames() throws IOException;
-        PathAddress getSecurityRealmResourcePathAddress(String resourceName);
-        void removeSecurityRealmResource(String resourceName) throws IOException;
+        default SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<SecurityRealmResource> getSecurityRealmResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getSecurityRealmResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getSecurityRealmResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getSecurityRealmResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeSecurityRealmResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

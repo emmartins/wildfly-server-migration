@@ -15,8 +15,8 @@
  */
 package org.jboss.migration.wfly10.config.task.subsystem;
 
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
 import java.io.IOException;

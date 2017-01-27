@@ -34,11 +34,27 @@ public interface ProfileResource extends ManageableResource, SubsystemConfigurat
         return RESOURCE_TYPE;
     }
 
+    /**
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link ProfileResource} children.
+     */
     interface Parent extends ManageableResource {
-        ProfileResource getProfileResource(String resourceName) throws IOException;
-        List<ProfileResource> getProfileResources() throws IOException;
-        Set<String> getProfileResourceNames() throws IOException;
-        PathAddress getProfileResourcePathAddress(String resourceName);
-        void removeProfileResource(String resourceName) throws IOException;
+        default ProfileResource getProfileResource(String resourceName) throws IOException {
+            return getChildResource(RESOURCE_TYPE, resourceName);
+        }
+        default List<ProfileResource> getProfileResources() throws IOException {
+            return getChildResources(RESOURCE_TYPE);
+        }
+        default Set<String> getProfileResourceNames() throws IOException {
+            return getChildResourceNames(RESOURCE_TYPE);
+        }
+        default PathAddress getProfileResourcePathAddress(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
+        }
+        default String getProfileResourceAbsoluteName(String resourceName) {
+            return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
+        }
+        default void removeProfileResource(String resourceName) throws IOException {
+            removeResource(RESOURCE_TYPE, resourceName);
+        }
     }
 }

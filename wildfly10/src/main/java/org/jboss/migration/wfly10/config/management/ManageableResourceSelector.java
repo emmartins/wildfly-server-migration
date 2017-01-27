@@ -32,18 +32,18 @@ import java.util.Set;
 @FunctionalInterface
 public interface ManageableResourceSelector<R extends ManageableResource> {
 
-    Set<R> collect(ManageableResource resource) throws IOException;
+    Set<R> fromResources(ManageableResource resource) throws IOException;
 
-    default <I extends ManageableResource> Set<R> collect(I... resources) throws IOException {
+    default <I extends ManageableResource> Set<R> fromResources(I... resources) throws IOException {
         Set<R> result = new HashSet<>();
         for (ManageableResource resource : resources) {
-            result.addAll(collect(resource));
+            result.addAll(fromResources(resource));
         }
         return result;
     }
 
-    default <I extends ManageableResource> Set<R> collect(Collection<I> resources) throws IOException {
-        return collect(resources.stream().toArray(ManageableResource[]::new));
+    default <I extends ManageableResource> Set<R> fromResources(Collection<I> resources) throws IOException {
+        return fromResources(resources.stream().toArray(ManageableResource[]::new));
     }
 
     /**
@@ -58,7 +58,7 @@ public interface ManageableResourceSelector<R extends ManageableResource> {
      */
     default ManageableResourceSelector<R> compose(ManageableResourceSelector<?> before) {
         Objects.requireNonNull(before);
-        return resource -> collect(before.collect(resource));
+        return resource -> fromResources(before.fromResources(resource));
     }
 
     /**
@@ -75,6 +75,6 @@ public interface ManageableResourceSelector<R extends ManageableResource> {
      */
     default <R1 extends ManageableResource> ManageableResourceSelector<R1> andThen(ManageableResourceSelector<R1> after) {
         Objects.requireNonNull(after);
-        return resource -> after.collect(collect(resource));
+        return resource -> after.fromResources(fromResources(resource));
     }
 }

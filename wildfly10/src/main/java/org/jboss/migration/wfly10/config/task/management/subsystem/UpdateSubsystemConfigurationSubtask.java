@@ -17,33 +17,41 @@
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.TaskContext;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 
 /**
  * @author emmartins
  */
-public abstract class UpdateSubsystemConfigurationSubtask<S> implements SubsystemConfigurationTask.Subtask<S> {
+public abstract class UpdateSubsystemConfigurationSubtask<S> implements SubsystemConfigurationTask.SubtaskFactory<S> {
+
+    public abstract ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext);
 
     @Override
-    public abstract ServerMigrationTaskName getName(SubsystemConfiguration subsystemConfiguration, TaskContext parentContext);
-
-    @Override
-    public ServerMigrationTaskResult run(SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
-        final String configName = subsystemConfiguration.getResourcePathAddress().toCLIStyleString();
-        final ModelNode config = subsystemConfiguration.getResourceConfiguration();
-        if (config == null) {
-            taskContext.getLogger().infof("Skipped subsystem config %s update, not found.", configName);
-            return ServerMigrationTaskResult.SKIPPED;
-        }
-        taskContext.getLogger().debugf("Updating subsystem config %s...", configName);
-        final ServerMigrationTaskResult taskResult = updateConfiguration(config, subsystemConfiguration, taskContext, taskEnvironment);
-        taskContext.getLogger().infof("Subsystem config %s updated.", configName);
-        return taskResult;
+    public ServerMigrationTask getTask(S source, SubsystemConfiguration resource, TaskContext context) throws Exception {
+        final ServerMigrationTaskName taskName = getName(source, resource, context);
+        final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(resource.getResourceName(), taskName.getName()));
+        final SubsystemConfigurationLeafTask.Runnable<S> runnable = (source1, resource1, context1) -> {
+            final String configName = resource1.getResourceAbsoluteName();
+            final ModelNode config = resource1.getResourceConfiguration();
+            if (config == null) {
+                context1.getLogger().infof("Skipped subsystem config %s update, not found.", configName);
+                return ServerMigrationTaskResult.SKIPPED;
+            }
+            context1.getLogger().debugf("Updating subsystem config %s...", configName);
+            final ServerMigrationTaskResult taskResult = updateConfiguration(config, source1, resource1, context1, taskEnvironment);
+            context1.getLogger().infof("Subsystem config %s updated.", configName);
+            return taskResult;
+        };
+        return new SubsystemConfigurationLeafTask.Builder<>(taskName, runnable)
+                .skipper(context1 -> taskEnvironment.isSkippedByEnvironment())
+                .build(source, resource);
     }
 
-    protected abstract ServerMigrationTaskResult updateConfiguration(ModelNode config, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
+    protected abstract ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception;
 }
