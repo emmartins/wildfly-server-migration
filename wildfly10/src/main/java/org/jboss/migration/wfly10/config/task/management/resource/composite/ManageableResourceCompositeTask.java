@@ -102,10 +102,10 @@ public abstract class ManageableResourceCompositeTask<S, R extends ManageableRes
 
     protected static abstract class Builder<S, R extends ManageableResource, T extends ManageableResourceCompositeTask<S, R, T>, B extends Builder<S, R, T, B>> extends CompositeTask.Builder<T, B> implements ManageableServerConfigurationTaskFactory<S, ManageableServerConfiguration> {
 
-        private S source;
-        private Collection<? extends R> resources;
-        private final ManageableResourceSelector<R> selector;
-        private final RunnableImpl runnable;
+        protected S source;
+        protected Collection<? extends R> resources;
+        protected final ManageableResourceSelector<R> selector;
+        protected final RunnableImpl runnable;
 
         protected Builder(ServerMigrationTaskName name, Class<R> resourceType) {
             this(name, ManageableResourceSelectors.selectResources(resourceType));

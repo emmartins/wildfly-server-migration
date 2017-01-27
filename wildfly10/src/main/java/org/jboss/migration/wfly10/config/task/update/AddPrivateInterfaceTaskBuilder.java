@@ -20,17 +20,13 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
-import org.jboss.migration.core.task.component.ComponentTask;
-import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.component.ComponentTask;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
-import org.jboss.migration.wfly10.config.task.management.resource.component.ManageableResourceComponentTask;
-import org.jboss.migration.wfly10.config.task.management.resource.composite.ManageableResourceCompositeTask;
 import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.component.BasicManageableResourceComponentTask;
 import org.jboss.migration.wfly10.config.task.management.socketbinding.SocketBindingGroupResourceCompositeTask;
 import org.jboss.migration.wfly10.config.task.management.socketbinding.SocketBindingGroupResourceLeafTask;
 
@@ -78,10 +74,13 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
             }
             return true;
         });
-        //subtask(new AddInterface<>());
-        subtask(new ManageableResourceComponentTask.Builder<>(new ServerMigrationTaskName.Builder("add-interface").build(), new ManageableResourceComponentTask.Runnable<S, ManageableServerConfiguration, ManageableResourceComponentTask<S, ManageableServerConfiguration>>() {
-            @Override
-            public ServerMigrationTaskResult run(ManageableResourceComponentTask<S, ManageableServerConfiguration> task, TaskContext context) throws Exception {
+        subtask(new AddInterface<>());
+        subtask(new UpdateSocketBindingGroups<>());
+    }
+
+    static class AddInterface<S> extends BasicManageableResourceComponentTask.Builder<S, ManageableServerConfiguration> {
+        AddInterface() {
+            super(new ServerMigrationTaskName.Builder("add-interface").build(), (task, context) -> {
                 final ManageableServerConfiguration serverConfiguration = task.getResource();
                 if (serverConfiguration.getInterfaceResourceNames().contains(INTERFACE_NAME)) {
                     context.getLogger().debugf("Skipping task to add private interface, the configuration already has it.");
@@ -92,32 +91,7 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
                 serverConfiguration.executeManagementOperation(addInterfaceOp);
                 context.getLogger().infof("Interface %s added.", INTERFACE_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
-            }
-        }));
-        subtask(new UpdateSocketBindingGroups<>());
-    }
-
-    static class AddInterface<S> implements ManageableResourceCompositeTask.SubtaskFactory<S, ManageableServerConfiguration> {
-        @Override
-        public ServerMigrationTask getTask(S source, ManageableServerConfiguration serverConfiguration, TaskContext parentContext) throws Exception {
-            final ManageableResourceComponentTask.<S>.Runnable runnable = (s, r, context) -> {
-                if (serverConfiguration.getInterfaceResourceNames().contains(INTERFACE_NAME)) {
-                    context.getLogger().debugf("Skipping task to add private interface, the configuration already has it.");
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                for (String socketBindingName : SOCKET_BINDING_NAMES) {
-                    if (!serverConfiguration.findResources(SocketBindingResource.class, socketBindingName).isEmpty()) {
-                        final ModelNode addInterfaceOp = Util.createAddOperation(serverConfiguration.getInterfaceResourcePathAddress(INTERFACE_NAME));
-                        addInterfaceOp.get(INET_ADDRESS).set(new ValueExpression("${jboss.bind.address.private:127.0.0.1}"));
-                        serverConfiguration.executeManagementOperation(addInterfaceOp);
-                        context.getLogger().infof("Interface %s added.", INTERFACE_NAME);
-                        return ServerMigrationTaskResult.SUCCESS;
-                    }
-                }
-                context.getLogger().debugf("Skipping task to add private interface, none of the target socket bindings were found.");
-                return ServerMigrationTaskResult.SKIPPED;
-            };
-            return new ManageableServerConfigurationLeafTask.Builder(new ServerMigrationTaskName.Builder("add-interface").build(), runnable).build(source, serverConfiguration);
+            });
         }
     }
 

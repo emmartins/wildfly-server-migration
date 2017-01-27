@@ -16,27 +16,18 @@
 
 package org.jboss.migration.wfly10.config.task.management.resource.composite;
 
-import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.component.NameFactory;
-import org.jboss.migration.core.task.composite.CompositeTask;
+import org.jboss.migration.core.task.composite.CompositeTaskRunnable;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
-import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.management.resource.component.ManageableResourceComponentTask;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author emmartins
  */
-public class BasicManageableResourceCompositeTask<S, R extends ManageableResource> extends ManageableResourceCompositeTask<S, R, BasicManageableResourceCompositeTask> {
+public class BasicManageableResourceCompositeTask<S, R extends ManageableResource> extends ManageableResourceCompositeTask<S, R, BasicManageableResourceCompositeTask<S, R>> {
 
     private final S source;
     private final Collection<? extends R> resources;
@@ -47,6 +38,11 @@ public class BasicManageableResourceCompositeTask<S, R extends ManageableResourc
         this.resources = builder.resources;
     }
 
+    @Override
+    protected BasicManageableResourceCompositeTask getThis() {
+        return this;
+    }
+
     public S getSource() {
         return source;
     }
@@ -55,29 +51,15 @@ public class BasicManageableResourceCompositeTask<S, R extends ManageableResourc
         return resources;
     }
 
-    // extensible component interfaces
-
     protected interface SubtaskExecutor<S, R extends ManageableResource> extends ManageableResourceCompositeTask.SubtaskExecutor<S, R, BasicManageableResourceCompositeTask<S, R>>  {
     }
 
     protected interface SubtaskFactory<S, R extends ManageableResource> extends ManageableResourceCompositeTask.SubtaskFactory<S, R, BasicManageableResourceCompositeTask<S, R>>  {
     }
 
-    protected interface RunnableExt<S, R extends ManageableResource, T extends BasicManageableResourceCompositeTask<S, R>> extends CompositeTask.Runnable<T> {
+    protected interface Runnable<S, R extends ManageableResource, T extends BasicManageableResourceCompositeTask<S, R>> extends CompositeTaskRunnable<T> {
     }
 
-    // default non extensible component interfaces
-
-    public interface SubtaskExecutor<S, R extends ManageableResource> extends SubtaskExecutorExt<S, R, BasicManageableResourceCompositeTask<S, R>> {
-        void run(Collection<? extends R> resources, T parentTask, TaskContext parentTaskContext) throws Exception;
-    }
-
-    public interface SubtaskFactory<S, R extends ManageableResource> extends SubtaskFactoryExt<S, R, BasicManageableResourceCompositeTask<S, R>> {
-        ServerMigrationTask getTask(R resource, T parentTask, TaskContext parentTaskContext) throws Exception;
-    }
-
-    protected interface Runnable<S, R extends ManageableResource> extends RunnableExt<S, R, BasicManageableResourceCompositeTask<S, R>> {
-    }
 
     public static class Builder<S, R extends ManageableResource> extends ManageableResourceCompositeTask.Builder<S, R, BasicManageableResourceCompositeTask<S, R>, Builder<S, R>> {
 
