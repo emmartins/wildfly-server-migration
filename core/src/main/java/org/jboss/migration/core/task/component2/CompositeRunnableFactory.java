@@ -25,23 +25,19 @@ import java.util.List;
  */
 public class CompositeRunnableFactory<P extends Parameters> implements RunnableFactory<P> {
 
-    private final P parameters;
     private final List<RunnableFactory<P>> factories;
 
-    public CompositeRunnableFactory(P parameters, List<RunnableFactory<P>> factories) {
-        this.parameters = parameters;
+    public CompositeRunnableFactory(List<RunnableFactory<P>> factories) {
         this.factories = factories;
     }
 
     @Override
     public Runnable newInstance(P parameters) {
-        return context -> {
+        return (name, context) -> {
             for (RunnableFactory<P> factory : factories) {
-                factory.newInstance(parameters).run(context);
+                factory.newInstance(parameters).run(name, context);
             }
             return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
         };
     }
-
-
 }

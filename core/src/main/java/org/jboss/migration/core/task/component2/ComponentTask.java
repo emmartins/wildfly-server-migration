@@ -48,33 +48,81 @@ public abstract class ComponentTask implements ServerMigrationTask {
         return runnable.run(name, context);
     }
 
-    public abstract static class Builder<P extends Parameters, T extends Builder<P, T>> implements ComponentTaskBuilder<P, T> {
+    protected abstract static class Builder<P extends Parameters, T extends Builder<P, T>> implements ComponentTaskBuilder<P, T> {
 
         private NameFactory<P> nameFactory;
         private SkipPolicy<P> skipPolicy;
+        private BeforeRun<P> beforeRun;
+        private AfterRun<P> afterRun;
 
+        protected Builder() {
+        }
+
+        protected Builder(Builder<P, ?> other) {
+            Objects.requireNonNull(other);
+            this.nameFactory = other.nameFactory;
+            this.skipPolicy = other.skipPolicy;
+            this.beforeRun = other.beforeRun;
+            this.afterRun = other.afterRun;
+        }
 
         @Override
         public T name(NameFactory<P> nameFactory) {
-            return null;
+            this.nameFactory = nameFactory;
+            return getThis();
         }
 
         @Override
         public T skipPolicy(SkipPolicy skipPolicy) {
-            return null;
+            this.skipPolicy = skipPolicy;
+            return getThis();
         }
 
         @Override
         public T beforeRun(BeforeRun beforeRun) {
-            return null;
+            this.beforeRun = beforeRun;
+            return getThis();
         }
 
         @Override
         public T afterRun(AfterRun afterRun) {
-            return null;
+            this.afterRun = afterRun;
+            return getThis();
         }
 
+        protected ServerMigrationTaskName buildName(P parameters) {
+            Objects.requireNonNull(nameFactory);
+            return nameFactory.newInstance(parameters);
+        }
+
+        protected Runnable buildRunnable(P parameters) {
+            final RunnableFactory<P> runnableFactory = getRunnableFactory();
+            Objects.requireNonNull(runnableFactory);
+            final SkipPolicy<P> skipPolicy = this.skipPolicy;
+            final BeforeRun<P> beforeRun = this.beforeRun;
+            final AfterRun<P> afterRun = this.afterRun;
+            return (taskName, context) -> {
+                if (skipPolicy != null && skipPolicy.isSkipped(parameters, taskName, context)) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                if (beforeRun != null) {
+                    beforeRun.beforeRun(parameters, taskName, context);
+                }
+                final ServerMigrationTaskResult result = runnableFactory.newInstance(parameters).run(taskName, context);
+                if (afterRun != null) {
+                    afterRun.afterRun(parameters, taskName, context);
+                }
+                return result;
+            };
+        }
+
+        @Override
+        public ServerMigrationTask build(P parameters) throws Exception {
+            return buildTask(buildName(parameters), buildRunnable(parameters));
+        }
 
         protected abstract T getThis();
+        protected abstract RunnableFactory<P> getRunnableFactory();
+        protected abstract ServerMigrationTask buildTask(ServerMigrationTaskName name, Runnable runnable);
     }
 }

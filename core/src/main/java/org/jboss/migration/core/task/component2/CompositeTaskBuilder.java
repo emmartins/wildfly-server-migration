@@ -17,6 +17,9 @@
 package org.jboss.migration.core.task.component2;
 
 import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 /**
  * @author emmartins
@@ -24,13 +27,13 @@ import org.jboss.migration.core.task.ServerMigrationTask;
 public interface CompositeTaskBuilder<P extends Parameters, T extends CompositeTaskBuilder<P, T>> extends ComponentTaskBuilder<P,T> {
 
     default T run(ServerMigrationTask task) {
-        final RunnableFactory<P> runnableFactory = parameters -> context -> context.execute(task).getResult();
+        final RunnableFactory<P> runnableFactory = parameters -> (taskName, context) -> context.execute(task).getResult();
         return run(runnableFactory);
     }
 
     default T run(ComponentTaskBuilder<P, ?> builder) {
         final ComponentTaskBuilder<P, ?> clone = builder.clone();
-        final RunnableFactory<P> runnableFactory = parameters -> context -> context.execute(clone.build(parameters)).getResult();
+        final RunnableFactory<P> runnableFactory = parameters -> (taskName, context) -> context.execute(clone.build(parameters)).getResult();
         return run(runnableFactory);
     }
 }
