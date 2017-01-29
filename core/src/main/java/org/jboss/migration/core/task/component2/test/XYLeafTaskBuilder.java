@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
+package org.jboss.migration.core.task.component2.test;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.component2.LeafTask;
 
 /**
  * @author emmartins
  */
-@FunctionalInterface
-public interface AfterRun<P extends Parameters> {
-    void afterRun(P parameters, ServerMigrationTaskName taskName, TaskContext context) throws Exception;
+public class XYLeafTaskBuilder extends LeafTask.Builder<XYTaskParams> {
 }

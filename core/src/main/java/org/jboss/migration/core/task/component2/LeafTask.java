@@ -22,44 +22,18 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 /**
  * @author emmartins
  */
-public class LeafTask extends ComponentTask {
+public class LeafTask extends AbstractTask {
 
-    public LeafTask(ServerMigrationTaskName name, Runnable runnable) {
-        super(name, runnable);
+    protected LeafTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+        super(name, taskRunnable);
     }
 
-    protected static abstract class BaseBuilder<P extends Parameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> {
-
-        private RunnableFactory<P> runnableFactory;
-
-        public BaseBuilder() {
-            super();
-        }
-
-        public BaseBuilder(BaseBuilder<P, ?> other) {
-            super(other);
-            this.runnableFactory = other.runnableFactory;
-        }
-
-        @Override
-        public T run(RunnableFactory<P> runnableFactory) {
-            this.runnableFactory = runnableFactory;
-            return getThis();
-        }
-
-        @Override
-        public RunnableFactory<P> getRunnableFactory() {
-            return runnableFactory;
-        }
-    }
-
-    public static class Builder<P extends Parameters> extends BaseBuilder<P, Builder<P>> {
+    public static class Builder<P extends TaskBuilder.Params> extends AbstractLeafTaskBuilder<P, Builder<P>> {
 
         public Builder() {
-            super();
         }
 
-        public Builder(Builder<P> other) {
+        protected Builder(Builder<P> other) {
             super(other);
         }
 
@@ -74,8 +48,8 @@ public class LeafTask extends ComponentTask {
         }
 
         @Override
-        protected ServerMigrationTask buildTask(ServerMigrationTaskName name, Runnable runnable) {
-            return new LeafTask(name, runnable);
+        protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+            return new LeafTask(name, taskRunnable);
         }
     }
 }

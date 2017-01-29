@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
-
-import org.jboss.migration.core.task.ServerMigrationTaskName;
+package org.jboss.migration.core.task.component2.test;
 
 /**
  * @author emmartins
  */
-@FunctionalInterface
-public interface RunnableFactory<P extends Parameters> {
-    Runnable newInstance(P parameters);
+public interface XYTaskParams extends XTaskParams, YTaskParams {
 }

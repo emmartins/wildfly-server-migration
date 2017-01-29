@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
+package org.jboss.migration.core.task.component2.test;
+
+import org.jboss.migration.core.task.component2.TaskBuilder;
 
 /**
  * @author emmartins
  */
-public interface LeafTaskBuilder<P extends TaskBuilder.Params, T extends LeafTaskBuilder<P, T>> extends TaskBuilder<P,T> {
+public interface YTaskParams extends TaskBuilder.Params {
+    int getY();
 }

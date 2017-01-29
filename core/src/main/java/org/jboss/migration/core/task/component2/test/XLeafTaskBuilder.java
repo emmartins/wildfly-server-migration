@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
+package org.jboss.migration.core.task.component2.test;
+
+import org.jboss.migration.core.task.component2.LeafTask;
 
 /**
  * @author emmartins
  */
-public interface ParametersAdapter<P extends Parameters> {
-    
+public class XLeafTaskBuilder extends LeafTask.Builder<XTaskParams> {
 }

@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
+package org.jboss.migration.core.task.component2.test;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.component2.TaskBuilder;
 
 /**
  * @author emmartins
  */
-@FunctionalInterface
-public interface Runnable {
-    ServerMigrationTaskResult run(ServerMigrationTaskName taskName, TaskContext context) throws Exception;
+public interface ZTaskParams extends TaskBuilder.Params {
+    int getZ();
 }

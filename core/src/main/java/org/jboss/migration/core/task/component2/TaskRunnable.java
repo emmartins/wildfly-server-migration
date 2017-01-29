@@ -17,12 +17,12 @@
 package org.jboss.migration.core.task.component2;
 
 import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 
 /**
  * @author emmartins
  */
-@FunctionalInterface
-public interface SkipPolicy<P extends Parameters> {
-    boolean isSkipped(P parameters, ServerMigrationTaskName taskName, TaskContext context) throws Exception;
+public interface TaskRunnable {
+    ServerMigrationTaskResult run(ServerMigrationTaskName taskName, TaskContext context) throws Exception;
 }

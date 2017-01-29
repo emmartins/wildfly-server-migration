@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
+package org.jboss.migration.core.task.component2.test;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.component.ComponentTask;
+import org.jboss.migration.core.task.component2.LeafTask;
 
 /**
  * @author emmartins
  */
-@FunctionalInterface
-public interface BeforeRun<P extends Parameters> {
-    void beforeRun(P parameters, ServerMigrationTaskName taskName, TaskContext context) throws Exception;
+public class YLeafTaskBuilder extends LeafTask.Builder<YTaskParams> {
 }

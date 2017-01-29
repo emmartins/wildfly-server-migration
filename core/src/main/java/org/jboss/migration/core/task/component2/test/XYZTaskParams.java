@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2;
+package org.jboss.migration.core.task.component2.test;
 
 /**
  * @author emmartins
  */
-public interface Parameters {
+public interface XYZTaskParams extends XYTaskParams,ZTaskParams {
 }

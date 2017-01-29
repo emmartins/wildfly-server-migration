@@ -18,32 +18,33 @@ package org.jboss.migration.core.task.component2;
 
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+
+import java.util.Objects;
 
 /**
  * @author emmartins
  */
-public interface ComponentTaskBuilder<P extends Parameters, T extends ComponentTaskBuilder<P, T>> {
+public abstract class AbstractTask implements ServerMigrationTask {
 
-    default T name(ServerMigrationTaskName name) {
-        return name(factory -> name);
+    private final ServerMigrationTaskName name;
+    private final TaskRunnable taskRunnable;
+
+    protected AbstractTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(taskRunnable);
+        this.name = name;
+        this.taskRunnable = taskRunnable;
     }
 
-    T name(NameFactory<P> nameFactory);
-
-    T skipPolicy(SkipPolicy skipPolicy);
-
-    T beforeRun(BeforeRun beforeRun);
-
-    default T run(Runnable runnable) {
-        final RunnableFactory<P> runnableFactory = parameters -> runnable;
-        return run(runnableFactory);
+    @Override
+    public ServerMigrationTaskName getName() {
+        return name;
     }
 
-    T run(RunnableFactory<P> runnableFactory);
-
-    T afterRun(AfterRun afterRun);
-
-    T clone();
-
-    ServerMigrationTask build(P parameters) throws Exception;
+    @Override
+    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+        return taskRunnable.run(name, context);
+    }
 }

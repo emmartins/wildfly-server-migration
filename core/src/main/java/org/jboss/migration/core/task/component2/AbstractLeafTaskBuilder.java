@@ -16,28 +16,29 @@
 
 package org.jboss.migration.core.task.component2;
 
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-
-import java.util.List;
-
 /**
  * @author emmartins
  */
-public class CompositeRunnableFactory<P extends Parameters> implements RunnableFactory<P> {
+public abstract class AbstractLeafTaskBuilder<P extends TaskBuilder.Params, T extends AbstractLeafTaskBuilder<P, T>> extends AbstractTaskBuilder<P, T> {
 
-    private final List<RunnableFactory<P>> factories;
+    private RunnableFactory<? super P> runnableFactory;
 
-    public CompositeRunnableFactory(List<RunnableFactory<P>> factories) {
-        this.factories = factories;
+    protected AbstractLeafTaskBuilder() {
+    }
+
+    protected AbstractLeafTaskBuilder(AbstractLeafTaskBuilder<P, ?> other) {
+        super(other);
+        this.runnableFactory = other.runnableFactory;
     }
 
     @Override
-    public Runnable newInstance(P parameters) {
-        return (name, context) -> {
-            for (RunnableFactory<P> factory : factories) {
-                factory.newInstance(parameters).run(name, context);
-            }
-            return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
-        };
+    public T run(RunnableFactory<? super P> runnableFactory) {
+        this.runnableFactory = runnableFactory;
+        return getThis();
+    }
+
+    @Override
+    public RunnableFactory<? super P> getRunnableFactory() {
+        return runnableFactory;
     }
 }

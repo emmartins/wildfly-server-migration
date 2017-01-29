@@ -19,45 +19,16 @@ package org.jboss.migration.core.task.component2;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author emmartins
  */
-public class CompositeTask extends ComponentTask {
+public class CompositeTask extends AbstractTask {
 
-    public CompositeTask(ServerMigrationTaskName name, Runnable runnable) {
-        super(name, runnable);
+    protected CompositeTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+        super(name, taskRunnable);
     }
 
-    protected static abstract class BaseBuilder<P extends Parameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> {
-
-        private final List<RunnableFactory<P>> runnableFactories = new ArrayList<>();
-
-        public BaseBuilder() {
-            super();
-        }
-
-        public BaseBuilder(BaseBuilder<P, ?> other) {
-            super(other);
-            this.runnableFactories.addAll(other.runnableFactories);
-        }
-
-        @Override
-        public T run(RunnableFactory<P> runnableFactory) {
-            this.runnableFactories.add(runnableFactory);
-            return getThis();
-        }
-
-        @Override
-        public RunnableFactory<P> getRunnableFactory() {
-            return new CompositeRunnableFactory<>(Collections.unmodifiableList(runnableFactories));
-        }
-    }
-
-    public static class Builder<P extends Parameters> extends BaseBuilder<P, Builder<P>> {
+    public static class Builder<P extends TaskBuilder.Params> extends AbstractCompositeTaskBuilder<P, Builder<P>> {
 
         public Builder() {
             super();
@@ -78,8 +49,8 @@ public class CompositeTask extends ComponentTask {
         }
 
         @Override
-        protected ServerMigrationTask buildTask(ServerMigrationTaskName name, Runnable runnable) {
-            return new CompositeTask(name, runnable);
+        protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+            return new CompositeTask(name, taskRunnable);
         }
     }
 }
