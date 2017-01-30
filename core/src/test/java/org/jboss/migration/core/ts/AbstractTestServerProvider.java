@@ -35,7 +35,7 @@ public abstract class AbstractTestServerProvider extends AbstractServerProvider 
     }
 
     @Override
-    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException {
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) {
         return TestServer.getBaseDir(testServer.getProductInfo()).equals(baseDir) ? testServer.getProductInfo() : null;
     }
 

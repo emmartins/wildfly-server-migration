@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.core.task;
 
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public class ServerMigrationTaskResult {
      * @param failReason the fail reason
      * @return a fail result with the specified reason, and no attributes
      */
-    public static ServerMigrationTaskResult fail(ServerMigrationFailedException failReason) {
+    public static ServerMigrationTaskResult fail(ServerMigrationFailureException failReason) {
         return new ServerMigrationTaskResult(Status.FAIL, failReason, null);
     }
 
@@ -54,10 +54,10 @@ public class ServerMigrationTaskResult {
     public enum Status { FAIL, SUCCESS, SKIPPED};
 
     private final Status status;
-    private final ServerMigrationFailedException failReason;
+    private final ServerMigrationFailureException failReason;
     private final Map<String, String> attributes;
 
-    private ServerMigrationTaskResult(final Status status, ServerMigrationFailedException failReason, Map<String, String> attributes) {
+    private ServerMigrationTaskResult(final Status status, ServerMigrationFailureException failReason, Map<String, String> attributes) {
         this.status = status;
         if (status == null) {
             throw new IllegalArgumentException("null status");
@@ -86,7 +86,7 @@ public class ServerMigrationTaskResult {
      * Retrieves the fail reason.
      * @return the fail reason
      */
-    public ServerMigrationFailedException getFailReason() {
+    public ServerMigrationFailureException getFailReason() {
         return failReason;
     }
 
@@ -100,7 +100,7 @@ public class ServerMigrationTaskResult {
      */
     public static class Builder {
         private Status status;
-        private ServerMigrationFailedException failReason;
+        private ServerMigrationFailureException failReason;
         private Map<String, String> attributes;
 
         /**
@@ -127,7 +127,7 @@ public class ServerMigrationTaskResult {
          * Sets the status as fail, with the specified reason.
          * @return the builder
          */
-        public Builder fail(ServerMigrationFailedException failReason) {
+        public Builder fail(ServerMigrationFailureException failReason) {
             status = Status.FAIL;
             this.failReason = failReason;
             return this;

@@ -26,6 +26,7 @@ import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.management.resource.component.ManageableResourceComponentTask;
 
@@ -142,12 +143,12 @@ public abstract class ManageableResourceCompositeTask<S, R extends ManageableRes
             return getThis();
         }
 
-        public B resources(Collection<? extends ManageableResource> resources) throws IOException {
+        public B resources(Collection<? extends ManageableResource> resources) throws ManagementOperationException {
             this.resources = Collections.unmodifiableSet(selector.fromResources(resources));
             return getThis();
         }
 
-        public B resources(ManageableResource resource) throws IOException {
+        public B resources(ManageableResource resource) throws ManagementOperationException {
             return resources(Collections.singleton(resource));
         }
 

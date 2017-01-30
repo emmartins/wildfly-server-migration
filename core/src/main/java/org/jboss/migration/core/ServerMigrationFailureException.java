@@ -16,23 +16,23 @@
 package org.jboss.migration.core;
 
 /**
- * A {@link RuntimeException} thrown in non-interactive mode to indicate failure.
+ * A generic {@link RuntimeException} thrown to indicate migration failure.
  *
  * @author emmartins
  */
-public class ServerMigrationFailedException extends RuntimeException {
+public class ServerMigrationFailureException extends RuntimeException {
 
     private static final long serialVersionUID = -6526393394847040107L;
 
-    public ServerMigrationFailedException(final String message) {
+    public ServerMigrationFailureException(final String message) {
         super(message);
     }
 
-    public ServerMigrationFailedException(Throwable cause) {
+    public ServerMigrationFailureException(Throwable cause) {
         super(cause);
     }
 
-    public ServerMigrationFailedException(String message, Throwable cause) {
+    public ServerMigrationFailureException(String message, Throwable cause) {
         super(message, cause);
     }
 }

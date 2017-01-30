@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public abstract class AbstractServerProvider implements ServerProvider {
 
     @Override
-    public Server getServer(String migrationName, Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException {
+    public Server getServer(String migrationName, Path baseDir, MigrationEnvironment migrationEnvironment) throws ServerMigrationFailureException {
         final ProductInfo productInfo = getProductInfo(baseDir, migrationEnvironment);
         return isProviderFor(productInfo) ? constructServer(migrationName, productInfo, baseDir, migrationEnvironment) : null;
     }
@@ -41,7 +41,7 @@ public abstract class AbstractServerProvider implements ServerProvider {
      * @return the {@link ProductInfo} from the specified base dir
      * @throws IOException if the product's info failed to be retrieved.
      */
-    protected abstract ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IOException;
+    protected abstract ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws ServerMigrationFailureException;
 
     protected boolean isProviderFor(ProductInfo productInfo) {
         if (productInfo == null) {

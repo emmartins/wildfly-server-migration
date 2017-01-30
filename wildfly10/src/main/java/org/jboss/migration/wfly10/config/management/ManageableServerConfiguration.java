@@ -32,9 +32,9 @@ public interface ManageableServerConfiguration extends ManageableResource, Exten
     void start();
     void stop();
     boolean isStarted();
-    ModelNode executeManagementOperation(ModelNode operation) throws IOException, ManagementOperationException;
+    ModelNode executeManagementOperation(ModelNode operation) throws ManagementOperationException;
     WildFlyServer10 getServer();
-    Path resolvePath(String path)  throws IOException, ManagementOperationException;
+    Path resolvePath(String path) throws ManagementOperationException;
     ModelControllerClient getModelControllerClient();
 
     class Type<T extends ManageableServerConfiguration> extends ManageableResource.Type<T> {

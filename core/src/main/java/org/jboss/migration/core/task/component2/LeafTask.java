@@ -22,28 +22,59 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 /**
  * @author emmartins
  */
-public class LeafTask extends AbstractTask {
+public class LeafTask extends ComponentTask {
 
     protected LeafTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
         super(name, taskRunnable);
     }
 
-    public static class Builder<P extends TaskBuilder.Params> extends AbstractLeafTaskBuilder<P, Builder<P>> {
+    public static <P extends BuildParameters> Builder<P, ?> builder() {
+        return new BuilderImpl<>();
+    }
 
-        public Builder() {
+    public interface Builder<P extends BuildParameters, T extends Builder<P, T>> extends ComponentTask.Builder<P,T> {
+    }
+
+    protected static abstract class AbstractBuilder<P extends BuildParameters, T extends AbstractBuilder<P, T>> extends ComponentTask.AbstractBuilder<P, T> implements Builder<P, T> {
+
+        private TaskRunnable.Builder<? super P> runnableBuilder;
+
+        protected AbstractBuilder() {
         }
 
-        protected Builder(Builder<P> other) {
+        protected AbstractBuilder(AbstractBuilder<P, ?> other) {
+            super(other);
+            this.runnableBuilder = other.runnableBuilder;
+        }
+
+        @Override
+        public T run(TaskRunnable.Builder<? super P> builder) {
+            this.runnableBuilder = builder;
+            return getThis();
+        }
+
+        @Override
+        public TaskRunnable.Builder<? super P> getRunnableBuilder() {
+            return runnableBuilder;
+        }
+    }
+
+    protected static class BuilderImpl<P extends BuildParameters> extends AbstractBuilder<P, BuilderImpl<P>> {
+
+        protected BuilderImpl() {
+        }
+
+        protected BuilderImpl(BuilderImpl<P> other) {
             super(other);
         }
 
         @Override
-        public Builder<P> clone() {
-            return new Builder(this);
+        public BuilderImpl<P> clone() {
+            return new BuilderImpl(this);
         }
 
         @Override
-        protected Builder<P> getThis() {
+        protected BuilderImpl<P> getThis() {
             return this;
         }
 

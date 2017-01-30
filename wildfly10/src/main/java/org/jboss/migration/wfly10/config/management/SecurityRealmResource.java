@@ -38,13 +38,13 @@ public interface SecurityRealmResource extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link SecurityRealmResource} children.
      */
     interface Parent extends ManageableResource {
-        default SecurityRealmResource getSecurityRealmResource(String resourceName) throws IOException {
+        default SecurityRealmResource getSecurityRealmResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<SecurityRealmResource> getSecurityRealmResources() throws IOException {
+        default List<SecurityRealmResource> getSecurityRealmResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getSecurityRealmResourceNames() throws IOException {
+        default Set<String> getSecurityRealmResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getSecurityRealmResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface SecurityRealmResource extends ManageableResource {
         default String getSecurityRealmResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeSecurityRealmResource(String resourceName) throws IOException {
+        default void removeSecurityRealmResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

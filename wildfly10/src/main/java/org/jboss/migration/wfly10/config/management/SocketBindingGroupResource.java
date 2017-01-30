@@ -38,13 +38,13 @@ public interface SocketBindingGroupResource extends ManageableResource, SocketBi
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link SocketBindingGroupResource} children.
      */
     interface Parent extends ManageableResource {
-        default SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws IOException {
+        default SocketBindingGroupResource getSocketBindingGroupResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<SocketBindingGroupResource> getSocketBindingGroupResources() throws IOException {
+        default List<SocketBindingGroupResource> getSocketBindingGroupResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getSocketBindingGroupResourceNames() throws IOException {
+        default Set<String> getSocketBindingGroupResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getSocketBindingGroupResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface SocketBindingGroupResource extends ManageableResource, SocketBi
         default String getSocketBindingGroupResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeSocketBindingGroupResource(String resourceName) throws IOException {
+        default void removeSocketBindingGroupResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

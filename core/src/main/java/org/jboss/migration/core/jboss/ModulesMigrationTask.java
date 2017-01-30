@@ -16,14 +16,13 @@
 
 package org.jboss.migration.core.jboss;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.core.env.TaskEnvironment;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +75,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
         }
     }
 
-    protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) throws Exception {
+    protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
         final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.<String>emptyList());
         for (String module : includedModules) {
             moduleMigrator.migrateModule(module, "requested by environment", context);
@@ -98,18 +97,18 @@ public class ModulesMigrationTask implements ServerMigrationTask {
             }
         }
 
-        public void migrateModule(String moduleId, String reason, final TaskContext context) throws IOException {
+        public void migrateModule(String moduleId, String reason, final TaskContext context) {
             migrateModule(ModuleIdentifier.fromString(moduleId), reason, context);
         }
 
-        public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final TaskContext context) throws IOException {
+        public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final TaskContext context) throws IllegalStateException {
             if (excludedByEnvironment.contains(moduleIdentifier)) {
                 context.getLogger().infof("Skipping module %s migration, it's excluded by environment.", moduleIdentifier);
                 return;
             }
             final JBossServer.Module sourceModule = sourceModules.getModule(moduleIdentifier);
             if (sourceModule == null) {
-                throw new IOException("Migration of module "+moduleIdentifier+" required, but module not found in source server.");
+                throw new IllegalStateException("Migration of module "+moduleIdentifier+" required, but module not found in source server.");
             }
             if (targetModules.getModule(moduleIdentifier) != null) {
                 context.getLogger().debugf("Skipping module %s migration, already exists in target.", moduleIdentifier, reason);

@@ -15,6 +15,8 @@
  */
 package org.jboss.migration.core.task;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 /**
  * The server migration task.
  * @author emmartins
@@ -31,7 +33,7 @@ public interface ServerMigrationTask {
      * Runs the task.
      * @param context the task context
      * @return the task result.
-     * @throws Exception if the task failed to run
+     * @throws ServerMigrationFailureException if the task failed to run
      */
-    ServerMigrationTaskResult run(TaskContext context) throws Exception;
+    ServerMigrationTaskResult run(TaskContext context) throws ServerMigrationFailureException;
 }

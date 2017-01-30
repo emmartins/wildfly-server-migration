@@ -18,6 +18,7 @@ package org.jboss.migration.wfly10.config.task.subsystem;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.AbstractServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
@@ -56,7 +57,7 @@ public abstract class AbstractSubsystemTask<S> extends AbstractServerMigrationTa
         this.taskEnvironment = taskEnvironment;
     }
 
-    protected ModelNode getConfig() throws IOException {
+    protected ModelNode getConfig() throws ServerMigrationFailureException {
         return getSubsystemResources().getResourceConfiguration(getSubsystem());
     }
 

@@ -144,13 +144,13 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
                 if (defaultJmsConnectionFactoryJndiName != null) {
                     addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
                     taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, defaultJmsConnectionFactoryJndiName);
-                    context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", defaultJmsConnectionFactoryJndiName);
+                    context.getLogger().infof("Java EE Default JMS Connection Builder configured with JNDI name %s.", defaultJmsConnectionFactoryJndiName);
                 } else {
                     if (context.getServerMigrationContext().isInteractive()) {
-                        context.getLogger().infof("Default JMS Connection Factory not found");
+                        context.getLogger().infof("Default JMS Connection Builder not found");
                     } else {
                         // not interactive, skip it
-                        context.getLogger().infof("Default JMS Connection Factory not found, skipping its configuration due to non interactive mode");
+                        context.getLogger().infof("Default JMS Connection Builder not found, skipping its configuration due to non interactive mode");
                         return;
                     }
                     // retrieve the names of configured factories
@@ -196,7 +196,7 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
                         private void processJmsConnectionFactoryJndiName(final String jmsConnectionFactoryJndiName) throws Exception {
                             addOp.get("jms-connection-factory").set(jmsConnectionFactoryJndiName);
                             taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, jmsConnectionFactoryJndiName);
-                            context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", jmsConnectionFactoryJndiName);
+                            context.getLogger().infof("Java EE Default JMS Connection Builder configured with JNDI name %s.", jmsConnectionFactoryJndiName);
                             final UserConfirmation.ResultHandler resultHandler = new org.jboss.migration.core.console.UserConfirmation.ResultHandler() {
                                 @Override
                                 public void onNo() throws Exception {
@@ -214,10 +214,10 @@ public class AddDefaultBindingsConfig implements UpdateSubsystemTaskFactory.Subt
                             };
                             final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
                             consoleWrapper.printf("%n");
-                            new UserConfirmation(consoleWrapper, "Save this Java EE Default JMS Connection Factory JNDI name and use it when migrating other config files?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+                            new UserConfirmation(consoleWrapper, "Save this Java EE Default JMS Connection Builder JNDI name and use it when migrating other config files?", ROOT_LOGGER.yesNo(), resultHandler).execute();
                         }
                     };
-                    new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Factory, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Factory: ", resultHandler).execute();
+                    new UserChoiceWithOtherOption(context.getServerMigrationContext().getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Builder, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Builder: ", resultHandler).execute();
                 }
             }
             private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, SubsystemResources subsystemResources, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) throws Exception {

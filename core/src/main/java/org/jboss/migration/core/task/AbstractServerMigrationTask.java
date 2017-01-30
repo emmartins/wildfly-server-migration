@@ -16,6 +16,8 @@
 
 package org.jboss.migration.core.task;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 /**
  * An abstract {@link ServerMigrationTask} implementation.
  * @author emmartins
@@ -42,7 +44,7 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
     }
 
     @Override
-    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(TaskContext context) throws ServerMigrationFailureException {
         if (skipper != null && skipper.isSkipped(context)) {
             return ServerMigrationTaskResult.SKIPPED;
         }
@@ -62,7 +64,7 @@ public abstract class AbstractServerMigrationTask implements ServerMigrationTask
      * @return
      * @throws Exception
      */
-    protected abstract ServerMigrationTaskResult runTask(TaskContext context) throws Exception;
+    protected abstract ServerMigrationTaskResult runTask(TaskContext context) throws ServerMigrationFailureException;
 
     /**
      * A listener for task run related events.

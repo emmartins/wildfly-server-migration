@@ -16,8 +16,22 @@
 
 package org.jboss.migration.core.task.component2;
 
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.TaskContext;
+
 /**
  * @author emmartins
  */
-public interface LeafTaskBuilder<P extends TaskBuilder.Params, T extends LeafTaskBuilder<P, T>> extends TaskBuilder<P,T> {
+public /**
+ *
+ * @param <P>
+ */
+
+interface BeforeTaskRun {
+
+    void beforeRun(TaskContext context);
+
+    interface Builder<P extends BuildParameters> {
+        BeforeTaskRun build(P parameters, ServerMigrationTaskName taskName);
+    }
 }

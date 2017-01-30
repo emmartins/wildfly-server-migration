@@ -20,6 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
+import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
@@ -69,7 +70,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         try {
             standaloneServer.start();
         } catch (EmbeddedProcessStartException e) {
-            throw new RuntimeException(e);
+            throw new ManagementOperationException(e);
         }
         return standaloneServer.getModelControllerClient();
     }
@@ -82,17 +83,17 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     }
 
     @Override
-    public DeploymentResource getDeploymentResource(String resourceName) throws IOException {
+    public DeploymentResource getDeploymentResource(String resourceName) throws ManagementOperationException {
         return deploymentResources.getResource(resourceName);
     }
 
     @Override
-    public List<DeploymentResource> getDeploymentResources() throws IOException {
+    public List<DeploymentResource> getDeploymentResources() throws ManagementOperationException {
         return deploymentResources.getResources();
     }
 
     @Override
-    public Set<String> getDeploymentResourceNames() throws IOException {
+    public Set<String> getDeploymentResourceNames() throws ManagementOperationException {
         return deploymentResources.getResourceNames();
     }
 
@@ -102,7 +103,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     }
 
     @Override
-    public void removeDeploymentResource(String resourceName) throws IOException {
+    public void removeDeploymentResource(String resourceName) throws ManagementOperationException {
         deploymentResources.removeResource(resourceName);
     }
 

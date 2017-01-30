@@ -21,5 +21,5 @@ import org.jboss.migration.core.task.component2.LeafTask;
 /**
  * @author emmartins
  */
-public class XLeafTaskBuilder extends LeafTask.Builder<XTaskParams> {
+public class XLeafTaskBuilder extends LeafTask.BuilderImpl<XTaskParams> {
 }

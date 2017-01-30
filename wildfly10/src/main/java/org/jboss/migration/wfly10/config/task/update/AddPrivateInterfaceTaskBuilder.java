@@ -22,26 +22,26 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.component.ComponentTask;
+import org.jboss.migration.core.task.component2.CompositeTask;
+import org.jboss.migration.core.task.component2.TaskRunnable;
+import org.jboss.migration.core.task.component2.TaskSkipPolicy;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
-import org.jboss.migration.wfly10.config.task.management.ManageableServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.component.BasicManageableResourceComponentTask;
-import org.jboss.migration.wfly10.config.task.management.socketbinding.SocketBindingGroupResourceCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.socketbinding.SocketBindingGroupResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableServerConfigurationTasks;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
-import static org.jboss.migration.wfly10.config.management.ManageableResourceSelectors.selectResources;
-import static org.jboss.migration.wfly10.config.management.ManageableResourceSelectors.selectServerConfiguration;
 
 /**
  * Adds private interface to config, and updates jgroup socket bindings to use it.
  * @author emmartins
  */
-public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigurationCompositeTask.Builder<S, ManageableServerConfiguration> {
+public class AddPrivateInterfaceTaskBuilder<S> extends CompositeTask.BuilderImpl<ManageableServerConfigurationTasks.Parameters<S>, AddPrivateInterfaceTaskBuilder<S>> {
 
     public static final AddPrivateInterfaceTaskBuilder INSTANCE = new AddPrivateInterfaceTaskBuilder();
 
@@ -50,38 +50,31 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
     private static final String[] SOCKET_BINDING_NAMES = {"jgroups-mping", "jgroups-tcp", "jgroups-tcp-fd", "jgroups-udp", "jgroups-udp-fd"};
 
     private AddPrivateInterfaceTaskBuilder() {
-        super(new ServerMigrationTaskName.Builder(TASK_NAME).build(), ManageableServerConfiguration.class);
-        beforeRun((task, context) -> context.getLogger().infof("Private interface setup starting..."));
-        afterRun((task, context) -> context.getLogger().infof("Private interface setup done."));
-        skipPolicy((task, context) -> {
-            if (ComponentTask.Skippers.skipIfDefaultSkipPropertyIsSet().isSkipped(task, context)) {
+        super();
+        name(new ServerMigrationTaskName.Builder(TASK_NAME).build());
+        skipPolicy((params, name) -> context -> {
+            if (TaskSkipPolicy.Builders.skipIfDefaultSkipPropertyIsSet().build(params, name).isSkipped(context)) {
                 return true;
             }
-            /*
-            for (ManageableServerConfiguration resource : task.getResources()) {
-                for (String socketBindingName : SOCKET_BINDING_NAMES) {
-                    if (!resource.findResources(SocketBindingResource.class, socketBindingName).isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-            */
             for (String socketBindingName : SOCKET_BINDING_NAMES) {
-                if (!selectServerConfiguration().andThen(selectResources(SocketBindingResource.class, socketBindingName)).fromResources(task.getResources()).isEmpty()) {
+                if (!ManageableResourceSelectors.selectResources(SocketBindingResource.class, socketBindingName).fromResources(params.getServerConfiguration()).isEmpty()) {
                     return false;
                 }
             }
             return true;
         });
-        subtask(new AddInterface<>());
-        subtask(new UpdateSocketBindingGroups<>());
+        beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
+        run(new AddInterface<>());
+        run(new UpdateSocketBindings<>());
+        afterRun(context -> context.getLogger().infof("Private interface setup done."));
     }
 
-    static class AddInterface<S> extends BasicManageableResourceComponentTask.Builder<S, ManageableServerConfiguration> {
+
+    static class AddInterface<S> extends ManageableServerConfigurationTasks.Leaf.Builder<ManageableServerConfigurationTasks.Parameters<S>> {
         AddInterface() {
-            super(new ServerMigrationTaskName.Builder("add-interface").build(), (task, context) -> {
-                final ManageableServerConfiguration serverConfiguration = task.getResource();
+            name(new ServerMigrationTaskName.Builder("add-interface").build());
+            run((params, taskName) -> context -> {
+                final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
                 if (serverConfiguration.getInterfaceResourceNames().contains(INTERFACE_NAME)) {
                     context.getLogger().debugf("Skipping task to add private interface, the configuration already has it.");
                     return ServerMigrationTaskResult.SKIPPED;
@@ -95,35 +88,46 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
         }
     }
 
-    static class UpdateSocketBindingGroups<S> extends SocketBindingGroupResourceCompositeTask.Builder<S> {
-        public UpdateSocketBindingGroups() {
-            super(new ServerMigrationTaskName.Builder("update-socket-binding-groups").build());
-            subtask((fSource, fSocketBindingGroupResource, fContext) -> {
-                final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", fSocketBindingGroupResource.getResourceName()).build();
-                final SocketBindingGroupResourceLeafTask.Runnable<S> taskRunnable = (rSource, rSocketBindingGroupResource, rContext) -> {
-                    final List<String> updated = new ArrayList<>();
-                    for (String socketBinding : SOCKET_BINDING_NAMES) {
-                        SocketBindingResource socketBindingResource = rSocketBindingGroupResource.getSocketBindingResource(socketBinding);
-                        ModelNode config = socketBindingResource.getResourceConfiguration();
-                        if (config != null) {
-                            if (!config.hasDefined(INTERFACE) || !config.get(INTERFACE).asString().equals(INTERFACE_NAME)) {
-                                final PathAddress pathAddress = socketBindingResource.getResourcePathAddress();
-                                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                                writeAttrOp.get(NAME).set(INTERFACE);
-                                writeAttrOp.get(VALUE).set(INTERFACE_NAME);
-                                socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                                rContext.getLogger().infof("Socket binding %s interface set to %s", pathAddress.toCLIStyleString(), INTERFACE_NAME);
-                                updated.add(socketBinding);
-                            }
+    static class UpdateSocketBindings<S> extends ManageableResourceTasks.Composite.Builder<S, SocketBindingGroupResource> {
+        UpdateSocketBindings() {
+            name(new ServerMigrationTaskName.Builder("update-socket-bindings").build());
+            run(TaskRunnable.Adapters.of(ManageableResourceTasks.ResourceBuildParameters.Mappers.from(ManageableResourceSelectors.selectResources(SocketBindingGroupResource.class)), new UpdateSocketBindingGroup<S>()));
+            /*
+            run(new ConvertParams<ManageableServerConfigurationTaskParams<S>, ManageableResourcesTaskParams<S, SocketBindingGroupResource>>(){
+                @Override
+                public ManageableResourcesTaskParams<S, SocketBindingGroupResource> apply(ManageableServerConfigurationTaskParams<S> sManageableServerConfigurationTaskParams) {
+                    return null;
+                }
+            }, new UpdateSocketBindingGroup<>);
+            */
+        }
+    }
+
+    static class UpdateSocketBindingGroup<S> extends ManageableResourceTasks.Leaf.Builder<S, SocketBindingGroupResource> {
+        UpdateSocketBindingGroup() {
+            name(params -> new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", params.getResource().getResourceName()).build());
+            run((params, taskName) -> context -> {
+                final List<String> updated = new ArrayList<>();
+                for (String socketBinding : SOCKET_BINDING_NAMES) {
+                    SocketBindingResource socketBindingResource = params.getResource().getSocketBindingResource(socketBinding);
+                    ModelNode config = socketBindingResource.getResourceConfiguration();
+                    if (config != null) {
+                        if (!config.hasDefined(INTERFACE) || !config.get(INTERFACE).asString().equals(INTERFACE_NAME)) {
+                            final PathAddress pathAddress = socketBindingResource.getResourcePathAddress();
+                            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                            writeAttrOp.get(NAME).set(INTERFACE);
+                            writeAttrOp.get(VALUE).set(INTERFACE_NAME);
+                            socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
+                            context.getLogger().infof("Socket binding %s interface set to %s", pathAddress.toCLIStyleString(), INTERFACE_NAME);
+                            updated.add(socketBinding);
                         }
                     }
-                    if (updated.isEmpty()) {
-                        return ServerMigrationTaskResult.SKIPPED;
-                    } else {
-                        return new ServerMigrationTaskResult.Builder().success().addAttribute("updated", updated.toString()).build();
-                    }
-                };
-                return new SocketBindingGroupResourceLeafTask.Builder<>(taskName, taskRunnable).build(fSource, fSocketBindingGroupResource);
+                }
+                if (updated.isEmpty()) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                } else {
+                    return new ServerMigrationTaskResult.Builder().success().addAttribute("updated", updated.toString()).build();
+                }
             });
         }
     }

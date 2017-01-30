@@ -20,6 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.AbstractServerMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.jboss.JBossServer;
@@ -130,7 +131,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
             return ServerMigrationTaskResult.SUCCESS;
         }
 
-        private void copyPropertiesFile(String propertiesName, String securityRealmName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmResources securityRealmResources, TaskContext context) throws IOException {
+        private void copyPropertiesFile(String propertiesName, String securityRealmName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmResources securityRealmResources, TaskContext context) throws ServerMigrationFailureException {
             final Server sourceServer = source.getServer();
             final Server targetServer = securityRealmResources.getServerConfiguration().getServer();
             final ModelNode properties = securityRealmConfig.get(propertiesName, PROPERTIES);
@@ -162,13 +163,13 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                     // path is relative to relative_to
                     final Path resolvedSourcePath = sourceServer.resolvePath(relativeTo);
                     if (resolvedSourcePath == null) {
-                        throw new IOException("failed to resolve source path "+relativeTo);
+                        throw new ServerMigrationFailureException("failed to resolve source path "+relativeTo);
                     }
                     final Path sourcePath = resolvedSourcePath.normalize().resolve(path);
                     context.getLogger().debugf("Source Properties file path: %s", sourcePath);
                     final Path resolvedTargetPath = targetServer.resolvePath(relativeTo);
                     if (resolvedTargetPath == null) {
-                        throw new IOException("failed to resolve target path "+relativeTo);
+                        throw new ServerMigrationFailureException("failed to resolve target path "+relativeTo);
                     }
                     final Path targetPath = resolvedTargetPath.normalize().resolve(path);
                     context.getLogger().debugf("Target Properties file path: %s", targetPath);

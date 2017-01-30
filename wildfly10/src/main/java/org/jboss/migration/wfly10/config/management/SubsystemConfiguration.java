@@ -39,13 +39,13 @@ public interface SubsystemConfiguration extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link SubsystemConfiguration} children.
      */
     interface Parent extends ManageableResource {
-        default SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws IOException {
+        default SubsystemConfiguration getSubsystemConfiguration(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<SubsystemConfiguration> getSubsystemConfigurations() throws IOException {
+        default List<SubsystemConfiguration> getSubsystemConfigurations() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getSubsystemConfigurationNames() throws IOException {
+        default Set<String> getSubsystemConfigurationNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getSubsystemConfigurationPathAddress(String resourceName) {
@@ -54,7 +54,7 @@ public interface SubsystemConfiguration extends ManageableResource {
         default String getSubsystemConfigurationAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeSubsystemConfiguration(String resourceName) throws IOException {
+        default void removeSubsystemConfiguration(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

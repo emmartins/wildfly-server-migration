@@ -17,6 +17,7 @@ package org.jboss.migration.cli;
 
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.SystemEnvironment;

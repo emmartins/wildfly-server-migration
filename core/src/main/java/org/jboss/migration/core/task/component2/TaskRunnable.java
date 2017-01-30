@@ -24,5 +24,42 @@ import org.jboss.migration.core.task.TaskContext;
  * @author emmartins
  */
 public interface TaskRunnable {
-    ServerMigrationTaskResult run(ServerMigrationTaskName taskName, TaskContext context) throws Exception;
+
+    ServerMigrationTaskResult run(TaskContext context);
+
+    /**
+     *
+     * @param <P>
+     */
+    @FunctionalInterface
+    interface Builder<P extends BuildParameters> {
+        TaskRunnable build(P params, ServerMigrationTaskName taskName);
+    }
+
+    interface Adapters {
+
+        static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> of(BuildParameters.Mapper<R, T> mapper, TaskRunnable.Builder<? super T> tBuilder) {
+            return (r, taskName) -> context -> {
+                final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().skipped();
+                for (T t : mapper.apply(r)) {
+                    if (tBuilder.build(t, taskName).run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
+                        resultBuilder.success();
+                    }
+                }
+                return resultBuilder.build();
+            };
+        }
+
+        static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> of(BuildParameters.Mapper<R, T> mapper, ComponentTask.Builder<? super T, ?> tBuilder) {
+            return (r, taskName) -> context -> {
+                final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().skipped();
+                for (T t : mapper.apply(r)) {
+                    if (context.execute(tBuilder.build(t)).getResult().getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
+                        resultBuilder.success();
+                    }
+                }
+                return resultBuilder.build();
+            };
+        }
+    }
 }

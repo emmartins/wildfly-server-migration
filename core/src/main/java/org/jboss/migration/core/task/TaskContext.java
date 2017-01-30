@@ -18,7 +18,7 @@ package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
 import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.List;
 
@@ -45,9 +45,9 @@ public interface TaskContext {
      * @param subtask the subtask to execute
      * @return the subtask execution
      * @throws IllegalStateException if the task result is already set
-     * @throws ServerMigrationFailedException if the subtask execution failed
+     * @throws ServerMigrationFailureException if the subtask execution failed
      */
-    TaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException;
+    TaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailureException;
 
     /**
      * Retrieves the server migration context.

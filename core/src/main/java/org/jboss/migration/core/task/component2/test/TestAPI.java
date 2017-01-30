@@ -20,16 +20,14 @@ import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.component2.TaskBuilder;
-import org.jboss.migration.core.task.component2.TaskBuilder.AfterRun;
-import org.jboss.migration.core.task.component2.TaskBuilder.BeforeRun;
+import org.jboss.migration.core.task.component2.AfterTaskRun;
+import org.jboss.migration.core.task.component2.BeforeTaskRun;
+import org.jboss.migration.core.task.component2.BuildParameters;
 import org.jboss.migration.core.task.component2.CompositeTask;
 import org.jboss.migration.core.task.component2.LeafTask;
-import org.jboss.migration.core.task.component2.TaskBuilder.NameFactory;
-import org.jboss.migration.core.task.component2.TaskBuilder.Params;
+import org.jboss.migration.core.task.component2.TaskNameBuilder;
 import org.jboss.migration.core.task.component2.TaskRunnable;
-import org.jboss.migration.core.task.component2.TaskBuilder.RunnableFactory;
-import org.jboss.migration.core.task.component2.TaskBuilder.SkipPolicy;
+import org.jboss.migration.core.task.component2.TaskSkipPolicy;
 
 /**
  * @author emmartins
@@ -77,7 +75,7 @@ public class TestAPI {
         final ServerMigrationTaskName nXY = new ServerMigrationTaskName.Builder("XY").build();
         final ServerMigrationTaskName nXYZ = new ServerMigrationTaskName.Builder("XYZ").build();
 
-        final TaskRunnable r = (taskName, context) -> ServerMigrationTaskResult.SUCCESS;
+        final TaskRunnable r = context -> ServerMigrationTaskResult.SUCCESS;
         final ServerMigrationTask t = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -85,68 +83,68 @@ public class TestAPI {
             }
 
             @Override
-            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                return r.run(n, context);
+            public ServerMigrationTaskResult run(TaskContext context) {
+                return r.run(context);
             }
         };
 
         // components
 
-        final TaskBuilder.ParamsConverter<XTaskParams, XTaskParams> pcXX = xTaskParams -> null;
-        final TaskBuilder.ParamsConverter<XTaskParams, YTaskParams> pcXY = xTaskParams -> null;
-        final TaskBuilder.ParamsConverter<XTaskParams, ZTaskParams> pcXZ = xTaskParams -> null;
-        final TaskBuilder.ParamsConverter<YTaskParams, XTaskParams> pcYX = yTaskParams -> null;
-        final TaskBuilder.ParamsConverter<YTaskParams, YTaskParams> pcYY = yTaskParams -> null;
-        final TaskBuilder.ParamsConverter<YTaskParams, ZTaskParams> pcYZ = yTaskParams -> null;
-        final TaskBuilder.ParamsConverter<ZTaskParams, XTaskParams> pcZX = zTaskParams -> null;
-        final TaskBuilder.ParamsConverter<ZTaskParams, YTaskParams> pcZY = zTaskParams -> null;
-        final TaskBuilder.ParamsConverter<ZTaskParams, ZTaskParams> pcZZ = zTaskParams -> null;
+        final BuildParameters.Mapper<XTaskParams, XTaskParams> pcXX = xTaskParams -> null;
+        final BuildParameters.Mapper<XTaskParams, YTaskParams> pcXY = xTaskParams -> null;
+        final BuildParameters.Mapper<XTaskParams, ZTaskParams> pcXZ = xTaskParams -> null;
+        final BuildParameters.Mapper<YTaskParams, XTaskParams> pcYX = yTaskParams -> null;
+        final BuildParameters.Mapper<YTaskParams, YTaskParams> pcYY = yTaskParams -> null;
+        final BuildParameters.Mapper<YTaskParams, ZTaskParams> pcYZ = yTaskParams -> null;
+        final BuildParameters.Mapper<ZTaskParams, XTaskParams> pcZX = zTaskParams -> null;
+        final BuildParameters.Mapper<ZTaskParams, YTaskParams> pcZY = zTaskParams -> null;
+        final BuildParameters.Mapper<ZTaskParams, ZTaskParams> pcZZ = zTaskParams -> null;
 
-        final NameFactory<Params> nf = parameters -> n;
-        final NameFactory<XTaskParams> nfX = parameters -> nX;
-        final NameFactory<YTaskParams> nfY = parameters -> nY;
-        final NameFactory<ZTaskParams> nfZ = parameters -> nZ;
-        final NameFactory<XYTaskParams> nfXY = parameters -> nXY;
-        final NameFactory<XYTaskParams> nfXYZ = parameters -> nXYZ;
+        final TaskNameBuilder<BuildParameters> nf = parameters -> n;
+        final TaskNameBuilder<XTaskParams> nfX = parameters -> nX;
+        final TaskNameBuilder<YTaskParams> nfY = parameters -> nY;
+        final TaskNameBuilder<ZTaskParams> nfZ = parameters -> nZ;
+        final TaskNameBuilder<XYTaskParams> nfXY = parameters -> nXY;
+        final TaskNameBuilder<XYTaskParams> nfXYZ = parameters -> nXYZ;
 
-        final SkipPolicy<Params> sp = (parameters, taskName, context) -> true;
-        final SkipPolicy<XTaskParams> spX = (parameters, taskName, context) -> false;
-        final SkipPolicy<YTaskParams> spY = (parameters, taskName, context) -> false;
-        final SkipPolicy<ZTaskParams> spZ = (parameters, taskName, context) -> false;
-        final SkipPolicy<XYTaskParams> spXY = (parameters, taskName, context) -> true;
-        final SkipPolicy<XYZTaskParams> spXYZ = (parameters, taskName, context) -> true;
+        final TaskSkipPolicy.Builder<BuildParameters> sp = (parameters, taskName) -> context -> true;
+        final TaskSkipPolicy.Builder<XTaskParams> spX = (parameters, taskName) -> context -> false;
+        final TaskSkipPolicy.Builder<YTaskParams> spY = (parameters, taskName) -> context -> false;
+        final TaskSkipPolicy.Builder<ZTaskParams> spZ = (parameters, taskName) -> context -> false;
+        final TaskSkipPolicy.Builder<XYTaskParams> spXY = (parameters, taskName) -> context -> true;
+        final TaskSkipPolicy.Builder<XYZTaskParams> spXYZ = (parameters, taskName) -> context -> true;
 
-        final BeforeRun<Params> br = (parameters, taskName, context) -> {};
-        final BeforeRun<XTaskParams> brX = (parameters, taskName, context) -> {};
-        final BeforeRun<YTaskParams> brY = (parameters, taskName, context) -> {};
-        final BeforeRun<ZTaskParams> brZ = (parameters, taskName, context) -> {};
-        final BeforeRun<XYTaskParams> brXY = (parameters, taskName, context) -> {};
-        final BeforeRun<XYZTaskParams> brXYZ = (parameters, taskName, context) -> {};
+        final BeforeTaskRun.Builder<BuildParameters> br = (parameters, taskName) -> context -> {};
+        final BeforeTaskRun.Builder<XTaskParams> brX = (parameters, taskName) -> context -> {};
+        final BeforeTaskRun.Builder<YTaskParams> brY = (parameters, taskName) -> context -> {};
+        final BeforeTaskRun.Builder<ZTaskParams> brZ = (parameters, taskName) -> context -> {};
+        final BeforeTaskRun.Builder<XYTaskParams> brXY = (parameters, taskName) -> context -> {};
+        final BeforeTaskRun.Builder<XYZTaskParams> brXYZ = (parameters, taskName) -> context -> {};
 
-        final RunnableFactory<Params> rf = parameters -> r;
-        final RunnableFactory<XTaskParams> rfX = parameters -> r;
-        final RunnableFactory<YTaskParams> rfY = parameters -> r;
-        final RunnableFactory<ZTaskParams> rfZ = parameters -> r;
-        final RunnableFactory<XYTaskParams> rfXY = parameters -> r;
-        final RunnableFactory<XYZTaskParams> rfXYZ = parameters -> r;
+        final TaskRunnable.Builder<BuildParameters> rf = (parameters, name) -> r;
+        final TaskRunnable.Builder<XTaskParams> rfX = (parameters, name) -> r;
+        final TaskRunnable.Builder<YTaskParams> rfY = (parameters, name) -> r;
+        final TaskRunnable.Builder<ZTaskParams> rfZ = (parameters, name) -> r;
+        final TaskRunnable.Builder<XYTaskParams> rfXY = (parameters, name) -> r;
+        final TaskRunnable.Builder<XYZTaskParams> rfXYZ = (parameters, name) -> r;
 
-        final AfterRun<Params> ar = (parameters, taskName, context) -> {};
-        final AfterRun<XTaskParams> arX = (parameters, taskName, context) -> {};
-        final AfterRun<YTaskParams> arY = (parameters, taskName, context) -> {};
-        final AfterRun<ZTaskParams> arZ = (parameters, taskName, context) -> {};
-        final AfterRun<XYTaskParams> arXY = (parameters, taskName, context) -> {};
-        final AfterRun<XYZTaskParams> arXYZ = (parameters, taskName, context) -> {};
+        final AfterTaskRun.Builder<BuildParameters> ar = (parameters, taskName) -> context -> {};
+        final AfterTaskRun.Builder<XTaskParams> arX = (parameters, taskName) -> context -> {};
+        final AfterTaskRun.Builder<YTaskParams> arY = (parameters, taskName) -> context -> {};
+        final AfterTaskRun.Builder<ZTaskParams> arZ = (parameters, taskName) -> context -> {};
+        final AfterTaskRun.Builder<XYTaskParams> arXY = (parameters, taskName) -> context -> {};
+        final AfterTaskRun.Builder<XYZTaskParams> arXYZ = (parameters, taskName) -> context -> {};
 
         // builders
 
-        final LeafTask.Builder<Params> lb = new LeafTask.Builder<>();
-        final LeafTask.Builder<XTaskParams> lbX = new LeafTask.Builder<>();
-        final LeafTask.Builder<YTaskParams> lbY = new LeafTask.Builder<>();
-        final LeafTask.Builder<ZTaskParams> lbZ = new LeafTask.Builder<>();
-        final LeafTask.Builder<XYTaskParams> lbXY = new LeafTask.Builder<>();
-        final LeafTask.Builder<XYZTaskParams> lbXYZ = new LeafTask.Builder<>();
+        final LeafTask.Builder<BuildParameters, ?> lb = LeafTask.builder();
+        final LeafTask.Builder<XTaskParams> lbX = new LeafTask.BuilderImpl<>();
+        final LeafTask.Builder<YTaskParams> lbY = new LeafTask.BuilderImpl<>();
+        final LeafTask.Builder<ZTaskParams> lbZ = new LeafTask.BuilderImpl<>();
+        final LeafTask.Builder<XYTaskParams> lbXY = new LeafTask.BuilderImpl<>();
+        final LeafTask.Builder<XYZTaskParams> lbXYZ = new LeafTask.BuilderImpl<>();
 
-        final CompositeTask.Builder<Params> cb = new CompositeTask.Builder<>();
+        final CompositeTask.Builder<BuildParameters> cb = new CompositeTask.Builder<>();
         final CompositeTask.Builder<XTaskParams> cbX = new CompositeTask.Builder<>();
         final CompositeTask.Builder<YTaskParams> cbY = new CompositeTask.Builder<>();
         final CompositeTask.Builder<ZTaskParams> cbZ = new CompositeTask.Builder<>();
@@ -448,7 +446,7 @@ public class TestAPI {
                 .afterRun(arXYZ);
 
         // tasks
-        lb.build(Params.NONE);
+        lb.build(BuildParameters.NONE);
         lb.build(pX);
         lb.build(pY);
         lb.build(pZ);
@@ -471,7 +469,7 @@ public class TestAPI {
 
         lbXYZ.build(pXYZ);
 
-        cb.build(Params.NONE);
+        cb.build(BuildParameters.NONE);
         cb.build(pX);
         cb.build(pY);
         cb.build(pZ);

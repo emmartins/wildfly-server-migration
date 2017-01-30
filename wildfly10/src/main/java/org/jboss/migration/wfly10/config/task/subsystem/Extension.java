@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.wfly10.config.task.subsystem;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
@@ -48,7 +49,7 @@ public class Extension {
         return Collections.unmodifiableList(subsystems);
     }
 
-    public void migrate(SubsystemResources subsystemResources, TaskContext context) throws IOException {
+    public void migrate(SubsystemResources subsystemResources, TaskContext context) throws ServerMigrationFailureException {
         for (WildFly10Subsystem subsystem : subsystems) {
             ServerMigrationTask subsystemTask = subsystem.getServerMigrationTask(subsystemResources);
             if (subsystemTask != null) {

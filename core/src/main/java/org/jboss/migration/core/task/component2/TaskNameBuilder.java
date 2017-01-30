@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2.test;
+package org.jboss.migration.core.task.component2;
 
-import org.jboss.migration.core.task.component2.BuildParameters;
-import org.jboss.migration.core.task.component2.TaskBuilder;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
 
 /**
  * @author emmartins
  */
-public interface XTaskParams extends BuildParameters {
-    int getX();
+public interface TaskNameBuilder<P extends BuildParameters> {
+    ServerMigrationTaskName build(P parameters);
 }

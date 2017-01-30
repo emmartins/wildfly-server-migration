@@ -38,13 +38,13 @@ public interface SystemPropertyConfiguration extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link SystemPropertyConfiguration} children.
      */
     interface Parent extends ManageableResource {
-        default SystemPropertyConfiguration getSystemPropertyConfiguration(String resourceName) throws IOException {
+        default SystemPropertyConfiguration getSystemPropertyConfiguration(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<SystemPropertyConfiguration> getSystemPropertyConfigurations() throws IOException {
+        default List<SystemPropertyConfiguration> getSystemPropertyConfigurations() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getSystemPropertyConfigurationNames() throws IOException {
+        default Set<String> getSystemPropertyConfigurationNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getSystemPropertyConfigurationPathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface SystemPropertyConfiguration extends ManageableResource {
         default String getSystemPropertyConfigurationAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeSystemPropertyConfiguration(String resourceName) throws IOException {
+        default void removeSystemPropertyConfiguration(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

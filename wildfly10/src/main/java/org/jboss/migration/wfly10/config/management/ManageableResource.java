@@ -40,26 +40,26 @@ public interface ManageableResource {
     }
 
     PathAddress getResourcePathAddress();
-    ModelNode getResourceConfiguration() throws IOException;
+    ModelNode getResourceConfiguration() throws ManagementOperationException;
 
     // children
-    <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) throws IOException;
-    <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) throws IOException;
-    <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) throws IOException;
-    <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) throws ManagementOperationException;
+    <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) throws ManagementOperationException;
+    <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) throws ManagementOperationException;
+    <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) throws ManagementOperationException;
     Set<Type<?>> getChildResourceTypes();
-    Set<String> getChildResourceNames(Type<?> resourceType) throws IOException;
+    Set<String> getChildResourceNames(Type<?> resourceType) throws ManagementOperationException;
 
     default <T extends ManageableResource> String getChildResourceAbsoluteName(Type<T> resourceType, String resourceName) {
         return getChildResourcePathAddress(resourceType, resourceName).toCLIStyleString();
     }
     <T extends ManageableResource> PathAddress getChildResourcePathAddress(Type<T> resourceType, String resourceName);
-    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) throws IOException;
-    <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) throws IOException;
-    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) throws IOException;
-    <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) throws IOException;
+    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) throws ManagementOperationException;
+    <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) throws ManagementOperationException;
+    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) throws ManagementOperationException;
+    <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) throws ManagementOperationException;
 
-    void removeResource(Type<?> resourceType, String resourceName) throws IOException;
+    void removeResource(Type<?> resourceType, String resourceName) throws ManagementOperationException;
     //ModelNode getResourceConfiguration(String name) throws IOException;
 
     // parent

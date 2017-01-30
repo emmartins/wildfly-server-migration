@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2.test;
+package org.jboss.migration.core.task.component2;
 
-import org.jboss.migration.core.task.component2.BuildParameters;
-import org.jboss.migration.core.task.component2.TaskBuilder;
+import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * @author emmartins
  */
-public interface XTaskParams extends BuildParameters {
-    int getX();
+public interface BuildParameters {
+
+    BuildParameters NONE = new BuildParameters() {};
+
+    /**
+     *
+     * @param <T>
+     * @param <R>
+     */
+    interface Mapper<T extends BuildParameters, R extends BuildParameters> extends Function<T, Collection<R>> {
+    }
 }

@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
@@ -26,6 +27,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -85,7 +87,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
         }
 
         @Override
-        protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) throws Exception {
+        protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) throws ServerMigrationFailureException {
             try (InputStream in = new BufferedInputStream(new FileInputStream(xmlConfigurationPath.toFile()))) {
                 XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(in);
                 reader.require(START_DOCUMENT, null, null);
@@ -94,10 +96,12 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
                         processElement(reader, moduleMigrator, context);
                     }
                 }
+            } catch (IOException | XMLStreamException e) {
+                throw new ServerMigrationFailureException("modules migration failed!", e);
             }
         }
 
-        protected void processElement(XMLStreamReader reader, ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
+        protected void processElement(XMLStreamReader reader, ModuleMigrator moduleMigrator, TaskContext context) throws ServerMigrationFailureException {
             final List<ModulesFinder> elementModulesFinders = modulesFinders.get(reader.getLocalName());
             if (elementModulesFinders != null) {
                 for (ModulesFinder modulesFinder : elementModulesFinders) {
@@ -120,7 +124,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
          * @param reader the XML stream reader, positioned at the start of an element of interest
          * @param moduleMigrator the module migrator
          */
-        void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException;
+        void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws ServerMigrationFailureException;
     }
 
     public static class Builder<S extends JBossServer<S>> {

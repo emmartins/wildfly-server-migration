@@ -38,13 +38,13 @@ public interface SocketBindingResource extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link SocketBindingResource} children.
      */
     interface Parent extends ManageableResource {
-        default SocketBindingResource getSocketBindingResource(String resourceName) throws IOException {
+        default SocketBindingResource getSocketBindingResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<SocketBindingResource> getSocketBindingResources() throws IOException {
+        default List<SocketBindingResource> getSocketBindingResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getSocketBindingResourceNames() throws IOException {
+        default Set<String> getSocketBindingResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getSocketBindingResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface SocketBindingResource extends ManageableResource {
         default String getSocketBindingResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeSocketBindingResource(String resourceName) throws IOException {
+        default void removeSocketBindingResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

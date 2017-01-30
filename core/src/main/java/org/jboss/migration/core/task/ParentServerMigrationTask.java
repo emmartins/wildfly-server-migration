@@ -16,6 +16,8 @@
 
 package org.jboss.migration.core.task;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,12 +36,12 @@ public abstract class ParentServerMigrationTask extends AbstractServerMigrationT
     }
 
     @Override
-    protected ServerMigrationTaskResult runTask(TaskContext context) throws Exception {
+    protected ServerMigrationTaskResult runTask(TaskContext context) throws ServerMigrationFailureException {
         runSubtasks(context);
         return (!succeedOnlyIfHasSuccessfulSubtasks || context.hasSucessfulSubtasks()) ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
     }
 
-    protected abstract void runSubtasks(TaskContext context) throws Exception;
+    protected abstract void runSubtasks(TaskContext context) throws ServerMigrationFailureException;
 
     /**
      * The parent task builder.

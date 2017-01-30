@@ -17,7 +17,7 @@ package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
 import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -145,9 +145,9 @@ public class TaskExecutionImpl implements TaskExecution {
      * @param subtask the subtask to execute
      * @return the subtask execution
      * @throws IllegalStateException if the task result is already set
-     * @throws ServerMigrationFailedException if the subtask execution failed
+     * @throws ServerMigrationFailureException if the subtask execution failed
      */
-    TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
+    TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailureException {
         if (this.result != null) {
             throw new IllegalStateException();
         }
@@ -160,7 +160,7 @@ public class TaskExecutionImpl implements TaskExecution {
         return child;
     }
 
-    public synchronized void run() throws IllegalStateException, ServerMigrationFailedException {
+    public synchronized void run() throws IllegalStateException, ServerMigrationFailureException {
         if (this.result != null) {
             throw new IllegalStateException("Task "+ taskPath +" already run");
         }
@@ -168,11 +168,11 @@ public class TaskExecutionImpl implements TaskExecution {
         logger.debugf("Task %s execution starting...", taskPath);
         try {
             result = task.run(new TaskContextImpl(this));
-        } catch (ServerMigrationFailedException e) {
+        } catch (ServerMigrationFailureException e) {
             result = ServerMigrationTaskResult.fail(e);
             throw e;
         } catch (Throwable t) {
-            final ServerMigrationFailedException e = new ServerMigrationFailedException(t);
+            final ServerMigrationFailureException e = new ServerMigrationFailureException(t);
             result = ServerMigrationTaskResult.fail(e);
             throw e;
         } finally {

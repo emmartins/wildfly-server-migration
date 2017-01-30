@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.core.env;
 
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.List;
 import java.util.Properties;
@@ -37,11 +37,11 @@ public interface Environment {
 
     List<String> getPropertyAsList(String propertyName, List<String> defaultValue);
 
-    Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailedException;
+    Boolean requirePropertyAsBoolean(String propertyName) throws ServerMigrationFailureException;
 
-    String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException;
+    String requirePropertyAsString(String propertyName, boolean failIfEmpty) throws ServerMigrationFailureException;
 
-    List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailedException;
+    List<String> requirePropertyAsList(String propertyName, boolean failIfEmpty) throws ServerMigrationFailureException;
 
     String setProperty(String propertyName, String propertyValue);
 

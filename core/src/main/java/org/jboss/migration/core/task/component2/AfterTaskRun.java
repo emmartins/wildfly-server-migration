@@ -16,35 +16,22 @@
 
 package org.jboss.migration.core.task.component2;
 
-import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-
-import java.util.Objects;
 
 /**
  * @author emmartins
  */
-public abstract class AbstractTask implements ServerMigrationTask {
+public /**
+ *
+ * @param <P>
+ */
 
-    private final ServerMigrationTaskName name;
-    private final TaskRunnable taskRunnable;
+interface AfterTaskRun {
 
-    protected AbstractTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(taskRunnable);
-        this.name = name;
-        this.taskRunnable = taskRunnable;
-    }
+    void afterRun(TaskContext context);
 
-    @Override
-    public ServerMigrationTaskName getName() {
-        return name;
-    }
-
-    @Override
-    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-        return taskRunnable.run(name, context);
+    interface Builder<P extends BuildParameters> {
+        AfterTaskRun build(P parameters, ServerMigrationTaskName taskName);
     }
 }

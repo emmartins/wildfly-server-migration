@@ -38,13 +38,13 @@ public interface HostResource extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link HostResource} children.
      */
     interface Parent extends ManageableResource {
-        default HostResource getHostResource(String resourceName) throws IOException {
+        default HostResource getHostResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<HostResource> getHostResources() throws IOException {
+        default List<HostResource> getHostResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getHostResourceNames() throws IOException {
+        default Set<String> getHostResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getHostResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface HostResource extends ManageableResource {
         default String getHostResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeHostResource(String resourceName) throws IOException {
+        default void removeHostResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

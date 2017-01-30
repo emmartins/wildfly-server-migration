@@ -16,6 +16,7 @@
 package org.jboss.migration.wfly8;
 
 import org.jboss.migration.core.AbstractServerProvider;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
@@ -38,7 +39,7 @@ import java.util.jar.Manifest;
 public class WildFlyServerProvider8 extends AbstractServerProvider {
 
     @Override
-    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, ServerMigrationFailureException {
         final JBossServer.Module module = new JBossServer.Modules(baseDir).getModule("org.jboss.as.version");
         if (module == null) {
             return null;

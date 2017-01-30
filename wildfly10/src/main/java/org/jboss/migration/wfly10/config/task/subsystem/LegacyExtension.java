@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.wfly10.config.task.subsystem;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionResources;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
@@ -32,7 +33,7 @@ public class LegacyExtension extends Extension {
     }
 
     @Override
-    public void migrate(SubsystemResources subsystemResources, TaskContext context) throws IOException {
+    public void migrate(SubsystemResources subsystemResources, TaskContext context) throws ServerMigrationFailureException {
         super.migrate(subsystemResources, context);
         // remove extension if none of its subsystems are in config
         final ExtensionResources extensionResources = subsystemResources.getServerConfiguration().getExtensionResources();

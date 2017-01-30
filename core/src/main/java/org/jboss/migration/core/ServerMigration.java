@@ -106,7 +106,7 @@ public class ServerMigration {
      * @throws IllegalStateException if the source and/or target base dir is not configured
      * @return the migration data
      */
-    public MigrationData run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailedException {
+    public MigrationData run() throws IllegalArgumentException, IllegalStateException, ServerMigrationFailureException {
         if (from == null) {
             throw ServerMigrationLogger.ROOT_LOGGER.serverBaseDirNotSet(SOURCE);
         }

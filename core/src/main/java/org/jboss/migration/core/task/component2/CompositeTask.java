@@ -18,33 +18,88 @@ package org.jboss.migration.core.task.component2;
 
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author emmartins
  */
-public class CompositeTask extends AbstractTask {
+public class CompositeTask extends ComponentTask {
 
     protected CompositeTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
         super(name, taskRunnable);
     }
 
-    public static class Builder<P extends TaskBuilder.Params> extends AbstractCompositeTaskBuilder<P, Builder<P>> {
+    public static <P extends BuildParameters> Builder<P, ?> builder() {
+        return new BuilderImpl<>();
+    }
 
-        public Builder() {
+    public interface Builder<P extends BuildParameters, T extends Builder<P, T>> extends ComponentTask.Builder<P,T> {
+
+        default T run(ServerMigrationTask task) {
+            return run((params, taskName) -> context -> context.execute(task).getResult());
+        }
+
+        default T run(ComponentTask.Builder<? super P, ?> builder) {
+            final ComponentTask.Builder<? super P, ?> clone = builder.clone();
+            return run((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
+        }
+
+        default <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> parametersMapper, ComponentTask.Builder<? super Q, ?> q) {
+            return run(TaskRunnable.Adapters.of(parametersMapper, q));
+        }
+    }
+
+    protected static abstract class AbstractBuilder<P extends BuildParameters, T extends AbstractBuilder<P, T>> extends ComponentTask.AbstractBuilder<P, T> implements Builder<P,T> {
+
+        private final List<TaskRunnable.Builder<? super P>> runnableBuilders = new ArrayList<>();
+
+        protected AbstractBuilder() {
+        }
+
+        protected AbstractBuilder(AbstractBuilder<P, ?> other) {
+            super(other);
+            this.runnableBuilders.addAll(other.runnableBuilders);
+        }
+
+        @Override
+        public T run(TaskRunnable.Builder<? super P> runnableBuilder) {
+            this.runnableBuilders.add(runnableBuilder);
+            return getThis();
+        }
+
+        @Override
+        public TaskRunnable.Builder<? super P> getRunnableBuilder() {
+            final List<TaskRunnable.Builder<? super P>> runnableBuildersCopy = new ArrayList<>(this.runnableBuilders);
+            final TaskRunnable.Builder<P> compositeRunnableBuilder = (params, name) -> context -> {
+                for (TaskRunnable.Builder<? super P> runnableBuilder : runnableBuildersCopy) {
+                    runnableBuilder.build(params, name).run(context);
+                }
+                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+            };
+            return compositeRunnableBuilder;
+        }
+    }
+
+    protected static class BuilderImpl<P extends BuildParameters> extends AbstractBuilder<P, BuilderImpl<P>> {
+
+        protected BuilderImpl() {
             super();
         }
 
-        public Builder(Builder<P> other) {
+        protected BuilderImpl(BuilderImpl<P> other) {
             super(other);
         }
 
         @Override
-        public Builder<P> clone() {
-            return new Builder(this);
+        public BuilderImpl<P> clone() {
+            return new BuilderImpl(this);
         }
 
         @Override
-        protected Builder<P> getThis() {
+        protected BuilderImpl<P> getThis() {
             return this;
         }
 

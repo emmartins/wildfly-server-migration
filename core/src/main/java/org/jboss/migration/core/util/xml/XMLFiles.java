@@ -16,6 +16,8 @@
 
 package org.jboss.migration.core.util.xml;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
@@ -49,38 +51,42 @@ public class XMLFiles {
      * @param recursive if the scan should include sub directories
      * @param matcher the xml file matcher
      * @return the paths of all files matched
-     * @throws IOException if there was a failure in the scanning process
+     * @throws ServerMigrationFailureException if there was a failure in the scanning process
      */
-    public static Collection<Path> scan(final Path start, final boolean recursive, final XMLFileMatcher matcher) throws IOException {
+    public static Collection<Path> scan(final Path start, final boolean recursive, final XMLFileMatcher matcher) throws ServerMigrationFailureException {
         final SortedSet<Path> result = new TreeSet<>();
-        Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (matcher.matches(file)) {
-                    result.add(file);
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if (recursive || dir.equals(start)) {
+        try {
+            Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (matcher.matches(file)) {
+                        result.add(file);
+                    }
                     return FileVisitResult.CONTINUE;
-                } else {
-                    return FileVisitResult.SKIP_SUBTREE;
                 }
-            }
 
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
-                if (e == null) {
-                    return recursive ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
-                } else {
-                    // directory iteration failed
-                    throw e;
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    if (recursive || dir.equals(start)) {
+                        return FileVisitResult.CONTINUE;
+                    } else {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
                 }
-            }
-        });
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                    if (e == null) {
+                        return recursive ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
+                    } else {
+                        // directory iteration failed
+                        throw e;
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new ServerMigrationFailureException("XML file scan failed!", e);
+        }
         return Collections.unmodifiableSet(result);
     }
 
@@ -89,11 +95,13 @@ public class XMLFiles {
      * @param source the source XML file
      * @param target the target XML file
      * @param filters the xml file content filters
-     * @throws IOException if there was a failure in the copy process
+     * @throws ServerMigrationFailureException if there was a failure in the copy process
      */
-    public static void copy(Path source, Path target, XMLFileFilter... filters) throws IOException {
+    public static void copy(Path source, Path target, XMLFileFilter... filters) throws ServerMigrationFailureException {
         try (InputStream inputStream = Files.newInputStream(source); OutputStream outputStream = Files.newOutputStream(target)) {
             filter(inputStream, outputStream, filters);
+        } catch (IOException e) {
+            throw new ServerMigrationFailureException("xml file copy failed", e);
         }
     }
 
@@ -101,16 +109,20 @@ public class XMLFiles {
      * Filters the specified XML file.
      * @param xmlFile the xml file to filter
      * @param filters the xml file content filters
-     * @throws IOException
+     * @throws ServerMigrationFailureException
      */
-    public static void filter(Path xmlFile, XMLFileFilter... filters) throws IOException {
-        byte[] xmlFileBytes = Files.readAllBytes(xmlFile);
-        try (InputStream inputStream = new ByteArrayInputStream(xmlFileBytes); OutputStream outputStream = Files.newOutputStream(xmlFile)) {
-            filter(inputStream, outputStream, filters);
+    public static void filter(Path xmlFile, XMLFileFilter... filters) throws ServerMigrationFailureException {
+        try {
+            byte[] xmlFileBytes = Files.readAllBytes(xmlFile);
+            try (InputStream inputStream = new ByteArrayInputStream(xmlFileBytes); OutputStream outputStream = Files.newOutputStream(xmlFile)) {
+                filter(inputStream, outputStream, filters);
+            }
+        } catch (IOException e) {
+            throw new ServerMigrationFailureException("XML file filter failed.", e);
         }
     }
 
-    private static void filter(final InputStream inputStream, final OutputStream outputStream, XMLFileFilter... filters) throws IOException {
+    private static void filter(final InputStream inputStream, final OutputStream outputStream, XMLFileFilter... filters) throws ServerMigrationFailureException {
         XMLEventReader xmlEventReader = null;
         XMLEventWriter xmlEventWriter = null;
         try {
@@ -143,8 +155,8 @@ public class XMLFiles {
                     xmlEventWriter.add(xmlEvent);
                 }
             }
-        } catch (XMLStreamException e) {
-            throw new IOException("XML file filtering failed");
+        } catch (XMLStreamException | IOException e) {
+            throw new ServerMigrationFailureException("XML file filtering failed", e);
         } finally {
             if (xmlEventReader != null) {
                 try {

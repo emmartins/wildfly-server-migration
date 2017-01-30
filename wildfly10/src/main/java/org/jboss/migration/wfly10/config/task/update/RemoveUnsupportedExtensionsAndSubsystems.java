@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
@@ -84,7 +85,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         };
     }
 
-    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) throws IOException {
+    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) throws ServerMigrationFailureException {
         final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         final List<WildFly10Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();
@@ -92,7 +93,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         // setup the extensions filter
         final XMLFileFilter extensionsFilter = new XMLFileFilter() {
             @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws IOException {
+            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws ServerMigrationFailureException {
                 if (startElement.getName().getLocalPart().equals("extension")) {
                     Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
                     final String moduleName = moduleAttr.getValue();
@@ -127,7 +128,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         // setup subsystems filter
         final XMLFileFilter subsystemsFilter = new XMLFileFilter() {
             @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws IOException {
+            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws ServerMigrationFailureException {
                 if (startElement.getName().getLocalPart().equals("subsystem")) {
                     final String namespaceURI = startElement.getName().getNamespaceURI();
                     // keep if the namespace uri starts with a supported subsystem's namespace without version

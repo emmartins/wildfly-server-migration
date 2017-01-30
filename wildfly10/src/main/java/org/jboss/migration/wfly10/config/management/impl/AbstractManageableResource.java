@@ -75,7 +75,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
     }
 
     @Override
-    public ModelNode getResourceConfiguration() throws IOException {
+    public ModelNode getResourceConfiguration() {
         final PathAddress address = getResourcePathAddress();
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
         op.get(RECURSIVE).set(true);
@@ -112,24 +112,24 @@ public abstract class AbstractManageableResource implements ManageableResource {
     }
 
     @Override
-    public <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) throws IOException {
+    public <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) {
         final Factory<T> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResource(resourceName) : null;
     }
 
     @Override
-    public <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) throws IOException {
+    public <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) {
         final Factory<T> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResources() : null;
     }
 
     @Override
-    public <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) throws IOException {
+    public <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) {
         return getChildResources(resourceType, null);
     }
 
     @Override
-    public <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) throws IOException {
+    public <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) {
         final List<Factory<T>> factories = getChildResourceFactories(resourceType);
         if (factories.isEmpty()) {
             return Collections.emptyList();
@@ -155,7 +155,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
     }
 
     @Override
-    public Set<String> getChildResourceNames(Type<?> resourceType) throws IOException {
+    public Set<String> getChildResourceNames(Type<?> resourceType) {
         final Factory factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResourceNames() : null;
     }
@@ -167,19 +167,19 @@ public abstract class AbstractManageableResource implements ManageableResource {
     }
 
     @Override
-    public void removeResource(Type<?> resourceType, String resourceName) throws IOException {
+    public void removeResource(Type<?> resourceType, String resourceName) {
         final Factory<?> factory = getChildResourceFactory(resourceType);
         if (factory != null) {
             factory.removeResource(resourceName);
         }
     }
     @Override
-    public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) throws IOException {
+    public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) {
         return findResources(resourceType, null);
     }
 
     @Override
-    public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) throws IOException {
+    public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) {
         final Set<T> result = new HashSet<>();
         // this
         if (resourceType.equals(getResourceType()) && (resourceName == null || resourceName.equals(getResourceName()))) {
@@ -208,12 +208,12 @@ public abstract class AbstractManageableResource implements ManageableResource {
     }
 
     @Override
-    public <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) throws IOException {
+    public <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) {
         return findResources(resourceType, null);
     }
 
     @Override
-    public <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) throws IOException {
+    public <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) {
         final Set<T> result = new HashSet<>();
         // this
         if (getClass().isInstance(resourceType) && (resourceName == null || resourceName.equals(getResourceName()))) {
@@ -278,7 +278,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
             return pathAddressBase.append(pathElementKey, resourceName);
         }
 
-        public Set<String> getResourceNames() throws IOException {
+        public Set<String> getResourceNames() {
             try {
                 final ModelNode op = Util.createEmptyOperation(READ_CHILDREN_NAMES_OPERATION, pathAddressBase);
                 op.get(CHILD_TYPE).set(pathElementKey);
@@ -309,7 +309,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
             }
         }
 
-        public ModelNode getResourceConfiguration(String name) throws IOException {
+        public ModelNode getResourceConfiguration(String name) {
             if (!getResourceNames().contains(name)) {
                 return null;
             }
@@ -320,7 +320,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
             return result.get(RESULT);
         }
 
-        public void removeResource(String resourceName) throws IOException {
+        public void removeResource(String resourceName) {
             final PathAddress address = getResourcePathAddress(resourceName);
             final ModelNode op = Util.createRemoveOperation(address);
             serverConfiguration.executeManagementOperation(op);
@@ -330,11 +330,11 @@ public abstract class AbstractManageableResource implements ManageableResource {
             return resourceType;
         }
 
-        public T getResource(String resourceName) throws IOException {
+        public T getResource(String resourceName) {
             return getResourceNames().contains(resourceName) ? newResourceInstance(resourceName) : null;
         }
 
-        public List<T> getResources() throws IOException {
+        public List<T> getResources() {
             final Set<String> resourceNames = getResourceNames();
             if (resourceNames.isEmpty()) {
                 return Collections.emptyList();

@@ -16,11 +16,12 @@
 
 package org.jboss.migration.core.task.component2.test;
 
+import org.jboss.migration.core.task.component2.BuildParameters;
 import org.jboss.migration.core.task.component2.TaskBuilder;
 
 /**
  * @author emmartins
  */
-public interface ZTaskParams extends TaskBuilder.Params {
+public interface ZTaskParams extends BuildParameters {
     int getZ();
 }

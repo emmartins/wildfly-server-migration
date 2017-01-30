@@ -17,7 +17,7 @@ package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
 import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class TaskContextImpl implements TaskContext {
     }
 
     @Override
-    public TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailedException {
+    public TaskExecutionImpl execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailureException {
         return taskExecution.execute(subtask);
     }
 

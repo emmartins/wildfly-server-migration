@@ -38,13 +38,13 @@ public interface DeploymentResource extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link DeploymentResource} children.
      */
     interface Parent extends ManageableResource {
-        default DeploymentResource getDeploymentResource(String resourceName) throws IOException {
+        default DeploymentResource getDeploymentResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<DeploymentResource> getDeploymentResources() throws IOException {
+        default List<DeploymentResource> getDeploymentResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getDeploymentResourceNames() throws IOException {
+        default Set<String> getDeploymentResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getDeploymentResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface DeploymentResource extends ManageableResource {
         default String getDeploymentResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeDeploymentResource(String resourceName) throws IOException {
+        default void removeDeploymentResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

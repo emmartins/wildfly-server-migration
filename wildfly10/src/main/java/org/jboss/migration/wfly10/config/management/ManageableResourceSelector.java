@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.management;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -32,9 +31,9 @@ import java.util.Set;
 @FunctionalInterface
 public interface ManageableResourceSelector<R extends ManageableResource> {
 
-    Set<R> fromResources(ManageableResource resource) throws IOException;
+    Set<R> fromResources(ManageableResource resource) throws ManagementOperationException;
 
-    default <I extends ManageableResource> Set<R> fromResources(I... resources) throws IOException {
+    default <I extends ManageableResource> Set<R> fromResources(I... resources) throws ManagementOperationException {
         Set<R> result = new HashSet<>();
         for (ManageableResource resource : resources) {
             result.addAll(fromResources(resource));
@@ -42,7 +41,7 @@ public interface ManageableResourceSelector<R extends ManageableResource> {
         return result;
     }
 
-    default <I extends ManageableResource> Set<R> fromResources(Collection<I> resources) throws IOException {
+    default <I extends ManageableResource> Set<R> fromResources(Collection<I> resources) throws ManagementOperationException {
         return fromResources(resources.stream().toArray(ManageableResource[]::new));
     }
 

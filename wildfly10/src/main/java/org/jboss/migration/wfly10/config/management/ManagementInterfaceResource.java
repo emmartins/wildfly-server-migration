@@ -38,13 +38,13 @@ public interface ManagementInterfaceResource extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link ManagementInterfaceResource} children.
      */
     interface Parent extends ManageableResource {
-        default ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws IOException {
+        default ManagementInterfaceResource getManagementInterfaceResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<ManagementInterfaceResource> getManagementInterfaceResources() throws IOException {
+        default List<ManagementInterfaceResource> getManagementInterfaceResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getManagementInterfaceResourceNames() throws IOException {
+        default Set<String> getManagementInterfaceResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getManagementInterfaceResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface ManagementInterfaceResource extends ManageableResource {
         default String getManagementInterfaceResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeManagementInterfaceResource(String resourceName) throws IOException {
+        default void removeManagementInterfaceResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

@@ -96,19 +96,23 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
     }
 
     @Override
-    public ModelNode executeManagementOperation(ModelNode operation) throws IOException {
+    public ModelNode executeManagementOperation(ModelNode operation) throws ManagementOperationException {
         final ModelControllerClient modelControllerClient = getModelControllerClient();
         if (modelControllerClient == null) {
             throw new IllegalStateException("configuration not started");
         }
-        final ModelNode result = modelControllerClient.execute(operation);
-        //ServerMigrationLogger.ROOT_LOGGER.infof("Op result %s", result.toString());
-        processResult(result);
-        return  result;
+        try {
+            final ModelNode result = modelControllerClient.execute(operation);
+            //ServerMigrationLogger.ROOT_LOGGER.infof("Op result %s", result.toString());
+            processResult(result);
+            return result;
+        } catch (IOException e) {
+            throw new ManagementOperationException(e);
+        }
     }
 
     @Override
-    public Path resolvePath(String pathName) throws IOException {
+    public Path resolvePath(String pathName) throws ManagementOperationException {
         final PathAddress address = pathAddress(pathElement(PATH, pathName));
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
         final ModelNode opResult = executeManagementOperation(op);
@@ -130,11 +134,7 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
         // force write of xml config by tmp setting a system property
         final String systemPropertyName = "org.jboss.migration.tmp."+System.nanoTime();
         final PathAddress pathAddress = getSystemPropertyConfigurationPathAddress(systemPropertyName);
-        try {
-            executeManagementOperation(Util.createAddOperation(pathAddress));
-            executeManagementOperation(Util.createRemoveOperation(pathAddress));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        executeManagementOperation(Util.createAddOperation(pathAddress));
+        executeManagementOperation(Util.createRemoveOperation(pathAddress));
     }
 }

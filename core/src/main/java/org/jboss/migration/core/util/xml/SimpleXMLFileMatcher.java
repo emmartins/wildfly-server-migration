@@ -16,6 +16,8 @@
 
 package org.jboss.migration.core.util.xml;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -34,7 +36,7 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 public abstract class SimpleXMLFileMatcher implements XMLFileMatcher {
 
     @Override
-    public boolean matches(Path path) throws IOException {
+    public boolean matches(Path path) throws ServerMigrationFailureException {
         boolean match = false;
         final String fileName = path.getFileName().toString();
         if (fileNameMatches(fileName)) {
@@ -49,8 +51,8 @@ public abstract class SimpleXMLFileMatcher implements XMLFileMatcher {
                         break;
                     }
                 }
-            } catch (XMLStreamException e) {
-                throw new IOException("failed to parse xml file "+path, e);
+            } catch (XMLStreamException | IOException e) {
+                throw new ServerMigrationFailureException("failed to parse xml file "+path, e);
             }
         }
         return match;

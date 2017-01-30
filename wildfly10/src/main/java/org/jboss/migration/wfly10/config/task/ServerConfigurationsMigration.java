@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationContext;
-import org.jboss.migration.core.ServerMigrationFailedException;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
@@ -111,7 +111,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
                     case ERROR:
                         return run(taskContext);
                     default:
-                        throw new ServerMigrationFailedException("unexpected user interaction result");
+                        throw new ServerMigrationFailureException("unexpected user interaction result");
                 }
             } else {
                 migrateAllConfigs(sourceConfigs, targetConfigDir, target, taskContext);

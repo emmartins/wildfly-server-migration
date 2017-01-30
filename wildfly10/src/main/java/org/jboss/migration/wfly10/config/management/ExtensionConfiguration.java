@@ -39,13 +39,13 @@ public interface ExtensionConfiguration extends ManageableResource {
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link ExtensionConfiguration} children.
      */
     interface Parent extends ManageableResource {
-        default ExtensionConfiguration getExtensionConfiguration(String resourceName) throws IOException {
+        default ExtensionConfiguration getExtensionConfiguration(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<ExtensionConfiguration> getExtensionConfigurations() throws IOException {
+        default List<ExtensionConfiguration> getExtensionConfigurations() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getExtensionConfigurationNames() throws IOException {
+        default Set<String> getExtensionConfigurationNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getExtensionConfigurationPathAddress(String resourceName) {
@@ -54,7 +54,7 @@ public interface ExtensionConfiguration extends ManageableResource {
         default String getExtensionConfigurationAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeExtensionConfiguration(String resourceName) throws IOException {
+        default void removeExtensionConfiguration(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

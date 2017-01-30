@@ -38,13 +38,13 @@ public interface ProfileResource extends ManageableResource, SubsystemConfigurat
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link ProfileResource} children.
      */
     interface Parent extends ManageableResource {
-        default ProfileResource getProfileResource(String resourceName) throws IOException {
+        default ProfileResource getProfileResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<ProfileResource> getProfileResources() throws IOException {
+        default List<ProfileResource> getProfileResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getProfileResourceNames() throws IOException {
+        default Set<String> getProfileResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getProfileResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface ProfileResource extends ManageableResource, SubsystemConfigurat
         default String getProfileResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeProfileResource(String resourceName) throws IOException {
+        default void removeProfileResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }

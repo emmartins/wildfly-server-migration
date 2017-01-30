@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.subsystem;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
@@ -60,7 +61,7 @@ public class SubsystemsMigration<S> {
         };
     }
 
-    protected void migrateExtensions(final SubsystemResources subsystemResources, TaskContext context) throws IOException {
+    protected void migrateExtensions(final SubsystemResources subsystemResources, TaskContext context) throws ServerMigrationFailureException {
         final List<Extension> extensionsToMigrate = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         for (Extension extensionToMigrate : extensionsToMigrate) {
             extensionToMigrate.migrate(subsystemResources, context);

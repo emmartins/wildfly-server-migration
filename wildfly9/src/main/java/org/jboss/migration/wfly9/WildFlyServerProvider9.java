@@ -16,6 +16,7 @@
 package org.jboss.migration.wfly9;
 
 import org.jboss.migration.core.AbstractServerProvider;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.ManifestProductInfo;
 import org.jboss.migration.core.ProductInfo;
@@ -31,7 +32,7 @@ import java.nio.file.Path;
  */
 public class WildFlyServerProvider9 extends AbstractServerProvider {
 
-    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, IOException {
+    protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, ServerMigrationFailureException {
         final JBossServer.Module module = new JBossServer.Modules(baseDir).getModule("org.jboss.as.product:wildfly-full");
         if (module == null) {
             return null;

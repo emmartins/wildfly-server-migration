@@ -38,13 +38,13 @@ public interface ServerGroupResource extends ManageableResource, JvmResource.Par
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link ServerGroupResource} children.
      */
     interface Parent extends ManageableResource {
-        default ServerGroupResource getServerGroupResource(String resourceName) throws IOException {
+        default ServerGroupResource getServerGroupResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<ServerGroupResource> getServerGroupResources() throws IOException {
+        default List<ServerGroupResource> getServerGroupResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getServerGroupResourceNames() throws IOException {
+        default Set<String> getServerGroupResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
         default PathAddress getServerGroupResourcePathAddress(String resourceName) {
@@ -53,7 +53,7 @@ public interface ServerGroupResource extends ManageableResource, JvmResource.Par
         default String getServerGroupResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default void removeServerGroupResource(String resourceName) throws IOException {
+        default void removeServerGroupResource(String resourceName) throws ManagementOperationException {
             removeResource(RESOURCE_TYPE, resourceName);
         }
     }
