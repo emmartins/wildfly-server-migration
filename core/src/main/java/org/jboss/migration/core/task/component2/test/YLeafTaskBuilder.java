@@ -21,5 +21,5 @@ import org.jboss.migration.core.task.component2.LeafTask;
 /**
  * @author emmartins
  */
-public class YLeafTaskBuilder extends LeafTask.BuilderImpl<YTaskParams> {
+public class YLeafTaskBuilder extends LeafTask.Builder<YTaskParams> {
 }

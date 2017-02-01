@@ -32,36 +32,29 @@ public class CompositeTask extends ComponentTask {
         super(name, taskRunnable);
     }
 
-    public static <P extends BuildParameters> Builder<P, ?> builder() {
-        return new BuilderImpl<>();
-    }
-
-    public interface Builder<P extends BuildParameters, T extends Builder<P, T>> extends ComponentTask.Builder<P,T> {
-
-        default T run(ServerMigrationTask task) {
-            return run((params, taskName) -> context -> context.execute(task).getResult());
-        }
-
-        default T run(ComponentTask.Builder<? super P, ?> builder) {
-            final ComponentTask.Builder<? super P, ?> clone = builder.clone();
-            return run((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
-        }
-
-        default <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> parametersMapper, ComponentTask.Builder<? super Q, ?> q) {
-            return run(TaskRunnable.Adapters.of(parametersMapper, q));
-        }
-    }
-
-    protected static abstract class AbstractBuilder<P extends BuildParameters, T extends AbstractBuilder<P, T>> extends ComponentTask.AbstractBuilder<P, T> implements Builder<P,T> {
+    protected static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> {
 
         private final List<TaskRunnable.Builder<? super P>> runnableBuilders = new ArrayList<>();
 
-        protected AbstractBuilder() {
+        protected BaseBuilder() {
         }
 
-        protected AbstractBuilder(AbstractBuilder<P, ?> other) {
+        protected BaseBuilder(BaseBuilder<P, ?> other) {
             super(other);
             this.runnableBuilders.addAll(other.runnableBuilders);
+        }
+
+        public T subtask(ServerMigrationTask task) {
+            return run((params, taskName) -> context -> context.execute(task).getResult());
+        }
+
+        public T subtask(ComponentTask.Builder<? super P, ?> builder) {
+            final ComponentTask.Builder clone = builder.clone();
+            return run((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
+        }
+
+        public  <Q extends BuildParameters> T subtask(BuildParameters.Mapper<P, Q> mapper, ComponentTask.Builder<? super Q, ?> builder) {
+            return run(TaskRunnable.Builder.from(mapper, builder));
         }
 
         @Override
@@ -83,23 +76,22 @@ public class CompositeTask extends ComponentTask {
         }
     }
 
-    protected static class BuilderImpl<P extends BuildParameters> extends AbstractBuilder<P, BuilderImpl<P>> {
+    public static class Builder<P extends BuildParameters> extends BaseBuilder<P, Builder<P>> {
 
-        protected BuilderImpl() {
-            super();
+        public Builder() {
         }
 
-        protected BuilderImpl(BuilderImpl<P> other) {
+        protected Builder(Builder<P> other) {
             super(other);
         }
 
         @Override
-        public BuilderImpl<P> clone() {
-            return new BuilderImpl(this);
+        public Builder<P> clone() {
+            return new Builder(this);
         }
 
         @Override
-        protected BuilderImpl<P> getThis() {
+        protected Builder<P> getThis() {
             return this;
         }
 

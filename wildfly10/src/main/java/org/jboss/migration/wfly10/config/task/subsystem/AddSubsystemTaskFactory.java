@@ -29,7 +29,7 @@ import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTask;
+import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTaskBuilder;
 
 /**
  * A task which adds the jmx subsystem to host configs.
@@ -38,14 +38,14 @@ import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionT
 public class AddSubsystemTaskFactory<S> implements StandaloneServerConfigurationTaskFactory<S>, HostConfigurationTaskFactory<S>, DomainConfigurationTaskFactory<S> {
 
     private final ServerMigrationTaskName taskName;
-    private final AddExtensionTask<S> addExtensionSubtask;
+    private final AddExtensionTaskBuilder<S> addExtensionSubtask;
     private final AddSubsystemConfigSubtask<S> addSubsystemConfigSubtask;
     private String skipTaskPropertyName;
     private AbstractServerMigrationTask.Listener eventListener;
 
     protected AddSubsystemTaskFactory(final Builder<S> builder) {
         this.taskName = builder.taskName != null ? builder.taskName : new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name",builder. subsystemName).build();
-        this.addExtensionSubtask = new AddExtensionTask<>(builder.extensionName);
+        this.addExtensionSubtask = new AddExtensionTaskBuilder<>(builder.extensionName);
         this.addSubsystemConfigSubtask = builder.addSubsystemConfigSubtask != null ? builder.addSubsystemConfigSubtask : new AddSubsystemConfigSubtask<S>(builder.subsystemName);
         this.skipTaskPropertyName = builder.skipTaskPropertyName != null ? builder.skipTaskPropertyName : (taskName.getName()+".skip");
         this.eventListener = builder.eventListener != null ? builder.eventListener : new AbstractServerMigrationTask.Listener() {

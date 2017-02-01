@@ -16,6 +16,7 @@
 
 package org.jboss.migration.core.task.component2;
 
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
 
@@ -27,16 +28,16 @@ public interface TaskSkipPolicy {
     boolean isSkipped(TaskContext context);
 
     interface Builder<P extends BuildParameters> {
-
         TaskSkipPolicy build(P buildParameters, ServerMigrationTaskName taskName);
     }
 
     interface Builders {
-
         static <P extends BuildParameters> Builder<P> skipIfDefaultSkipPropertyIsSet() {
             return (buildParameters, taskName) -> context -> context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(taskName.getName() + ".skip", Boolean.FALSE);
         }
-
+        static <P extends BuildParameters> Builder<P> skipByTaskEnvironment(String taskEnvironmentPropertyNamePrefix) {
+            return (buildParameters, taskName) -> context -> new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), taskEnvironmentPropertyNamePrefix).isSkippedByEnvironment();
+        }
         static <P extends BuildParameters> Builder<P> skipIfAnyPropertyIsSet(String... propertyNames) {
             return (buildParameters, taskName) -> context -> {
                 for (String propertyName : propertyNames) {

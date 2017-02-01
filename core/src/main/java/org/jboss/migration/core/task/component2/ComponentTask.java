@@ -50,67 +50,75 @@ public abstract class ComponentTask implements ServerMigrationTask {
         return taskRunnable.run(context);
     }
 
-    public interface Builder<P extends BuildParameters, T extends Builder<P, T>> {
+    protected static abstract class Builder<P extends BuildParameters, T extends Builder<P, T>> {
 
-        default T name(ServerMigrationTaskName name) {
+        private TaskNameBuilder<? super P> taskNameBuilder;
+        private TaskSkipPolicy.Builder<? super P> skipPolicyBuilder = TaskSkipPolicy.Builders.skipIfDefaultSkipPropertyIsSet();
+        private BeforeTaskRun.Builder<? super P> beforeRunBuilder;
+        private AfterTaskRun.Builder<? super P> afterRunBuilder;
+
+        protected Builder() {
+        }
+
+        protected Builder(Builder<P, ?> other) {
+            Objects.requireNonNull(other);
+            this.taskNameBuilder = other.taskNameBuilder;
+            this.skipPolicyBuilder = other.skipPolicyBuilder;
+            this.beforeRunBuilder = other.beforeRunBuilder;
+            this.afterRunBuilder = other.afterRunBuilder;
+        }
+
+        public T name(String name) {
+            return name(new ServerMigrationTaskName.Builder(name).build());
+        }
+
+        public T name(ServerMigrationTaskName name) {
             return name(parameters -> name);
         }
 
-        T name(TaskNameBuilder<? super P> builder);
-
-        /*
-        default <Q extends Params> T name(ParamsMapper<P, Q> paramsConverter, NameFactory<? super Q> qNameFactory) {
-            final NameFactory<P> pNameFactory = params -> qNameFactory.newInstance(paramsConverter.apply(params));
-            return name(pNameFactory);
+        public T name(TaskNameBuilder<? super P> builder) {
+            this.taskNameBuilder = builder;
+            return getThis();
         }
-    */
-        default T skipPolicy(TaskSkipPolicy skipPolicy) {
+
+        public T skipPolicy(TaskSkipPolicy skipPolicy) {
             return skipPolicy((parameters, name) -> skipPolicy);
         }
 
-        T skipPolicy(TaskSkipPolicy.Builder<? super P> builder);
-
-        /*
-        default <Q extends Params> T skipPolicy(ParamsMapper<P, Q> paramsConverter, SkipPolicyBuilder<? super Q> q) {
-            final SkipPolicyBuilder<P> p = (params, name, context) -> q.isSkipped(paramsConverter.apply(params), name, context);
-            return skipPolicy(p);
+        public T skipPolicy(TaskSkipPolicy.Builder<? super P> builder) {
+            this.skipPolicyBuilder = builder;
+            return getThis();
         }
-    */
-        default T beforeRun(BeforeTaskRun beforeRun) {
+
+        public T beforeRun(BeforeTaskRun beforeRun) {
             return beforeRun((parameters, name) -> beforeRun);
         }
 
-        T beforeRun(BeforeTaskRun.Builder<? super P> builder);
+        public T beforeRun(BeforeTaskRun.Builder<? super P> builder) {
+            this.beforeRunBuilder = builder;
+            return getThis();
+        }
 
-    /*
-    default <Q extends Params> T beforeRun(ParamsMapper<P, Q> paramsConverter, BeforeTaskRun<? super Q> q) {
-        final BeforeTaskRun<P> p = (params, name, context) -> q.beforeRun(paramsConverter.apply(params), name, context);
-        return beforeRun(p);
-    }*/
-
-        default T run(TaskRunnable runnable) {
+        public T run(TaskRunnable runnable) {
             return run((params, name) -> runnable);
         }
 
-        T run(TaskRunnable.Builder<? super P> builder);
+        public abstract T run(TaskRunnable.Builder<? super P> builder);
 
-        default <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> parametersMapper, TaskRunnable.Builder<? super Q> q) {
-            return run(TaskRunnable.Adapters.of(parametersMapper, q));
+        public <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> p1p2Mapper, TaskRunnable.Builder<? super Q> qBuilder) {
+            return run(TaskRunnable.Builder.from(p1p2Mapper, qBuilder));
         }
 
-        /*
-        default <Q extends Params> T run(ParamsMapper<P, Q> paramsConverter, RunnableFactory<? super Q> q) {
-            final RunnableFactory<P> p = params -> q.newInstance(paramsConverter.apply(params));
-            return run(p);
-        }
-    */
-        default T afterRun(AfterTaskRun afterRun) {
+        public T afterRun(AfterTaskRun afterRun) {
             return afterRun((parameters, name) -> afterRun);
         }
 
-        T afterRun(AfterTaskRun.Builder<? super P> builder);
+        public T afterRun(AfterTaskRun.Builder<? super P> builder) {
+            this.afterRunBuilder = builder;
+            return getThis();
+        }
 
-        default <P1 extends BuildParameters> TaskRunnable.Builder<P1> toRunnableBuilder(BuildParameters.Mapper<P1, P> mapper) {
+        public  <P1 extends BuildParameters> TaskRunnable.Builder<P1> toRunnableBuilder(BuildParameters.Mapper<P1, P> mapper) {
             final Builder<P, ?> builder = this;
             return (p1, taskName) -> {
                 final Set<P> pSet = new HashSet<>();
@@ -124,59 +132,6 @@ public abstract class ComponentTask implements ServerMigrationTask {
                     return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
                 };
             };
-        }
-    /*
-    default <Q extends Params> T afterRun(ParamsMapper<P, Q> paramsConverter, AfterRun<? super Q> q) {
-        final AfterRun<P> p = (params, name, context) -> paramsConverter.apply(params)q.afterRun(paramsConverter.apply(params), name, context);
-        return afterRun(p);
-    }
-    */
-
-        T clone();
-
-        <P1 extends P> ServerMigrationTask build(P1 params);
-    }
-
-    protected static abstract class AbstractBuilder <P extends BuildParameters, T extends AbstractBuilder<P, T>> implements Builder<P, T> {
-
-        private TaskNameBuilder<? super P> taskNameBuilder;
-        private TaskSkipPolicy.Builder<? super P> skipPolicyBuilder = TaskSkipPolicy.Builders.skipIfDefaultSkipPropertyIsSet();
-        private BeforeTaskRun.Builder<? super P> beforeRunBuilder;
-        private AfterTaskRun.Builder<? super P> afterRunBuilder;
-
-        protected AbstractBuilder() {
-        }
-
-        protected AbstractBuilder(AbstractBuilder<P, ?> other) {
-            Objects.requireNonNull(other);
-            this.taskNameBuilder = other.taskNameBuilder;
-            this.skipPolicyBuilder = other.skipPolicyBuilder;
-            this.beforeRunBuilder = other.beforeRunBuilder;
-            this.afterRunBuilder = other.afterRunBuilder;
-        }
-
-        @Override
-        public T name(TaskNameBuilder<? super P> builder) {
-            this.taskNameBuilder = builder;
-            return getThis();
-        }
-
-        @Override
-        public T skipPolicy(TaskSkipPolicy.Builder<? super P> builder) {
-            this.skipPolicyBuilder = builder;
-            return getThis();
-        }
-
-        @Override
-        public T beforeRun(BeforeTaskRun.Builder<? super P> builder) {
-            this.beforeRunBuilder = builder;
-            return getThis();
-        }
-
-        @Override
-        public T afterRun(AfterTaskRun.Builder<? super P> builder) {
-            this.afterRunBuilder = builder;
-            return getThis();
         }
 
         protected ServerMigrationTaskName buildName(P parameters) {
@@ -213,14 +168,16 @@ public abstract class ComponentTask implements ServerMigrationTask {
             };
         }
 
-        @Override
         public <P1 extends P> ServerMigrationTask build(P1 params) {
             final ServerMigrationTaskName taskName = buildName(params);
             return buildTask(taskName, buildRunnable(params, taskName));
         }
 
+        protected abstract T clone();
         protected abstract T getThis();
         protected abstract TaskRunnable.Builder<? super P> getRunnableBuilder();
         protected abstract ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable);
+
+
     }
 }

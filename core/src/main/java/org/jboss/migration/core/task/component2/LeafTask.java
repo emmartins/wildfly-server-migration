@@ -28,21 +28,14 @@ public class LeafTask extends ComponentTask {
         super(name, taskRunnable);
     }
 
-    public static <P extends BuildParameters> Builder<P, ?> builder() {
-        return new BuilderImpl<>();
-    }
-
-    public interface Builder<P extends BuildParameters, T extends Builder<P, T>> extends ComponentTask.Builder<P,T> {
-    }
-
-    protected static abstract class AbstractBuilder<P extends BuildParameters, T extends AbstractBuilder<P, T>> extends ComponentTask.AbstractBuilder<P, T> implements Builder<P, T> {
+    protected static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> {
 
         private TaskRunnable.Builder<? super P> runnableBuilder;
 
-        protected AbstractBuilder() {
+        protected BaseBuilder() {
         }
 
-        protected AbstractBuilder(AbstractBuilder<P, ?> other) {
+        protected BaseBuilder(BaseBuilder<P, ?> other) {
             super(other);
             this.runnableBuilder = other.runnableBuilder;
         }
@@ -59,22 +52,22 @@ public class LeafTask extends ComponentTask {
         }
     }
 
-    protected static class BuilderImpl<P extends BuildParameters> extends AbstractBuilder<P, BuilderImpl<P>> {
+    public static class Builder<P extends BuildParameters> extends BaseBuilder<P, Builder<P>> {
 
-        protected BuilderImpl() {
+        public Builder() {
         }
 
-        protected BuilderImpl(BuilderImpl<P> other) {
+        protected Builder(Builder<P> other) {
             super(other);
         }
 
         @Override
-        public BuilderImpl<P> clone() {
-            return new BuilderImpl(this);
+        public Builder<P> clone() {
+            return new Builder(this);
         }
 
         @Override
-        protected BuilderImpl<P> getThis() {
+        protected Builder<P> getThis() {
             return this;
         }
 

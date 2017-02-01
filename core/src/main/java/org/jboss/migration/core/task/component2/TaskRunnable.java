@@ -33,12 +33,10 @@ public interface TaskRunnable {
      */
     @FunctionalInterface
     interface Builder<P extends BuildParameters> {
+
         TaskRunnable build(P params, ServerMigrationTaskName taskName);
-    }
 
-    interface Adapters {
-
-        static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> of(BuildParameters.Mapper<R, T> mapper, TaskRunnable.Builder<? super T> tBuilder) {
+        static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> from(BuildParameters.Mapper<R, T> mapper, TaskRunnable.Builder<? super T> tBuilder) {
             return (r, taskName) -> context -> {
                 final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().skipped();
                 for (T t : mapper.apply(r)) {
@@ -50,7 +48,7 @@ public interface TaskRunnable {
             };
         }
 
-        static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> of(BuildParameters.Mapper<R, T> mapper, ComponentTask.Builder<? super T, ?> tBuilder) {
+        static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> from(BuildParameters.Mapper<R, T> mapper, ComponentTask.Builder<? super T, ?> tBuilder) {
             return (r, taskName) -> context -> {
                 final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().skipped();
                 for (T t : mapper.apply(r)) {

@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.core.task.component2.test;
+package org.jboss.migration.wfly10.config.task.management.configuration;
 
 import org.jboss.migration.core.task.component2.BuildParameters;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 /**
  * @author emmartins
  */
-public interface XTaskParams extends BuildParameters {
-    int getX();
+public interface ManageableServerConfigurationParameters<S> extends BuildParameters {
+    S getSource();
+    ManageableServerConfiguration getServerConfiguration();
 }
