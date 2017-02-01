@@ -21,9 +21,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author emmartins
@@ -99,16 +97,6 @@ public abstract class ComponentTask implements ServerMigrationTask {
             return getThis();
         }
 
-        public T run(TaskRunnable runnable) {
-            return run((params, name) -> runnable);
-        }
-
-        public abstract T run(TaskRunnable.Builder<? super P> builder);
-
-        public <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> p1p2Mapper, TaskRunnable.Builder<? super Q> qBuilder) {
-            return run(TaskRunnable.Builder.from(p1p2Mapper, qBuilder));
-        }
-
         public T afterRun(AfterTaskRun afterRun) {
             return afterRun((parameters, name) -> afterRun);
         }
@@ -118,35 +106,13 @@ public abstract class ComponentTask implements ServerMigrationTask {
             return getThis();
         }
 
-        public  <P1 extends BuildParameters> TaskRunnable.Builder<P1> toRunnableBuilder(BuildParameters.Mapper<P1, P> mapper) {
-            final Builder<P, ?> builder = this;
-            return (p1, taskName) -> {
-                final Set<P> pSet = new HashSet<>();
-                for (P p : mapper.apply(p1)) {
-                    pSet.add(p);
-                }
-                return context -> {
-                    for(P p : pSet) {
-                        context.execute(builder.build(p));
-                    }
-                    return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
-                };
-            };
-        }
-
         protected ServerMigrationTaskName buildName(P parameters) {
             Objects.requireNonNull(taskNameBuilder);
             return taskNameBuilder.build(parameters);
         }
 
         protected TaskRunnable buildRunnable(P parameters, ServerMigrationTaskName taskName) {
-        /*
-        final TaskRunnable.Builder<? super P> runnableBuilder = getRunnableBuilder();
-        Objects.requireNonNull(runnableBuilder);
-        final TaskSkipPolicy.Builder<? super P> skipPolicyBuilder = this.skipPolicyBuilder;
-        final BeforeTaskRun.Builder<? super P> beforeRunBuilder = this.beforeRunBuilder;
-        final AfterTaskRun.Builder<? super P> afterRunBuilder = this.afterRunBuilder;
-        */
+
             final TaskRunnable.Builder<? super P> runnableBuilder = getRunnableBuilder();
             Objects.requireNonNull(runnableBuilder);
             final TaskRunnable runnable = runnableBuilder.build(parameters, taskName);

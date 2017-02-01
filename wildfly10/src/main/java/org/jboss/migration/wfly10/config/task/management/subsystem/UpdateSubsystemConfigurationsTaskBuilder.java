@@ -32,8 +32,9 @@ import java.util.Collection;
  */
 public class UpdateSubsystemConfigurationsTaskBuilder<S> extends ManageableResourcesCompositeTask.Builder<S, SubsystemConfiguration> {
 
+    protected
     public UpdateSubsystemConfigurationsTaskBuilder(String subsystem) {
-        name(parameters -> new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
+        name(new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
         beforeRun(context -> context.getLogger().infof("Updating subsystem %s configuration(s)...", subsystem));
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {

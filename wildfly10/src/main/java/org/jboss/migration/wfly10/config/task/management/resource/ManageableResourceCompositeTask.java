@@ -147,12 +147,12 @@ public class ManageableResourceCompositeTask extends CompositeTask {
 
         public Builder<S, R> subtask(ManageableServerConfigurationLeafTask.Builder<S> builder) {
             final ComponentTask.Builder clone = builder.clone();
-            return run((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
+            return subtask((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
         }
 
         public Builder<S, R> subtask(ManageableServerConfigurationCompositeTask.Builder<S> builder) {
             final ComponentTask.Builder clone = builder.clone();
-            return run((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
+            return subtask((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
         }
     }
 }

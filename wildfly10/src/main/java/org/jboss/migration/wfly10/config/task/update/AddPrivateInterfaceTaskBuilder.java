@@ -22,12 +22,14 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.component2.CompositeTask;
 import org.jboss.migration.core.task.component2.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationParameters;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import java.util.ArrayList;
@@ -60,8 +62,9 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
             return true;
         });
         beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
-        subtask(new AddInterface<>());
-        subtask(new UpdateSocketBindings<>());
+        subtasks(subtasksBuilder()
+                .run(new AddInterface<>())
+                .run(new UpdateSocketBindings<>()));
         afterRun(context -> context.getLogger().infof("Private interface setup done."));
     }
 

@@ -40,11 +40,36 @@ public class LeafTask extends ComponentTask {
             this.runnableBuilder = other.runnableBuilder;
         }
 
+        public T run(TaskRunnable runnable) {
+            return run((params, name) -> runnable);
+        }
+
+        public T run(TaskRunnable.Builder<? super P> builder) {
+            this.runnableBuilder = builder;
+            return getThis();
+        }
+
+        public <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
+            return run(TaskRunnable.Builder.from(pqMapper, qBuilder));
+        }
+
+        /*
+        public T run(TaskRunnable runnable) {
+            return run((params, name) -> runnable);
+        }
+
+        public abstract T run(TaskRunnable.Builder<? super P> builder);
+
+        public <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
+            return run(TaskRunnable.Builder.from(pqMapper, qBuilder));
+        }
+
         @Override
         public T run(TaskRunnable.Builder<? super P> builder) {
             this.runnableBuilder = builder;
             return getThis();
         }
+        */
 
         @Override
         public TaskRunnable.Builder<? super P> getRunnableBuilder() {

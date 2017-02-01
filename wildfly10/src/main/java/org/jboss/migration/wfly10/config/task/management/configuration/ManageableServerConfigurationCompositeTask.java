@@ -70,6 +70,11 @@ public class ManageableServerConfigurationCompositeTask extends CompositeTask {
             return new ManageableServerConfigurationCompositeTask(name, taskRunnable);
         }
 
+        @Override
+        public Builder<S> subtasks(Subtasks<ManageableServerConfigurationParameters<S>> subtasks) {
+            return super.subtasks(subtasks);
+        }
+
         // TODO extract common code from resource(s) composite tasks' builders
 
         public <R extends ManageableResource> Builder<S> subtask(Class<R> resourceType, ManageableResourcesCompositeTask.Builder<S, R> builder) {
