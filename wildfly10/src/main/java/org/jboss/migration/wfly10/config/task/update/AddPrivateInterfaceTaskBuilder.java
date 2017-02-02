@@ -22,14 +22,13 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.component2.CompositeTask;
 import org.jboss.migration.core.task.component2.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask.SubtasksBuilder;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationParameters;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import java.util.ArrayList;
@@ -62,9 +61,7 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
             return true;
         });
         beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
-        subtasks(subtasksBuilder()
-                .run(new AddInterface<>())
-                .run(new UpdateSocketBindings<>()));
+        subtasks(new SubtasksBuilder<S>().subtask(new AddInterface<>()).subtask(new UpdateSocketBindings<>()));
         afterRun(context -> context.getLogger().infof("Private interface setup done."));
     }
 
@@ -89,7 +86,8 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
     static class UpdateSocketBindings<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
         UpdateSocketBindings() {
             name("update-socket-bindings");
-            subtask(SocketBindingGroupResource.class, new UpdateSocketBindingGroup<>());
+            subtasks(new SubtasksBuilder<S>()
+                    .subtask(SocketBindingGroupResource.class, new UpdateSocketBindingGroup<>()));
         }
     }
 

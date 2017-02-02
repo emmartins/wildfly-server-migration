@@ -20,22 +20,33 @@ import org.jboss.migration.core.task.AbstractServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.component2.BuildParameters;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourcesBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourcesCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourcesCompositeTask.SubtasksBuilder;
 
 import java.util.Collection;
 
 /**
  * @author emmartins
  */
-public class UpdateSubsystemConfigurationsTaskBuilder<S> extends ManageableResourcesCompositeTask.Builder<S, SubsystemConfiguration> {
+public class UpdateSubsystemConfigurationsTaskBuilder<S> extends ManageableResourcesCompositeTask.Builder<S, ManageableResource> {
 
-    protected
-    public UpdateSubsystemConfigurationsTaskBuilder(String subsystem) {
+    public UpdateSubsystemConfigurationsTaskBuilder(String subsystem, SubtasksBuilder<S, SubsystemConfiguration> subtasks) {
         name(new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystem).build());
         beforeRun(context -> context.getLogger().infof("Updating subsystem %s configuration(s)...", subsystem));
+        final SubtasksBuilder<S, SubsystemConfiguration> subtasksBuilder = new SubtasksBuilder<>();
+        final BuildParameters.Mapper<ManageableResourcesBuildParameters<S, ManageableResource>, ManageableResourcesBuildParameters<S, SubsystemConfiguration>> mapper = new BuildParameters.Mapper<ManageableResourcesBuildParameters<S, ManageableResource>, ManageableResourcesBuildParameters<S, SubsystemConfiguration>>() {
+            @Override
+            public Collection<ManageableResourcesBuildParameters<S, SubsystemConfiguration>> apply(ManageableResourcesBuildParameters<S, ManageableResource> sManageableResourceManageableResourcesBuildParameters) {
+                return null;
+            }
+        }
+        subtasks(new SubtasksBuilder<S, ManageableResource>().);
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
                 context.getLogger().infof("Subsystem %s configuration(s) updated.", subsystem);
@@ -43,11 +54,12 @@ public class UpdateSubsystemConfigurationsTaskBuilder<S> extends ManageableResou
                 context.getLogger().infof("No subsystem %s configuration(s) updated.", subsystem);
             }
         });
+
     }
 
     @Override
     public <P1 extends ManageableResourcesBuildParameters<S, SubsystemConfiguration>> ServerMigrationTask build(P1 params) {
-        // params is the "context", we
+
         return super.build(params);
     }
 

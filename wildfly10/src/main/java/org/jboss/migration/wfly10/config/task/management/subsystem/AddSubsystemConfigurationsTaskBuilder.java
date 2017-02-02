@@ -20,6 +20,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourcesCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourcesCompositeTask.SubtasksBuilder;
 
 /**
  * @author emmartins
@@ -33,6 +34,9 @@ public class AddSubsystemConfigurationsTaskBuilder<S> extends ManageableResource
     public AddSubsystemConfigurationsTaskBuilder(final String extension, AddSubsystemConfigurationTaskBuilder<S> subtask) {
         name(new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subtask.getSubsystem()).build());
         beforeRun(context -> context.getLogger().infof("Adding subsystem %s configuration(s)...", subtask.getSubsystem()));
+        subtasks(new SubtasksBuilder<S, SubsystemConfiguration.Parent>()
+                .subtask(new AddExtensionTaskBuilder<S>(extension))
+                .subtask(subtask));
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
                 context.getLogger().infof("Subsystem %s configuration(s) added.", subtask.getSubsystem());
@@ -40,7 +44,5 @@ public class AddSubsystemConfigurationsTaskBuilder<S> extends ManageableResource
                 context.getLogger().infof("No subsystem %s configuration(s) added.", subtask.getSubsystem());
             }
         });
-        subtask(new AddExtensionTaskBuilder<S>(extension));
-        subtask(subtask);
     }
 }

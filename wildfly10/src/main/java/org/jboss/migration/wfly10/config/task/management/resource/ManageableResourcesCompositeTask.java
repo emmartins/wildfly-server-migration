@@ -66,22 +66,22 @@ public class ManageableResourcesCompositeTask extends CompositeTask {
         protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
             return new ManageableResourcesCompositeTask(name, taskRunnable);
         }
+    }
+
+    public static class SubtasksBuilder<S, R extends ManageableResource> extends CompositeTask.SubtasksBaseBuilder<ManageableResourcesBuildParameters<S, R>, SubtasksBuilder<S>> {
+
+        @Override
+        protected SubtasksBuilder<S, R> getThis() {
+            return this;
+        }
 
         // TODO extract common code from server config and resources composite tasks' builders
 
-        public <R1 extends ManageableResource> Builder<S, R> subtask(Class<R1> resourceType, ManageableResourcesCompositeTask.Builder<S, R1> builder) {
-            return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
-        }
-
-        public <R1 extends ManageableResource> Builder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourcesCompositeTask.Builder<S, R1> builder) {
+        public <R1 extends ManageableResource> SubtasksBuilder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourcesCompositeTask.Builder<S, R1> builder) {
             return subtask(getResourcesMapper(resourceSelector), builder);
         }
 
-        public <R1 extends ManageableResource> Builder<S, R> subtask(Class<R1> resourceType, ManageableResourcesLeafTask.Builder<S, R1> builder) {
-            return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
-        }
-
-        public <R1 extends ManageableResource> Builder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourcesLeafTask.Builder<S, R1> builder) {
+        public <R1 extends ManageableResource> SubtasksBuilder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourcesLeafTask.Builder<S, R1> builder) {
             return subtask(getResourcesMapper(resourceSelector), builder);
         }
 
@@ -107,19 +107,11 @@ public class ManageableResourcesCompositeTask extends CompositeTask {
             };
         }
 
-        public <R1 extends ManageableResource> Builder<S, R> subtask(Class<R1> resourceType, ManageableResourceCompositeTask.Builder<S, R1> builder) {
-            return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
-        }
-
-        public <R1 extends ManageableResource> Builder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourceCompositeTask.Builder<S, R1> builder) {
+        public <R1 extends ManageableResource> SubtasksBuilder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourceCompositeTask.Builder<S, R1> builder) {
             return subtask(getResourceMapper(resourceSelector), builder);
         }
 
-        public <R1 extends ManageableResource> Builder<S, R> subtask(Class<R1> resourceType, ManageableResourceLeafTask.Builder<S, R1> builder) {
-            return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
-        }
-
-        public <R1 extends ManageableResource> Builder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourceLeafTask.Builder<S, R1> builder) {
+        public <R1 extends ManageableResource> SubtasksBuilder<S, R> subtask(ManageableResourceSelector<R1> resourceSelector, ManageableResourceLeafTask.Builder<S, R1> builder) {
             return subtask(getResourceMapper(resourceSelector), builder);
         }
 
@@ -145,19 +137,19 @@ public class ManageableResourcesCompositeTask extends CompositeTask {
             };
         }
 
-        public Builder<S, R> subtask(ManageableResourceLeafTask.Builder<S, R> builder) {
+        public SubtasksBuilder<S, R> subtask(ManageableResourceLeafTask.Builder<S, R> builder) {
             final ComponentTask.Builder clone = builder.clone();
             return subtask((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
         }
 
-        public Builder<S, R> subtask(ManageableServerConfigurationLeafTask.Builder<S> builder) {
+        public SubtasksBuilder<S, R> subtask(ManageableServerConfigurationLeafTask.Builder<S> builder) {
             final ComponentTask.Builder clone = builder.clone();
             return subtask((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
         }
 
-        public Builder<S, R> subtask(ManageableServerConfigurationCompositeTask.Builder<S> builder) {
+        public SubtasksBuilder<S, R> subtask(ManageableServerConfigurationCompositeTask.Builder<S> builder) {
             final ComponentTask.Builder clone = builder.clone();
             return subtask((params, taskName) -> context -> context.execute(clone.build(params)).getResult());
         }
+
     }
-}

@@ -69,27 +69,30 @@ public class ManageableServerConfigurationCompositeTask extends CompositeTask {
         protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
             return new ManageableServerConfigurationCompositeTask(name, taskRunnable);
         }
+    }
+
+    public static class SubtasksBuilder<S> extends CompositeTask.SubtasksBaseBuilder<ManageableServerConfigurationParameters<S>, SubtasksBuilder<S>> {
 
         @Override
-        public Builder<S> subtasks(Subtasks<ManageableServerConfigurationParameters<S>> subtasks) {
-            return super.subtasks(subtasks);
+        protected SubtasksBuilder<S> getThis() {
+            return this;
         }
 
         // TODO extract common code from resource(s) composite tasks' builders
 
-        public <R extends ManageableResource> Builder<S> subtask(Class<R> resourceType, ManageableResourcesCompositeTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(Class<R> resourceType, ManageableResourcesCompositeTask.Builder<S, R> builder) {
             return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourcesCompositeTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourcesCompositeTask.Builder<S, R> builder) {
             return subtask(getResourcesMapper(resourceSelector), builder);
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(Class<R> resourceType, ManageableResourcesLeafTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(Class<R> resourceType, ManageableResourcesLeafTask.Builder<S, R> builder) {
             return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourcesLeafTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourcesLeafTask.Builder<S, R> builder) {
             return subtask(getResourcesMapper(resourceSelector), builder);
         }
 
@@ -115,19 +118,19 @@ public class ManageableServerConfigurationCompositeTask extends CompositeTask {
             };
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(Class<R> resourceType, ManageableResourceCompositeTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(Class<R> resourceType, ManageableResourceCompositeTask.Builder<S, R> builder) {
             return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourceCompositeTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourceCompositeTask.Builder<S, R> builder) {
             return subtask(getResourceMapper(resourceSelector), builder);
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(Class<R> resourceType, ManageableResourceLeafTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(Class<R> resourceType, ManageableResourceLeafTask.Builder<S, R> builder) {
             return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
         }
 
-        public <R extends ManageableResource> Builder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourceLeafTask.Builder<S, R> builder) {
+        public <R extends ManageableResource> SubtasksBuilder<S> subtask(ManageableResourceSelector<R> resourceSelector, ManageableResourceLeafTask.Builder<S, R> builder) {
             return subtask(getResourceMapper(resourceSelector), builder);
         }
 
