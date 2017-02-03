@@ -23,7 +23,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 
@@ -31,7 +31,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  * A task which adds support for websockets.
  * @author emmartins
  */
-public class AddWebsockets<S> extends UpdateSubsystemConfigurationSubtask<S> {
+public class AddWebsockets<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
     private static final String SERVLET_CONTAINER = "servlet-container";
     private static final String SERVLET_CONTAINER_NAME = "default";

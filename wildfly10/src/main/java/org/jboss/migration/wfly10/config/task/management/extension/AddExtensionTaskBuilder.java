@@ -21,7 +21,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MODULE;
 
@@ -29,7 +29,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MOD
  * Builder for a task which creates an extension if its missing from the server's config.
  * @author emmartins
  */
-public class AddExtensionTaskBuilder<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
+public class AddExtensionTaskBuilder<S> extends ServerConfigurationLeafTask.Builder<S> {
     public AddExtensionTaskBuilder(String extensionModule) {
         name(new ServerMigrationTaskName.Builder("add-extension").addAttribute("name", extensionModule).build());
         run((params, taskName) -> context -> {

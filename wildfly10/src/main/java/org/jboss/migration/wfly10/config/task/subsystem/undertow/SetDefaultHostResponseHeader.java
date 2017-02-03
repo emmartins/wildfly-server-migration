@@ -25,7 +25,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER;
@@ -34,7 +34,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  * A task which adds a response header filter to Undertow's default host config.
  * @author emmartins
  */
-public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemConfigurationSubtask<S> {
+public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
     public static final String TASK_NAME_NAME = "add-default-host-response-header";
 

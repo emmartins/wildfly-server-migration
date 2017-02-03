@@ -16,46 +16,33 @@
 
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resources.ResourcesCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resources.ResourcesCompositeTask;
 
 /**
- * The builder for leaf tasks, which add subsystem configs.
  * @author emmartins
  */
-public class AddSubsystemConfigurationTaskBuilder<S> extends ManageableResourceLeafTask.Builder<S, SubsystemConfiguration.Parent> {
+public class AddSubsystemConfigurationTaskBuilder<S> extends ResourcesCompositeTask.Builder<S, SubsystemConfiguration.Parent> {
 
-    private String subsystem;
+    public AddSubsystemConfigurationTaskBuilder(String extension, String subsystem) {
+        this(extension, new AddSubsystemConfigurationSubtaskBuilder<>(subsystem));
+    }
 
-    public AddSubsystemConfigurationTaskBuilder(String subsystem) {
-        this.subsystem = subsystem;
-        name(parameters -> new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", parameters.getResource().getSubsystemConfigurationAbsoluteName(subsystem)).build());
-        run((params, taskName) -> taskContext -> {
-            SubsystemConfiguration.Parent parent = params.getResource();
-            if (parent.getSubsystemConfiguration(subsystem) != null) {
-                taskContext.getLogger().infof("Skipped adding subsystem config %s, already exists.", parent.getSubsystemConfigurationAbsoluteName(subsystem));
-                return ServerMigrationTaskResult.SKIPPED;
+    public AddSubsystemConfigurationTaskBuilder(final String extension, AddSubsystemConfigurationSubtaskBuilder<S> subtask) {
+        name(new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subtask.getSubsystem()).build());
+        beforeRun(context -> context.getLogger().infof("Adding subsystem %s configuration(s)...", subtask.getSubsystem()));
+        subtasks(new ResourcesCompositeSubtasks.Builder<S, SubsystemConfiguration.Parent>()
+                .subtask(new AddExtensionTaskBuilder<S>(extension))
+                .subtask(subtask));
+        afterRun(context -> {
+            if (context.hasSucessfulSubtasks()) {
+                context.getLogger().infof("Subsystem %s configuration(s) added.", subtask.getSubsystem());
+            } else {
+                context.getLogger().infof("No subsystem %s configuration(s) added.", subtask.getSubsystem());
             }
-            final String configName = parent.getSubsystemConfigurationAbsoluteName(subsystem);
-            taskContext.getLogger().debugf("Adding subsystem config %s...", configName);
-            addConfiguration(params, taskName, taskContext);
-            taskContext.getLogger().infof("Subsystem config %s added.", configName);
-            return ServerMigrationTaskResult.SUCCESS;
         });
-    }
-
-    protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
-        final ModelNode op = Util.createAddOperation(params.getResource().getSubsystemConfigurationPathAddress(subsystem));
-        params.getServerConfiguration().executeManagementOperation(op);
-    }
-
-    public String getSubsystem() {
-        return subsystem;
     }
 }

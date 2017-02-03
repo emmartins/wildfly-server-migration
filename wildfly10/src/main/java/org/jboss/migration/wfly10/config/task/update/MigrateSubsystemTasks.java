@@ -16,16 +16,15 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.wfly10.config.task.management.subsystem.MigrateSubsystemConfigurationTask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.MigrateSubsystemConfigurationTaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.MigrateSubsystemTaskFactory;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * @author emmartins
  */
 public class MigrateSubsystemTasks {
-    public static final MigrateSubsystemConfigurationTask.Builder JACORB = new MigrateSubsystemConfigurationTask.Builder(ExtensionNames.JACORB, SubsystemNames.JACORB);
-    public static final MigrateSubsystemConfigurationTask.Builder MESSAGING = new MigrateSubsystemConfigurationTask.Builder(ExtensionNames.MESSAGING, SubsystemNames.MESSAGING);
-    public static final MigrateSubsystemConfigurationTask.Builder WEB = new MigrateSubsystemConfigurationTask.Builder(ExtensionNames.WEB, SubsystemNames.WEB);
+    public static final MigrateSubsystemConfigurationTaskBuilder.Builder JACORB = new MigrateSubsystemConfigurationTaskBuilder.Builder(ExtensionNames.JACORB, SubsystemNames.JACORB);
+    public static final MigrateSubsystemConfigurationTaskBuilder.Builder MESSAGING = new MigrateSubsystemConfigurationTaskBuilder.Builder(ExtensionNames.MESSAGING, SubsystemNames.MESSAGING);
+    public static final MigrateSubsystemConfigurationTaskBuilder.Builder WEB = new MigrateSubsystemConfigurationTaskBuilder.Builder(ExtensionNames.WEB, SubsystemNames.WEB);
 }

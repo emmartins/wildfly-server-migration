@@ -24,7 +24,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -32,7 +32,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * A task which adds Undertow's default https listener.
  * @author emmartins
  */
-public class AddHttpsListener<S> extends UpdateSubsystemConfigurationSubtask<S> {
+public class AddHttpsListener<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
     public static final String TASK_NAME_NAME = "add-undertow-https-listener";
     private static final String SERVER_NAME = "default-server";

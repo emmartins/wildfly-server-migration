@@ -22,14 +22,16 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.component2.TaskSkipPolicy;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask.SubtasksBuilder;
-import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resources.ResourcesCompositeTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,17 +42,15 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Adds private interface to config, and updates jgroup socket bindings to use it.
  * @author emmartins
  */
-public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
-
-    public static final AddPrivateInterfaceTaskBuilder INSTANCE = new AddPrivateInterfaceTaskBuilder();
+public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompositeTask.Builder<S> {
 
     private static final String INTERFACE_NAME = "private";
     private static final String[] SOCKET_BINDING_NAMES = {"jgroups-mping", "jgroups-tcp", "jgroups-tcp-fd", "jgroups-udp", "jgroups-udp-fd"};
 
-    private AddPrivateInterfaceTaskBuilder() {
+    public AddPrivateInterfaceTaskBuilder() {
         name("setup-private-interface");
         skipPolicy((params, name) -> context -> {
-            if (TaskSkipPolicy.Builders.skipIfDefaultSkipPropertyIsSet().build(params, name).isSkipped(context)) {
+            if (TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(name).isSkipped(context)) {
                 return true;
             }
             for (String socketBindingName : SOCKET_BINDING_NAMES) {
@@ -61,12 +61,14 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
             return true;
         });
         beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
-        subtasks(new SubtasksBuilder<S>().subtask(new AddInterface<>()).subtask(new UpdateSocketBindings<>()));
+        subtasks(new ServerConfigurationCompositeSubtasks.Builder<S>()
+                .subtask(new AddInterface<>())
+                .subtask(SocketBindingGroupResource.class, new UpdateSocketBindingGroups<>()));
         afterRun(context -> context.getLogger().infof("Private interface setup done."));
     }
 
-    static class AddInterface<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
-        AddInterface() {
+    protected static class AddInterface<S> extends ServerConfigurationLeafTask.Builder<S> {
+        protected AddInterface() {
             name("add-interface");
             run((params, taskName) -> context -> {
                 final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
@@ -83,16 +85,15 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ManageableServerConfigura
         }
     }
 
-    static class UpdateSocketBindings<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
-        UpdateSocketBindings() {
-            name("update-socket-bindings");
-            subtasks(new SubtasksBuilder<S>()
-                    .subtask(SocketBindingGroupResource.class, new UpdateSocketBindingGroup<>()));
+    protected static class UpdateSocketBindingGroups<S> extends ResourcesCompositeTask.Builder<S, SocketBindingGroupResource> {
+        protected UpdateSocketBindingGroups() {
+            name("update-socket-binding-groups");
+            subtasks(new ResourceCompositeSubtasks.Builder<S, SocketBindingGroupResource>().subtask(new UpdateSocketBindingGroup<>()));
         }
     }
 
-    static class UpdateSocketBindingGroup<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingGroupResource> {
-        UpdateSocketBindingGroup() {
+    protected static class UpdateSocketBindingGroup<S> extends ResourceLeafTask.Builder<S, SocketBindingGroupResource> {
+        protected UpdateSocketBindingGroup() {
             name(params -> new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", params.getResource().getResourceName()).build());
             run((params, taskName) -> context -> {
                 final List<String> updated = new ArrayList<>();

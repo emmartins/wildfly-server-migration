@@ -35,6 +35,7 @@ import org.jboss.migration.wfly10.config.management.SocketBindingResources;
 import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
 import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -42,17 +43,16 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Set socket binding's multicast address as value expressions.
  * @author emmartins
  */
-public class AddSocketBindingMulticastAddressExpressions<S> implements ManageableServerConfigurationTaskFactory<S, ManageableServerConfiguration> {
+public class AddSocketBindingMulticastAddressExpressions<S> extends ServerConfigurationCompositeTask.Builder<S> {
 
     public static final String[] SOCKET_BINDINGS = {
             "modcluster"
     };
-
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("add-socket-binding-multicast-address-expressions").build();
-
-    public static final AddSocketBindingMulticastAddressExpressions INSTANCE = new AddSocketBindingMulticastAddressExpressions();
-
-    private AddSocketBindingMulticastAddressExpressions() {
+    
+    public AddSocketBindingMulticastAddressExpressions() {
+        name("add-socket-binding-multicast-address-expressions");
+        beforeRun(context -> context.getLogger().infof("Adding socket binding's multicast address expressions..."));
+        afterRun( context -> context.getLogger().infof("Socket binding's multicast address expressions added."));
     }
 
     @Override
@@ -62,12 +62,12 @@ public class AddSocketBindingMulticastAddressExpressions<S> implements Manageabl
                 .listener(new AbstractServerMigrationTask.Listener() {
                     @Override
                     public void started(TaskContext context) {
-                        context.getLogger().infof("Adding socket binding's multicast address expressions...");
+
                     }
 
                     @Override
                     public void done(TaskContext context) {
-                        context.getLogger().infof("Socket binding's multicast address expressions added.");
+                        ;
                     }
                 })
                 .build();

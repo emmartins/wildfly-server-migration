@@ -23,7 +23,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 
@@ -31,7 +31,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  * A task which adds Undertow's default buffer cache.
  * @author emmartins
  */
-public class AddBufferCache<S> extends UpdateSubsystemConfigurationSubtask<S> {
+public class AddBufferCache<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
     private static final String BUFFER_CACHE = "buffer-cache";
     private static final String BUFFER_CACHE_NAME = "default";

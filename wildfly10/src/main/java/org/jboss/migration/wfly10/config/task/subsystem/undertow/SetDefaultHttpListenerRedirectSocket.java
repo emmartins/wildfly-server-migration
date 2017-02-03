@@ -23,7 +23,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER;
 
@@ -31,7 +31,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  * A task which ensures that Undertow's default http listener 'redirect-socket' is set.
  * @author emmartins
  */
-public class SetDefaultHttpListenerRedirectSocket<S> extends UpdateSubsystemConfigurationSubtask<S> {
+public class SetDefaultHttpListenerRedirectSocket<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
     private static final String SERVER_NAME = "default-server";
     private static final String HTTP_LISTENER = "http-listener";

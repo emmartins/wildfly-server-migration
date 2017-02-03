@@ -16,7 +16,6 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtask;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTask;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
