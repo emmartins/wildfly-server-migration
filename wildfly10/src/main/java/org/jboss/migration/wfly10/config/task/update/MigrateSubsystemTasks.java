@@ -24,7 +24,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
  * @author emmartins
  */
 public class MigrateSubsystemTasks {
-    public static final MigrateSubsystemConfigurationTaskBuilder.Builder JACORB = new MigrateSubsystemConfigurationTaskBuilder.Builder(ExtensionNames.JACORB, SubsystemNames.JACORB);
-    public static final MigrateSubsystemConfigurationTaskBuilder.Builder MESSAGING = new MigrateSubsystemConfigurationTaskBuilder.Builder(ExtensionNames.MESSAGING, SubsystemNames.MESSAGING);
-    public static final MigrateSubsystemConfigurationTaskBuilder.Builder WEB = new MigrateSubsystemConfigurationTaskBuilder.Builder(ExtensionNames.WEB, SubsystemNames.WEB);
+    public static final MigrateSubsystemConfigurationTaskBuilder JACORB = new MigrateSubsystemConfigurationTaskBuilder(ExtensionNames.JACORB, SubsystemNames.JACORB);
+    public static final MigrateSubsystemConfigurationTaskBuilder MESSAGING = new MigrateSubsystemConfigurationTaskBuilder(ExtensionNames.MESSAGING, SubsystemNames.MESSAGING);
+    public static final MigrateSubsystemConfigurationTaskBuilder WEB = new MigrateSubsystemConfigurationTaskBuilder(ExtensionNames.WEB, SubsystemNames.WEB);
 }

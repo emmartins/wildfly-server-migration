@@ -31,6 +31,7 @@ import org.jboss.migration.wfly10.config.task.management.configuration.ServerCon
 import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
 import org.jboss.migration.wfly10.config.task.management.resources.ResourcesCompositeTask;
 
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompos
     protected static class UpdateSocketBindingGroup<S> extends ResourceLeafTask.Builder<S, SocketBindingGroupResource> {
         protected UpdateSocketBindingGroup() {
             name(params -> new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", params.getResource().getResourceName()).build());
-            run((params, taskName) -> context -> {
+            final ResourceTaskRunnableBuilder<S, SocketBindingGroupResource> runnableBuilder = (params, taskName) ->context -> {
                 final List<String> updated = new ArrayList<>();
                 for (String socketBinding : SOCKET_BINDING_NAMES) {
                     SocketBindingResource socketBindingResource = params.getResource().getSocketBindingResource(socketBinding);
@@ -117,7 +118,8 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompos
                 } else {
                     return new ServerMigrationTaskResult.Builder().success().addAttribute("updated", updated.toString()).build();
                 }
-            });
+            };
+            run(runnableBuilder);
         }
     }
 }

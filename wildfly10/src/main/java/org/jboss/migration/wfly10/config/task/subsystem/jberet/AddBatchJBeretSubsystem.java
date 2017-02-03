@@ -19,16 +19,18 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurationSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Batch JBeret subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
+public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigurationSubtaskBuilder<S> {
 
     public static final AddBatchJBeretSubsystem INSTANCE = new AddBatchJBeretSubsystem();
 
@@ -53,7 +55,7 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
     private static final String KEEPALIVE_TIME_UNIT_ATTR_VALUE = "seconds";
 
     @Override
-    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
+    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
         /*
             <subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">
                 <default-job-repository name="in-memory"/>
@@ -67,8 +69,9 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
                 </thread-pool>
             </subsystem>
              */
+        final SubsystemConfiguration.Parent parentResource = params.getResource();
         final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
+        final PathAddress subsystemPathAddress = parentResource.getSubsystemConfigurationPathAddress(getSubsystem());
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         subsystemAddOperation.get(DEFAULT_JOB_REPOSITORY_ATTR_NAME).set(DEFAULT_JOB_REPOSITORY_ATTR_VALUE);
         subsystemAddOperation.get(DEFAULT_THREAD_POOL_ATTR_NAME).set(DEFAULT_THREAD_POOL_ATTR_VALUE);
@@ -86,6 +89,6 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigSubtask<S> {
         keepAliveTime.get(KEEPALIVE_TIME_UNIT_ATTR_NAME).set(KEEPALIVE_TIME_UNIT_ATTR_VALUE);
         threadPoolAddOperation.get(KEEPALIVE_TIME).set(keepAliveTime);
         compositeOperationBuilder.addStep(threadPoolAddOperation);
-        subsystemResources.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
+        parentResource.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
     }
 }

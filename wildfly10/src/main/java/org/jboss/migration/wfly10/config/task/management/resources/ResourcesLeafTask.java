@@ -31,7 +31,7 @@ public class ResourcesLeafTask extends LeafTask {
         super(name, taskRunnable);
     }
 
-    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<ResourcesBuildParameters<S, R>, Builder<S, R>> implements ResourcesComponentTaskBuilder<S, R, Builder<S, R>> {
+    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<ResourcesBuildParameters<S, R>, Builder<S, R>> implements ResourcesLeafTaskBuilder<S, R, Builder<S, R>> {
         @Override
         protected Builder<S, R> getThis() {
             return this;

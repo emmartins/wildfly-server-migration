@@ -30,7 +30,7 @@ public interface CompositeSubtasksBuilder<P extends BuildParameters, T extends C
         return subtask((params, taskName) -> context -> context.execute(task).getResult());
     }
 
-    default T subtask(ComponentTask.Builder<? super P, ?> builder) {
+    default T subtask(ComponentTaskBuilder<? super P, ?> builder) {
         return subtask((params, taskName) -> context -> context.execute(builder.build(params)).getResult());
     }
 

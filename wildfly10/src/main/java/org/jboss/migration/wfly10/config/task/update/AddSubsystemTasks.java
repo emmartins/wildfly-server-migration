@@ -16,7 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurationTaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
@@ -28,17 +28,13 @@ import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSu
  */
 public class AddSubsystemTasks {
 
-    public static final AddSubsystemTaskFactory BEAN_VALIDATION = new AddSubsystemTaskFactory.Builder(SubsystemNames.BEAN_VALIDATION, ExtensionNames.BEAN_VALIDATION)
-                                .build();
-    public static final AddSubsystemTaskFactory BATCH_JBERET = new AddSubsystemTaskFactory.Builder(SubsystemNames.BATCH_JBERET, ExtensionNames.BATCH_JBERET)
-            .subtask(AddBatchJBeretSubsystem.INSTANCE)
-            .build();
-    public static final AddSubsystemTaskFactory REQUEST_CONTROLLER = new AddSubsystemTaskFactory.Builder(SubsystemNames.REQUEST_CONTROLLER, ExtensionNames.REQUEST_CONTROLLER)
-            .build();
-    public static final AddSubsystemTaskFactory SECURITY_MANAGER = new AddSubsystemTaskFactory.Builder(SubsystemNames.SECURITY_MANAGER, ExtensionNames.SECURITY_MANAGER)
-            .subtask(AddSecurityManagerSubsystem.INSTANCE)
-            .build();
-    public static final AddSubsystemTaskFactory SINGLETON = new AddSubsystemTaskFactory.Builder(SubsystemNames.SINGLETON, ExtensionNames.SINGLETON)
-            .subtask(AddSingletonSubsystem.INSTANCE)
-            .build();
+    public static final AddSubsystemConfigurationTaskBuilder BEAN_VALIDATION = new AddSubsystemConfigurationTaskBuilder(ExtensionNames.BEAN_VALIDATION, SubsystemNames.BEAN_VALIDATION);
+
+    public static final AddSubsystemConfigurationTaskBuilder BATCH_JBERET = new AddSubsystemConfigurationTaskBuilder(ExtensionNames.BATCH_JBERET, AddBatchJBeretSubsystem.INSTANCE);
+
+    public static final AddSubsystemConfigurationTaskBuilder REQUEST_CONTROLLER = new AddSubsystemConfigurationTaskBuilder(ExtensionNames.REQUEST_CONTROLLER, SubsystemNames.REQUEST_CONTROLLER);
+
+    public static final AddSubsystemConfigurationTaskBuilder SECURITY_MANAGER = new AddSubsystemConfigurationTaskBuilder(ExtensionNames.SECURITY_MANAGER, AddSecurityManagerSubsystem.INSTANCE);
+
+    public static final AddSubsystemConfigurationTaskBuilder SINGLETON = new AddSubsystemConfigurationTaskBuilder(ExtensionNames.SINGLETON, AddSingletonSubsystem.INSTANCE);
 }

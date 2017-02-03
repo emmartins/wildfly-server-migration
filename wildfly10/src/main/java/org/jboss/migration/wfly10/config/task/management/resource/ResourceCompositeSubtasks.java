@@ -43,4 +43,12 @@ public class ResourceCompositeSubtasks extends CompositeSubtasks {
             return this;
         }
     }
+
+    public static <S, R extends ManageableResource> Builder<S, R> of(ResourceComponentTaskBuilder<S, R, ?>... subtasks) {
+        final Builder<S, R> builder = new Builder<>();
+        for (ResourceComponentTaskBuilder<S, R, ?> subtask : subtasks) {
+            builder.subtask(subtask);
+        };
+        return builder;
+    }
 }

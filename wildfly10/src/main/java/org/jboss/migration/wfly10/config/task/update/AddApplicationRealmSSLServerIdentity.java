@@ -26,9 +26,8 @@ import org.jboss.migration.wfly10.config.management.ManageableServerConfiguratio
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ServerConfigurationToResourceParametersMapper;
-
-import java.util.Collection;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -51,24 +50,21 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> exte
     public AddApplicationRealmSSLServerIdentity() {
         name("add-application-realm-ssl-server-identity");
         beforeRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
-        run(TaskRunnable.Builder.from(new ServerConfigurationToResourceParametersMapper<S, SecurityRealmResource>(SecurityRealmResource.class, RESOURCE_NAME), )
+        run(SecurityRealmResource.class, RESOURCE_NAME, new RunnableBuilder<>());
+        afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
+    }
 
-                (params, taskName) -> (TaskRunnable) context -> {
-            final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
-            final Collection<SecurityRealmResource> securityRealmResources = serverConfiguration.findResources(SecurityRealmResource.class, RESOURCE_NAME);
-            if (securityRealmResources.isEmpty()) {
-                context.getLogger().debugf("Security realm %s not defined, skipping task to add SSL server identity", RESOURCE_NAME);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            if (securityRealmResources.size() > 1) {
-                throw new IllegalStateException("Multiple security realms named " + RESOURCE_NAME + " found!");
-            }
-            final SecurityRealmResource resource = securityRealmResources.iterator().next();
-            final ModelNode resourceConfig = resource.getResourceConfiguration();
-            if (resourceConfig.hasDefined(SERVER_IDENTITY, SERVER_IDENTITY_NAME)) {
-                context.getLogger().debugf("Security realm %s already includes SSL server identify, skipping task to add it.", RESOURCE_NAME);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
+    protected static class RunnableBuilder<S> implements ResourceTaskRunnableBuilder<S, SecurityRealmResource> {
+        @Override
+        public TaskRunnable build(ResourceBuildParameters<S, SecurityRealmResource> params, ServerMigrationTaskName taskName) {
+            return context -> {
+                final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
+                final SecurityRealmResource resource = params.getResource();
+                final ModelNode resourceConfig = resource.getResourceConfiguration();
+                if (resourceConfig.hasDefined(SERVER_IDENTITY, SERVER_IDENTITY_NAME)) {
+                    context.getLogger().debugf("Security realm %s already includes SSL server identify, skipping task to add it.", RESOURCE_NAME);
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
                 /*
     XML:
     <server-identities>
@@ -95,20 +91,18 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> exte
             }}
 
      */
-            final ModelNode addOperation = Util.createAddOperation(resource.getResourcePathAddress().append(SERVER_IDENTITY, SERVER_IDENTITY_NAME));
-            addOperation.get(KEYSTORE_PATH).set("application.keystore");
-            final String keystoreRelativeTo = serverConfiguration instanceof StandaloneServerConfiguration ? "jboss.server.config.dir" : "jboss.domain.config.dir";
-            addOperation.get(KEYSTORE_RELATIVE_TO).set(keystoreRelativeTo);
-            addOperation.get(KEYSTORE_PASSWORD).set("password");
-            addOperation.get(ALIAS).set("server");
-            addOperation.get(KEY_PASSWORD).set("password");
-            addOperation.get(GENERATE_SELF_SIGNED_CERTIFICATE_HOST).set("localhost");
-            serverConfiguration.executeManagementOperation(addOperation);
-            context.getLogger().infof("SSL server identity added to security realm %s.", RESOURCE_NAME);
-            return ServerMigrationTaskResult.SUCCESS;
-        });
-        afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
+                final ModelNode addOperation = Util.createAddOperation(resource.getResourcePathAddress().append(SERVER_IDENTITY, SERVER_IDENTITY_NAME));
+                addOperation.get(KEYSTORE_PATH).set("application.keystore");
+                final String keystoreRelativeTo = serverConfiguration instanceof StandaloneServerConfiguration ? "jboss.server.config.dir" : "jboss.domain.config.dir";
+                addOperation.get(KEYSTORE_RELATIVE_TO).set(keystoreRelativeTo);
+                addOperation.get(KEYSTORE_PASSWORD).set("password");
+                addOperation.get(ALIAS).set("server");
+                addOperation.get(KEY_PASSWORD).set("password");
+                addOperation.get(GENERATE_SELF_SIGNED_CERTIFICATE_HOST).set("localhost");
+                serverConfiguration.executeManagementOperation(addOperation);
+                context.getLogger().infof("SSL server identity added to security realm %s.", RESOURCE_NAME);
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+        }
     }
-
-    protected static class RunnableBuilder<S> extends   
 }

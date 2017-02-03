@@ -17,9 +17,43 @@
 package org.jboss.migration.wfly10.config.task.management.configuration;
 
 import org.jboss.migration.core.task.component.CompositeTaskBuilder;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasksBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ServerConfigurationToResourceParametersMapper;
+import org.jboss.migration.wfly10.config.task.management.resources.ResourcesCompositeSubtasksBuilder;
+import org.jboss.migration.wfly10.config.task.management.resources.ServerConfigurationToResourcesParametersMapper;
 
 /**
  * @author emmartins
  */
 public interface ServerConfigurationCompositeTaskBuilder<S, T extends ServerConfigurationCompositeTaskBuilder<S, T>> extends CompositeTaskBuilder<ServerConfigurationBuildParameters<S>, T>, ServerConfigurationComponentTaskBuilder<S, T> {
+
+    default <R1 extends ManageableResource> T subtasks(Class<R1> resourceType, ResourcesCompositeSubtasksBuilder<S, R1, ?> builder) {
+        return subtasks(ManageableResourceSelectors.selectResources(resourceType), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtasks(Class<R1> resourceType, String resourceName, ResourcesCompositeSubtasksBuilder<S, R1, ?> builder) {
+        return subtasks(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtasks(ManageableResourceSelector<R1> resourceSelector, ResourcesCompositeSubtasksBuilder<S, R1, ?> builder) {
+        return subtasks(new ServerConfigurationToResourcesParametersMapper<>(resourceSelector), builder);
+    }
+
+    // --
+
+    default <R1 extends ManageableResource> T subtasks(Class<R1> resourceType, ResourceCompositeSubtasksBuilder<S, R1, ?> builder) {
+        return subtasks(ManageableResourceSelectors.selectResources(resourceType), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtasks(Class<R1> resourceType, String resourceName, ResourceCompositeSubtasksBuilder<S, R1, ?> builder) {
+        return subtasks(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtasks(ManageableResourceSelector<R1> resourceSelector, ResourceCompositeSubtasksBuilder<S, R1, ?> builder) {
+        return subtasks(new ServerConfigurationToResourceParametersMapper<>(resourceSelector), builder);
+    }
+
 }

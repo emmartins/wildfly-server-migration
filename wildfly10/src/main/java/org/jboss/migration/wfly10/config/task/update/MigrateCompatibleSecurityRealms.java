@@ -20,25 +20,19 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationFailureException;
-import org.jboss.migration.core.task.AbstractServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.jboss.JBossServer;
-import org.jboss.migration.core.task.ParentServerMigrationTask;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.ServerMigrationFailureException;
+import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.ServerPath;
-import org.jboss.migration.wfly10.config.management.HostConfiguration;
-import org.jboss.migration.wfly10.config.management.SecurityRealmResources;
-import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.task.executor.SecurityRealmsManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
-import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -48,92 +42,38 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Migration of security realms fully compatible with WildFly 10.
  * @author emmartins
  */
-public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implements StandaloneServerConfigurationTaskFactory<ServerPath<S>>, HostConfigurationTaskFactory<ServerPath<S>> {
+public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends ServerConfigurationCompositeTask.Builder<ServerPath<S>> {
 
-    public static final MigrateCompatibleSecurityRealms INSTANCE = new MigrateCompatibleSecurityRealms();
+    public MigrateCompatibleSecurityRealms() {
+        name("migrate-compatible-security-realms");
+        beforeRun(context -> context.getLogger().infof("Migrating security realms..."));
+        subtasks(SecurityRealmResource.class, ResourceCompositeSubtasks.of(new Subtask<>()));
+        afterRun(context -> context.getLogger().infof("Security realms migration done."));
 
-    private static final String TASK_NAME_NAME = "migrate-compatible-security-realms";
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
-    private static final String SUBTASK_NAME_NAME = "migrate-compatible-security-realm";
-
-    public static final String SECURITY_REALM = "security-realm";
-
-    private MigrateCompatibleSecurityRealms() {
     }
 
-    @Override
-    public ServerMigrationTask getTask(ServerPath<S> source, StandaloneServerConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getSecurityRealmResources());
-    }
-
-    @Override
-    public ServerMigrationTask getTask(ServerPath<S> source, HostConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getSecurityRealmResources());
-    }
-
-    public ServerMigrationTask getTask(ServerPath<S> source, SecurityRealmResources resourcesManagement) throws Exception {
-        return new ParentServerMigrationTask.Builder(TASK_NAME)
-                .subtask(SubtaskExecutorAdapters.of(source, resourcesManagement, new SubtaskExecutor<S>()))
-                .listener(new AbstractServerMigrationTask.Listener() {
-                    @Override
-                    public void started(TaskContext context) {
-                        context.getLogger().infof("Migrating security realms...");
-                    }
-                    @Override
-                    public void done(TaskContext context) {
-                        context.getLogger().infof("Security realms migration done.");
-                    }
-                })
-                .build();
-    }
-
-    public static class SubtaskExecutor<S extends JBossServer<S>> implements SecurityRealmsManagementSubtaskExecutor<ServerPath<S>> {
-        @Override
-        public void executeSubtasks(ServerPath<S> source, SecurityRealmResources resourceManagement, TaskContext context) throws Exception {
-            for (String resourceName : resourceManagement.getResourceNames()) {
-                final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME).addAttribute("name", resourceName).build();
-                context.execute(new Task<>(taskName, source, resourceName, resourceManagement));
-            }
-        }
-    }
-
-    protected static class Task<S extends Server> implements ServerMigrationTask {
-
-        private final ServerMigrationTaskName name;
-        private final ServerPath<S> source;
-        private final String securityRealmName;
-        private final SecurityRealmResources securityRealmResources;
-
-        protected Task(ServerMigrationTaskName name, ServerPath<S> source, String securityRealmName, SecurityRealmResources securityRealmResources) {
-            this.name = name;
-            this.source = source;
-            this.securityRealmName = securityRealmName;
-            this.securityRealmResources = securityRealmResources;
+    protected static class Subtask<S extends JBossServer<S>> extends ResourceLeafTask.Builder<ServerPath<S>, SecurityRealmResource> {
+        protected Subtask() {
+            name(parameters -> new ServerMigrationTaskName.Builder("migrate-compatible-security-realm").addAttribute("name", parameters.getResource().getResourceName()).build());
+            beforeRun((params, taskName) -> context -> context.getLogger().debugf("Security realm %s migration starting...", params.getResource().getResourceName()));
+            afterRun((params, taskName) -> context -> context.getLogger().infof("Security realm %s migrated.", params.getResource().getResourceName()));
+            final ResourceTaskRunnableBuilder<ServerPath<S>, SecurityRealmResource> runnableBuilder = (params, taskName) -> context -> {
+                final SecurityRealmResource securityRealmResource = params.getResource();
+                final ModelNode securityRealmConfig = securityRealmResource.getResourceConfiguration();
+                if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
+                    copyPropertiesFile(AUTHENTICATION, securityRealmConfig, params.getSource(), securityRealmResource, context);
+                }
+                if (securityRealmConfig.hasDefined(AUTHORIZATION, PROPERTIES)) {
+                    copyPropertiesFile(AUTHORIZATION, securityRealmConfig, params.getSource(), securityRealmResource, context);
+                }
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            run(runnableBuilder);
         }
 
-        @Override
-        public ServerMigrationTaskName getName() {
-            return name;
-        }
-
-        @Override
-        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-            context.getLogger().debugf("Security realm %s migration starting...", securityRealmName);
-            final ModelNode securityRealmConfig = securityRealmResources.getResourceConfiguration(securityRealmName);
-            if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
-                copyPropertiesFile(AUTHENTICATION, securityRealmName, securityRealmConfig, source, securityRealmResources, context);
-            }
-            if (securityRealmConfig.hasDefined(AUTHORIZATION, PROPERTIES)) {
-                copyPropertiesFile(AUTHORIZATION, securityRealmName, securityRealmConfig, source, securityRealmResources, context);
-            }
-            context.getLogger().infof("Security realm %s migrated.", securityRealmName);
-
-            return ServerMigrationTaskResult.SUCCESS;
-        }
-
-        private void copyPropertiesFile(String propertiesName, String securityRealmName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmResources securityRealmResources, TaskContext context) throws ServerMigrationFailureException {
+        private void copyPropertiesFile(String propertiesName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmResource securityRealmResource, TaskContext context) throws ServerMigrationFailureException {
             final Server sourceServer = source.getServer();
-            final Server targetServer = securityRealmResources.getServerConfiguration().getServer();
+            final Server targetServer = securityRealmResource.getServerConfiguration().getServer();
             final ModelNode properties = securityRealmConfig.get(propertiesName, PROPERTIES);
             if (properties.hasDefined(PATH)) {
                 final String path = properties.get(PATH).asString();
@@ -151,11 +91,11 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> implement
                         final Path targetPath = sourceServer.getBaseDir().resolve(targetServer.getBaseDir().relativize(sourcePath));
                         context.getLogger().debugf("Target Properties file path: %s", targetPath);
                         context.getServerMigrationContext().getMigrationFiles().copy(sourcePath, targetPath);
-                        final PathAddress pathAddress = securityRealmResources.getResourcePathAddress(securityRealmName).append(PathElement.pathElement(propertiesName, PROPERTIES));
+                        final PathAddress pathAddress = securityRealmResource.getResourcePathAddress().append(PathElement.pathElement(propertiesName, PROPERTIES));
                         final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
                         op.get(NAME).set(PATH);
                         op.get(VALUE).set(targetPath.toString());
-                        securityRealmResources.getServerConfiguration().executeManagementOperation(op);
+                        securityRealmResource.getServerConfiguration().executeManagementOperation(op);
                     } else {
                         context.getLogger().debugf("Source Properties file path is not in source server base dir, skipping file copy");
                     }

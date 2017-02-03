@@ -30,7 +30,8 @@ public class ServerConfigurationLeafTask extends LeafTask {
         super(name, taskRunnable);
     }
 
-    public static class Builder<S> extends BaseBuilder<ServerConfigurationBuildParameters<S>, Builder<S>> implements ServerConfigurationComponentTaskBuilder<S, Builder<S>> {
+    public static class Builder<S> extends BaseBuilder<ServerConfigurationBuildParameters<S>, Builder<S>> implements ServerConfigurationLeafTaskBuilder<S, Builder<S>> {
+
         @Override
         protected Builder<S> getThis() {
             return this;

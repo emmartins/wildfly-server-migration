@@ -18,17 +18,19 @@ package org.jboss.migration.wfly10.config.task.subsystem.securitymanager;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurationSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Security Manager subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S> {
+public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigurationSubtaskBuilder<S> {
 
     public static final AddSecurityManagerSubsystem INSTANCE = new AddSecurityManagerSubsystem();
 
@@ -42,8 +44,8 @@ public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S>
     private static final String CLASS_ATTR_NAME = "class";
     private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
 
-    @Override
-    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
+    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
+        final SubsystemConfiguration.Parent parentResource = params.getResource();
         // add subsystem with default config
             /*
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
@@ -54,8 +56,8 @@ public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigSubtask<S>
                 </deployment-permissions>
             </subsystem>
              */
-        final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
-        final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
+        final ManageableServerConfiguration configurationManagement = parentResource.getServerConfiguration();
+        final PathAddress subsystemPathAddress = parentResource.getSubsystemConfigurationPathAddress(getSubsystem());
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         configurationManagement.executeManagementOperation(subsystemAddOperation);
         // add default deployment permissions

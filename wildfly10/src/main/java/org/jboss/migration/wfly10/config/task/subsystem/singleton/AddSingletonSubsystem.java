@@ -19,17 +19,19 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.AddSubsystemConfigSubtask;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurationSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Singleton subsystem, if missing from the server config.
  * @author emmartins
  */
-public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
+public class AddSingletonSubsystem<S> extends AddSubsystemConfigurationSubtaskBuilder<S> {
 
     public static final AddSingletonSubsystem INSTANCE = new AddSingletonSubsystem();
 
@@ -47,8 +49,8 @@ public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
     private static final String ELECTION_POLICY = "election-policy";
     private static final String ELECTION_POLICY_NAME = "simple";
 
-    @Override
-    protected void addSubsystem(SubsystemResources subsystemResources, TaskContext context) throws Exception {
+    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
+        final SubsystemConfiguration.Parent parentResource = params.getResource();
         // add subsystem with default config
                 /*
             <subsystem xmlns="urn:jboss:domain:singleton:1.0">
@@ -59,9 +61,9 @@ public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
             </singleton-policies>
             </subsystem>
             */
-        final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
+        final ManageableServerConfiguration serverConfiguration = parentResource.getServerConfiguration();
         final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-        final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystemName);
+        final PathAddress subsystemPathAddress = parentResource.getSubsystemConfigurationPathAddress(getSubsystem());
         final ModelNode subsystemAddOperation = Util.createAddOperation(subsystemPathAddress);
         subsystemAddOperation.get(DEFAULT_ATTR_NAME).set(DEFAULT_ATTR_VALUE);
         compositeOperationBuilder.addStep(subsystemAddOperation);
@@ -74,6 +76,6 @@ public class AddSingletonSubsystem<S> extends AddSubsystemConfigSubtask<S> {
         final PathAddress electionPolicyPathAddress = singletonPolicyPathAddress.append(ELECTION_POLICY, ELECTION_POLICY_NAME);
         final ModelNode electionPolicyAddOperation = Util.createAddOperation(electionPolicyPathAddress);
         compositeOperationBuilder.addStep(electionPolicyAddOperation);
-        configurationManagement.executeManagementOperation(compositeOperationBuilder.build().getOperation());
+        serverConfiguration.executeManagementOperation(compositeOperationBuilder.build().getOperation());
     }
 }

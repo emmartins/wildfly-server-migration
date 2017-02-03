@@ -24,6 +24,7 @@ import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
 
 /**
  * The builder for leaf tasks, which add subsystem configs.
@@ -36,7 +37,7 @@ public class AddSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeafTask
     public AddSubsystemConfigurationSubtaskBuilder(String subsystem) {
         this.subsystem = subsystem;
         name(parameters -> new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", parameters.getResource().getSubsystemConfigurationAbsoluteName(subsystem)).build());
-        run((params, taskName) -> taskContext -> {
+        final ResourceTaskRunnableBuilder<S, SubsystemConfiguration.Parent> runnableBuilder = (params, taskName) -> taskContext -> {
             SubsystemConfiguration.Parent parent = params.getResource();
             if (parent.getSubsystemConfiguration(subsystem) != null) {
                 taskContext.getLogger().infof("Skipped adding subsystem config %s, already exists.", parent.getSubsystemConfigurationAbsoluteName(subsystem));
@@ -47,7 +48,8 @@ public class AddSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeafTask
             addConfiguration(params, taskName, taskContext);
             taskContext.getLogger().infof("Subsystem config %s added.", configName);
             return ServerMigrationTaskResult.SUCCESS;
-        });
+        };
+        run(runnableBuilder);
     }
 
     protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {

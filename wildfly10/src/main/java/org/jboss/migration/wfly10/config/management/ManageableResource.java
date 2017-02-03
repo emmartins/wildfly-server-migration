@@ -59,6 +59,7 @@ public interface ManageableResource {
     <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) throws ManagementOperationException;
     <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) throws ManagementOperationException;
 
+    void remove() throws ManagementOperationException;
     void removeResource(Type<?> resourceType, String resourceName) throws ManagementOperationException;
     //ModelNode getResourceConfiguration(String name) throws IOException;
 

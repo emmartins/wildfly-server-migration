@@ -23,7 +23,6 @@ import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -173,6 +172,14 @@ public abstract class AbstractManageableResource implements ManageableResource {
             factory.removeResource(resourceName);
         }
     }
+
+    @Override
+    public void remove() throws ManagementOperationException {
+        final PathAddress address = getResourcePathAddress();
+        final ModelNode op = Util.createRemoveOperation(address);
+        serverConfiguration.executeManagementOperation(op);
+    }
+
     @Override
     public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) {
         return findResources(resourceType, null);
