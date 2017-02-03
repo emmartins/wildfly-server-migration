@@ -26,6 +26,7 @@ import org.jboss.migration.wfly10.config.management.ManageableServerConfiguratio
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ServerConfigurationToResourceParametersMapper;
 
 import java.util.Collection;
 
@@ -50,7 +51,9 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> exte
     public AddApplicationRealmSSLServerIdentity() {
         name("add-application-realm-ssl-server-identity");
         beforeRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
-        run((params, taskName) -> (TaskRunnable) context -> {
+        run(TaskRunnable.Builder.from(new ServerConfigurationToResourceParametersMapper<S, SecurityRealmResource>(SecurityRealmResource.class, RESOURCE_NAME), )
+
+                (params, taskName) -> (TaskRunnable) context -> {
             final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
             final Collection<SecurityRealmResource> securityRealmResources = serverConfiguration.findResources(SecurityRealmResource.class, RESOURCE_NAME);
             if (securityRealmResources.isEmpty()) {
@@ -106,4 +109,6 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> exte
         });
         afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
     }
+
+    protected static class RunnableBuilder<S> extends   
 }

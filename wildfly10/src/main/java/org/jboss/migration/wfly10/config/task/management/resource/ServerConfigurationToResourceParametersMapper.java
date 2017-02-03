@@ -29,7 +29,7 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author emmartins
  */
-public class ServerConfigurationToResourceParametersMapper<S, T extends ManageableResource, R extends ManageableResource> implements BuildParameters.Mapper<ServerConfigurationBuildParameters<S>, ResourceBuildParameters<S, R>> {
+public class ServerConfigurationToResourceParametersMapper<S, R extends ManageableResource> implements BuildParameters.Mapper<ServerConfigurationBuildParameters<S>, ResourceBuildParameters<S, R>> {
 
     private final ManageableResourceSelector<R> resourceSelector;
 
