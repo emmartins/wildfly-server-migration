@@ -34,6 +34,11 @@ public class TaskContextImpl implements TaskContext {
     }
 
     @Override
+    public ServerMigrationTaskName getTaskName() {
+        return taskExecution.getTaskName();
+    }
+
+    @Override
     public List<? extends TaskExecution> getSubtasks() {
         return taskExecution.getSubtasks();
     }

@@ -31,7 +31,7 @@ import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
 
 /**
  * Server migration, from EAP 6.4 to EAP 7.0.
@@ -41,7 +41,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
+        final CompositeServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)

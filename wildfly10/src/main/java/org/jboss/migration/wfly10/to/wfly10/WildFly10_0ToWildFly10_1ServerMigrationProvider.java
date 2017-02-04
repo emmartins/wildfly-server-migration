@@ -23,7 +23,7 @@ import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServe
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_0;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
@@ -36,7 +36,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
+        final CompositeServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
@@ -55,7 +55,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
                                 .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW)
                                 .subtask(WildFly10_0ToWildFly10_1SubsystemUpdates.INFINISPAN)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                                .subtask(AddLoadBalancerProfile.INSTANCE)
+                                .subtask(AddLoadBalancerProfileTaskBuilder.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )

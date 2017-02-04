@@ -24,41 +24,70 @@ import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
 import org.jboss.migration.wfly10.config.task.management.resources.ResourceToResourcesParametersDirectMapper;
 import org.jboss.migration.wfly10.config.task.management.resources.ResourceToResourcesParametersMapper;
 import org.jboss.migration.wfly10.config.task.management.resources.ResourcesComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resources.ResourcesTaskRunnableBuilder;
 
 /**
  * @author emmartins
  */
-public interface ResourceCompositeSubtasksBuilder<S, R extends ManageableResource, T extends ResourceCompositeSubtasksBuilder<S, R, T>> extends CompositeSubtasksBuilder<ResourceBuildParameters<S, R>, T> {
+public interface ResourceCompositeSubtasksBuilder<S, R extends ManageableResource, T extends ResourceCompositeSubtasksBuilder<S, R, T>> extends CompositeSubtasksBuilder<ResourceBuildParameters<S, R>, T>, ResourceTaskRunnableBuilder<S, R> {
 
-    default  <R1 extends ManageableResource> T subtask(Class<R1> resourceType, ResourcesComponentTaskBuilder<S, R1, ?> builder) {
+    default  <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, ResourcesComponentTaskBuilder<S, R1, ?> builder) {
         return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
     }
 
-    default  <R1 extends ManageableResource> T subtask(Class<R1> resourceType, String resourceName, ResourcesComponentTaskBuilder<S, R1, ?> builder) {
+    default  <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, String resourceName, ResourcesComponentTaskBuilder<S, R1, ?> builder) {
         return subtask(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
     }
 
-    default  <R1 extends ManageableResource> T subtask(ManageableResourceSelector<R1> resourceSelector, ResourcesComponentTaskBuilder<S, R1, ?> builder) {
+    default  <R1 extends ManageableResource> T subtask(ManageableResourceSelector<? extends R1> resourceSelector, ResourcesComponentTaskBuilder<S, R1, ?> builder) {
+        return subtask(new ResourceToResourcesParametersMapper<>(resourceSelector), builder);
+    }
+
+    default  <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, ResourcesTaskRunnableBuilder<S, R1> builder) {
+        return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
+    }
+
+    default  <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, String resourceName, ResourcesTaskRunnableBuilder<S, R1> builder) {
+        return subtask(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
+    }
+
+    default  <R1 extends ManageableResource> T subtask(ManageableResourceSelector<? extends R1> resourceSelector, ResourcesTaskRunnableBuilder<S, R1> builder) {
         return subtask(new ResourceToResourcesParametersMapper<>(resourceSelector), builder);
     }
 
     //
 
-    default <R1 extends ManageableResource> T subtask(Class<R1> resourceType, ResourceComponentTaskBuilder<S, R1, ?> builder) {
+    default <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, ResourceComponentTaskBuilder<S, R1, ?> builder) {
         return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
     }
 
-    default <R1 extends ManageableResource> T subtask(Class<R1> resourceType, String resourceName, ResourceComponentTaskBuilder<S, R1, ?> builder) {
+    default <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, String resourceName, ResourceComponentTaskBuilder<S, R1, ?> builder) {
         return subtask(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
     }
 
-    default <R1 extends ManageableResource> T subtask(ManageableResourceSelector<R1> resourceSelector, ResourceComponentTaskBuilder<S, R1, ?> builder) {
+    default <R1 extends ManageableResource> T subtask(ManageableResourceSelector<? extends R1> resourceSelector, ResourceComponentTaskBuilder<S, R1, ?> builder) {
+        return subtask(new ResourceToResourceParametersMapper<>(resourceSelector), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, ResourceTaskRunnableBuilder<S, R1> builder) {
+        return subtask(ManageableResourceSelectors.selectResources(resourceType), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtask(Class<? extends R1> resourceType, String resourceName, ResourceTaskRunnableBuilder<S, R1> builder) {
+        return subtask(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
+    }
+
+    default <R1 extends ManageableResource> T subtask(ManageableResourceSelector<? extends R1> resourceSelector, ResourceTaskRunnableBuilder<S, R1> builder) {
         return subtask(new ResourceToResourceParametersMapper<>(resourceSelector), builder);
     }
 
     //
 
     default T subtask(ResourcesComponentTaskBuilder<S, R, ?> builder) {
+        return subtask(new ResourceToResourcesParametersDirectMapper<>(), builder);
+    }
+
+    default T subtask(ResourcesTaskRunnableBuilder<S, R> builder) {
         return subtask(new ResourceToResourcesParametersDirectMapper<>(), builder);
     }
 

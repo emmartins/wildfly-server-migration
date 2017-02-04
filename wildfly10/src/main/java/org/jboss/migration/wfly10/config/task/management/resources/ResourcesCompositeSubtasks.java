@@ -18,22 +18,21 @@ package org.jboss.migration.wfly10.config.task.management.resources;
 
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.component.CompositeSubtasks;
-import org.jboss.migration.core.task.component.TaskRunnable;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 
 /**
  * @author emmartins
  */
-public class ResourcesCompositeSubtasks extends CompositeSubtasks {
+public class ResourcesCompositeSubtasks<S, R extends ManageableResource> extends CompositeSubtasks<ResourcesBuildParameters<S, R>>  {
 
-    protected ResourcesCompositeSubtasks(TaskRunnable[] runnables) {
-        super(runnables);
+    protected ResourcesCompositeSubtasks(BaseBuilder<S, R, ?> baseBuilder, ResourcesBuildParameters<S, R> params, ServerMigrationTaskName taskName) {
+        super(baseBuilder, params, taskName);
     }
 
     public static abstract class BaseBuilder<S, R extends ManageableResource, T extends BaseBuilder<S, R, T>> extends CompositeSubtasks.BaseBuilder<ResourcesBuildParameters<S, R>, T> implements ResourcesCompositeSubtasksBuilder<S, R, T> {
         @Override
         public ResourcesCompositeSubtasks build(ResourcesBuildParameters<S, R> params, ServerMigrationTaskName taskName) {
-            return new ResourcesCompositeSubtasks(buildRunnables(params, taskName));
+            return new ResourcesCompositeSubtasks(this, params, taskName);
         }
     }
 
@@ -42,5 +41,13 @@ public class ResourcesCompositeSubtasks extends CompositeSubtasks {
         protected Builder<S, R> getThis() {
             return this;
         }
+    }
+
+    public static <S, R extends ManageableResource> Builder<S, R> of(ResourcesComponentTaskBuilder<S, R, ?>... subtasks) {
+        final Builder<S, R> builder = new Builder<>();
+        for (ResourcesComponentTaskBuilder<S, R, ?> subtask : subtasks) {
+            builder.subtask(subtask);
+        };
+        return builder;
     }
 }

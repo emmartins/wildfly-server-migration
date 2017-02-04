@@ -36,17 +36,17 @@ public class TaskExecutionImpl implements TaskExecution {
     private final TaskExecutionImpl parent;
     private final List<TaskExecutionImpl> children;
     private final ServerMigrationContext serverMigrationContext;
-    private long startTime;
-    private volatile ServerMigrationTaskResult result;
+    private final AtomicLong startTime = new AtomicLong();
+    private ServerMigrationTaskResult result;
     private final Logger logger;
     private final long taskNumber;
     private final ServerMigrationTaskPath taskPath;
 
-    TaskExecutionImpl(ServerMigrationTask task, TaskExecutionImpl parent) {
+    public TaskExecutionImpl(ServerMigrationTask task, TaskExecutionImpl parent) {
         this(task, parent, parent.serverMigrationContext);
     }
 
-    TaskExecutionImpl(ServerMigrationTask task, ServerMigrationContext serverMigrationContext) {
+    public TaskExecutionImpl(ServerMigrationTask task, ServerMigrationContext serverMigrationContext) {
         this(task, null, serverMigrationContext);
     }
 
@@ -97,7 +97,7 @@ public class TaskExecutionImpl implements TaskExecution {
      * @return
      */
     public long getStartTime() {
-        return startTime;
+        return startTime.get();
     }
 
     /**
@@ -160,11 +160,10 @@ public class TaskExecutionImpl implements TaskExecution {
         return child;
     }
 
-    public synchronized void run() throws IllegalStateException, ServerMigrationFailureException {
-        if (this.result != null) {
-            throw new IllegalStateException("Task "+ taskPath +" already run");
+    public void run() throws IllegalStateException, ServerMigrationFailureException {
+        if (!startTime.compareAndSet(0, System.currentTimeMillis())) {
+            throw new IllegalStateException("Task "+ taskPath +" already started");
         }
-        startTime = System.currentTimeMillis();
         logger.debugf("Task %s execution starting...", taskPath);
         try {
             result = task.run(new TaskContextImpl(this));

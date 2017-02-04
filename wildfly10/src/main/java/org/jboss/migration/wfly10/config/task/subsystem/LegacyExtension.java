@@ -20,36 +20,13 @@ import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ExtensionResources;
 import org.jboss.migration.wfly10.config.management.SubsystemResources;
 
-import java.io.IOException;
 import java.util.Set;
 
 /**
  * @author emmartins
  */
 public class LegacyExtension extends Extension {
-
     public LegacyExtension(String name) {
         super(name);
-    }
-
-    @Override
-    public void migrate(SubsystemResources subsystemResources, TaskContext context) throws ServerMigrationFailureException {
-        super.migrate(subsystemResources, context);
-        // remove extension if none of its subsystems are in config
-        final ExtensionResources extensionResources = subsystemResources.getServerConfiguration().getExtensionResources();
-        if (extensionResources.getResourceNames().contains(getName())) {
-            final Set<String> subsystems = extensionResources.getSubsystems();
-            boolean remove = true;
-            for (WildFly10Subsystem subsystem : getSubsystems()) {
-                if (subsystems.contains(subsystem.getName())) {
-                    remove = false;
-                    break;
-                }
-            }
-            if (remove) {
-                extensionResources.removeResource(getName());
-                context.getLogger().debugf("Extension %s removed.", getName());
-            }
-        }
     }
 }

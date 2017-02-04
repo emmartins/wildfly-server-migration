@@ -29,7 +29,7 @@ import org.jboss.migration.wfly10.config.task.DomainMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.MigrationBuilders;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
-import org.jboss.migration.wfly10.config.task.ServerMigration;
+import org.jboss.migration.wfly10.config.task.ServerMigrationBuilder;
 import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.StandaloneServerMigration;
 import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
@@ -40,13 +40,13 @@ import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurat
 /**
  * @author emmartins
  */
-public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
+public class CompositeServerUpdate<S extends JBossServer<S>> extends ServerMigrationBuilder<S> {
 
-    public ServerUpdate(ServerMigration.Builder<S> builder) {
+    public CompositeServerUpdate(ServerMigrationBuilder.Builder<S> builder) {
         super(builder);
     }
 
-    public static class Builder<S extends JBossServer<S>> extends ServerMigration.Builder<S> {
+    public static class Builder<S extends JBossServer<S>> extends ServerMigrationBuilder.Builder<S> {
 
         public Builder() {
             subtask(new SubtaskFactory<S>() {
@@ -91,8 +91,8 @@ public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
             return standaloneServer(standaloneServerConfigurationUpdateBuilder.build());
         }
 
-        public ServerUpdate<S> build() {
-            return new ServerUpdate(this);
+        public CompositeServerUpdate<S> build() {
+            return new CompositeServerUpdate(this);
         }
     }
 
@@ -100,8 +100,8 @@ public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
 
         private final ServerConfigurationMigration.XMLConfigurationProvider<S> defaultXmlConfigurationProvider = new CopySourceXMLConfiguration();
 
-        public ServerUpdate.Builder<S> serverUpdateBuilder() {
-            return new ServerUpdate.Builder();
+        public CompositeServerUpdate.Builder<S> serverUpdateBuilder() {
+            return new CompositeServerUpdate.Builder();
         }
 
         public DomainConfigurationMigration.Builder<ServerPath<S>> domainConfigurationBuilder() {
@@ -193,7 +193,7 @@ public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
             return this;
         }
 
-        public ServerUpdate<S> build() {
+        public CompositeServerUpdate<S> build() {
             final Builder<S> builder = new Builder<>();
             if (standaloneBuilder != null) {
                 builder.standaloneServer(standaloneBuilder);

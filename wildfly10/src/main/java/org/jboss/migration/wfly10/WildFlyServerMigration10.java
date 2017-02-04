@@ -16,20 +16,11 @@
 package org.jboss.migration.wfly10;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.component.TaskRunnable;
+import org.jboss.migration.wfly10.config.task.ServerMigrationParameters;
 
 /**
  * @author emmartins
  */
-public interface WildFlyServerMigration10<S extends Server> {
-
-    /**
-     * Runs the server migration.
-     * @param source
-     * @param target
-     * @param context
-     * @return
-     */
-    ServerMigrationTaskResult run(S source, WildFlyServer10 target, TaskContext context);
+public interface WildFlyServerMigration10<S extends Server> extends TaskRunnable.Builder<ServerMigrationParameters<S>>{
 }

@@ -40,7 +40,7 @@ public class UserConfirmationServerMigrationTask implements ServerMigrationTask 
         return task.getName();
     }
 
-    protected ServerMigrationTaskResult confirmTaskRun(final TaskContext context) throws Exception {
+    protected ServerMigrationTaskResult confirmTaskRun(final TaskContext context) {
         final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
         new UserConfirmation(context.getServerMigrationContext().getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
         switch (resultHandler.getResult()) {
@@ -54,12 +54,12 @@ public class UserConfirmationServerMigrationTask implements ServerMigrationTask 
         }
     }
 
-    protected ServerMigrationTaskResult runTask(final TaskContext context) throws Exception {
+    protected ServerMigrationTaskResult runTask(final TaskContext context) {
         return task.run(context);
     }
 
     @Override
-    public ServerMigrationTaskResult run(final TaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(final TaskContext context) {
         return context.getServerMigrationContext().isInteractive() ? confirmTaskRun(context) : runTask(context);
     }
 }

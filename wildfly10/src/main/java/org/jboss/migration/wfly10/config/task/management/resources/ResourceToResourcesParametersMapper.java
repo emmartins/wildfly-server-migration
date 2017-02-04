@@ -30,17 +30,17 @@ import java.util.Collections;
  */
 public class ResourceToResourcesParametersMapper<S, T extends ManageableResource, R extends ManageableResource> implements BuildParameters.Mapper<ResourceBuildParameters<S, T>, ResourcesBuildParameters<S, R>> {
 
-    private final ManageableResourceSelector<R> resourceSelector;
+    private final ManageableResourceSelector<? extends R> resourceSelector;
 
-    public ResourceToResourcesParametersMapper(ManageableResourceSelector<R> resourceSelector) {
+    public ResourceToResourcesParametersMapper(ManageableResourceSelector<? extends R> resourceSelector) {
         this.resourceSelector = resourceSelector;
     }
 
-    public ResourceToResourcesParametersMapper(Class<R> resourceType) {
+    public ResourceToResourcesParametersMapper(Class<? extends R> resourceType) {
         this(ManageableResourceSelectors.selectResources(resourceType));
     }
 
-    public ResourceToResourcesParametersMapper(Class<R> resourceType, String resourceName) {
+    public ResourceToResourcesParametersMapper(Class<? extends R> resourceType, String resourceName) {
         this(ManageableResourceSelectors.selectResources(resourceType, resourceName));
     }
 

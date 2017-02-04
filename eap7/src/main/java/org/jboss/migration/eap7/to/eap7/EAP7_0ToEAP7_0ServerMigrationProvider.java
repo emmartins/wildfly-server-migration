@@ -22,7 +22,7 @@ import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
 
 /**
  * Server migration, from EAP 7.0 to EAP 7.0.
@@ -32,7 +32,7 @@ public class EAP7_0ToEAP7_0ServerMigrationProvider implements EAPServerMigration
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders serverUpdateBuilders = new ServerUpdate.Builders();
+        final CompositeServerUpdate.Builders serverUpdateBuilders = new CompositeServerUpdate.Builders();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)

@@ -43,7 +43,7 @@ public class SkippableByEnvServerMigrationTask implements ServerMigrationTask {
     }
 
     @Override
-    public ServerMigrationTaskResult run(final TaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(final TaskContext context) {
         return !context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(propertyName, Boolean.FALSE) ? task.run(context) : ServerMigrationTaskResult.SKIPPED;
     }
 

@@ -17,11 +17,11 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.util.xml.XMLFileFilter;
 import org.jboss.migration.core.util.xml.XMLFiles;
 import org.jboss.migration.wfly10.WildFlyServer10;
@@ -30,14 +30,13 @@ import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 import org.jboss.migration.wfly10.config.task.subsystem.Extension;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SupportedExtensions;
-import org.jboss.migration.wfly10.config.task.subsystem.WildFly10Subsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.Subsystem;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +74,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                 return XML_CONFIG_SERVER_MIGRATION_TASK_NAME;
             }
             @Override
-            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) {
                 //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
                 context.getLogger().debugf("Unsupported Extensions and Subsystems removal starting...");
                 removeExtensionsAndSubsystems(source, xmlConfigurationPath, target, context);
@@ -87,7 +86,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
 
     protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) throws ServerMigrationFailureException {
         final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
-        final List<WildFly10Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
+        final List<Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();
         final Set<String> subsystemsRemoved = new HashSet<>();
         // setup the extensions filter
@@ -112,7 +111,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                         }
 
                         @Override
-                        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+                        public ServerMigrationTaskResult run(TaskContext context) {
                             context.getLogger().debugf("Extension with module %s removed.", moduleName);
                             extensionsRemoved.add(moduleName);
                             return ServerMigrationTaskResult.SUCCESS;
@@ -132,7 +131,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                 if (startElement.getName().getLocalPart().equals("subsystem")) {
                     final String namespaceURI = startElement.getName().getNamespaceURI();
                     // keep if the namespace uri starts with a supported subsystem's namespace without version
-                    for (WildFly10Subsystem subsystem : migrationSubsystems) {
+                    for (Subsystem subsystem : migrationSubsystems) {
                         final String namespaceWithoutVersion = subsystem.getNamespaceWithoutVersion();
                         if (namespaceWithoutVersion != null && namespaceURI.startsWith(namespaceWithoutVersion + ':')) {
                             return Result.KEEP;
@@ -147,7 +146,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                         }
 
                         @Override
-                        public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+                        public ServerMigrationTaskResult run(TaskContext context) {
                             context.getLogger().debugf("Subsystem with namespace %s removed.", namespaceURI);
                             subsystemsRemoved.add(namespaceURI);
                             return ServerMigrationTaskResult.SUCCESS;
@@ -181,11 +180,11 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         }
     }
 
-    private List<WildFly10Subsystem> getMigrationSubsystems(List<Extension> migrationExtensions, MigrationEnvironment migrationEnvironment) {
+    private List<Subsystem> getMigrationSubsystems(List<Extension> migrationExtensions, MigrationEnvironment migrationEnvironment) {
         final List<String> removedByEnv = migrationEnvironment.getPropertyAsList(EnvironmentProperties.SUBSYSTEMS_REMOVE);
-        List<WildFly10Subsystem> migrationSubsystems = new ArrayList<>();
+        List<Subsystem> migrationSubsystems = new ArrayList<>();
         for (Extension extension : migrationExtensions) {
-            for (WildFly10Subsystem subsystem : extension.getSubsystems()) {
+            for (Subsystem subsystem : extension.getSubsystems()) {
                 if (removedByEnv == null || !removedByEnv.contains(subsystem.getName())) {
                     migrationSubsystems.add(subsystem);
                 }

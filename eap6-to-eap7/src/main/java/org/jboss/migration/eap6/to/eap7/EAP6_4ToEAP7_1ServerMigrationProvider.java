@@ -18,7 +18,7 @@ package org.jboss.migration.eap6.to.eap7;
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
 import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
-import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfileTaskBuilder;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAPSubsystemUpdates7_1;
@@ -34,7 +34,7 @@ import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
 
 /**
  * Server migration, from EAP 6.4 to EAP 7.1.
@@ -44,7 +44,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
+        final CompositeServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
@@ -91,7 +91,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(AddPrivateInterface.INSTANCE)
                                 .subtask(AddSocketBindingPortExpressions.INSTANCE)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                                .subtask(AddLoadBalancerProfile.INSTANCE)
+                                .subtask(AddLoadBalancerProfileTaskBuilder.INSTANCE)
                                 .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()

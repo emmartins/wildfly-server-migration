@@ -25,8 +25,8 @@ import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAd
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
-import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfileTaskBuilder;
 
 /**
  * Server migration, from EAP 7.0 to EAP 7.1.
@@ -36,7 +36,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders serverUpdateBuilders = new ServerUpdate.Builders();
+        final CompositeServerUpdate.Builders serverUpdateBuilders = new CompositeServerUpdate.Builders();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
@@ -55,7 +55,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
                                 .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                                .subtask(AddLoadBalancerProfile.INSTANCE)
+                                .subtask(AddLoadBalancerProfileTaskBuilder.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                                 .build()
                         )

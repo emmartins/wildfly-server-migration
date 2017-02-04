@@ -26,19 +26,23 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class CompositeSubtasks implements TaskRunnable {
+public class CompositeSubtasks<P extends BuildParameters> implements TaskRunnable {
 
-    private final TaskRunnable[] runnables;
+    private final List<TaskRunnable.Builder<? super P>> builders;
+    private final P params;
+    private final ServerMigrationTaskName taskName;
 
-    protected CompositeSubtasks(TaskRunnable[] runnables) {
-        this.runnables = runnables;
+    protected CompositeSubtasks(BaseBuilder<P, ?> baseBuilder, P params, ServerMigrationTaskName taskName) {
+        this.builders = new ArrayList<>(baseBuilder.builders);
+        this.params = params;
+        this.taskName = taskName;
     }
 
     @Override
     public ServerMigrationTaskResult run(TaskContext context) {
         final ServerMigrationTaskResult.Builder result = new ServerMigrationTaskResult.Builder().skipped();
-        for (TaskRunnable runnable : runnables) {
-            if (runnable.run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
+        for (TaskRunnable.Builder<? super P> builder : builders) {
+            if (builder.build(params, taskName).run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
                 result.success();
             }
         }
@@ -56,13 +60,9 @@ public class CompositeSubtasks implements TaskRunnable {
             return getThis();
         }
 
-        protected TaskRunnable[] buildRunnables(P params, ServerMigrationTaskName taskName) {
-            return builders.stream().map(builder -> builder.build(params, taskName)).toArray(TaskRunnable[]::new);
-        }
-
         @Override
         public CompositeSubtasks build(P params, ServerMigrationTaskName taskName) {
-            return new CompositeSubtasks(buildRunnables(params, taskName));
+            return new CompositeSubtasks(this, params, taskName);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10.config.task.executor;
+package org.jboss.migration.wfly10.config.task;
 
-import org.jboss.migration.wfly10.config.management.JvmResource;
+import org.jboss.migration.core.Server;
+import org.jboss.migration.core.task.component.BuildParameters;
+import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
  * @author emmartins
  */
-public interface JVMsManagementSubtaskExecutor<S> extends ManageableResourceSubtaskExecutor<S, JvmResource.Parent> {
+public interface ServerMigrationParameters<S extends Server> extends BuildParameters {
+    S getSourceServer();
+    WildFlyServer10 getTargetServer();
 }

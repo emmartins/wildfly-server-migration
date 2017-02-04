@@ -30,15 +30,17 @@ public class ServerConfigurationCompositeTask extends CompositeTask {
         super(name, taskRunnable);
     }
 
-    public static class Builder<S> extends BaseBuilder<ServerConfigurationBuildParameters<S>, Builder<S>> implements ServerConfigurationCompositeTaskBuilder<S, Builder<S>> {
-        @Override
-        protected Builder<S> getThis() {
-            return this;
-        }
-
+    public static abstract class BaseBuilder<S,T extends BaseBuilder<S, T>> extends CompositeTask.BaseBuilder<ServerConfigurationBuildParameters<S>, T> implements ServerConfigurationCompositeTaskBuilder<S, T> {
         @Override
         protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
             return new ServerConfigurationCompositeTask(name, taskRunnable);
+        }
+    }
+
+    public static class Builder<S> extends BaseBuilder<S, Builder<S>> {
+        @Override
+        protected Builder<S> getThis() {
+            return this;
         }
     }
 }

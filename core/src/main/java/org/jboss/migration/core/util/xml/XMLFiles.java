@@ -155,7 +155,7 @@ public class XMLFiles {
                     xmlEventWriter.add(xmlEvent);
                 }
             }
-        } catch (XMLStreamException | IOException e) {
+        } catch (XMLStreamException e) {
             throw new ServerMigrationFailureException("XML file filtering failed", e);
         } finally {
             if (xmlEventReader != null) {

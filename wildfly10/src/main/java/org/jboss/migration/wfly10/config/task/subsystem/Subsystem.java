@@ -15,40 +15,39 @@
  */
 package org.jboss.migration.wfly10.config.task.subsystem;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author emmartins
  */
-public class Extension {
+public class Subsystem {
 
     private final String name;
-    protected final List<Subsystem> subsystems;
+    private final String namespaceWithoutVersion;
+    private final Extension extension;
 
-    public Extension(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException();
-        }
+    public Subsystem(String name, String namespaceWithoutVersion, Extension extension) {
         this.name = name;
-        subsystems = new ArrayList<>();
+        this.namespaceWithoutVersion = namespaceWithoutVersion;
+        this.extension = extension;
+    }
+
+    public Extension getExtension() {
+        return extension;
     }
 
     public String getName() {
         return name;
     }
 
-    public List<Subsystem> getSubsystems() {
-        return Collections.unmodifiableList(subsystems);
+    public String getNamespaceWithoutVersion() {
+        return namespaceWithoutVersion;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final Extension that = (Extension) o;
-        return name.equals(that.name);
+        final Subsystem subsystem = (Subsystem) o;
+        return name.equals(subsystem.name);
     }
 
     @Override
@@ -60,4 +59,5 @@ public class Extension {
     public String toString() {
         return name;
     }
+
 }

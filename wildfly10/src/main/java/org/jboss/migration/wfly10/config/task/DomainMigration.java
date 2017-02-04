@@ -31,7 +31,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
  * @author emmartins
  * @param <S> the source server type
  */
-public class DomainMigration<S extends Server> implements ServerMigration.SubtaskFactory<S> {
+public class DomainMigration<S extends Server> implements CompositeServerMigration.SubtaskFactory<S> {
 
     public static final String DOMAIN = "domain";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(DOMAIN).build();

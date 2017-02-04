@@ -60,7 +60,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
     }
 
     @Override
-    public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+    public ServerMigrationTaskResult run(TaskContext context) {
         if (new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), getName().getName()).isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
@@ -122,7 +122,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
                 }
 
                 @Override
-                public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+                public ServerMigrationTaskResult run(TaskContext context) {
                     context.getServerMigrationContext().getMigrationFiles().copy(sourceModule.getModuleDir(), targetModules.getModuleDir(moduleIdentifier));
                     context.getLogger().infof("Module %s migrated.", moduleIdentifier);
                     return new ServerMigrationTaskResult.Builder()

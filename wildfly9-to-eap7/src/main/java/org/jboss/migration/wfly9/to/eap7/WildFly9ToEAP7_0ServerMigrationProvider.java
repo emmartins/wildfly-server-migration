@@ -25,7 +25,7 @@ import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly9.WildFlyServer9;
 
@@ -37,7 +37,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new ServerUpdate.Builders<>();
+        final CompositeServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)

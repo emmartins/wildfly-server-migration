@@ -84,7 +84,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         }
 
         @Override
-        public ServerMigrationTaskResult run(final TaskContext taskContext) throws Exception {
+        public ServerMigrationTaskResult run(final TaskContext taskContext) {
             final ServerMigrationContext serverMigrationContext = taskContext.getServerMigrationContext();
             final ConsoleWrapper consoleWrapper = serverMigrationContext.getConsoleWrapper();
             consoleWrapper.printf("%n");
@@ -119,19 +119,19 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
             return taskContext.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
         }
 
-        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) throws Exception {
+        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
                 taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigDir, target));
             }
         }
 
-        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) throws Exception {
+        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
                 confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
             }
         }
 
-        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final TaskContext taskContext) throws Exception {
+        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final TaskContext taskContext) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
                 public void onNo() throws Exception {

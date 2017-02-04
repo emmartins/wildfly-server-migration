@@ -30,22 +30,22 @@ import static java.util.stream.Collectors.toSet;
  */
 public class ResourceToResourceParametersMapper<S, T extends ManageableResource, R extends ManageableResource> implements BuildParameters.Mapper<ResourceBuildParameters<S, T>, ResourceBuildParameters<S, R>> {
 
-    private final ManageableResourceSelector<R> resourceSelector;
+    private final ManageableResourceSelector<? extends R> resourceSelector;
 
-    public ResourceToResourceParametersMapper(ManageableResourceSelector<R> resourceSelector) {
+    public ResourceToResourceParametersMapper(ManageableResourceSelector<? extends R> resourceSelector) {
         this.resourceSelector = resourceSelector;
     }
 
-    public ResourceToResourceParametersMapper(Class<R> resourceType) {
+    public ResourceToResourceParametersMapper(Class<? extends R> resourceType) {
         this(ManageableResourceSelectors.selectResources(resourceType));
     }
 
-    public ResourceToResourceParametersMapper(Class<R> resourceType, String resourceName) {
+    public ResourceToResourceParametersMapper(Class<? extends R> resourceType, String resourceName) {
         this(ManageableResourceSelectors.selectResources(resourceType, resourceName));
     }
 
     @Override
     public Collection<ResourceBuildParameters<S, R>> apply(ResourceBuildParameters<S, T> tParams) {
-        return resourceSelector.fromResources(tParams.getResource()).stream().map(resource -> new ResourceBuildParametersImpl<>(tParams.getSource(), tParams.getServerConfiguration(), resource)).collect(toSet());
+        return resourceSelector.fromResources(tParams.getResource()).stream().map(resource -> new ResourceBuildParametersImpl<S, R>(tParams.getSource(), tParams.getServerConfiguration(), resource)).collect(toSet());
     }
 }

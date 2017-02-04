@@ -29,6 +29,12 @@ import java.util.List;
 public interface TaskContext {
 
     /**
+     * Retrieves the name of the task in context.
+     * @return the name of the task in context
+     */
+    ServerMigrationTaskName getTaskName();
+
+    /**
      * Retrieves the children task executions.
      * @return the children task executions
      */

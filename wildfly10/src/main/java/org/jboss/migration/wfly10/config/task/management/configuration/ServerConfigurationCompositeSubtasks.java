@@ -18,18 +18,17 @@ package org.jboss.migration.wfly10.config.task.management.configuration;
 
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.component.CompositeSubtasks;
-import org.jboss.migration.core.task.component.TaskRunnable;
 
 /**
  * @author emmartins
  */
-public class ServerConfigurationCompositeSubtasks extends CompositeSubtasks {
+public class ServerConfigurationCompositeSubtasks<S> extends CompositeSubtasks<ServerConfigurationBuildParameters<S>> {
 
-    protected ServerConfigurationCompositeSubtasks(TaskRunnable[] runnables) {
-        super(runnables);
+    public ServerConfigurationCompositeSubtasks(Builder<S> builder, ServerConfigurationBuildParameters<S> params, ServerMigrationTaskName taskName) {
+        super(builder, params, taskName);
     }
 
-    public static class Builder<S> extends CompositeSubtasks.BaseBuilder<ServerConfigurationBuildParameters<S>, Builder<S>> implements ServerConfigurationCompositeSubtasksBuilder<S, Builder<S>> {
+    public static class Builder<S> extends BaseBuilder<ServerConfigurationBuildParameters<S>, Builder<S>> implements ServerConfigurationCompositeSubtasksBuilder<S, Builder<S>> {
 
         @Override
         protected Builder<S> getThis() {
@@ -38,8 +37,15 @@ public class ServerConfigurationCompositeSubtasks extends CompositeSubtasks {
 
         @Override
         public ServerConfigurationCompositeSubtasks build(ServerConfigurationBuildParameters<S> params, ServerMigrationTaskName taskName) {
-            return new ServerConfigurationCompositeSubtasks(buildRunnables(params, taskName));
+            return new ServerConfigurationCompositeSubtasks(this, params, taskName);
         }
     }
 
+    public static <S> Builder<S> of(ServerConfigurationComponentTaskBuilder<S, ?>... subtasks) {
+        final Builder<S> builder = new Builder<>();
+        for (ServerConfigurationComponentTaskBuilder<S, ?> subtask : subtasks) {
+            builder.subtask(subtask);
+        };
+        return builder;
+    }
 }

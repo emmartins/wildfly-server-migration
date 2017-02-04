@@ -26,10 +26,10 @@ import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
-import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfileTaskBuilder;
 import org.jboss.migration.wfly9.WildFlyServer9;
 
 /**
@@ -40,7 +40,7 @@ public class WildFly9ToWildFly10_1ServerMigrationProvider implements WildFlyFull
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new ServerUpdate.Builders<>();
+        final CompositeServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
@@ -69,7 +69,7 @@ public class WildFly9ToWildFly10_1ServerMigrationProvider implements WildFlyFull
                                 .subtask(AddPrivateInterface.INSTANCE)
                                 .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
                                 .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                .subtask(AddLoadBalancerProfile.INSTANCE)
+                                .subtask(AddLoadBalancerProfileTaskBuilder.INSTANCE)
                                 .subtask(RemoveDeployments.INSTANCE)
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()

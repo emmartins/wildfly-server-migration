@@ -31,17 +31,17 @@ public class ResourceCompositeTask extends CompositeTask {
         super(name, taskRunnable);
     }
 
-    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<ResourceBuildParameters<S, R>, Builder<S, R>> implements ResourceCompositeTaskBuilder<S, R, Builder<S, R>> {
-
-        @Override
-        protected Builder<S, R> getThis() {
-            return this;
-        }
-
+    public static abstract class BaseBuilder<S, R extends ManageableResource, T extends BaseBuilder<S, R, T>> extends CompositeTask.BaseBuilder<ResourceBuildParameters<S, R>, T> implements ResourceCompositeTaskBuilder<S, R, T> {
         @Override
         protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
             return new ResourceCompositeTask(name, taskRunnable);
         }
     }
 
+    public static class Builder<S, R extends ManageableResource> extends BaseBuilder<S, R, Builder<S, R>> {
+        @Override
+        protected Builder<S, R> getThis() {
+            return this;
+        }
+    }
 }

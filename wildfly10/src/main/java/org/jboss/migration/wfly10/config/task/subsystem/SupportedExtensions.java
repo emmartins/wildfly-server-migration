@@ -28,15 +28,15 @@ import java.util.Set;
 public class SupportedExtensions {
 
     public static final Extension JACORB = new LegacyExtensionBuilder(ExtensionNames.JACORB)
-            .addMigratedSubsystem(SubsystemNames.JACORB)
+            .subsystem(SubsystemNames.JACORB)
             .build();
 
     public static final Extension WEB = new LegacyExtensionBuilder(ExtensionNames.WEB)
-            .addMigratedSubsystem(SubsystemNames.WEB)
+            .subsystem(SubsystemNames.WEB)
             .build();
 
     public static final Extension MESSAGING = new LegacyExtensionBuilder(ExtensionNames.MESSAGING)
-            .addMigratedSubsystem(SubsystemNames.MESSAGING)
+            .subsystem(SubsystemNames.MESSAGING)
             .build();
 
     public static final Extension INFINISPAN = new ExtensionBuilder(ExtensionNames.INFINISPAN)
