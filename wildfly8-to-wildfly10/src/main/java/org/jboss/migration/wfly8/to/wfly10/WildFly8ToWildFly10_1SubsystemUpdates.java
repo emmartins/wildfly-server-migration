@@ -16,9 +16,8 @@
 
 package org.jboss.migration.wfly8.to.wfly10;
 
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
@@ -33,11 +32,15 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpL
  */
 public class WildFly8ToWildFly10_1SubsystemUpdates {
 
-    public static final UpdateSubsystemTaskFactory INFINISPAN = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.INFINISPAN, ExtensionNames.INFINISPAN)
-            .subtasks(AddServerCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE, UpdateWebCache.INSTANCE)
-            .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder INFINISPAN = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.INFINISPAN,
+            new AddServerCache<>(),
+            new FixHibernateCacheModuleName<>(),
+            new UpdateWebCache<>());
 
-    public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
-            .subtasks(SetDefaultHttpListenerRedirectSocket.INSTANCE, AddHttpsListener.INSTANCE, EnableHttp2.INSTANCE, new SetDefaultHostResponseHeaderServer(), new SetDefaultHostResponseHeaderXPoweredBy())
-            .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder UNDERTOW = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.UNDERTOW,
+            new SetDefaultHttpListenerRedirectSocket<>(),
+            new AddHttpsListener<>(),
+            new EnableHttp2<>(),
+            new SetDefaultHostResponseHeaderServer<>(),
+            new SetDefaultHostResponseHeaderXPoweredBy<>());
 }

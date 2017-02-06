@@ -18,14 +18,12 @@ package org.jboss.migration.wfly10.config.task.subsystem.ejb3;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -33,52 +31,42 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * A task which applies WFLY-5520 workaround when EAP 7.0.0.Beta1 is the target server.
  * @author emmartins
  */
-public class WorkaroundForWFLY5520 implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class WorkaroundForWFLY5520<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
-    public static final WorkaroundForWFLY5520 INSTANCE = new WorkaroundForWFLY5520();
+    public static final String TASK_NAME = "apply-wfly-5520-fix";
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("apply-wfly-5520-fix").build();
-
-    private WorkaroundForWFLY5520() {
+    public WorkaroundForWFLY5520() {
+        super(TASK_NAME);
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
-                // this tmp workaround only needed when migrating into EAP 7.0.0.Beta1
-                if (!configurationManagement.getServer().getProductInfo().getName().equals("EAP") || !configurationManagement.getServer().getProductInfo().getVersion().equals("7.0.0.Beta1")) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                if (config == null || !config.hasDefined("default-clustered-sfsb-cache")) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                // /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
-                final PathAddress address = subsystemResources.getResourcePathAddress(subsystem.getName());
-                ModelNode op = Util.createEmptyOperation(UNDEFINE_ATTRIBUTE_OPERATION, address);
-                op.get(NAME).set("default-clustered-sfsb-cache");
-                configurationManagement.executeManagementOperation(op);
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
+        final ManageableServerConfiguration configurationManagement = subsystemConfiguration.getServerConfiguration();
+        // this tmp workaround only needed when migrating into EAP 7.0.0.Beta1
+        if (!configurationManagement.getServer().getProductInfo().getName().equals("EAP") || !configurationManagement.getServer().getProductInfo().getVersion().equals("7.0.0.Beta1")) {
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        if (config == null || !config.hasDefined("default-clustered-sfsb-cache")) {
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        // /subsystem=ejb3:undefine-attribute(name=default-clustered-sfsb-cache)
+        final PathAddress address = subsystemConfiguration.getResourcePathAddress();
+        ModelNode op = Util.createEmptyOperation(UNDEFINE_ATTRIBUTE_OPERATION, address);
+        op.get(NAME).set("default-clustered-sfsb-cache");
+        configurationManagement.executeManagementOperation(op);
 
-                // /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=clustered)
-                op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-                op.get(NAME).set("default-sfsb-cache");
-                op.get(VALUE).set("clustered");
-                configurationManagement.executeManagementOperation(op);
+        // /subsystem=ejb3:write-attribute(name=default-sfsb-cache,value=clustered)
+        op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
+        op.get(NAME).set("default-sfsb-cache");
+        op.get(VALUE).set("clustered");
+        configurationManagement.executeManagementOperation(op);
 
-                // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=simple)
-                op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
-                op.get(NAME).set("default-sfsb-passivation-disabled-cache");
-                op.get(VALUE).set("simple");
-                configurationManagement.executeManagementOperation(op);
-                context.getLogger().infof("Target server does not includes fix for WFLY-5520, workaround applied into EJB3 subsystem configuration.");
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
+        // /subsystem=ejb3:write-attribute(name=default-sfsb-passivation-disabled-cache,value=simple)
+        op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, address);
+        op.get(NAME).set("default-sfsb-passivation-disabled-cache");
+        op.get(VALUE).set("simple");
+        configurationManagement.executeManagementOperation(op);
+        context.getLogger().infof("Target server does not includes fix for WFLY-5520, workaround applied into EJB3 subsystem configuration.");
+        return ServerMigrationTaskResult.SUCCESS;
     }
 }

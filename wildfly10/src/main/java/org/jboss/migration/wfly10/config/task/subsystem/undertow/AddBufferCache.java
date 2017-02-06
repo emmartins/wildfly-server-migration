@@ -18,10 +18,9 @@ package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
@@ -33,16 +32,16 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  */
 public class AddBufferCache<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
+    public static final String TASK_NAME = "add-undertow-default-buffer-cache";
     private static final String BUFFER_CACHE = "buffer-cache";
     private static final String BUFFER_CACHE_NAME = "default";
 
-    @Override
-    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
-        return new ServerMigrationTaskName.Builder("add-undertow-default-buffer-cache").build();
+    public AddBufferCache() {
+        super(TASK_NAME);
     }
 
     @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment) {
         if (!config.hasDefined(BUFFER_CACHE, BUFFER_CACHE_NAME)) {
             final PathAddress pathAddress = subsystemConfiguration.getResourcePathAddress().append(BUFFER_CACHE, BUFFER_CACHE_NAME);
             subsystemConfiguration.getServerConfiguration().executeManagementOperation(Util.createEmptyOperation(ADD, pathAddress));

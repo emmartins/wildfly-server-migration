@@ -42,7 +42,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
 
     public SetupHttpUpgradeManagement() {
         name(TASK_NAME);
-        skipPolicy(TaskSkipPolicy.Builders.skipIfDefaultSkipPropertyIsSet());
+        skipPolicy(TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("HTTP upgrade management setup starting..."));
         subtasks(ServerConfigurationCompositeSubtasks.of(new SetManagementInterfacesHttpUpgradeEnabled<>(), new UpdateManagementHttpsSocketBindingPort<>()));
         afterRun(context -> context.getLogger().infof("HTTP upgrade management setup completed."));
@@ -56,7 +56,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
         protected SetManagementInterfacesHttpUpgradeEnabled() {
             name(SUBTASK_NAME);
             skipPolicy(TaskSkipPolicy.skipIfAnyPropertyIsSet(TASK_NAME+"."+SUBTASK_NAME+".skip"));
-            final ResourceTaskRunnableBuilder<S, ManagementInterfaceResource> runnableBuilder = (params, taskName) -> context -> {
+            final ResourceTaskRunnableBuilder<S, ManagementInterfaceResource> runnableBuilder = params -> context -> {
                 // check if attribute is defined
                 final ManagementInterfaceResource resource = params.getResource();
                 final ModelNode resourceConfig = resource.getResourceConfiguration();
@@ -73,7 +73,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
                 context.getLogger().infof("Management interface '%s' http upgrade enabled.", MANAGEMENT_INTERFACE_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(ManagementInterfaceResource.class, MANAGEMENT_INTERFACE_NAME, runnableBuilder);
+            runBuilder(ManagementInterfaceResource.class, MANAGEMENT_INTERFACE_NAME, runnableBuilder);
         }
     }
 
@@ -96,7 +96,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
 
         protected UpdateManagementHttpsSocketBindingPort() {
             name("set-management-interfaces-http-upgrade-enabled");
-            skipPolicy((buildParameters, taskName) -> context -> {
+            skipPolicyBuilder(buildParameters -> context -> {
                 if(TaskSkipPolicy.skipIfAnyPropertyIsSet(TASK_NAME+"."+SUBTASK_NAME+".skip").isSkipped(context)) {
                     return true;
                 }
@@ -106,7 +106,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
                 }
                 return false;
             });
-            final ResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = (params, taskName) -> context -> {
+            final ResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
                 final SocketBindingResource resource = params.getResource();
                 final MigrationEnvironment env = context.getServerMigrationContext().getMigrationEnvironment();
                 String envPropertyPort = env.getPropertyAsString(UpdateManagementHttpsSocketBindingPort.EnvironmentProperties.PORT);
@@ -122,7 +122,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
                 context.getLogger().infof("Socket binding '%s' port set to "+envPropertyPort+".", SOCKET_BINDING_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(SocketBindingResource.class, SOCKET_BINDING_NAME, runnableBuilder);
+            runBuilder(SocketBindingResource.class, SOCKET_BINDING_NAME, runnableBuilder);
         }
     }
 }

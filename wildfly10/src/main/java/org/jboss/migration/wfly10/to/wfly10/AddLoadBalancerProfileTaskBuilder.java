@@ -53,8 +53,8 @@ public class AddLoadBalancerProfileTaskBuilder<S> extends AddProfileTaskBuilder<
 
         protected AddLoadBalancerSocketBindingsGroup() {
             name("add-"+SOCKET_BINDING_GROUP_NAME);
-            skipPolicy((buildParameters, taskName) -> context -> buildParameters.getServerConfiguration().getSocketBindingGroupResource(SOCKET_BINDING_GROUP_NAME) != null);
-            run((params, taskName) -> context -> {
+            skipPolicyBuilder(buildParameters -> context -> buildParameters.getServerConfiguration().getSocketBindingGroupResource(SOCKET_BINDING_GROUP_NAME) != null);
+            runBuilder(params -> context -> {
                 final ManageableServerConfiguration configuration = params.getServerConfiguration();
                 final PathAddress socketBindingGroupPathAddress = configuration.getSocketBindingGroupResourcePathAddress(SOCKET_BINDING_GROUP_NAME);
                 final ModelNode socketBindingGroupOp = Util.createAddOperation(socketBindingGroupPathAddress);

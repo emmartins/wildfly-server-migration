@@ -21,6 +21,7 @@ import org.jboss.migration.core.task.component.BuildParameters;
 import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
+ * TODO move this up to core for jboss server, and have wfly 10 to implement/extend that...
  * @author emmartins
  */
 public interface ServerMigrationParameters<S extends Server> extends BuildParameters {

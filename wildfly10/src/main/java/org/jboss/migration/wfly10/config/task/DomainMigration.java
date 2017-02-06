@@ -18,87 +18,71 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.console.ConsoleWrapper;
-import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.task.component.CompositeTask;
+import org.jboss.migration.core.task.component.TaskRunnable;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
 
 /**
- * Implementation for the domain migration.
+ * The domain migration (composite) task.
  * @author emmartins
- * @param <S> the source server type
  */
-public class DomainMigration<S extends Server> implements CompositeServerMigration.SubtaskFactory<S> {
+public class DomainMigration extends CompositeTask {
 
-    public static final String DOMAIN = "domain";
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(DOMAIN).build();
-
-    public interface EnvironmentProperties {
-        /**
-         * the prefix for the name of related properties
-         */
-        String PROPERTIES_PREFIX = DOMAIN + ".";
-        /**
-         * Boolean property which if true skips the migration task execution
-         */
-        String SKIP = PROPERTIES_PREFIX + "skip";
+    protected DomainMigration(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+        super(name, taskRunnable);
     }
 
-    private final DomainConfigurationsMigration<S, ?> domainConfigurationsMigration;
-    private final HostConfigurationsMigration<S, ?> hostConfigurationsMigration;
-
-    public DomainMigration(Builder<S> builder) {
-        this.domainConfigurationsMigration = builder.domainConfigurationsMigration;
-        this.hostConfigurationsMigration = builder.hostConfigurationsMigration;
-    }
-
-    @Override
-    public ServerMigrationTask getTask(final S source, final WildFlyServer10 target) {
-        final ServerMigrationTask task = new ServerMigrationTask() {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-
-            @Override
-            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Domain migration starting...");
-                if (domainConfigurationsMigration != null) {
-                    context.execute(domainConfigurationsMigration.getServerMigrationTask(source, target, target.getDomainConfigurationDir()));
-                }
-                if (hostConfigurationsMigration != null) {
-                    context.execute(hostConfigurationsMigration.getServerMigrationTask(source, target, target.getDomainConfigurationDir()));
-                }
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Domain migration done.");
-                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
-            }
-        };
-        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Setup the target's domain?"), EnvironmentProperties.SKIP);
-    }
-
-    public static class Builder<S extends Server>  {
+    /**
+     * Base abstract builder implementation.
+     * @param <S> the source server type
+     * @param <P>
+     * @param <T>
+     */
+    protected static abstract class BaseBuilder<S extends Server, P extends ServerMigrationParameters<S>, T extends BaseBuilder<S, P, T>> extends CompositeTask.BaseBuilder<P, T> {
 
         private DomainConfigurationsMigration<S, ?> domainConfigurationsMigration;
         private HostConfigurationsMigration<S, ?> hostConfigurationsMigration;
 
-        public Builder<S> domainConfigurations(DomainConfigurationsMigration<S, ?> domainConfigurationsMigration) {
+        protected BaseBuilder() {
+            name("domain");
+            skipPolicyBuilder(buildParameters -> TaskSkipPolicy.skipIfAnySkips(
+                    TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(),
+                    TaskSkipPolicy.skipIfNoUserConfirmation("Setup the target's domain?")));
+            beforeRun(context -> {
+                context.getServerMigrationContext().getConsoleWrapper().printf("%n");
+                context.getLogger().infof("Domain migration starting...");
+            });
+            afterRun(context -> {
+                context.getServerMigrationContext().getConsoleWrapper().printf("%n");
+                context.getLogger().infof("Domain migration done.");
+            });
+        }
+
+        public T domainConfigurations(DomainConfigurationsMigration<S, ?> domainConfigurationsMigration) {
             this.domainConfigurationsMigration = domainConfigurationsMigration;
-            return this;
+            return getThis();
         }
 
-        public Builder<S> hostConfigurations(HostConfigurationsMigration<S, ?> hostConfigurationsMigration) {
+        public T hostConfigurations(HostConfigurationsMigration<S, ?> hostConfigurationsMigration) {
             this.hostConfigurationsMigration = hostConfigurationsMigration;
-            return this;
+            return getThis();
         }
 
-        public DomainMigration<S> build() {
-            return new DomainMigration<>(this);
+        @Override
+        protected ServerMigrationTask buildTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
+            return new DomainMigration(name, taskRunnable);
+        }
+    }
+
+    /**
+     * A concrete builder implementation.
+     * @param <S> the source server type
+     */
+    public static class Builder<S extends Server> extends BaseBuilder<S, ServerMigrationParameters<S>, Builder<S>> {
+        @Override
+        protected Builder<S> getThis() {
+            return this;
         }
     }
 }

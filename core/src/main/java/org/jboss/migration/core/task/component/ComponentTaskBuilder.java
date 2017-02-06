@@ -29,28 +29,28 @@ public interface ComponentTaskBuilder<P extends BuildParameters, T extends Compo
     }
 
     default T name(ServerMigrationTaskName name) {
-        return name(parameters -> name);
+        return nameBuilder(parameters -> name);
     }
 
-    T name(TaskNameBuilder<? super P> builder);
+    T nameBuilder(TaskNameBuilder<? super P> builder);
 
     default T skipPolicy(TaskSkipPolicy skipPolicy) {
-        return skipPolicy((parameters, name) -> skipPolicy);
+        return skipPolicyBuilder(parameters -> skipPolicy);
     }
 
-    T skipPolicy(TaskSkipPolicy.Builder<? super P> builder);
+    T skipPolicyBuilder(TaskSkipPolicy.Builder<? super P> builder);
 
     default T beforeRun(BeforeTaskRun beforeRun) {
-        return beforeRun((parameters, name) -> beforeRun);
+        return beforeRunBuilder(parameters -> beforeRun);
     }
 
-    T beforeRun(BeforeTaskRun.Builder<? super P> builder);
+    T beforeRunBuilder(BeforeTaskRun.Builder<? super P> builder);
 
     default T afterRun(AfterTaskRun afterRun) {
-        return afterRun((parameters, name) -> afterRun);
+        return afterRunBuilder(parameters -> afterRun);
     }
 
-    T afterRun(AfterTaskRun.Builder<? super P> builder);
+    T afterRunBuilder(AfterTaskRun.Builder<? super P> builder);
 
     ServerMigrationTask build(P params);
 }

@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.component.CompositeSubtasksBuilder;
+import org.jboss.migration.core.task.component.CompositeSubtasks;
 import org.jboss.migration.core.task.component.TaskRunnable;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 
@@ -27,14 +27,32 @@ import org.jboss.migration.wfly10.WildFlyServerMigration10;
  */
 public class CompositeServerMigration<S extends Server> implements WildFlyServerMigration10<S> {
 
-    protected final CompositeSubtasksBuilder<ServerMigrationParameters<S>, ?> subtasks;
+    protected final SubtasksBuilder<S> subtasks;
 
-    public CompositeServerMigration(CompositeSubtasksBuilder<ServerMigrationParameters<S>, ?> subtasks) {
+    public CompositeServerMigration(SubtasksBuilder<S> subtasks) {
         this.subtasks = subtasks;
     }
 
     @Override
-    public TaskRunnable build(ServerMigrationParameters<S> params, ServerMigrationTaskName taskName) {
-        return context -> subtasks.build(params, context.getTaskName()).run(context);
+    public TaskRunnable build(ServerMigrationParameters<S> params) {
+        return context -> subtasks.build(params).run(context);
+    }
+
+    protected static abstract class SubtasksBaseBuilder<S extends Server, T extends SubtasksBaseBuilder<S, T>> extends CompositeSubtasks.BaseBuilder<ServerMigrationParameters<S>, T> {
+
+        public T domain(DomainMigration<S> domainMigration) {
+            return subtask(domainMigration);
+        }
+
+        public T standaloneServer(StandaloneServerMigration<S> standaloneServerMigration) {
+            return subtask(standaloneServerMigration);
+        }
+    }
+
+    public static class SubtasksBuilder<S extends Server> extends SubtasksBaseBuilder<S, SubtasksBuilder<S>> {
+        @Override
+        protected SubtasksBuilder<S> getThis() {
+            return this;
+        }
     }
 }

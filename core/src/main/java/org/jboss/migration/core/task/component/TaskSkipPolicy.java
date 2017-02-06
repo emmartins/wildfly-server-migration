@@ -16,8 +16,10 @@
 
 package org.jboss.migration.core.task.component;
 
+import org.jboss.migration.core.console.BasicResultHandlers;
+import org.jboss.migration.core.console.UserConfirmation;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.task.TaskContext;
 
 /**
@@ -31,8 +33,8 @@ public interface TaskSkipPolicy {
         return context -> new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), taskEnvironmentPropertyNamePrefix).isSkippedByEnvironment();
     }
 
-    static TaskSkipPolicy skipIfDefaultSkipPropertyIsSet(ServerMigrationTaskName taskName) {
-        return context -> context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(taskName.getName() + ".skip", Boolean.FALSE);
+    static TaskSkipPolicy skipIfDefaultSkipPropertyIsSet() {
+        return context -> context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(context.getTaskName().getName() + ".skip", Boolean.FALSE);
     }
 
     static TaskSkipPolicy skipIfAnyPropertyIsSet(String... propertyNames) {
@@ -46,30 +48,87 @@ public interface TaskSkipPolicy {
         };
     }
 
+    static TaskSkipPolicy skipIfAnySkips(TaskSkipPolicy... policies) {
+        return context -> {
+            for (TaskSkipPolicy policy : policies) {
+                if (policy.isSkipped(context)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
+    static TaskSkipPolicy skipIfAllSkips(TaskSkipPolicy... policies) {
+        return context -> {
+            for (TaskSkipPolicy policy : policies) {
+                if (!policy.isSkipped(context)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    static TaskSkipPolicy skipIfNoUserConfirmation(String message) {
+        return new TaskSkipPolicy() {
+            @Override
+            public boolean isSkipped(TaskContext context) {
+                return !confirmTaskRun(context);
+            }
+            private boolean confirmTaskRun(final TaskContext context) {
+                final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
+                new UserConfirmation(context.getServerMigrationContext().getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
+                switch (resultHandler.getResult()) {
+                    case NO:
+                        return false;
+                    case YES:
+                        return true;
+                    case ERROR:
+                    default:
+                        return confirmTaskRun(context);
+                }
+            }
+        };
+    }
+
     interface Builder<P extends BuildParameters> {
-
-        TaskSkipPolicy build(P buildParameters, ServerMigrationTaskName taskName);
-
-        static <P extends BuildParameters> Builder<P> skipIfDefaultSkipPropertyIsSet() {
-            return (buildParameters, taskName) -> TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(taskName);
-        }
-        static <P extends BuildParameters> Builder<P> skipByTaskEnvironment(String taskEnvironmentPropertyNamePrefix) {
-            return (buildParameters, taskName) -> TaskSkipPolicy.skipByTaskEnvironment(taskEnvironmentPropertyNamePrefix);
-        }
-        static <P extends BuildParameters> Builder<P> skipIfAnyPropertyIsSet(String... propertyNames) {
-            return (buildParameters, taskName) -> TaskSkipPolicy.skipIfAnyPropertyIsSet(propertyNames);
-        }
+        TaskSkipPolicy build(P buildParameters);
     }
 
     interface Builders {
         static <P extends BuildParameters> Builder<P> skipIfDefaultSkipPropertyIsSet() {
-            return (buildParameters, taskName) -> TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(taskName);
+            return (buildParameters) -> TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet();
         }
         static <P extends BuildParameters> Builder<P> skipByTaskEnvironment(String taskEnvironmentPropertyNamePrefix) {
-            return (buildParameters, taskName) -> TaskSkipPolicy.skipByTaskEnvironment(taskEnvironmentPropertyNamePrefix);
+            return (buildParameters) -> TaskSkipPolicy.skipByTaskEnvironment(taskEnvironmentPropertyNamePrefix);
         }
         static <P extends BuildParameters> Builder<P> skipIfAnyPropertyIsSet(String... propertyNames) {
-            return (buildParameters, taskName) -> TaskSkipPolicy.skipIfAnyPropertyIsSet(propertyNames);
+            return (buildParameters) -> TaskSkipPolicy.skipIfAnyPropertyIsSet(propertyNames);
+        }
+        static <P extends BuildParameters> Builder<P> skipIfNoUserConfirmation(String message) {
+            return (buildParameters) -> TaskSkipPolicy.skipIfNoUserConfirmation(message);
+        }
+
+        static <P extends BuildParameters> Builder<P> skipIfAnySkips(Builder<P>... builders) {
+            return (buildParameters) -> context -> {
+                for (Builder<P> builder : builders) {
+                    if (builder.build(buildParameters).isSkipped(context)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
+        static <P extends BuildParameters> Builder<P> skipIfAllSkips(Builder<P>... builders) {
+            return (buildParameters) -> context -> {
+                for (Builder<P> builder : builders) {
+                    if (!builder.build(buildParameters).isSkipped(context)) {
+                        return false;
+                    }
+                }
+                return true;
+            };
         }
     }
 }

@@ -16,7 +16,7 @@
 
 package org.jboss.migration.wfly9.to.wfly10;
 
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTaskBuilder;
 import org.jboss.migration.wfly10.to.wfly10.WildFly10_0ToWildFly10_1SubsystemUpdates;
 
 /**
@@ -24,8 +24,8 @@ import org.jboss.migration.wfly10.to.wfly10.WildFly10_0ToWildFly10_1SubsystemUpd
  */
 public class WildFly9ToWildFly10_1SubsystemUpdates {
 
-    public static final UpdateSubsystemTaskFactory INFINISPAN = WildFly10_0ToWildFly10_1SubsystemUpdates.INFINISPAN;
+    public static final UpdateSubsystemConfigurationTaskBuilder INFINISPAN = WildFly10_0ToWildFly10_1SubsystemUpdates.INFINISPAN;
 
-    public static final UpdateSubsystemTaskFactory UNDERTOW = WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW;
+    public static final UpdateSubsystemConfigurationTaskBuilder UNDERTOW = WildFly10_0ToWildFly10_1SubsystemUpdates.UNDERTOW;
 
 }

@@ -44,7 +44,9 @@ public class AddSecurityManagerSubsystem<S> extends AddSubsystemConfigurationSub
     private static final String CLASS_ATTR_NAME = "class";
     private static final String CLASS_ATTR_VALUE = "java.security.AllPermission";
 
-    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
+    @Override
+    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, TaskContext taskContext) {
+        super.addConfiguration(params, taskContext);
         final SubsystemConfiguration.Parent parentResource = params.getResource();
         // add subsystem with default config
             /*

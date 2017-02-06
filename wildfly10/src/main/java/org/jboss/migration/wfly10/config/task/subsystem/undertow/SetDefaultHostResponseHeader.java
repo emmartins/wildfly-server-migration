@@ -36,7 +36,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  */
 public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
-    public static final String TASK_NAME_NAME = "add-default-host-response-header";
+    public static final String TASK_NAME = "add-default-host-response-header";
 
     private static final String SERVER_NAME = "default-server";
     private static final String HOST_NAME = "default-host";
@@ -57,6 +57,7 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemConfiguratio
     }
 
     public SetDefaultHostResponseHeader(String filterName, String headerName, String headerValue) {
+        super(new ServerMigrationTaskName.Builder(TASK_NAME).addAttribute(RESPONSE_HEADER, filterName).build());
         this.filterName = filterName;
         this.headerName = headerName;
         this.headerValue = headerValue;
@@ -67,12 +68,7 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemConfiguratio
     }
 
     @Override
-    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
-        return new ServerMigrationTaskName.Builder(TASK_NAME_NAME).addAttribute(RESPONSE_HEADER, filterName).build();
-    }
-
-    @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         final PathAddress configPathAddress = subsystemConfiguration.getResourcePathAddress();
         // check if server is defined
         final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));

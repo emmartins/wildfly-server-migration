@@ -21,25 +21,22 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 /**
  * A task which updates Infinispan subsystem configurations' 'web' cache, to match EAP 7.1 defaults.
  * @author emmartins
  */
-public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class UpdateWebCache<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
-    public static final UpdateWebCache INSTANCE = new UpdateWebCache();
+    public static final String TASK_NAME = "update-infinispan-web-cache";
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("update-infinispan-web-cache").build();
-
-    private UpdateWebCache() {
+    public UpdateWebCache() {
+        super(TASK_NAME);
     }
 
     private static final String CACHE_CONTAINER = "cache-container";
@@ -58,35 +55,25 @@ public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory
     private static final String PURGE = "purge";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                if (config == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                if (!config.hasDefined(CACHE_CONTAINER)) {
-                    context.getLogger().debugf("No cache containers found, skipping task...");
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                if (!config.hasDefined(CACHE_CONTAINER, CACHE_CONTAINER_NAME)) {
-                    context.getLogger().debugf("No cache container named %s found, skipping task...", CACHE_CONTAINER_NAME);
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final ModelNode cacheContainerConfig = config.get(CACHE_CONTAINER, CACHE_CONTAINER_NAME);
-                final PathAddress cacheContainerPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(CACHE_CONTAINER, CACHE_CONTAINER_NAME));
-                final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
+        if (!config.hasDefined(CACHE_CONTAINER)) {
+            context.getLogger().debugf("No cache containers found, skipping task...");
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        if (!config.hasDefined(CACHE_CONTAINER, CACHE_CONTAINER_NAME)) {
+            context.getLogger().debugf("No cache container named %s found, skipping task...", CACHE_CONTAINER_NAME);
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        final ModelNode cacheContainerConfig = config.get(CACHE_CONTAINER, CACHE_CONTAINER_NAME);
+        final PathAddress cacheContainerPathAddress = subsystemConfiguration.getResourcePathAddress().append(PathElement.pathElement(CACHE_CONTAINER, CACHE_CONTAINER_NAME));
+        final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
 
-                if (cacheContainerConfig.hasDefined(DISTRIBUTED_CACHE)) {
-                    // ha config
-                    if (cacheContainerConfig.hasDefined(DISTRIBUTED_CACHE, CACHE_NAME)) {
-                        context.getLogger().debugf("Cache container named %s already defines distributed cache named %s, skipping task...", CACHE_CONTAINER_NAME, CACHE_NAME);
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
+        if (cacheContainerConfig.hasDefined(DISTRIBUTED_CACHE)) {
+            // ha config
+            if (cacheContainerConfig.hasDefined(DISTRIBUTED_CACHE, CACHE_NAME)) {
+                context.getLogger().debugf("Cache container named %s already defines distributed cache named %s, skipping task...", CACHE_CONTAINER_NAME, CACHE_NAME);
+                return ServerMigrationTaskResult.SKIPPED;
+            }
                     /*
                     <distributed-cache name="concurrent" mode="SYNC" l1-lifespan="0" owners="2">
                         <file-store/>
@@ -101,20 +88,20 @@ public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory
                             }
                         }
                      */
-                    final PathAddress cachePathAddress = cacheContainerPathAddress.append(PathElement.pathElement(DISTRIBUTED_CACHE, CACHE_NAME));
-                    final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
-                    cacheAddOperation.get(L1_LIFESPAN).set(0);
-                    cacheAddOperation.get(MODE).set("SYNC");
-                    cacheAddOperation.get(OWNERS).set(2);
-                    compositeOperationBuilder.addStep(cacheAddOperation);
-                    final ModelNode cacheFileStoreAddOperation = Util.createAddOperation(cachePathAddress.append(STORE, STORE_NAME));
-                    compositeOperationBuilder.addStep(cacheFileStoreAddOperation);
-                } else {
-                    // local config
-                    if (cacheContainerConfig.hasDefined(LOCAL_CACHE, CACHE_NAME)) {
-                        context.getLogger().debugf("Cache container named %s already defines local cache named %s, skipping task...", CACHE_CONTAINER_NAME, CACHE_NAME);
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
+            final PathAddress cachePathAddress = cacheContainerPathAddress.append(PathElement.pathElement(DISTRIBUTED_CACHE, CACHE_NAME));
+            final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
+            cacheAddOperation.get(L1_LIFESPAN).set(0);
+            cacheAddOperation.get(MODE).set("SYNC");
+            cacheAddOperation.get(OWNERS).set(2);
+            compositeOperationBuilder.addStep(cacheAddOperation);
+            final ModelNode cacheFileStoreAddOperation = Util.createAddOperation(cachePathAddress.append(STORE, STORE_NAME));
+            compositeOperationBuilder.addStep(cacheFileStoreAddOperation);
+        } else {
+            // local config
+            if (cacheContainerConfig.hasDefined(LOCAL_CACHE, CACHE_NAME)) {
+                context.getLogger().debugf("Cache container named %s already defines local cache named %s, skipping task...", CACHE_CONTAINER_NAME, CACHE_NAME);
+                return ServerMigrationTaskResult.SKIPPED;
+            }
                     /*
                         <local-cache name="concurrent">
                             <file-store passivation="true" purge="false"/>
@@ -129,18 +116,16 @@ public class UpdateWebCache implements UpdateSubsystemTaskFactory.SubtaskFactory
                             }
                         }
                      */
-                    final PathAddress cachePathAddress = cacheContainerPathAddress.append(PathElement.pathElement(LOCAL_CACHE, CACHE_NAME));
-                    final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
-                    compositeOperationBuilder.addStep(cacheAddOperation);
-                    final ModelNode cacheFileStoreAddOperation = Util.createAddOperation(cachePathAddress.append(STORE, STORE_NAME));
-                    cacheFileStoreAddOperation.get(PASSIVATION).set(true);
-                    cacheFileStoreAddOperation.get(PURGE).set(false);
-                    compositeOperationBuilder.addStep(cacheFileStoreAddOperation);
-                }
-                subsystemResources.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
-                context.getLogger().infof("Cache '%s' added to cache container '%s'.", CACHE_NAME, CACHE_CONTAINER_NAME);
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
+            final PathAddress cachePathAddress = cacheContainerPathAddress.append(PathElement.pathElement(LOCAL_CACHE, CACHE_NAME));
+            final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
+            compositeOperationBuilder.addStep(cacheAddOperation);
+            final ModelNode cacheFileStoreAddOperation = Util.createAddOperation(cachePathAddress.append(STORE, STORE_NAME));
+            cacheFileStoreAddOperation.get(PASSIVATION).set(true);
+            cacheFileStoreAddOperation.get(PURGE).set(false);
+            compositeOperationBuilder.addStep(cacheFileStoreAddOperation);
+        }
+        subsystemConfiguration.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
+        context.getLogger().infof("Cache '%s' added to cache container '%s'.", CACHE_NAME, CACHE_CONTAINER_NAME);
+        return ServerMigrationTaskResult.SUCCESS;
     }
 }

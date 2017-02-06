@@ -17,61 +17,23 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.console.ConsoleWrapper;
-import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.task.component.CompositeTask;
 
 /**
- * Implementation for the standalone server migration.
+ * Builder for the standalone server migration task.
  * @author emmartins
  * @param <S> the source server type
  */
-public class StandaloneServerMigration<S extends Server> implements CompositeServerMigration.SubtaskFactory<S> {
-
-    public static final String STANDALONE = "standalone";
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(STANDALONE).build();
-
-    public interface EnvironmentProperties {
-        /**
-         * the prefix for the name of related properties
-         */
-        String PROPERTIES_PREFIX = STANDALONE + ".";
-        /**
-         * Boolean property which if true skips the migration task execution
-         */
-        String SKIP = PROPERTIES_PREFIX + "skip";
-    }
-
-    private final StandaloneServerConfigurationsMigration<S, ?> configFilesMigration;
-
-    public StandaloneServerMigration(StandaloneServerConfigurationsMigration<S, ?> configFilesMigration) {
-        this.configFilesMigration = configFilesMigration;
-    }
-
-    @Override
-    public ServerMigrationTask getTask(final S source, final WildFlyServer10 target) {
-        final ServerMigrationTask task = new ServerMigrationTask() {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-
-            @Override
-            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
-                final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Standalone server migration starting...");
-                context.execute(configFilesMigration.getServerMigrationTask(source, target, target.getStandaloneConfigurationDir()));
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Standalone server migration done.");
-                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
-            }
-        };
-        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Setup the target's standalone server?"), EnvironmentProperties.SKIP);
+public class StandaloneServerMigration<S extends Server> extends CompositeTask.Builder<ServerMigrationParameters<S>> {
+    public StandaloneServerMigration() {
+        name("standalone");
+        beforeRun(context -> {
+            context.getServerMigrationContext().getConsoleWrapper().printf("%n");
+            context.getLogger().infof("Standalone server's migration starting...");
+        });
+        afterRun(context -> {
+            context.getServerMigrationContext().getConsoleWrapper().printf("%n");
+            context.getLogger().infof("Standalone server's migration done.");
+        });
     }
 }

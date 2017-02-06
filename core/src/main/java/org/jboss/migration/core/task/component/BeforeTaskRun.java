@@ -16,7 +16,6 @@
 
 package org.jboss.migration.core.task.component;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
 
 /**
@@ -32,6 +31,6 @@ interface BeforeTaskRun {
     void beforeRun(TaskContext context);
 
     interface Builder<P extends BuildParameters> {
-        BeforeTaskRun build(P parameters, ServerMigrationTaskName taskName);
+        BeforeTaskRun build(P parameters);
     }
 }

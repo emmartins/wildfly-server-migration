@@ -17,7 +17,6 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ServerGroupResource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_GROUP;
@@ -25,10 +24,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
 /**
  * @author emmartins
  */
-public class ServerGroupResourceImpl extends AbstractManageableResource implements ServerGroupResource {
+public class ServerGroupResourceImpl extends AbstractManageableResource<ServerGroupResource.Parent> implements ServerGroupResource {
 
-    public static class Factory extends AbstractManageableResource.Factory<ServerGroupResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+    public static class Factory extends AbstractManageableResource.Factory<ServerGroupResource, ServerGroupResource.Parent> {
+        public Factory(PathAddress pathAddressBase, ServerGroupResource.Parent parentResource) {
             super(RESOURCE_TYPE, pathAddressBase, SERVER_GROUP, parentResource);
         }
         @Override
@@ -39,7 +38,7 @@ public class ServerGroupResourceImpl extends AbstractManageableResource implemen
 
     private final JvmResourceImpl.Factory jvmResources;
 
-    private ServerGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+    private ServerGroupResourceImpl(String resourceName, PathAddress pathAddress, ServerGroupResource.Parent parent) {
         super(resourceName, pathAddress, parent);
         jvmResources = new JvmResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(jvmResources);

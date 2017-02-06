@@ -40,15 +40,16 @@ public class AddProfileTaskBuilder<S> extends ServerConfigurationCompositeTask.B
 
     public AddProfileTaskBuilder(String profileName) {
         name("add-profile-"+profileName);
-        skipPolicy((buildParameters, taskName) -> context -> {
-            if (TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(taskName).isSkipped(context)) {
-                return true;
-            } else if (!buildParameters.getServerConfiguration().findResources(ProfileResource.class, profileName).isEmpty()) {
-                context.getLogger().infof("Profile %s already exists.", profileName);
-                return true;
-            };
-            return false;
-        });
+        skipPolicyBuilder(buildParameters -> TaskSkipPolicy.skipIfAnySkips(
+                TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(),
+                context -> {
+                    if (!buildParameters.getServerConfiguration().findResources(ProfileResource.class, profileName).isEmpty()) {
+                        context.getLogger().infof("Profile %s already exists.", profileName);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }));
         beforeRun(context -> context.getLogger().infof("Configuring profile %s...", profileName));
         this.subsystemSubtasks = new ResourceCompositeSubtasks.Builder<>();
         this.subtasks = new ServerConfigurationCompositeSubtasks.Builder<S>()
@@ -66,7 +67,7 @@ public class AddProfileTaskBuilder<S> extends ServerConfigurationCompositeTask.B
     public static class CreateProfileTask<S> extends ResourceLeafTask.Builder<S, ProfileResource.Parent> {
         protected CreateProfileTask(String profileName) {
             name(new ServerMigrationTaskName.Builder("create-profile").addAttribute("name", profileName).build());
-            final ResourceTaskRunnableBuilder<S, ProfileResource.Parent> runnableBuilder = (params, taskName) -> context -> {
+            final ResourceTaskRunnableBuilder<S, ProfileResource.Parent> runnableBuilder = params -> context -> {
                 final ProfileResource.Parent resource = params.getResource();
                 final PathAddress pathAddress = resource.getProfileResourcePathAddress(profileName);
                 final ModelNode op = Util.createAddOperation(pathAddress);
@@ -74,7 +75,7 @@ public class AddProfileTaskBuilder<S> extends ServerConfigurationCompositeTask.B
                 context.getLogger().infof("Profile %s created.", profileName);
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(runnableBuilder);
+            runBuilder(runnableBuilder);
         }
     }
 }

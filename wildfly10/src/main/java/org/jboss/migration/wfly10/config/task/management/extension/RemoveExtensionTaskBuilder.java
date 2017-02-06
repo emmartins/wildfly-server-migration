@@ -28,7 +28,7 @@ import org.jboss.migration.wfly10.config.task.management.configuration.ServerCon
 public class RemoveExtensionTaskBuilder<S> extends ServerConfigurationLeafTask.Builder<S> {
     public RemoveExtensionTaskBuilder(String extensionModule) {
         name(new ServerMigrationTaskName.Builder("remove-extension").addAttribute("name", extensionModule).build());
-        run((params, taskName) -> context -> {
+        runBuilder(params -> context -> {
             final ManageableServerConfiguration extensionResourceParent = params.getServerConfiguration();
             if (extensionResourceParent.getExtensionConfigurationNames().contains(extensionModule)) {
                 context.getLogger().debugf("Removing Extension %s...", extensionModule);

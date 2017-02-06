@@ -37,10 +37,6 @@ public class StandaloneServerConfigurationCompositeTask<S> extends ManageableSer
 
     public static class Builder<S> extends BaseBuilder<S, StandaloneServerConfiguration, Builder<S>> {
 
-        public Builder(ServerMigrationTaskName taskName) {
-            super(taskName);
-        }
-
         @Override
         public ServerMigrationTask build(S source, Collection<? extends ManageableResource> resources) {
             return new StandaloneServerConfigurationCompositeTask<>(this, source, resources);

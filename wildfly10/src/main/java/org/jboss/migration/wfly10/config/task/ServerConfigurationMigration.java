@@ -72,7 +72,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
             }
 
             @Override
-            public ServerMigrationTaskResult run(TaskContext context) throws Exception {
+            public ServerMigrationTaskResult run(TaskContext context) {
                 final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Migrating %s configuration %s", getConfigType(), source);
@@ -95,7 +95,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
                         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, null);
                         op.get(RECURSIVE).set(true);
                         op.get(INCLUDE_DEFAULTS).set(false);
-                        context.getLogger().debugf("&&&&&&&&&&&&& Configuration resource description: %s", configurationManagement.executeManagementOperation(op));
+                        context.getLogger().debugf("Configuration resource description: %s", configurationManagement.executeManagementOperation(op));
                         // execute config management subtasks
                         for (ManageableServerConfigurationTaskFactory subtaskFactory : manageableConfigurationSubtaskFactories) {
                             final ServerMigrationTask subtask = subtaskFactory.getTask(source, configurationManagement);
@@ -118,7 +118,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
      * @param <S>
      */
     public interface XMLConfigurationProvider<S> {
-        Path getXMLConfiguration(S source, Path targetConfigDir, WildFlyServer10 target, TaskContext context) throws Exception;
+        Path getXMLConfiguration(S source, Path targetConfigDir, WildFlyServer10 target, TaskContext context);
     }
 
     /**
@@ -126,7 +126,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
      * @param <T>
      */
     public interface ManageableConfigurationProvider<T extends ManageableServerConfiguration> {
-        T getManageableConfiguration(Path targetConfigFilePath, WildFlyServer10 target) throws Exception;
+        T getManageableConfiguration(Path targetConfigFilePath, WildFlyServer10 target);
     }
 
     public interface XMLConfigurationSubtaskFactory<S> {

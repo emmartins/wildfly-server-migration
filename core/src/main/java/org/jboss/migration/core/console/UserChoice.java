@@ -50,7 +50,7 @@ public class UserChoice {
         this(theConsole, (String[]) null, options, prompt, resultHandler);
     }
 
-    public void execute() throws Exception {
+    public void execute() {
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);
@@ -101,7 +101,7 @@ public class UserChoice {
     }
 
     public interface ResultHandler {
-        void onChoice(String choice) throws Exception;
-        void onError() throws Exception;
+        void onChoice(String choice);
+        void onError();
     }
 }

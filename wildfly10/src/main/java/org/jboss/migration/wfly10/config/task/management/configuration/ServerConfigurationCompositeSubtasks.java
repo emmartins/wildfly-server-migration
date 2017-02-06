@@ -24,8 +24,8 @@ import org.jboss.migration.core.task.component.CompositeSubtasks;
  */
 public class ServerConfigurationCompositeSubtasks<S> extends CompositeSubtasks<ServerConfigurationBuildParameters<S>> {
 
-    public ServerConfigurationCompositeSubtasks(Builder<S> builder, ServerConfigurationBuildParameters<S> params, ServerMigrationTaskName taskName) {
-        super(builder, params, taskName);
+    public ServerConfigurationCompositeSubtasks(Builder<S> builder, ServerConfigurationBuildParameters<S> params) {
+        super(builder, params);
     }
 
     public static class Builder<S> extends BaseBuilder<ServerConfigurationBuildParameters<S>, Builder<S>> implements ServerConfigurationCompositeSubtasksBuilder<S, Builder<S>> {
@@ -36,8 +36,8 @@ public class ServerConfigurationCompositeSubtasks<S> extends CompositeSubtasks<S
         }
 
         @Override
-        public ServerConfigurationCompositeSubtasks build(ServerConfigurationBuildParameters<S> params, ServerMigrationTaskName taskName) {
-            return new ServerConfigurationCompositeSubtasks(this, params, taskName);
+        public ServerConfigurationCompositeSubtasks build(ServerConfigurationBuildParameters<S> params) {
+            return new ServerConfigurationCompositeSubtasks(this, params);
         }
     }
 

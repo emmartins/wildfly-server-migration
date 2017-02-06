@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task.management.configuration;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.component.CompositeSubtasksBuilder;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableResourceSelector;
@@ -84,5 +83,5 @@ public interface ServerConfigurationCompositeSubtasksBuilder<S, T extends Server
     }
 
     @Override
-    ServerConfigurationCompositeSubtasks build(ServerConfigurationBuildParameters<S> params, ServerMigrationTaskName taskName);
+    ServerConfigurationCompositeSubtasks build(ServerConfigurationBuildParameters<S> params);
 }

@@ -22,12 +22,12 @@ package org.jboss.migration.core.task.component;
 public interface LeafTaskBuilder<P extends BuildParameters, T extends LeafTaskBuilder<P, T>> extends ComponentTaskBuilder<P, T> {
 
     default T run(TaskRunnable runnable) {
-        return run((params, name) -> runnable);
+        return runBuilder(params  -> runnable);
     }
 
-    T run(TaskRunnable.Builder<? super P> builder);
+    T runBuilder(TaskRunnable.Builder<? super P> builder);
 
-    default <Q extends BuildParameters> T run(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
-        return run(TaskRunnable.Builder.from(pqMapper, qBuilder));
+    default <Q extends BuildParameters> T runBuilder(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
+        return runBuilder(TaskRunnable.Builder.from(pqMapper, qBuilder));
     }
 }

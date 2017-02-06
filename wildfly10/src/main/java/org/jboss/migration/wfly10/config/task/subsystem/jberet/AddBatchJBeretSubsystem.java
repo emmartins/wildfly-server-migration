@@ -19,7 +19,6 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
@@ -55,7 +54,8 @@ public class AddBatchJBeretSubsystem<S> extends AddSubsystemConfigurationSubtask
     private static final String KEEPALIVE_TIME_UNIT_ATTR_VALUE = "seconds";
 
     @Override
-    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
+    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, TaskContext taskContext) {
+        super.addConfiguration(params, taskContext);
         /*
             <subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">
                 <default-job-repository name="in-memory"/>

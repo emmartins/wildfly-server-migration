@@ -19,14 +19,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 
@@ -34,13 +32,12 @@ import static org.jboss.as.controller.PathElement.pathElement;
  * A task which adds the 'ejb' cache, present on EAP 7 default configs, to Infinispan subsystem configuration.
  * @author emmartins
  */
-public class AddEjbCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class AddEjbCache<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
-    public static final AddEjbCache INSTANCE = new AddEjbCache();
+    public static final String TASK_NAME = "add-infinispan-ejb-cache";
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("add-infinispan-ejb-cache").build();
-
-    private AddEjbCache() {
+    public AddEjbCache() {
+        super(TASK_NAME);
     }
 
     private static final String CACHE_CONTAINER = "cache-container";
@@ -70,28 +67,17 @@ public class AddEjbCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
     private static final String PURGE_ATTR_NAME = "purge";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                if (config == null) {
-                    context.getLogger().debug("No subsystem config, skipping configuration update.");
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                if (!config.hasDefined(CACHE_CONTAINER)) {
-                    context.getLogger().debug("No Cache container found in subsystem config, skipping configuration update.");
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
-                    context.getLogger().debugf("Cache %s already exists in subsystem config, skipping configuration update.",CACHE_NAME);
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
+        if (!config.hasDefined(CACHE_CONTAINER)) {
+            context.getLogger().debug("No Cache container found in subsystem config, skipping configuration update.");
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
+            context.getLogger().debugf("Cache %s already exists in subsystem config, skipping configuration update.",CACHE_NAME);
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        final PathAddress subsystemPathAddress = subsystemConfiguration.getResourcePathAddress();
+        final ManageableServerConfiguration configurationManagement = subsystemConfiguration.getServerConfiguration();
                 /*
         <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                 <local-cache name="passivation">
@@ -106,22 +92,20 @@ public class AddEjbCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
                 </local-cache>
             </cache-container>
          */
-                final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-                final PathAddress cachePathAddress = subsystemPathAddress.append(pathElement(CACHE_CONTAINER, CACHE_NAME));
-                final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
-                for (String alias : ALIASES_ATTR_VALUE) {
-                    cacheAddOperation.get(ALIASES_ATTR_NAME).add(alias);
-                }
-                cacheAddOperation.get(DEFAULT_CACHE_ATTR_NAME).set(DEFAULT_CACHE_ATTR_VALUE);
-                cacheAddOperation.get(MODULE_ATTR_NAME).set(MODULE_ATTR_VALUE);
-                compositeOperationBuilder.addStep(cacheAddOperation);
-                addLocalCachePassivation(compositeOperationBuilder, cachePathAddress);
-                addLocalCachePersistent(compositeOperationBuilder, cachePathAddress);
-                configurationManagement.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-                context.getLogger().infof("Ejb cache added to Infinispan subsystem configuration.");
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
+        final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+        final PathAddress cachePathAddress = subsystemPathAddress.append(pathElement(CACHE_CONTAINER, CACHE_NAME));
+        final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
+        for (String alias : ALIASES_ATTR_VALUE) {
+            cacheAddOperation.get(ALIASES_ATTR_NAME).add(alias);
+        }
+        cacheAddOperation.get(DEFAULT_CACHE_ATTR_NAME).set(DEFAULT_CACHE_ATTR_VALUE);
+        cacheAddOperation.get(MODULE_ATTR_NAME).set(MODULE_ATTR_VALUE);
+        compositeOperationBuilder.addStep(cacheAddOperation);
+        addLocalCachePassivation(compositeOperationBuilder, cachePathAddress);
+        addLocalCachePersistent(compositeOperationBuilder, cachePathAddress);
+        configurationManagement.executeManagementOperation(compositeOperationBuilder.build().getOperation());
+        context.getLogger().infof("Ejb cache added to Infinispan subsystem configuration.");
+        return ServerMigrationTaskResult.SUCCESS;
     }
 
     private static void addLocalCachePassivation(Operations.CompositeOperationBuilder compositeOperationBuilder, PathAddress cachePathAddress) {

@@ -41,8 +41,8 @@ public class MigrateSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeaf
 
     public MigrateSubsystemConfigurationSubtaskBuilder(String subsystem) {
         this.subsystem = subsystem;
-        name(parameters -> new ServerMigrationTaskName.Builder("migrate-subsystem-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build());
-        run((params, taskName) -> context -> migrateConfiguration(params.getResource(), context));
+        nameBuilder(parameters -> new ServerMigrationTaskName.Builder("migrate-subsystem-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build());
+        runBuilder(params -> context -> migrateConfiguration(params.getResource(), context));
     }
 
     protected ServerMigrationTaskResult migrateConfiguration(SubsystemConfiguration subsystemConfiguration, TaskContext taskContext) {

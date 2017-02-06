@@ -91,5 +91,5 @@ public interface ResourcesCompositeSubtasksBuilder<S, R extends ManageableResour
     }
 
     @Override
-    ResourcesCompositeSubtasks build(ResourcesBuildParameters<S, R> params, ServerMigrationTaskName taskName);
+    ResourcesCompositeSubtasks build(ResourcesBuildParameters<S, R> params);
 }

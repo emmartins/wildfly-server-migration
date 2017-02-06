@@ -50,13 +50,13 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> exte
     public AddApplicationRealmSSLServerIdentity() {
         name("add-application-realm-ssl-server-identity");
         beforeRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
-        run(SecurityRealmResource.class, RESOURCE_NAME, new RunnableBuilder<>());
+        runBuilder(SecurityRealmResource.class, RESOURCE_NAME, new RunnableBuilder<>());
         afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
     }
 
     protected static class RunnableBuilder<S> implements ResourceTaskRunnableBuilder<S, SecurityRealmResource> {
         @Override
-        public TaskRunnable build(ResourceBuildParameters<S, SecurityRealmResource> params, ServerMigrationTaskName taskName) {
+        public TaskRunnable build(ResourceBuildParameters<S, SecurityRealmResource> params) {
             return context -> {
                 final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
                 final SecurityRealmResource resource = params.getResource();

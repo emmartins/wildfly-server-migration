@@ -32,7 +32,8 @@ public class LeafTask extends ComponentTask {
 
         private TaskRunnable.Builder<? super P> runnableBuilder;
 
-        public T run(TaskRunnable.Builder<? super P> builder) {
+        @Override
+        public T runBuilder(TaskRunnable.Builder<? super P> builder) {
             this.runnableBuilder = builder;
             return getThis();
         }

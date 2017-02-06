@@ -134,14 +134,14 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final TaskContext taskContext) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
-                public void onNo() throws Exception {
+                public void onNo() {
                 }
                 @Override
-                public void onYes() throws Exception {
+                public void onYes() {
                     taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigDir, target));
                 }
                 @Override
-                public void onError() throws Exception {
+                public void onError() {
                     // repeat
                     confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
                 }

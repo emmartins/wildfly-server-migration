@@ -17,7 +17,6 @@
 package org.jboss.migration.core.task.component.test;
 
 import org.jboss.migration.core.task.component.BuildParameters;
-import org.jboss.migration.core.task.component.TaskBuilder;
 
 /**
  * @author emmartins

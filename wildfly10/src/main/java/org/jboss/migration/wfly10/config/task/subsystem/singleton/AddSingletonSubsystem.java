@@ -49,7 +49,9 @@ public class AddSingletonSubsystem<S> extends AddSubsystemConfigurationSubtaskBu
     private static final String ELECTION_POLICY = "election-policy";
     private static final String ELECTION_POLICY_NAME = "simple";
 
-    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext taskContext) {
+    @Override
+    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, TaskContext taskContext) {
+        super.addConfiguration(params, taskContext);
         final SubsystemConfiguration.Parent parentResource = params.getResource();
         // add subsystem with default config
                 /*

@@ -16,7 +16,6 @@
 
 package org.jboss.migration.core.task.component;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 
@@ -34,13 +33,13 @@ public interface TaskRunnable {
     @FunctionalInterface
     interface Builder<P extends BuildParameters> {
 
-        TaskRunnable build(P params, ServerMigrationTaskName taskName);
+        TaskRunnable build(P params);
 
         static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> from(BuildParameters.Mapper<R, T> mapper, TaskRunnable.Builder<? super T> tBuilder) {
-            return (r, taskName) -> context -> {
+            return r -> context -> {
                 final ServerMigrationTaskResult.Builder resultBuilder = new ServerMigrationTaskResult.Builder().skipped();
                 for (T t : mapper.apply(r)) {
-                    if (tBuilder.build(t, taskName).run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
+                    if (tBuilder.build(t).run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
                         resultBuilder.success();
                     }
                 }
@@ -49,7 +48,7 @@ public interface TaskRunnable {
         }
 
         static <T extends BuildParameters, R extends BuildParameters> TaskRunnable.Builder<R> from(BuildParameters.Mapper<R, T> mapper, ComponentTaskBuilder<? super T, ?> tBuilder) {
-            return from(mapper, ((params, taskName) -> context -> context.execute(tBuilder.build(params)).getResult()));
+            return from(mapper, params -> context -> context.execute(tBuilder.build(params)).getResult());
         }
     }
 }

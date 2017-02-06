@@ -1,8 +1,6 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.ManageableResource;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SECURITY_REALM;
@@ -10,15 +8,15 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SEC
 /**
  * @author emmartins
  */
-public class SecurityRealmResourceImpl extends AbstractManageableResource implements SecurityRealmResource {
+public class SecurityRealmResourceImpl extends AbstractManageableResource<SecurityRealmResource.Parent> implements SecurityRealmResource {
 
 
-    private SecurityRealmResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+    private SecurityRealmResourceImpl(String resourceName, PathAddress pathAddress, SecurityRealmResource.Parent parent) {
         super(resourceName, pathAddress, parent);
     }
 
-    public static class Factory extends AbstractManageableResource.Factory<SecurityRealmResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+    public static class Factory extends AbstractManageableResource.Factory<SecurityRealmResource, SecurityRealmResource.Parent> {
+        public Factory(PathAddress pathAddressBase, SecurityRealmResource.Parent parentResource) {
             super(RESOURCE_TYPE, pathAddressBase, SECURITY_REALM, parentResource);
         }
         @Override

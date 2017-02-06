@@ -33,18 +33,18 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  */
 public class AddWebsockets<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
+    public static final String TASK_NAME = "add-undertow-websockets";
     private static final String SERVLET_CONTAINER = "servlet-container";
     private static final String SERVLET_CONTAINER_NAME = "default";
     private static final String SETTING = "setting";
     private static final String SETTING_NAME = "websockets";
 
-    @Override
-    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
-        return new ServerMigrationTaskName.Builder("add-undertow-websockets").build();
+    public AddWebsockets() {
+        super(TASK_NAME);
     }
 
     @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         if (!config.hasDefined(SERVLET_CONTAINER, SERVLET_CONTAINER_NAME, SETTING, SETTING_NAME)) {
             final PathAddress pathAddress = subsystemConfiguration.getResourcePathAddress().append(SERVLET_CONTAINER, SERVLET_CONTAINER_NAME).append(SETTING, SETTING_NAME);
             final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);

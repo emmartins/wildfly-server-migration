@@ -18,7 +18,6 @@ package org.jboss.migration.wfly10.config.management;
 
 import org.jboss.as.controller.PathAddress;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +32,9 @@ public interface ManagementInterfaceResource extends ManageableResource {
     default Type<ManagementInterfaceResource> getResourceType() {
         return RESOURCE_TYPE;
     }
+
+    @Override
+    Parent getParentResource();
 
     /**
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link ManagementInterfaceResource} children.

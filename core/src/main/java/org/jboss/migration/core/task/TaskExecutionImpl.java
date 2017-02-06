@@ -36,7 +36,7 @@ public class TaskExecutionImpl implements TaskExecution {
     private final TaskExecutionImpl parent;
     private final List<TaskExecutionImpl> children;
     private final ServerMigrationContext serverMigrationContext;
-    private final AtomicLong startTime = new AtomicLong();
+    private final AtomicLong startTime = new AtomicLong(0L);
     private ServerMigrationTaskResult result;
     private final Logger logger;
     private final long taskNumber;
@@ -161,19 +161,16 @@ public class TaskExecutionImpl implements TaskExecution {
     }
 
     public void run() throws IllegalStateException, ServerMigrationFailureException {
-        if (!startTime.compareAndSet(0, System.currentTimeMillis())) {
+        if (!startTime.compareAndSet(0L, System.currentTimeMillis())) {
             throw new IllegalStateException("Task "+ taskPath +" already started");
         }
         logger.debugf("Task %s execution starting...", taskPath);
         try {
             result = task.run(new TaskContextImpl(this));
         } catch (ServerMigrationFailureException e) {
-            result = ServerMigrationTaskResult.fail(e);
-            throw e;
+            throw (result = ServerMigrationTaskResult.fail(e)).getFailReason();
         } catch (Throwable t) {
-            final ServerMigrationFailureException e = new ServerMigrationFailureException(t);
-            result = ServerMigrationTaskResult.fail(e);
-            throw e;
+            throw (result = ServerMigrationTaskResult.fail(new ServerMigrationFailureException(t))).getFailReason();
         } finally {
             logger.debugf("Task %s execution completed with result status... %s", taskPath, result);
         }

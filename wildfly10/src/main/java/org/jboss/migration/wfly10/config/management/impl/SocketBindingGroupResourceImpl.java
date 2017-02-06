@@ -17,7 +17,6 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.SocketBindingGroupResource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING_GROUP;
@@ -25,10 +24,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOC
 /**
  * @author emmartins
  */
-public class SocketBindingGroupResourceImpl extends AbstractManageableResource implements SocketBindingGroupResource {
+public class SocketBindingGroupResourceImpl extends AbstractManageableResource<SocketBindingGroupResource.Parent> implements SocketBindingGroupResource {
 
-    public static class Factory extends AbstractManageableResource.Factory<SocketBindingGroupResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+    public static class Factory extends AbstractManageableResource.Factory<SocketBindingGroupResource, SocketBindingGroupResource.Parent> {
+        public Factory(PathAddress pathAddressBase, SocketBindingGroupResource.Parent parentResource) {
             super(RESOURCE_TYPE, pathAddressBase, SOCKET_BINDING_GROUP, parentResource);
         }
         @Override
@@ -39,7 +38,7 @@ public class SocketBindingGroupResourceImpl extends AbstractManageableResource i
 
     private final SocketBindingResourceImpl.Factory socketBindingResources;
 
-    private SocketBindingGroupResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+    private SocketBindingGroupResourceImpl(String resourceName, PathAddress pathAddress, SocketBindingGroupResource.Parent parent) {
         super(resourceName, pathAddress, parent);
         socketBindingResources = new SocketBindingResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(socketBindingResources);

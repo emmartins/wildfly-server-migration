@@ -34,18 +34,17 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class AddHttpsListener<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
-    public static final String TASK_NAME_NAME = "add-undertow-https-listener";
+    public static final String TASK_NAME = "add-undertow-https-listener";
     private static final String SERVER_NAME = "default-server";
     private static final String HTTPS_LISTENER = "https-listener";
     private static final String HTTPS_LISTENER_NAME = "https";
 
-    @Override
-    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
-        return new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
+    public AddHttpsListener() {
+        super(TASK_NAME);
     }
 
     @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         final PathAddress configPathAddress = subsystemConfiguration.getResourcePathAddress();
         final PathAddress serverPathAddress = configPathAddress.append(SERVER, SERVER_NAME);
         if (!config.hasDefined(SERVER, SERVER_NAME)) {

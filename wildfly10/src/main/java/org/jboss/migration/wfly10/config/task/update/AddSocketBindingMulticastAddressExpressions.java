@@ -65,8 +65,8 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ServerConfig
         }
 
         protected AddSocketBindingMulticastAddressExpression(String resourceName, String propertyName) {
-            name(parameters -> new ServerMigrationTaskName.Builder("add-"+resourceName+"-multicast-address-expression").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
-            run((ResourceTaskRunnableBuilder<S, SocketBindingResource>) (params, taskName1) -> context -> {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("add-"+resourceName+"-multicast-address-expression").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
+            runBuilder(params -> context -> {
                 // retrieve resource config
                 final SocketBindingResource socketBindingResource = params.getResource();
                 final ModelNode resourceConfig = socketBindingResource.getResourceConfiguration();

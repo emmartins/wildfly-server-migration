@@ -24,6 +24,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
+import org.jboss.migration.wfly10.config.task.CompositeServerMigration;
 import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.DomainMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
@@ -40,27 +41,16 @@ import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurat
 /**
  * @author emmartins
  */
-public class CompositeServerUpdate<S extends JBossServer<S>> extends ServerMigrationBuilder<S> {
+public class CompositeServerUpdate<S extends JBossServer<S>> extends CompositeServerMigration<S> {
 
-    public CompositeServerUpdate(ServerMigrationBuilder.Builder<S> builder) {
-        super(builder);
+    public CompositeServerUpdate(SubtasksBuilder<S> subtasks) {
+        super(subtasks);
     }
 
-    public static class Builder<S extends JBossServer<S>> extends ServerMigrationBuilder.Builder<S> {
+    public static class SubtasksBuilder<S extends JBossServer<S>> extends CompositeServerMigration.SubtasksBuilder<S> {
 
-        public Builder() {
-            subtask(new SubtaskFactory<S>() {
-                @Override
-                public ServerMigrationTask getTask(S source, WildFlyServer10 target) {
-                    return new ModulesMigrationTask(source, target);
-                }
-            });
-        }
-
-        @Override
-        public Builder<S> subtask(SubtaskFactory<S> subtaskFactory) {
-            super.subtask(subtaskFactory);
-            return this;
+        public SubtasksBuilder() {
+            subtask((params, taskName) -> context -> context.execute(new ModulesMigrationTask(params.getSourceServer(), params.getTargetServer())).getResult());
         }
 
         public Builder<S> migrate(DomainMigration<S> domainUpdate) {
@@ -84,17 +74,15 @@ public class CompositeServerUpdate<S extends JBossServer<S>> extends ServerMigra
         }
 
         public Builder<S> standaloneServer(StandaloneServerConfigurationMigration<ServerPath<S>> standaloneServerConfigurationUpdate) {
-           return standaloneServer(new StandaloneServerConfigurationsUpdate(standaloneServerConfigurationUpdate));
+            return standaloneServer(new StandaloneServerConfigurationsUpdate(standaloneServerConfigurationUpdate));
         }
 
         public Builder<S> standaloneServer(StandaloneServerConfigurationMigration.Builder<ServerPath<S>> standaloneServerConfigurationUpdateBuilder) {
             return standaloneServer(standaloneServerConfigurationUpdateBuilder.build());
         }
-
-        public CompositeServerUpdate<S> build() {
-            return new CompositeServerUpdate(this);
-        }
     }
+
+
 
     public static class Builders<S extends JBossServer<S>> extends MigrationBuilders<S, ServerPath<S>> {
 

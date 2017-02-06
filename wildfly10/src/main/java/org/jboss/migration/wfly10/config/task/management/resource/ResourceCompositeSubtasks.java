@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task.management.resource;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.component.CompositeSubtasks;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 
@@ -25,14 +24,14 @@ import org.jboss.migration.wfly10.config.management.ManageableResource;
  */
 public class ResourceCompositeSubtasks<S, R extends ManageableResource> extends CompositeSubtasks<ResourceBuildParameters<S, R>> {
 
-    protected ResourceCompositeSubtasks(BaseBuilder<S, R, ?> baseBuilder, ResourceBuildParameters<S, R> params, ServerMigrationTaskName taskName) {
-        super(baseBuilder, params, taskName);
+    protected ResourceCompositeSubtasks(BaseBuilder<S, R, ?> baseBuilder, ResourceBuildParameters<S, R> params) {
+        super(baseBuilder, params);
     }
 
     public static abstract class BaseBuilder<S, R extends ManageableResource, T extends BaseBuilder<S, R, T>> extends CompositeSubtasks.BaseBuilder<ResourceBuildParameters<S, R>, T> implements ResourceCompositeSubtasksBuilder<S, R, T> {
         @Override
-        public ResourceCompositeSubtasks build(ResourceBuildParameters<S, R> params, ServerMigrationTaskName taskName) {
-            return new ResourceCompositeSubtasks(this, params, taskName);
+        public ResourceCompositeSubtasks build(ResourceBuildParameters<S, R> params) {
+            return new ResourceCompositeSubtasks(this, params);
         }
     }
 

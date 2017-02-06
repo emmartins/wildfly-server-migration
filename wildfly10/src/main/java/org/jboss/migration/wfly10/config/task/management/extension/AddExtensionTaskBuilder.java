@@ -32,7 +32,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MOD
 public class AddExtensionTaskBuilder<S> extends ServerConfigurationLeafTask.Builder<S> {
     public AddExtensionTaskBuilder(String extensionModule) {
         name(new ServerMigrationTaskName.Builder("add-extension").addAttribute("name", extensionModule).build());
-        run((params, taskName) -> context -> {
+        runBuilder(params -> context -> {
             final ManageableServerConfiguration extensionResourceParent = params.getServerConfiguration();
             if (!extensionResourceParent.getExtensionConfigurationNames().contains(extensionModule)) {
                 context.getLogger().debugf("Adding Extension %s...", extensionModule);

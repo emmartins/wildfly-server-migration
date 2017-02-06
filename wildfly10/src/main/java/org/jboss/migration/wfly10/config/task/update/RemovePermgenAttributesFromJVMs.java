@@ -42,8 +42,8 @@ public class RemovePermgenAttributesFromJVMs<S> extends ServerConfigurationCompo
 
     public static class Subtask<S> extends ResourceLeafTask.Builder<S, JvmResource> {
         protected Subtask() {
-            name(parameters -> new ServerMigrationTaskName.Builder("remove-permgen-attributes-from-jvm").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
-            final ResourceTaskRunnableBuilder<S, JvmResource> runnableBuilder = (params, taskName) -> context -> {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("remove-permgen-attributes-from-jvm").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
+            final ResourceTaskRunnableBuilder<S, JvmResource> runnableBuilder = params-> context -> {
                 final JvmResource resource = params.getResource();
                 final ModelNode config = resource.getResourceConfiguration();
                 final PathAddress pathAddress = resource.getResourcePathAddress();
@@ -64,7 +64,7 @@ public class RemovePermgenAttributesFromJVMs<S> extends ServerConfigurationCompo
                 context.getLogger().infof("Permgen removed from JVM %s", pathAddress.toCLIStyleString());
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(runnableBuilder);
+            runBuilder(runnableBuilder);
         }
     }
 }

@@ -68,22 +68,26 @@ public abstract class ComponentTask implements ServerMigrationTask {
         }
         */
 
-        public T name(TaskNameBuilder<? super P> builder) {
+        @Override
+        public T nameBuilder(TaskNameBuilder<? super P> builder) {
             this.taskNameBuilder = builder;
             return getThis();
         }
 
-        public T skipPolicy(TaskSkipPolicy.Builder<? super P> builder) {
+        @Override
+        public T skipPolicyBuilder(TaskSkipPolicy.Builder<? super P> builder) {
             this.skipPolicyBuilder = builder;
             return getThis();
         }
 
-        public T beforeRun(BeforeTaskRun.Builder<? super P> builder) {
+        @Override
+        public T beforeRunBuilder(BeforeTaskRun.Builder<? super P> builder) {
             this.beforeRunBuilder = builder;
             return getThis();
         }
 
-        public T afterRun(AfterTaskRun.Builder<? super P> builder) {
+        @Override
+        public T afterRunBuilder(AfterTaskRun.Builder<? super P> builder) {
             this.afterRunBuilder = builder;
             return getThis();
         }
@@ -93,13 +97,13 @@ public abstract class ComponentTask implements ServerMigrationTask {
             return taskNameBuilder.build(parameters);
         }
 
-        protected TaskRunnable buildRunnable(P parameters, ServerMigrationTaskName taskName) {
+        protected TaskRunnable buildRunnable(P parameters) {
             final TaskRunnable.Builder<? super P> runnableBuilder = getRunnableBuilder();
             Objects.requireNonNull(runnableBuilder);
-            final TaskRunnable runnable = runnableBuilder.build(parameters, taskName);
-            final TaskSkipPolicy skipPolicy = skipPolicyBuilder != null ? skipPolicyBuilder.build(parameters, taskName) : null;
-            final BeforeTaskRun beforeRun = beforeRunBuilder != null ? beforeRunBuilder.build(parameters, taskName) : null;
-            final AfterTaskRun afterRun = afterRunBuilder != null ? afterRunBuilder.build(parameters, taskName) : null;
+            final TaskRunnable runnable = runnableBuilder.build(parameters);
+            final TaskSkipPolicy skipPolicy = skipPolicyBuilder != null ? skipPolicyBuilder.build(parameters) : null;
+            final BeforeTaskRun beforeRun = beforeRunBuilder != null ? beforeRunBuilder.build(parameters) : null;
+            final AfterTaskRun afterRun = afterRunBuilder != null ? afterRunBuilder.build(parameters) : null;
             return context -> {
                 if (skipPolicy != null && skipPolicy.isSkipped(context)) {
                     return ServerMigrationTaskResult.SKIPPED;
@@ -116,8 +120,7 @@ public abstract class ComponentTask implements ServerMigrationTask {
         }
 
         public ServerMigrationTask build(P params) {
-            final ServerMigrationTaskName taskName = buildName(params);
-            return buildTask(taskName, buildRunnable(params, taskName));
+            return buildTask(buildName(params), buildRunnable(params));
         }
 
         protected abstract T getThis();

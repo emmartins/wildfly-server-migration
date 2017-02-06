@@ -18,15 +18,13 @@ package org.jboss.migration.wfly10.config.task.subsystem.messaging;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
+import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -35,7 +33,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  * A task which adds HTTP Acceptors and Connectors to the Messaging subsystem.
  * @author emmartins
  */
-public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
     public interface EnvironmentProperties {
         String HTTP_ACCEPTOR_NAME = "httpAcceptorName";
@@ -51,11 +49,10 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
     public static final String DEFAULT_UNDERTOW_HTTP_LISTENER_NAME = "http";
     public static final String DEFAULT_UNDERTOW_SERVER_NAME = "default-server";
 
-    public static final AddHttpAcceptorsAndConnectors INSTANCE = new AddHttpAcceptorsAndConnectors();
+    public static final String TASK_NAME = "add-messaging-http-acceptors-and-connectors";
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("add-messaging-http-acceptors-and-connectors").build();
-
-    private AddHttpAcceptorsAndConnectors() {
+    public AddHttpAcceptorsAndConnectors() {
+        super(TASK_NAME);
     }
 
     private static final String SERVER = "server";
@@ -68,47 +65,37 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
     private static final String ENDPOINT = "endpoint";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemResources) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemResources subsystemResources, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                if (config == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
+        final PathAddress subsystemPathAddress = subsystemConfiguration.getResourcePathAddress();
+        final ManageableServerConfiguration configurationManagement = subsystemConfiguration.getServerConfiguration();
+        // read env properties
+        final String httpAcceptorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_ACCEPTOR_NAME, DEFAULT_HTTP_ACCEPTOR_NAME);
+        final String httpConnectorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_CONNECTOR_NAME, DEFAULT_HTTP_CONNECTOR_NAME);
+        final String socketBindingName = taskEnvironment.getPropertyAsString(EnvironmentProperties.SOCKET_BINDING_NAME, DEFAULT_SOCKET_BINDING_NAME);
+        final String undertowHttpListenerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME, DEFAULT_UNDERTOW_HTTP_LISTENER_NAME);
+        final String undertowServerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_SERVER_NAME, DEFAULT_UNDERTOW_SERVER_NAME);
+        // ensure undertow's default http listener is configured
+        final SubsystemConfiguration undertow = subsystemConfiguration.getParentResource().getSubsystemConfiguration(SubsystemNames.UNDERTOW);
+        if (undertow == null) {
+            return ServerMigrationTaskResult.SKIPPED;
+        };
+        final ModelNode undertowConfig = undertow.getResourceConfiguration();
+        if (!undertowConfig.hasDefined(SERVER, undertowServerName, HTTP_LISTENER, undertowHttpListenerName)) {
+            context.getLogger().debug("Skipping configuration of Messaging ActiveMQ http acceptors and connectors, Undertow's default HTTP listener not found.");
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        // add http acceptors and connectors to each messaging server
+        if (config.hasDefined(SERVER)) {
+            boolean configUpdated = false;
+            for (String serverName : config.get(SERVER).keys()) {
+                if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, httpAcceptorName)) {
+                    final PathAddress pathAddress = subsystemPathAddress.append(pathElement(SERVER, serverName), pathElement(HTTP_ACCEPTOR, httpAcceptorName));
+                    final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
+                    addOp.get(HTTP_LISTENER).set(undertowHttpListenerName);
+                    configurationManagement.executeManagementOperation(addOp);
+                    configUpdated = true;
+                    context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", httpAcceptorName);
                 }
-                final PathAddress subsystemPathAddress = subsystemResources.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemResources.getServerConfiguration();
-                // read env properties
-                final String httpAcceptorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_ACCEPTOR_NAME, DEFAULT_HTTP_ACCEPTOR_NAME);
-                final String httpConnectorName = taskEnvironment.getPropertyAsString(EnvironmentProperties.HTTP_CONNECTOR_NAME, DEFAULT_HTTP_CONNECTOR_NAME);
-                final String socketBindingName = taskEnvironment.getPropertyAsString(EnvironmentProperties.SOCKET_BINDING_NAME, DEFAULT_SOCKET_BINDING_NAME);
-                final String undertowHttpListenerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME, DEFAULT_UNDERTOW_HTTP_LISTENER_NAME);
-                final String undertowServerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_SERVER_NAME, DEFAULT_UNDERTOW_SERVER_NAME);
-                // ensure undertow's default http listener is configured
-                final ModelNode undertowConfig = subsystemResources.getResourceConfiguration(SubsystemNames.UNDERTOW);
-                if (undertowConfig == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                } else {
-                    if (!undertowConfig.hasDefined(SERVER, undertowServerName, HTTP_LISTENER, undertowHttpListenerName)) {
-                        context.getLogger().debug("Skipping configuration of Messaging ActiveMQ http acceptors and connectors, Undertow's default HTTP listener not found.");
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
-                }
-                // add http acceptors and connectors to each messaging server
-                if (config.hasDefined(SERVER)) {
-                    boolean configUpdated = false;
-                    for (String serverName : config.get(SERVER).keys()) {
-                        if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, httpAcceptorName)) {
-                            final PathAddress pathAddress = subsystemPathAddress.append(pathElement(SERVER, serverName), pathElement(HTTP_ACCEPTOR, httpAcceptorName));
-                            final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                            addOp.get(HTTP_LISTENER).set(undertowHttpListenerName);
-                            configurationManagement.executeManagementOperation(addOp);
-                            configUpdated = true;
-                            context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", httpAcceptorName);
-                        }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, HTTP_ACCEPTOR_THROUGHPUT_NAME)) {
                     final PathAddress pathAddress = subsystemPathAddress.append(pathElement(SERVER, serverName), pathElement(HTTP_ACCEPTOR, HTTP_ACCEPTOR_THROUGHPUT_NAME));
@@ -118,15 +105,15 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
                     context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_THROUGHPUT_NAME);
                 }
                 */
-                        if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, httpConnectorName)) {
-                            final PathAddress pathAddress = subsystemPathAddress.append(pathElement(SERVER, serverName), pathElement(HTTP_CONNECTOR, httpConnectorName));
-                            final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                            addOp.get(SOCKET_BINDING).set(socketBindingName);
-                            addOp.get(ENDPOINT).set(httpAcceptorName);
-                            configurationManagement.executeManagementOperation(addOp);
-                            configUpdated = true;
-                            context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", httpConnectorName);
-                        }
+                if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, httpConnectorName)) {
+                    final PathAddress pathAddress = subsystemPathAddress.append(pathElement(SERVER, serverName), pathElement(HTTP_CONNECTOR, httpConnectorName));
+                    final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
+                    addOp.get(SOCKET_BINDING).set(socketBindingName);
+                    addOp.get(ENDPOINT).set(httpAcceptorName);
+                    configurationManagement.executeManagementOperation(addOp);
+                    configUpdated = true;
+                    context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", httpConnectorName);
+                }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, HTTP_CONNECTOR_THROUGHPUT_NAME)) {
                     final PathAddress pathAddress = subsystemPathAddress.append(pathElement(SERVER, serverName), pathElement(HTTP_CONNECTOR, HTTP_CONNECTOR_THROUGHPUT_NAME));
@@ -137,12 +124,10 @@ public class AddHttpAcceptorsAndConnectors implements UpdateSubsystemTaskFactory
                     context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_THROUGHPUT_NAME);
                 }
                 */
-                    }
-                    return configUpdated ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
-                } else {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
             }
-        };
+            return configUpdated ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+        } else {
+            return ServerMigrationTaskResult.SKIPPED;
+        }
     }
 }

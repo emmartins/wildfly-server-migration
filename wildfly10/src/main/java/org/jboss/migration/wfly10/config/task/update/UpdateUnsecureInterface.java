@@ -47,7 +47,7 @@ public class UpdateUnsecureInterface<S> extends ServerConfigurationCompositeTask
     public static class SetUnsecureInterfaceInetAddress<S> extends ResourceLeafTask.Builder<S, InterfaceResource> {
         protected SetUnsecureInterfaceInetAddress() {
             name("set-unsecure-interface-inet-address");
-            final ResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = (params, taskName) -> context -> {
+            final ResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params -> context -> {
                 final InterfaceResource resource = params.getResource();
                 final ModelNode resourceConfig = params.getResource().getResourceConfiguration();
                 if (resourceConfig == null) {
@@ -69,7 +69,7 @@ public class UpdateUnsecureInterface<S> extends ServerConfigurationCompositeTask
                 context.getLogger().infof("Interface %s inet address value set as %s.", INTERFACE_NAME, valueExpression.getExpressionString());
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(runnableBuilder);
+            runBuilder(runnableBuilder);
         }
     }
 }

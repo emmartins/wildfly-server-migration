@@ -17,7 +17,6 @@
 package org.jboss.migration.core.task.component;
 
 import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 
 /**
  * @author emmartins
@@ -27,11 +26,11 @@ public interface CompositeSubtasksBuilder<P extends BuildParameters, T extends C
     T subtask(TaskRunnable.Builder<? super P> subtasksBuilder);
 
     default T subtask(ServerMigrationTask task) {
-        return subtask((params, taskName) -> context -> context.execute(task).getResult());
+        return subtask(params -> context -> context.execute(task).getResult());
     }
 
     default T subtask(ComponentTaskBuilder<? super P, ?> builder) {
-        return subtask((params, taskName) -> context -> context.execute(builder.build(params)).getResult());
+        return subtask(params -> context -> context.execute(builder.build(params)).getResult());
     }
 
     default <Q extends BuildParameters> T subtask(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
@@ -43,5 +42,5 @@ public interface CompositeSubtasksBuilder<P extends BuildParameters, T extends C
     }
 
     @Override
-    CompositeSubtasks build(P params, ServerMigrationTaskName taskName);
+    CompositeSubtasks build(P params);
 }

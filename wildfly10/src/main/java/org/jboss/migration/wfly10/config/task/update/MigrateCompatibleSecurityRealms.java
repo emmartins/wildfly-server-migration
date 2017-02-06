@@ -54,10 +54,10 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends S
 
     protected static class Subtask<S extends JBossServer<S>> extends ResourceLeafTask.Builder<ServerPath<S>, SecurityRealmResource> {
         protected Subtask() {
-            name(parameters -> new ServerMigrationTaskName.Builder("migrate-compatible-security-realm").addAttribute("name", parameters.getResource().getResourceName()).build());
-            beforeRun((params, taskName) -> context -> context.getLogger().debugf("Security realm %s migration starting...", params.getResource().getResourceName()));
-            afterRun((params, taskName) -> context -> context.getLogger().infof("Security realm %s migrated.", params.getResource().getResourceName()));
-            final ResourceTaskRunnableBuilder<ServerPath<S>, SecurityRealmResource> runnableBuilder = (params, taskName) -> context -> {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("migrate-compatible-security-realm").addAttribute("name", parameters.getResource().getResourceName()).build());
+            beforeRunBuilder(params-> context -> context.getLogger().debugf("Security realm %s migration starting...", params.getResource().getResourceName()));
+            afterRunBuilder(params -> context -> context.getLogger().infof("Security realm %s migrated.", params.getResource().getResourceName()));
+            final ResourceTaskRunnableBuilder<ServerPath<S>, SecurityRealmResource> runnableBuilder = params -> context -> {
                 final SecurityRealmResource securityRealmResource = params.getResource();
                 final ModelNode securityRealmConfig = securityRealmResource.getResourceConfiguration();
                 if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
@@ -68,7 +68,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends S
                 }
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(runnableBuilder);
+            runBuilder(runnableBuilder);
         }
 
         private void copyPropertiesFile(String propertiesName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmResource securityRealmResource, TaskContext context) throws ServerMigrationFailureException {

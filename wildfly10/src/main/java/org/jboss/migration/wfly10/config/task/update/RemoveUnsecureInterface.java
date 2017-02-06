@@ -44,12 +44,12 @@ public class RemoveUnsecureInterface<S> extends ServerConfigurationCompositeTask
     public static class Subtask<S> extends ResourceLeafTask.Builder<S, InterfaceResource> {
         protected Subtask() {
             name("remove-unsecure-interface-config");
-            final ResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = (params, taskName) -> context -> {
+            final ResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params-> context -> {
                 params.getResource().remove();
                 context.getLogger().info("Unsecure interface configuration removed.");
                 return ServerMigrationTaskResult.SUCCESS;
             };
-            run(runnableBuilder);
+            runBuilder(runnableBuilder);
         }
     }
 }

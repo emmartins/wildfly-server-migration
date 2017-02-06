@@ -29,35 +29,35 @@ import org.jboss.migration.wfly10.config.task.management.resources.ResourcesTask
  */
 public interface ResourceLeafTaskBuilder<S, R extends ManageableResource, T extends ResourceLeafTaskBuilder<S, R, T>> extends LeafTaskBuilder<ResourceBuildParameters<S, R>, T>, ResourceComponentTaskBuilder<S, R, T> {
 
-    default <R1 extends ManageableResource> T run(Class<? extends R1> resourceType, ResourceTaskRunnableBuilder<S, R1> builder) {
-        return run(ManageableResourceSelectors.selectResources(resourceType), builder);
+    default <R1 extends ManageableResource> T runBuilder(Class<? extends R1> resourceType, ResourceTaskRunnableBuilder<S, R1> builder) {
+        return runBuilder(ManageableResourceSelectors.selectResources(resourceType), builder);
     }
 
-    default <R1 extends ManageableResource> T run(Class<? extends R1> resourceType, String resourceName, ResourceTaskRunnableBuilder<S, R1> builder) {
-        return run(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
+    default <R1 extends ManageableResource> T runBuilder(Class<? extends R1> resourceType, String resourceName, ResourceTaskRunnableBuilder<S, R1> builder) {
+        return runBuilder(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
     }
 
-    default <R1 extends ManageableResource> T run(ManageableResourceSelector<? extends R1> resourceSelector, ResourceTaskRunnableBuilder<S, R1> builder) {
-        return run(new ResourceToResourceParametersMapper<>(resourceSelector), builder);
+    default <R1 extends ManageableResource> T runBuilder(ManageableResourceSelector<? extends R1> resourceSelector, ResourceTaskRunnableBuilder<S, R1> builder) {
+        return runBuilder(new ResourceToResourceParametersMapper<>(resourceSelector), builder);
     }
 
     // --
 
-    default <R1 extends ManageableResource> T run(Class<? extends R1> resourceType, ResourcesTaskRunnableBuilder<S, R1> builder) {
-        return run(ManageableResourceSelectors.selectResources(resourceType), builder);
+    default <R1 extends ManageableResource> T runBuilder(Class<? extends R1> resourceType, ResourcesTaskRunnableBuilder<S, R1> builder) {
+        return runBuilder(ManageableResourceSelectors.selectResources(resourceType), builder);
     }
 
-    default <R1 extends ManageableResource> T run(Class<? extends R1> resourceType, String resourceName, ResourcesTaskRunnableBuilder<S, R1> builder) {
-        return run(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
+    default <R1 extends ManageableResource> T runBuilder(Class<? extends R1> resourceType, String resourceName, ResourcesTaskRunnableBuilder<S, R1> builder) {
+        return runBuilder(ManageableResourceSelectors.selectResources(resourceType, resourceName), builder);
     }
 
-    default <R1 extends ManageableResource> T run(ManageableResourceSelector<? extends R1> resourceSelector, ResourcesTaskRunnableBuilder<S, R1> builder) {
-        return run(new ResourceToResourcesParametersMapper<>(resourceSelector), builder);
+    default <R1 extends ManageableResource> T runBuilder(ManageableResourceSelector<? extends R1> resourceSelector, ResourcesTaskRunnableBuilder<S, R1> builder) {
+        return runBuilder(new ResourceToResourcesParametersMapper<>(resourceSelector), builder);
     }
 
     // ---
 
-    default T run(ResourcesTaskRunnableBuilder<S, R> builder) {
-        return run(new ResourceToResourcesParametersDirectMapper<>(), builder);
+    default T resourcesRunBuilder(ResourcesTaskRunnableBuilder<S, R> builder) {
+        return runBuilder(new ResourceToResourcesParametersDirectMapper<>(), builder);
     }
 }

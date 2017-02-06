@@ -20,7 +20,6 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.WildFlyServer10;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 

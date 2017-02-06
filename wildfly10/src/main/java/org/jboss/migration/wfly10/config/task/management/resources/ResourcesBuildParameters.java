@@ -17,27 +17,13 @@
 package org.jboss.migration.wfly10.config.task.management.resources;
 
 import org.jboss.migration.wfly10.config.management.ManageableResource;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationBuildParameters;
 
 import java.util.Collection;
-
-import static java.util.stream.Collectors.toSet;
 
 /**
  * @author emmartins
  */
 public interface ResourcesBuildParameters<S, R extends ManageableResource> extends ServerConfigurationBuildParameters<S> {
-
     Collection<? extends R> getResources();
-
-    @Override
-    default S getSource() {
-        return null;
-    }
-
-    @Override
-    default ManageableServerConfiguration getServerConfiguration() {
-        return null;
-    }
 }

@@ -17,7 +17,6 @@
 package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ProfileResource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
@@ -25,10 +24,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PRO
 /**
  * @author emmartins
  */
-public class ProfileResourceImpl extends AbstractManageableResource implements ProfileResource {
+public class ProfileResourceImpl extends AbstractManageableResource<ProfileResource.Parent> implements ProfileResource {
 
-    public static class Factory extends AbstractManageableResource.Factory<ProfileResource> {
-        public Factory(PathAddress pathAddressBase, ManageableResource parentResource) {
+    public static class Factory extends AbstractManageableResource.Factory<ProfileResource, ProfileResource.Parent> {
+        public Factory(PathAddress pathAddressBase, ProfileResource.Parent parentResource) {
             super(RESOURCE_TYPE, pathAddressBase, PROFILE, parentResource);
         }
         @Override
@@ -39,7 +38,7 @@ public class ProfileResourceImpl extends AbstractManageableResource implements P
 
     private final SubsystemConfigurationImpl.Factory subsystemResources;
 
-    private ProfileResourceImpl(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+    private ProfileResourceImpl(String resourceName, PathAddress pathAddress, ProfileResource.Parent parent) {
         super(resourceName, pathAddress, parent);
         subsystemResources = new SubsystemConfigurationImpl.Factory(pathAddress, this);
         addChildResourceFactory(subsystemResources);

@@ -16,10 +16,8 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTask;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 import org.jboss.migration.wfly10.config.task.subsystem.ee.AddConcurrencyUtilitiesDefaultConfig;
 import org.jboss.migration.wfly10.config.task.subsystem.ee.AddDefaultBindingsConfig;
 import org.jboss.migration.wfly10.config.task.subsystem.ejb3.AddInfinispanPassivationStoreAndDistributableCache;
@@ -31,9 +29,9 @@ import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateC
 import org.jboss.migration.wfly10.config.task.subsystem.messaging.AddHttpAcceptorsAndConnectors;
 import org.jboss.migration.wfly10.config.task.subsystem.remoting.AddHttpConnectorIfMissing;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpListenerRedirectSocket;
 
 /**
@@ -41,32 +39,31 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpL
  */
 public class EAPSubsystemUpdates7_0 {
 
-    public static final UpdateSubsystemConfigurationTask.Builder INFINISPAN = new UpdateSubsystemConfigurationTask.Builder(SubsystemNames.INFINISPAN)
-            .subtask(AddServerCache.INSTANCE)
-            .subtask(AddEjbCache.INSTANCE)
-            .subtask(FixHibernateCacheModuleName.INSTANCE);
+    public static final UpdateSubsystemConfigurationTaskBuilder INFINISPAN = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.INFINISPAN,
+            new AddServerCache<>(),
+            new AddEjbCache<>(),
+            new FixHibernateCacheModuleName<>());
 
-    public static final UpdateSubsystemTaskFactory EE = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.EE, ExtensionNames.EE)
-                                .subtasks(AddConcurrencyUtilitiesDefaultConfig.INSTANCE, AddDefaultBindingsConfig.INSTANCE)
-                                .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder EE = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.EE,
+            new AddConcurrencyUtilitiesDefaultConfig<>(),
+            new AddDefaultBindingsConfig<>());
 
-    public static final UpdateSubsystemTaskFactory EJB3 = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.EJB3, ExtensionNames.EJB3)
-                                .subtasks(RefHttpRemotingConnectorInEJB3Remote.INSTANCE, DefinePassivationDisabledCacheRef.INSTANCE, AddInfinispanPassivationStoreAndDistributableCache.INSTANCE)
-                                .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder EJB3 = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.EJB3,
+            new RefHttpRemotingConnectorInEJB3Remote<>(),
+            new DefinePassivationDisabledCacheRef<>(),
+            new AddInfinispanPassivationStoreAndDistributableCache<>());
 
-    public static final UpdateSubsystemTaskFactory REMOTING = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.REMOTING, ExtensionNames.REMOTING)
-                                .subtasks(AddHttpConnectorIfMissing.INSTANCE)
-                                .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder REMOTING = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.REMOTING,
+            new AddHttpConnectorIfMissing<>());
 
-    public static final UpdateSubsystemConfigurationTask.Builder UNDERTOW = new UpdateSubsystemConfigurationTask.Builder<>(SubsystemNames.UNDERTOW)
-            .subtask(new AddBufferCache<>())
-            .subtask(new SetDefaultHttpListenerRedirectSocket<>())
-            .subtask(new AddWebsockets<>())
-            .subtask(new SetDefaultHostResponseHeaderServer<>())
-            .subtask(new SetDefaultHostResponseHeaderXPoweredBy<>());
+    public static final UpdateSubsystemConfigurationTaskBuilder UNDERTOW = new UpdateSubsystemConfigurationTaskBuilder<>(SubsystemNames.UNDERTOW,
+            new AddBufferCache<>(),
+            new SetDefaultHttpListenerRedirectSocket<>(),
+            new AddWebsockets<>(),
+            new SetDefaultHostResponseHeaderServer<>(),
+            new SetDefaultHostResponseHeaderXPoweredBy<>());
 
-    public static final UpdateSubsystemTaskFactory MESSAGING_ACTIVEMQ = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.MESSAGING_ACTIVEMQ, ExtensionNames.MESSAGING_ACTIVEMQ)
-                                .subtasks(AddHttpAcceptorsAndConnectors.INSTANCE)
-                                .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder MESSAGING_ACTIVEMQ = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.MESSAGING_ACTIVEMQ,
+            new AddHttpAcceptorsAndConnectors<>());
 
 }

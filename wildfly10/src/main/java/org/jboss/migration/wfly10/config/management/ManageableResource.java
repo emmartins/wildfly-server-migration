@@ -19,7 +19,6 @@ package org.jboss.migration.wfly10.config.management;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;

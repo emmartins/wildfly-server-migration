@@ -16,7 +16,6 @@
 
 package org.jboss.migration.core.task.component;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 
@@ -30,26 +29,24 @@ public class CompositeSubtasks<P extends BuildParameters> implements TaskRunnabl
 
     private final List<TaskRunnable.Builder<? super P>> builders;
     private final P params;
-    private final ServerMigrationTaskName taskName;
 
-    protected CompositeSubtasks(BaseBuilder<P, ?> baseBuilder, P params, ServerMigrationTaskName taskName) {
+    protected CompositeSubtasks(BaseBuilder<P, ?> baseBuilder, P params) {
         this.builders = new ArrayList<>(baseBuilder.builders);
         this.params = params;
-        this.taskName = taskName;
     }
 
     @Override
     public ServerMigrationTaskResult run(TaskContext context) {
         final ServerMigrationTaskResult.Builder result = new ServerMigrationTaskResult.Builder().skipped();
         for (TaskRunnable.Builder<? super P> builder : builders) {
-            if (builder.build(params, taskName).run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
+            if (builder.build(params).run(context).getStatus() == ServerMigrationTaskResult.Status.SUCCESS) {
                 result.success();
             }
         }
         return result.build();
     }
 
-    protected static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> implements CompositeSubtasksBuilder<P, T> {
+    public static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> implements CompositeSubtasksBuilder<P, T> {
 
         private final List<TaskRunnable.Builder<? super P>> builders = new ArrayList<>();
 
@@ -61,8 +58,8 @@ public class CompositeSubtasks<P extends BuildParameters> implements TaskRunnabl
         }
 
         @Override
-        public CompositeSubtasks build(P params, ServerMigrationTaskName taskName) {
-            return new CompositeSubtasks(this, params, taskName);
+        public CompositeSubtasks build(P params) {
+            return new CompositeSubtasks(this, params);
         }
     }
 

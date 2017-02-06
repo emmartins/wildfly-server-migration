@@ -42,10 +42,11 @@ public abstract class UpdateSubsystemConfigurationSubtaskBuilder<S> extends Reso
     }
 
     public UpdateSubsystemConfigurationSubtaskBuilder(TaskNameBuilder<ResourceBuildParameters<S, SubsystemConfiguration>> nameBuilder) {
-        skipPolicy((params, taskName) -> TaskSkipPolicy.skipByTaskEnvironment(EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(params.getResource().getResourceName(), taskName.getName())));
-        run(((params, taskName) -> context -> {
+        nameBuilder(nameBuilder);
+        skipPolicyBuilder(params -> context -> TaskSkipPolicy.skipByTaskEnvironment(EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(params.getResource().getResourceName(), context.getTaskName().getName())).isSkipped(context));
+        runBuilder(params -> context -> {
             final SubsystemConfiguration resource = params.getResource();
-            final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(resource.getResourceName(), taskName.getName()));
+            final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(resource.getResourceName(), context.getTaskName().getName()));
             final String configName = resource.getResourceAbsoluteName();
             final ModelNode config = resource.getResourceConfiguration();
             if (config == null) {
@@ -56,7 +57,7 @@ public abstract class UpdateSubsystemConfigurationSubtaskBuilder<S> extends Reso
             final ServerMigrationTaskResult taskResult = updateConfiguration(config, params.getSource(), resource, context, taskEnvironment);
             context.getLogger().infof("Subsystem config %s updated.", configName);
             return taskResult;
-        }));
+        });
     }
 
     protected abstract ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext taskContext, TaskEnvironment taskEnvironment);

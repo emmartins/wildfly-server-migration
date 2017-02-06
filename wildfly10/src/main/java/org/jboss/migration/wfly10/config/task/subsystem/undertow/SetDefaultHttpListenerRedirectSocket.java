@@ -33,19 +33,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  */
 public class SetDefaultHttpListenerRedirectSocket<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
+    public static final String TASK_NAME = "set-default-http-listener-redirect-socket";
     private static final String SERVER_NAME = "default-server";
     private static final String HTTP_LISTENER = "http-listener";
     private static final String HTTP_LISTENER_NAME = "http";
     private static final String REDIRECT_SOCKET_ATTR_NAME = "redirect-socket";
     private static final String REDIRECT_SOCKET_ATTR_VALUE = "https";
 
-    @Override
-    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
-        return new ServerMigrationTaskName.Builder("set-default-http-listener-redirect-socket").build();
+    public SetDefaultHttpListenerRedirectSocket() {
+        super(TASK_NAME);
     }
 
     @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         if (config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME) && !config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME, REDIRECT_SOCKET_ATTR_NAME)) {
             final PathAddress pathAddress = subsystemConfiguration.getResourcePathAddress().append(SERVER, SERVER_NAME).append(HTTP_LISTENER, HTTP_LISTENER_NAME);
             final ModelNode op = Util.getWriteAttributeOperation(pathAddress, REDIRECT_SOCKET_ATTR_NAME, REDIRECT_SOCKET_ATTR_VALUE);

@@ -37,16 +37,16 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 /**
  * @author emmartins
  */
-public abstract class AbstractManageableResource implements ManageableResource {
+public abstract class AbstractManageableResource<P extends ManageableResource> implements ManageableResource {
 
     private final Map<Type, Factory> childResourceFactories = new HashMap<>();
 
     private final String resourceName;
     private final PathAddress pathAddress;
-    private final ManageableResource parent;
+    private final P parent;
     private final ManageableServerConfiguration serverConfiguration;
 
-    protected AbstractManageableResource(String resourceName, PathAddress pathAddress, ManageableResource parent) {
+    protected AbstractManageableResource(String resourceName, PathAddress pathAddress, P parent) {
         this.resourceName = resourceName;
         this.pathAddress = pathAddress != null ? pathAddress : PathAddress.EMPTY_ADDRESS;
         this.parent = parent;
@@ -64,7 +64,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
     }
 
     @Override
-    public ManageableResource getParentResource() {
+    public P getParentResource() {
         return parent;
     }
 
@@ -86,19 +86,19 @@ public abstract class AbstractManageableResource implements ManageableResource {
         childResourceFactories.put(childResourceFactory.getResourceType(), childResourceFactory);
     }
 
-    protected <T extends ManageableResource> Factory<T> getChildResourceFactory(Type<T> resourceType) {
+    protected <T extends ManageableResource> Factory<T, ?> getChildResourceFactory(Type<T> resourceType) {
         return childResourceFactories.get(resourceType);
     }
 
-    protected <T extends ManageableResource> List<Factory<T>> getChildResourceFactories(Class<T> resourceType) {
+    protected <T extends ManageableResource> List<Factory<T, ?>> getChildResourceFactories(Class<T> resourceType) {
         return childResourceFactories.values().stream().filter(factory -> factory.getResourceType().getType().isInstance(resourceType)).collect(toList());
     }
 
-    protected <T extends ManageableResource> List<Factory<?>> getDescendantResourceFactories(Type<T> resourceType) {
+    protected <T extends ManageableResource> List<Factory<?, ?>> getDescendantResourceFactories(Type<T> resourceType) {
         return childResourceFactories.values().stream().filter(factory -> factory.getResourceType().getDescendantTypes().contains(resourceType)).collect(toList());
     }
 
-    protected <T extends ManageableResource> List<Factory<?>> getDescendantResourceFactories(Class<T> resourceType) {
+    protected <T extends ManageableResource> List<Factory<?, ?>> getDescendantResourceFactories(Class<T> resourceType) {
         return childResourceFactories.values().stream().filter(factory -> {
             final Set<Type<?>> descendantTypes = factory.getResourceType().getDescendantTypes();
             for (Type<?> t : descendantTypes) {
@@ -112,13 +112,13 @@ public abstract class AbstractManageableResource implements ManageableResource {
 
     @Override
     public <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) {
-        final Factory<T> factory = getChildResourceFactory(resourceType);
+        final Factory<T, ?> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResource(resourceName) : null;
     }
 
     @Override
     public <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) {
-        final Factory<T> factory = getChildResourceFactory(resourceType);
+        final Factory<T, ?> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResources() : null;
     }
 
@@ -129,12 +129,12 @@ public abstract class AbstractManageableResource implements ManageableResource {
 
     @Override
     public <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) {
-        final List<Factory<T>> factories = getChildResourceFactories(resourceType);
+        final List<Factory<T, ?>> factories = getChildResourceFactories(resourceType);
         if (factories.isEmpty()) {
             return Collections.emptyList();
         } else {
             final List<T> result = new ArrayList<T>();
-            for (Factory<T> factory : factories) {
+            for (Factory<T, ?> factory : factories) {
                 if (resourceName != null) {
                     final T t = factory.getResource(resourceName);
                     if (t != null) {
@@ -161,13 +161,13 @@ public abstract class AbstractManageableResource implements ManageableResource {
 
     @Override
     public <T extends ManageableResource> PathAddress getChildResourcePathAddress(Type<T> resourceType, String resourceName) {
-        final Factory<T> factory = getChildResourceFactory(resourceType);
+        final Factory<T, ?> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResourcePathAddress(resourceName) : null;
     }
 
     @Override
     public void removeResource(Type<?> resourceType, String resourceName) {
-        final Factory<?> factory = getChildResourceFactory(resourceType);
+        final Factory<?, ?> factory = getChildResourceFactory(resourceType);
         if (factory != null) {
             factory.removeResource(resourceName);
         }
@@ -206,7 +206,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
             }
         }*/
         // descendants
-        for(Factory<?> descendantFactory : getDescendantResourceFactories(resourceType)) {
+        for(Factory<?, ?> descendantFactory : getDescendantResourceFactories(resourceType)) {
             for (ManageableResource child : descendantFactory.getResources()) {
                 result.addAll(child.findResources(resourceType, resourceName));
             }
@@ -240,7 +240,7 @@ public abstract class AbstractManageableResource implements ManageableResource {
         }
         */
         // descendants
-        for(Factory<?> descendantFactory : getDescendantResourceFactories(resourceType)) {
+        for(Factory<?, ?> descendantFactory : getDescendantResourceFactories(resourceType)) {
             for (ManageableResource child : descendantFactory.getResources()) {
                 result.addAll(child.findResources(resourceType, resourceName));
             }
@@ -264,16 +264,16 @@ public abstract class AbstractManageableResource implements ManageableResource {
         return pathAddress.hashCode();
     }
 
-    protected static abstract class Factory<T extends ManageableResource> {
+    protected static abstract class Factory<T extends ManageableResource, P extends ManageableResource> {
 
-        protected final ManageableResource parentResource;
+        protected final P parentResource;
         protected final ManageableServerConfiguration serverConfiguration;
 
         protected final PathAddress pathAddressBase;
         protected final String pathElementKey;
         protected final Type<T> resourceType;
 
-        public Factory(Type<T> resourceType, PathAddress pathAddressBase, String pathElementKey, ManageableResource parentResource) {
+        public Factory(Type<T> resourceType, PathAddress pathAddressBase, String pathElementKey, P parentResource) {
             this.resourceType = resourceType;
             this.pathAddressBase = pathAddressBase;
             this.pathElementKey = pathElementKey;

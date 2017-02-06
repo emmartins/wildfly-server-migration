@@ -50,17 +50,16 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompos
 
     public AddPrivateInterfaceTaskBuilder() {
         name("setup-private-interface");
-        skipPolicy((params, name) -> context -> {
-            if (TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(name).isSkipped(context)) {
-                return true;
-            }
-            for (String socketBindingName : SOCKET_BINDING_NAMES) {
-                if (!params.getServerConfiguration().findResources(SocketBindingResource.class, socketBindingName).isEmpty()) {
-                    return false;
-                }
-            }
-            return true;
-        });
+        skipPolicyBuilder(buildParameters -> TaskSkipPolicy.skipIfAnySkips(
+                TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(),
+                context -> {
+                    for (String socketBindingName : SOCKET_BINDING_NAMES) {
+                        if (!buildParameters.getServerConfiguration().findResources(SocketBindingResource.class, socketBindingName).isEmpty()) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }));
         beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
         subtasks(new ServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(new AddInterface<>())
@@ -71,7 +70,7 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompos
     protected static class AddInterface<S> extends ServerConfigurationLeafTask.Builder<S> {
         protected AddInterface() {
             name("add-interface");
-            run((params, taskName) -> context -> {
+            runBuilder(params -> context -> {
                 final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
                 if (serverConfiguration.getInterfaceResourceNames().contains(INTERFACE_NAME)) {
                     context.getLogger().debugf("Skipping task to add private interface, the configuration already has it.");
@@ -95,8 +94,8 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompos
 
     protected static class UpdateSocketBindingGroup<S> extends ResourceLeafTask.Builder<S, SocketBindingGroupResource> {
         protected UpdateSocketBindingGroup() {
-            name(params -> new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", params.getResource().getResourceName()).build());
-            final ResourceTaskRunnableBuilder<S, SocketBindingGroupResource> runnableBuilder = (params, taskName) ->context -> {
+            nameBuilder(params -> new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", params.getResource().getResourceName()).build());
+            final ResourceTaskRunnableBuilder<S, SocketBindingGroupResource> runnableBuilder = params -> context -> {
                 final List<String> updated = new ArrayList<>();
                 for (String socketBinding : SOCKET_BINDING_NAMES) {
                     SocketBindingResource socketBindingResource = params.getResource().getSocketBindingResource(socketBinding);
@@ -119,7 +118,7 @@ public class AddPrivateInterfaceTaskBuilder<S> extends ServerConfigurationCompos
                     return new ServerMigrationTaskResult.Builder().success().addAttribute("updated", updated.toString()).build();
                 }
             };
-            run(runnableBuilder);
+            runBuilder(runnableBuilder);
         }
     }
 }

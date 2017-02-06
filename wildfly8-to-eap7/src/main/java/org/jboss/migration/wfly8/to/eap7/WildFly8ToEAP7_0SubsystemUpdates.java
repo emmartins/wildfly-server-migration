@@ -16,9 +16,8 @@
 
 package org.jboss.migration.wfly8.to.eap7;
 
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemConfigurationTaskBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
@@ -30,11 +29,12 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpL
  */
 public class WildFly8ToEAP7_0SubsystemUpdates {
 
-    public static final UpdateSubsystemTaskFactory INFINISPAN = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.INFINISPAN, ExtensionNames.INFINISPAN)
-            .subtasks(AddServerCache.INSTANCE, FixHibernateCacheModuleName.INSTANCE)
-            .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder INFINISPAN = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.INFINISPAN,
+            new AddServerCache<>(),
+            new FixHibernateCacheModuleName<>());
 
-    public static final UpdateSubsystemTaskFactory UNDERTOW = new UpdateSubsystemTaskFactory.Builder(SubsystemNames.UNDERTOW, ExtensionNames.UNDERTOW)
-            .subtasks(SetDefaultHttpListenerRedirectSocket.INSTANCE, new SetDefaultHostResponseHeaderServer(), new SetDefaultHostResponseHeaderXPoweredBy())
-            .build();
+    public static final UpdateSubsystemConfigurationTaskBuilder UNDERTOW = new UpdateSubsystemConfigurationTaskBuilder(SubsystemNames.UNDERTOW,
+            new SetDefaultHttpListenerRedirectSocket<>(),
+            new SetDefaultHostResponseHeaderServer<>(),
+            new SetDefaultHostResponseHeaderXPoweredBy<>());
 }

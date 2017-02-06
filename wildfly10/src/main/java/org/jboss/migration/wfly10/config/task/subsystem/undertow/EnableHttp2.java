@@ -37,20 +37,19 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EnableHttp2<S> extends UpdateSubsystemConfigurationSubtaskBuilder<S> {
 
-    public static final String TASK_NAME_NAME = "enable-http2";
+    public static final String TASK_NAME = "enable-http2";
 
     private static final String SERVER_NAME = "default-server";
     private static final String HTTP_LISTENER = "http-listener";
     private static final String HTTPS_LISTENER = "https-listener";
     private static final String ENABLE_HTTP2 = "enable-http2";
 
-    @Override
-    public ServerMigrationTaskName getName(S source, SubsystemConfiguration subsystemConfiguration, TaskContext parentContext) {
-        return new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
+    public EnableHttp2() {
+        super(TASK_NAME);
     }
 
     @Override
-    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) throws Exception {
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemConfiguration subsystemConfiguration, TaskContext context, TaskEnvironment taskEnvironment) {
         final PathAddress configPathAddress = subsystemConfiguration.getResourcePathAddress();
         final String configName = subsystemConfiguration.getResourceAbsoluteName();
         final PathAddress serverPathAddress = configPathAddress.append(SERVER, SERVER_NAME);

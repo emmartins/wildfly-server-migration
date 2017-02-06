@@ -69,7 +69,7 @@ public class TestAPI {
             }
         };
 
-        final ServerMigrationTaskName n = new ServerMigrationTaskName.Builder(" ").build();
+        final String n = " ";
         final ServerMigrationTaskName nX = new ServerMigrationTaskName.Builder("X").build();
         final ServerMigrationTaskName nY = new ServerMigrationTaskName.Builder("Y").build();
         final ServerMigrationTaskName nZ = new ServerMigrationTaskName.Builder("Z").build();
@@ -80,7 +80,7 @@ public class TestAPI {
         final ServerMigrationTask t = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
-                return n;
+                return new ServerMigrationTaskName.Builder(n).build();
             }
 
             @Override
@@ -101,40 +101,40 @@ public class TestAPI {
         final BuildParameters.Mapper<ZTaskParams, YTaskParams> pcZY = zTaskParams -> null;
         final BuildParameters.Mapper<ZTaskParams, ZTaskParams> pcZZ = zTaskParams -> null;
 
-        final TaskNameBuilder<BuildParameters> nf = parameters -> n;
+        final TaskNameBuilder<BuildParameters> nf = parameters -> new ServerMigrationTaskName.Builder(n).build();
         final TaskNameBuilder<XTaskParams> nfX = parameters -> nX;
         final TaskNameBuilder<YTaskParams> nfY = parameters -> nY;
         final TaskNameBuilder<ZTaskParams> nfZ = parameters -> nZ;
         final TaskNameBuilder<XYTaskParams> nfXY = parameters -> nXY;
         final TaskNameBuilder<XYTaskParams> nfXYZ = parameters -> nXYZ;
 
-        final TaskSkipPolicy.Builder<BuildParameters> sp = (parameters, taskName) -> context -> true;
-        final TaskSkipPolicy.Builder<XTaskParams> spX = (parameters, taskName) -> context -> false;
-        final TaskSkipPolicy.Builder<YTaskParams> spY = (parameters, taskName) -> context -> false;
-        final TaskSkipPolicy.Builder<ZTaskParams> spZ = (parameters, taskName) -> context -> false;
-        final TaskSkipPolicy.Builder<XYTaskParams> spXY = (parameters, taskName) -> context -> true;
-        final TaskSkipPolicy.Builder<XYZTaskParams> spXYZ = (parameters, taskName) -> context -> true;
+        final TaskSkipPolicy sp = context -> true;
+        final TaskSkipPolicy.Builder<XTaskParams> spX = parameters -> context -> false;
+        final TaskSkipPolicy.Builder<YTaskParams> spY = parameters -> context -> false;
+        final TaskSkipPolicy.Builder<ZTaskParams> spZ = parameters -> context -> false;
+        final TaskSkipPolicy.Builder<XYTaskParams> spXY = parameters -> context -> true;
+        final TaskSkipPolicy.Builder<XYZTaskParams> spXYZ = parameters -> context -> true;
 
-        final BeforeTaskRun.Builder<BuildParameters> br = (parameters, taskName) -> context -> {};
-        final BeforeTaskRun.Builder<XTaskParams> brX = (parameters, taskName) -> context -> {};
-        final BeforeTaskRun.Builder<YTaskParams> brY = (parameters, taskName) -> context -> {};
-        final BeforeTaskRun.Builder<ZTaskParams> brZ = (parameters, taskName) -> context -> {};
-        final BeforeTaskRun.Builder<XYTaskParams> brXY = (parameters, taskName) -> context -> {};
-        final BeforeTaskRun.Builder<XYZTaskParams> brXYZ = (parameters, taskName) -> context -> {};
+        final BeforeTaskRun br = context -> {};
+        final BeforeTaskRun.Builder<XTaskParams> brX = parameters -> context -> {};
+        final BeforeTaskRun.Builder<YTaskParams> brY = parameters -> context -> {};
+        final BeforeTaskRun.Builder<ZTaskParams> brZ = parameters -> context -> {};
+        final BeforeTaskRun.Builder<XYTaskParams> brXY = parameters -> context -> {};
+        final BeforeTaskRun.Builder<XYZTaskParams> brXYZ = parameters -> context -> {};
 
-        final TaskRunnable.Builder<BuildParameters> rf = (parameters, name) -> r;
-        final TaskRunnable.Builder<XTaskParams> rfX = (parameters, name) -> r;
-        final TaskRunnable.Builder<YTaskParams> rfY = (parameters, name) -> r;
-        final TaskRunnable.Builder<ZTaskParams> rfZ = (parameters, name) -> r;
-        final TaskRunnable.Builder<XYTaskParams> rfXY = (parameters, name) -> r;
-        final TaskRunnable.Builder<XYZTaskParams> rfXYZ = (parameters, name) -> r;
+        final TaskRunnable.Builder<BuildParameters> rf = parameters -> r;
+        final TaskRunnable.Builder<XTaskParams> rfX = parameters -> r;
+        final TaskRunnable.Builder<YTaskParams> rfY = parameters -> r;
+        final TaskRunnable.Builder<ZTaskParams> rfZ = parameters -> r;
+        final TaskRunnable.Builder<XYTaskParams> rfXY = parameters -> r;
+        final TaskRunnable.Builder<XYZTaskParams> rfXYZ = parameters -> r;
 
-        final AfterTaskRun.Builder<BuildParameters> ar = (parameters, taskName) -> context -> {};
-        final AfterTaskRun.Builder<XTaskParams> arX = (parameters, taskName) -> context -> {};
-        final AfterTaskRun.Builder<YTaskParams> arY = (parameters, taskName) -> context -> {};
-        final AfterTaskRun.Builder<ZTaskParams> arZ = (parameters, taskName) -> context -> {};
-        final AfterTaskRun.Builder<XYTaskParams> arXY = (parameters, taskName) -> context -> {};
-        final AfterTaskRun.Builder<XYZTaskParams> arXYZ = (parameters, taskName) -> context -> {};
+        final AfterTaskRun ar = context -> {};
+        final AfterTaskRun.Builder<XTaskParams> arX = parameters -> context -> {};
+        final AfterTaskRun.Builder<YTaskParams> arY = parameters -> context -> {};
+        final AfterTaskRun.Builder<ZTaskParams> arZ = parameters -> context -> {};
+        final AfterTaskRun.Builder<XYTaskParams> arXY = parameters -> context -> {};
+        final AfterTaskRun.Builder<XYZTaskParams> arXYZ = parameters -> context -> {};
 
         // builders
 
@@ -157,191 +157,191 @@ public class TestAPI {
 
         lb
                 .name(n)
-                .name(nf)
+                .nameBuilder(nf)
                 .name(n)
-                .name(nf)
+                .nameBuilder(nf)
                 .skipPolicy(sp)
                 .beforeRun(br)
                 .run(r)
-                .run(rf)
+                .runBuilder(rf)
                 .run(r)
-                .run(rf)
+                .runBuilder(rf)
                 .afterRun(ar);
 
         lb
-                .name(nf)
+                .nameBuilder(nf)
                 .name(n)
-                .name(nf)
+                .nameBuilder(nf)
                 .name(n)
                 .skipPolicy(sp)
                 .beforeRun(br)
-                .run(rf)
+                .runBuilder(rf)
                 .run(r)
-                .run(rf)
+                .runBuilder(rf)
                 .run(r)
                 .afterRun(ar);
 
         lbX
                 .name(n)
-                .name(nf)
-                .name(nfX)
+                .nameBuilder(nf)
+                .nameBuilder(nfX)
                 .skipPolicy(sp)
-                .skipPolicy(spX)
+                .skipPolicyBuilder(spX)
                 .beforeRun(br)
-                .beforeRun(brX)
+                .beforeRunBuilder(brX)
                 .run(r)
-                .run(rf)
-                .run(rfX)
-                .run(pcXX, rfX)
-                .run(pcXY, rfY)
-                .run(pcXZ, rfZ)
+                .runBuilder(rf)
+                .runBuilder(rfX)
+                .runBuilder(pcXX, rfX)
+                .runBuilder(pcXY, rfY)
+                .runBuilder(pcXZ, rfZ)
                 .afterRun(ar)
-                .afterRun(arX);
+                .afterRunBuilder(arX);
 
         lbY
-                .name(nfY)
-                .name(nf)
+                .nameBuilder(nfY)
+                .nameBuilder(nf)
                 .name(n)
-                .skipPolicy(spY)
+                .skipPolicyBuilder(spY)
                 .skipPolicy(sp)
-                .beforeRun(brY)
+                .beforeRunBuilder(brY)
                 .beforeRun(br)
-                .run(pcYX, rfX)
-                .run(pcYY, rfY)
-                .run(pcYZ, rfZ)
-                .run(rfY)
-                .run(rf)
+                .runBuilder(pcYX, rfX)
+                .runBuilder(pcYY, rfY)
+                .runBuilder(pcYZ, rfZ)
+                .runBuilder(rfY)
+                .runBuilder(rf)
                 .run(r)
-                .afterRun(arY)
+                .afterRunBuilder(arY)
                 .afterRun(ar);
 
         lbZ
-                .name(nfZ)
-                .skipPolicy(spZ)
-                .beforeRun(brZ)
-                .run(pcZX, rfX)
-                .run(pcZY, rfY)
-                .run(pcZZ, rfZ)
-                .run(rfZ)
-                .afterRun(arZ);
+                .nameBuilder(nfZ)
+                .skipPolicyBuilder(spZ)
+                .beforeRunBuilder(brZ)
+                .runBuilder(pcZX, rfX)
+                .runBuilder(pcZY, rfY)
+                .runBuilder(pcZZ, rfZ)
+                .runBuilder(rfZ)
+                .afterRunBuilder(arZ);
 
         lbXY
                 .name(n)
-                .name(nf)
-                .name(nfX)
-                .name(nfY)
-                .name(nfXY)
+                .nameBuilder(nf)
+                .nameBuilder(nfX)
+                .nameBuilder(nfY)
+                .nameBuilder(nfXY)
                 .skipPolicy(sp)
-                .skipPolicy(spX)
-                .skipPolicy(spY)
-                .skipPolicy(spXY)
+                .skipPolicyBuilder(spX)
+                .skipPolicyBuilder(spY)
+                .skipPolicyBuilder(spXY)
                 .beforeRun(br)
-                .beforeRun(brX)
-                .beforeRun(brY)
-                .beforeRun(brXY)
+                .beforeRunBuilder(brX)
+                .beforeRunBuilder(brY)
+                .beforeRunBuilder(brXY)
                 .run(r)
-                .run(rf)
-                .run(rfX)
-                .run(rfY)
-                .run(rfXY)
+                .runBuilder(rf)
+                .runBuilder(rfX)
+                .runBuilder(rfY)
+                .runBuilder(rfXY)
                 .afterRun(ar)
-                .afterRun(arX)
-                .afterRun(arY)
-                .afterRun(arXY);
+                .afterRunBuilder(arX)
+                .afterRunBuilder(arY)
+                .afterRunBuilder(arXY);
 
         lbXYZ
                 .name(n)
-                .name(nf)
-                .name(nfX)
-                .name(nfY)
-                .name(nfZ)
-                .name(nfXY)
-                .name(nfXYZ)
+                .nameBuilder(nf)
+                .nameBuilder(nfX)
+                .nameBuilder(nfY)
+                .nameBuilder(nfZ)
+                .nameBuilder(nfXY)
+                .nameBuilder(nfXYZ)
                 .skipPolicy(sp)
-                .skipPolicy(spX)
-                .skipPolicy(spY)
-                .skipPolicy(spZ)
-                .skipPolicy(spXY)
-                .skipPolicy(spXYZ)
+                .skipPolicyBuilder(spX)
+                .skipPolicyBuilder(spY)
+                .skipPolicyBuilder(spZ)
+                .skipPolicyBuilder(spXY)
+                .skipPolicyBuilder(spXYZ)
                 .beforeRun(br)
-                .beforeRun(brX)
-                .beforeRun(brY)
-                .beforeRun(brZ)
-                .beforeRun(brXY)
-                .beforeRun(brXYZ)
+                .beforeRunBuilder(brX)
+                .beforeRunBuilder(brY)
+                .beforeRunBuilder(brZ)
+                .beforeRunBuilder(brXY)
+                .beforeRunBuilder(brXYZ)
                 .run(r)
-                .run(rf)
-                .run(rfX)
-                .run(rfY)
-                .run(rfZ)
-                .run(rfXY)
-                .run(rfXYZ)
+                .runBuilder(rf)
+                .runBuilder(rfX)
+                .runBuilder(rfY)
+                .runBuilder(rfZ)
+                .runBuilder(rfXY)
+                .runBuilder(rfXYZ)
                 .afterRun(ar)
-                .afterRun(arX)
-                .afterRun(arY)
-                .afterRun(arZ)
-                .afterRun(arXY)
-                .afterRun(arXYZ);
+                .afterRunBuilder(arX)
+                .afterRunBuilder(arY)
+                .afterRunBuilder(arZ)
+                .afterRunBuilder(arXY)
+                .afterRunBuilder(arXYZ);
 
         cb
                 .name(n)
-                .name(nf)
+                .nameBuilder(nf)
                 .name(n)
-                .name(nf)
+                .nameBuilder(nf)
                 .skipPolicy(sp)
                 .beforeRun(br)
                 .subtasks(new CompositeSubtasks.Builder<>()
                         .subtask(t)
                         .subtask(lb)
-                        .subtask(cb.clone())
+                        //.subtask(cb.clone())
                         .subtask(lb)
                         .subtask(t))
                 .afterRun(ar);
 
         cbX
                 .name(n)
-                .name(nf)
-                .name(nfX)
+                .nameBuilder(nf)
+                .nameBuilder(nfX)
                 .skipPolicy(sp)
-                .skipPolicy(spX)
+                .skipPolicyBuilder(spX)
                 .beforeRun(br)
-                .beforeRun(brX)
+                .beforeRunBuilder(brX)
                 .subtasks(new CompositeSubtasks.Builder<XTaskParams>()
                         .subtask(t)
                         .subtask(lb)
                         .subtask(lbX)
                         .subtask(cb)
-                        .subtask(cbX.clone())
+                        //.subtask(cbX.clone())
                         .subtask(pcXX, lbX)
                         .subtask(pcXY, lbY)
                         .subtask(pcXZ, lbZ))
                 .afterRun(ar)
-                .afterRun(arX);
+                .afterRunBuilder(arX);
 
         cbY
-                .name(nfY)
-                .name(nf)
+                .nameBuilder(nfY)
+                .nameBuilder(nf)
                 .name(n)
-                .skipPolicy(spY)
+                .skipPolicyBuilder(spY)
                 .skipPolicy(sp)
-                .beforeRun(brY)
+                .beforeRunBuilder(brY)
                 .beforeRun(br)
                 .subtasks(new CompositeSubtasks.Builder<YTaskParams>()
                         .subtask(pcYX, lbX)
                         .subtask(pcYY, lbY)
                         .subtask(pcYZ, lbZ)
-                        .subtask(cbY.clone())
+                        //.subtask(cbY.clone())
                         .subtask(cb)
                         .subtask(lbY)
                         .subtask(lb)
                         .subtask(t))
-                .afterRun(arY)
+                .afterRunBuilder(arY)
                 .afterRun(ar);
 
         cbZ
-                .name(nfZ)
-                .skipPolicy(spZ)
-                .beforeRun(brZ)
+                .nameBuilder(nfZ)
+                .skipPolicyBuilder(spZ)
+                .beforeRunBuilder(brZ)
                 .subtasks(new CompositeSubtasks.Builder<ZTaskParams>()
                         .subtask(t)
                         .subtask(pcZX, lbX)
@@ -349,22 +349,22 @@ public class TestAPI {
                         .subtask(pcZZ, lbZ)
                         .subtask(lbZ)
                         .subtask(cb))
-                .afterRun(arZ);
+                .afterRunBuilder(arZ);
 
         cbXY
                 .name(n)
-                .name(nf)
-                .name(nfX)
-                .name(nfY)
-                .name(nfXY)
+                .nameBuilder(nf)
+                .nameBuilder(nfX)
+                .nameBuilder(nfY)
+                .nameBuilder(nfXY)
                 .skipPolicy(sp)
-                .skipPolicy(spX)
-                .skipPolicy(spY)
-                .skipPolicy(spXY)
+                .skipPolicyBuilder(spX)
+                .skipPolicyBuilder(spY)
+                .skipPolicyBuilder(spXY)
                 .beforeRun(br)
-                .beforeRun(brX)
-                .beforeRun(brY)
-                .beforeRun(brXY)
+                .beforeRunBuilder(brX)
+                .beforeRunBuilder(brY)
+                .beforeRunBuilder(brXY)
                 .subtasks(new CompositeSubtasks.Builder<XYTaskParams>()
                         .subtask(t)
                         .subtask(lb)
@@ -374,32 +374,33 @@ public class TestAPI {
                         .subtask(cb)
                         .subtask(cbX)
                         .subtask(cbY)
-                        .subtask(cbXY.clone()))
+                        //.subtask(cbXY.clone())
+                )
                 .afterRun(ar)
-                .afterRun(arX)
-                .afterRun(arY)
-                .afterRun(arXY);
+                .afterRunBuilder(arX)
+                .afterRunBuilder(arY)
+                .afterRunBuilder(arXY);
 
         cbXYZ
                 .name(n)
-                .name(nf)
-                .name(nfX)
-                .name(nfY)
-                .name(nfZ)
-                .name(nfXY)
-                .name(nfXYZ)
+                .nameBuilder(nf)
+                .nameBuilder(nfX)
+                .nameBuilder(nfY)
+                .nameBuilder(nfZ)
+                .nameBuilder(nfXY)
+                .nameBuilder(nfXYZ)
                 .skipPolicy(sp)
-                .skipPolicy(spX)
-                .skipPolicy(spY)
-                .skipPolicy(spZ)
-                .skipPolicy(spXY)
-                .skipPolicy(spXYZ)
+                .skipPolicyBuilder(spX)
+                .skipPolicyBuilder(spY)
+                .skipPolicyBuilder(spZ)
+                .skipPolicyBuilder(spXY)
+                .skipPolicyBuilder(spXYZ)
                 .beforeRun(br)
-                .beforeRun(brX)
-                .beforeRun(brY)
-                .beforeRun(brZ)
-                .beforeRun(brXY)
-                .beforeRun(brXYZ)
+                .beforeRunBuilder(brX)
+                .beforeRunBuilder(brY)
+                .beforeRunBuilder(brZ)
+                .beforeRunBuilder(brXY)
+                .beforeRunBuilder(brXYZ)
                 .subtasks(new CompositeSubtasks.Builder<XYZTaskParams>()
                         .subtask(t)
                         .subtask(lb)
@@ -413,13 +414,14 @@ public class TestAPI {
                         .subtask(cbY)
                         .subtask(cbZ)
                         .subtask(cbXY)
-                        .subtask(cbXYZ.clone()))
+                        //.subtask(cbXYZ.clone())
+                )
                 .afterRun(ar)
-                .afterRun(arX)
-                .afterRun(arY)
-                .afterRun(arZ)
-                .afterRun(arXY)
-                .afterRun(arXYZ);
+                .afterRunBuilder(arX)
+                .afterRunBuilder(arY)
+                .afterRunBuilder(arZ)
+                .afterRunBuilder(arXY)
+                .afterRunBuilder(arXYZ);
 
         // tasks
         lb.build(BuildParameters.NONE);
