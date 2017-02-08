@@ -16,14 +16,13 @@
 package org.jboss.migration.wfly9;
 
 import org.jboss.migration.core.AbstractServerProvider;
-import org.jboss.migration.core.ServerMigrationFailureException;
-import org.jboss.migration.core.jboss.JBossServer;
-import org.jboss.migration.core.jboss.ManifestProductInfo;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.ManifestProductInfo;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**

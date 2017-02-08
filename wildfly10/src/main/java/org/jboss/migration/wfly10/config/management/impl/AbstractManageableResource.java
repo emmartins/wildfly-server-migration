@@ -20,6 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
+import org.jboss.migration.wfly10.config.management.ManageableResourceType;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 
@@ -39,7 +40,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public abstract class AbstractManageableResource<P extends ManageableResource> implements ManageableResource {
 
-    private final Map<Type, Factory> childResourceFactories = new HashMap<>();
+    private final Map<ManageableResourceType, Factory> childResourceFactories = new HashMap<>();
 
     private final String resourceName;
     private final PathAddress pathAddress;
@@ -86,22 +87,22 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
         childResourceFactories.put(childResourceFactory.getResourceType(), childResourceFactory);
     }
 
-    protected <T extends ManageableResource> Factory<T, ?> getChildResourceFactory(Type<T> resourceType) {
+    protected <T extends ManageableResource> Factory<T, ?> getChildResourceFactory(ManageableResourceType resourceType) {
         return childResourceFactories.get(resourceType);
     }
 
-    protected <T extends ManageableResource> List<Factory<T, ?>> getChildResourceFactories(Class<T> resourceType) {
+    protected <T extends ManageableResource> List<Factory> getChildResourceFactories(Class<T> resourceType) {
         return childResourceFactories.values().stream().filter(factory -> factory.getResourceType().getType().isInstance(resourceType)).collect(toList());
     }
 
-    protected <T extends ManageableResource> List<Factory<?, ?>> getDescendantResourceFactories(Type<T> resourceType) {
+    protected <T extends ManageableResource> List<Factory> getDescendantResourceFactories(ManageableResourceType resourceType) {
         return childResourceFactories.values().stream().filter(factory -> factory.getResourceType().getDescendantTypes().contains(resourceType)).collect(toList());
     }
 
-    protected <T extends ManageableResource> List<Factory<?, ?>> getDescendantResourceFactories(Class<T> resourceType) {
+    protected <T extends ManageableResource> List<Factory> getDescendantResourceFactories(Class<T> resourceType) {
         return childResourceFactories.values().stream().filter(factory -> {
-            final Set<Type<?>> descendantTypes = factory.getResourceType().getDescendantTypes();
-            for (Type<?> t : descendantTypes) {
+            final Set<ManageableResourceType> descendantTypes = factory.getResourceType().getDescendantTypes();
+            for (ManageableResourceType t : descendantTypes) {
                 if (t.getType().isInstance(resourceType)) {
                     return true;
                 }
@@ -111,13 +112,13 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
     }
 
     @Override
-    public <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) {
+    public <T extends ManageableResource> T getChildResource(ManageableResourceType resourceType, String resourceName) {
         final Factory<T, ?> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResource(resourceName) : null;
     }
 
     @Override
-    public <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) {
+    public <T extends ManageableResource> List<T> getChildResources(ManageableResourceType resourceType) {
         final Factory<T, ?> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResources() : null;
     }
@@ -129,7 +130,7 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
 
     @Override
     public <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) {
-        final List<Factory<T, ?>> factories = getChildResourceFactories(resourceType);
+        final List<Factory> factories = getChildResourceFactories(resourceType);
         if (factories.isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -149,24 +150,24 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
     }
 
     @Override
-    public Set<Type<?>> getChildResourceTypes() {
+    public Set<ManageableResourceType> getChildResourceTypes() {
         return Collections.unmodifiableSet(childResourceFactories.keySet());
     }
 
     @Override
-    public Set<String> getChildResourceNames(Type<?> resourceType) {
+    public Set<String> getChildResourceNames(ManageableResourceType resourceType) {
         final Factory factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResourceNames() : null;
     }
 
     @Override
-    public <T extends ManageableResource> PathAddress getChildResourcePathAddress(Type<T> resourceType, String resourceName) {
+    public <T extends ManageableResource> PathAddress getChildResourcePathAddress(ManageableResourceType resourceType, String resourceName) {
         final Factory<T, ?> factory = getChildResourceFactory(resourceType);
         return factory != null ? factory.getResourcePathAddress(resourceName) : null;
     }
 
     @Override
-    public void removeResource(Type<?> resourceType, String resourceName) {
+    public void removeResource(ManageableResourceType resourceType, String resourceName) {
         final Factory<?, ?> factory = getChildResourceFactory(resourceType);
         if (factory != null) {
             factory.removeResource(resourceName);
@@ -181,12 +182,12 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
     }
 
     @Override
-    public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) {
+    public <T extends ManageableResource> Set<T> findResources(ManageableResourceType resourceType) {
         return findResources(resourceType, null);
     }
 
     @Override
-    public <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) {
+    public <T extends ManageableResource> Set<T> findResources(ManageableResourceType resourceType, String resourceName) {
         final Set<T> result = new HashSet<>();
         // this
         if (resourceType.equals(getResourceType()) && (resourceName == null || resourceName.equals(getResourceName()))) {
@@ -264,16 +265,16 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
         return pathAddress.hashCode();
     }
 
-    protected static abstract class Factory<T extends ManageableResource, P extends ManageableResource> {
+    protected abstract static class Factory<T extends ManageableResource, P extends ManageableResource> {
 
         protected final P parentResource;
         protected final ManageableServerConfiguration serverConfiguration;
 
         protected final PathAddress pathAddressBase;
         protected final String pathElementKey;
-        protected final Type<T> resourceType;
+        protected final ManageableResourceType resourceType;
 
-        public Factory(Type<T> resourceType, PathAddress pathAddressBase, String pathElementKey, P parentResource) {
+        public Factory(ManageableResourceType resourceType, PathAddress pathAddressBase, String pathElementKey, P parentResource) {
             this.resourceType = resourceType;
             this.pathAddressBase = pathAddressBase;
             this.pathElementKey = pathElementKey;
@@ -333,7 +334,7 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
             serverConfiguration.executeManagementOperation(op);
         }
 
-        public Type<T> getResourceType() {
+        public ManageableResourceType getResourceType() {
             return resourceType;
         }
 

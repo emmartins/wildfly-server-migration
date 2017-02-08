@@ -46,7 +46,7 @@ public class CompositeSubtasks<P extends BuildParameters> implements TaskRunnabl
         return result.build();
     }
 
-    public static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> implements CompositeSubtasksBuilder<P, T> {
+    public abstract static class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> implements CompositeSubtasksBuilder<P, T> {
 
         private final List<TaskRunnable.Builder<? super P>> builders = new ArrayList<>();
 

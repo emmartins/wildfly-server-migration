@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface ProfileResource extends ManageableResource, SubsystemConfiguration.Parent {
 
-    Type<ProfileResource> RESOURCE_TYPE = new Type<>(ProfileResource.class, SubsystemConfiguration.RESOURCE_TYPE);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(ProfileResource.class, SubsystemConfiguration.RESOURCE_TYPE);
 
     @Override
-    default Type<ProfileResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

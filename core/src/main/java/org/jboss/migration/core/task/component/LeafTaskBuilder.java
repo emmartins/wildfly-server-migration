@@ -28,6 +28,6 @@ public interface LeafTaskBuilder<P extends BuildParameters, T extends LeafTaskBu
     T runBuilder(TaskRunnable.Builder<? super P> builder);
 
     default <Q extends BuildParameters> T runBuilder(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
-        return runBuilder(TaskRunnable.Builder.from(pqMapper, qBuilder));
+        return runBuilder(TaskRunnable.Builder.of(pqMapper, qBuilder));
     }
 }

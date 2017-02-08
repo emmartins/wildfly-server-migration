@@ -24,10 +24,9 @@ import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -35,7 +34,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Set socket binding's multicast address as value expressions.
  * @author emmartins
  */
-public class AddSocketBindingMulticastAddressExpressions<S> extends ServerConfigurationCompositeTask.Builder<S> {
+public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     public static final String[] SOCKET_BINDINGS = {
             "modcluster"
@@ -44,7 +43,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ServerConfig
     public AddSocketBindingMulticastAddressExpressions() {
         name("add-socket-binding-multicast-address-expressions");
         beforeRun(context -> context.getLogger().infof("Adding socket binding's multicast address expressions..."));
-        final ServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ServerConfigurationCompositeSubtasks.Builder<>();
+        final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
         for (String socketBinding : SOCKET_BINDINGS) {
             subtasks.subtask(SocketBindingResource.class, socketBinding, new AddSocketBindingMulticastAddressExpression<S>(socketBinding));
         }
@@ -58,7 +57,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ServerConfig
         });
     }
 
-    public static class AddSocketBindingMulticastAddressExpression<S> extends ResourceLeafTask.Builder<S, SocketBindingResource> {
+    public static class AddSocketBindingMulticastAddressExpression<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingResource> {
 
         protected AddSocketBindingMulticastAddressExpression(String resourceName) {
             this(resourceName, "jboss."+resourceName+".multicast.adress");

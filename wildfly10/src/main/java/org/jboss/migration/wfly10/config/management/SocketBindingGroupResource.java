@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface SocketBindingGroupResource extends ManageableResource, SocketBindingResource.Parent {
 
-    Type<SocketBindingGroupResource> RESOURCE_TYPE = new Type<>(SocketBindingGroupResource.class, SocketBindingResource.RESOURCE_TYPE);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(SocketBindingGroupResource.class, SocketBindingResource.RESOURCE_TYPE);
 
     @Override
-    default Type<SocketBindingGroupResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

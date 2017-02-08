@@ -65,7 +65,7 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
 
     public static class HostConfigFileMigrationFactory implements HostMigration.HostConfigurationProvider {
         @Override
-        public EmbeddedHostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) throws Exception {
+        public EmbeddedHostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) {
             return new EmbeddedHostConfiguration(hostController, host);
         }
     }

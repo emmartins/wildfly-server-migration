@@ -15,13 +15,12 @@
  */
 package org.jboss.migration.wfly10;
 
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.wfly10.config.task.ServerMigrationParameters;
+import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 
 import java.nio.file.Path;
 
@@ -44,19 +43,8 @@ public abstract class WildFlyServer10 extends JBossServer<WildFlyServer10> {
     @Override
     public ServerMigrationTaskResult migrate(Server source, TaskContext context) throws IllegalArgumentException {
         final WildFlyServerMigration10 migration = getMigration(source);
-        final ServerMigrationParameters<Server> serverMigrationParameters = new ServerMigrationParameters<Server>() {
-            @Override
-            public Server getSourceServer() {
-                return source;
-            }
-
-            @Override
-            public WildFlyServer10 getTargetServer() {
-                return WildFlyServer10.this;
-            }
-        };
         if (migration != null) {
-            return migration.build(serverMigrationParameters, context.getTaskName()).run(context);
+            return migration.run(source, this, context);
         } else {
             return super.migrate(source, context);
         }

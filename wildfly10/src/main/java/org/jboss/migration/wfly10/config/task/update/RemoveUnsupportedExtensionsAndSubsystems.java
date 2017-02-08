@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
@@ -29,7 +28,6 @@ import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 import org.jboss.migration.wfly10.config.task.subsystem.Extension;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SupportedExtensions;
 import org.jboss.migration.wfly10.config.task.subsystem.Subsystem;
 
 import javax.xml.namespace.QName;
@@ -50,10 +48,6 @@ import java.util.Set;
  */
 public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<S> {
 
-    public static final RemoveUnsupportedExtensionsAndSubsystems INSTANCE = new RemoveUnsupportedExtensionsAndSubsystems.Builder()
-            .extensions(SupportedExtensions.all())
-            .build();
-
     public static final ServerMigrationTaskName XML_CONFIG_SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("remove-unsupported-subsystems").build();
     public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM = "remove-unsupported-subsystem";
     public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION = "remove-unsupported-extension";
@@ -62,7 +56,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
 
     private final List<Extension> supportedExtensions;
 
-    protected RemoveUnsupportedExtensionsAndSubsystems(Builder builder) {
+    protected RemoveUnsupportedExtensionsAndSubsystems(Builder<S> builder) {
         this.supportedExtensions = Collections.unmodifiableList(builder.supportedExtensions);
     }
 
@@ -84,7 +78,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         };
     }
 
-    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) throws ServerMigrationFailureException {
+    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) {
         final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
         final List<Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();
@@ -92,7 +86,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         // setup the extensions filter
         final XMLFileFilter extensionsFilter = new XMLFileFilter() {
             @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws ServerMigrationFailureException {
+            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) {
                 if (startElement.getName().getLocalPart().equals("extension")) {
                     Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
                     final String moduleName = moduleAttr.getValue();
@@ -127,7 +121,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         // setup subsystems filter
         final XMLFileFilter subsystemsFilter = new XMLFileFilter() {
             @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws ServerMigrationFailureException {
+            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) {
                 if (startElement.getName().getLocalPart().equals("subsystem")) {
                     final String namespaceURI = startElement.getName().getNamespaceURI();
                     // keep if the namespace uri starts with a supported subsystem's namespace without version
@@ -213,7 +207,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         }
 
         public RemoveUnsupportedExtensionsAndSubsystems<S> build() {
-            return new RemoveUnsupportedExtensionsAndSubsystems<S>(this);
+            return new RemoveUnsupportedExtensionsAndSubsystems<>(this);
         }
     }
 }

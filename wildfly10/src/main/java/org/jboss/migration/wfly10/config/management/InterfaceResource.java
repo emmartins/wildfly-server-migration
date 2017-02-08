@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface InterfaceResource extends ManageableResource {
 
-    Type<InterfaceResource> RESOURCE_TYPE = new Type<>(InterfaceResource.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(InterfaceResource.class);
 
     @Override
-    default Type<InterfaceResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

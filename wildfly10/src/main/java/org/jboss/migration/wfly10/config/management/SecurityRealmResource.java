@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface SecurityRealmResource extends ManageableResource {
 
-    Type<SecurityRealmResource> RESOURCE_TYPE = new Type<>(SecurityRealmResource.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(SecurityRealmResource.class);
 
     @Override
-    default Type<SecurityRealmResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

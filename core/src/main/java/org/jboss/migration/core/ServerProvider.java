@@ -31,7 +31,7 @@ public interface ServerProvider {
      * @param baseDir the server's base directory.
      * @param migrationEnvironment
      * @return null if the specified base directory is not the base directory of the provider's server.
-     * @throws ServerMigrationFailureException if the server failed to retrieve.
+     * @throws ServerMigrationFailureException if there was a failure retrieving the server
      */
     Server getServer(String migrationName, Path baseDir, MigrationEnvironment migrationEnvironment) throws ServerMigrationFailureException;
 

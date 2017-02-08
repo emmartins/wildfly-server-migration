@@ -16,19 +16,24 @@
 
 package org.jboss.migration.wfly10.config.task;
 
-import org.jboss.migration.core.task.AbstractServerMigrationTask;
-import org.jboss.migration.core.task.ParentServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.HostResources;
+import org.jboss.migration.wfly10.config.management.HostResource;
+import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.impl.EmbeddedHostConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.HostsManagementTaskFactory;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParametersImpl;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceComponentTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesComponentTaskBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,74 +52,51 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
     protected final HostConfigurationProvider hostConfigurationProvider;
     protected final List<HostConfigurationTaskFactory<S>> subtaskFactories;
 
-    protected HostMigration(Builder builder) {
+    protected HostMigration(Builder<S> builder) {
         this.hostConfigurationProvider = builder.hostConfigurationProvider;
         this.subtaskFactories = Collections.unmodifiableList(builder.subtaskFactories);
     }
 
-    protected ServerMigrationTask getResourceSubtask(final String resourceName, final S source, final HostResources resourceManagement) throws Exception {
-        final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(HOST).addAttribute(MIGRATION_REPORT_TASK_ATTR_NAME, resourceName).build();
-        return new ServerMigrationTask() {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return subtaskName;
-            }
-
-            @Override
-            public ServerMigrationTaskResult run(final TaskContext context) throws Exception {
-                context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-                context.getLogger().infof("Migrating host %s in host configuration %s ...", resourceName, source);
-                final HostConfiguration hostConfiguration = hostConfigurationProvider.getHostConfiguration(resourceName, resourceManagement.getHostControllerConfiguration());
-                hostConfiguration.start();
-                try {
-                    for (HostConfigurationTaskFactory<S> subtaskFactory : subtaskFactories) {
-                        final ServerMigrationTask subtask = subtaskFactory.getTask(source, hostConfiguration);
-                        if (subtask != null) {
-                            context.execute(subtask);
-                        }
-                    }
-                } finally {
-                    hostConfiguration.stop();
-                    context.getLogger().infof("Migration of host %s in host configuration %s done.", resourceName, source);
-                }
-                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
-            }
-        };
+    @Override
+    public ServerMigrationTask getTask(final S source, final HostResource.Parent hostsManagement) {
+        return new ManageableResourceCompositeTask.Builder<S, HostResource.Parent>()
+                .name(HOSTS)
+                .beforeRun(context -> context.getLogger().infof("Hosts migration starting..."))
+                .subtasks(new ManageableResourceCompositeSubtasks.Builder<S, HostResource.Parent>().subtask(HostResource.class, getSubtask()))
+                .afterRun(context -> context.getLogger().infof("Hosts migration done."))
+                .build(new ManageableResourceBuildParametersImpl<>(source, hostsManagement));
     }
 
-    @Override
-    public ServerMigrationTask getTask(final S source, final HostResources hostResources) throws Exception {
-        final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(HOSTS).build();
-        return new ParentServerMigrationTask.Builder(taskName)
-                .listener(new AbstractServerMigrationTask.Listener() {
-                    @Override
-                    public void started(TaskContext context) {
-                        context.getLogger().infof("Hosts migration starting...");
-                    }
-                    @Override
-                    public void done(TaskContext context) {
-                        context.getLogger().infof("Hosts migration done.");
-                    }
+    protected ManageableResourceComponentTaskBuilder<S, HostResource, ?> getSubtask() {
+        return new ManageableResourceLeafTask.Builder<S, HostResource>()
+                .nameBuilder(parameters -> new ServerMigrationTaskName.Builder(HOST).addAttribute(MIGRATION_REPORT_TASK_ATTR_NAME, parameters.getResource().getResourceName()).build())
+                .beforeRunBuilder(parameters -> context -> {
+                    context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                    context.getLogger().infof("Migrating host %s in host configuration %s ...", parameters.getResource().getResourceName(), parameters.getSource());
                 })
-                .subtask(new ParentServerMigrationTask.SubtaskExecutor() {
-                    @Override
-                    public void executeSubtasks(TaskContext context) throws Exception {
-                        for (String resourceName : hostResources.getResourceNames()) {
-                            final ServerMigrationTask subtask = getResourceSubtask(resourceName, source, hostResources);
+                .afterRunBuilder(parameters -> context -> context.getLogger().infof("Migration of host %s in host configuration %s done.", parameters.getResource().getResourceName(), parameters.getSource()))
+                .runBuilder(params -> context -> {
+                    final HostConfiguration hostConfiguration = hostConfigurationProvider.getHostConfiguration(params.getResource().getResourceName(), (HostControllerConfiguration) params.getResource().getServerConfiguration());
+                    hostConfiguration.start();
+                    try {
+                        for (HostConfigurationTaskFactory<S> subtaskFactory : subtaskFactories) {
+                            final ServerMigrationTask subtask = subtaskFactory.getTask(params.getSource(), hostConfiguration);
                             if (subtask != null) {
                                 context.execute(subtask);
                             }
                         }
+                    } finally {
+                        hostConfiguration.stop();
                     }
-                })
-                .build();
+                    return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+                });
     }
 
     /**
      * Provider for the host manageable configuration
      */
     public interface HostConfigurationProvider {
-        HostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) throws Exception;
+        HostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController);
     }
 
     /**
@@ -140,10 +122,22 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
             return this;
         }
 
+        public Builder<S> subtask(final ManageableServerConfigurationComponentTaskBuilder<S, ?> subtaskBuilder) {
+            return subtask(ManageableServerConfigurationTaskFactory.of(subtaskBuilder));
+        }
+
+        public Builder<S> subtask(final ManageableResourceComponentTaskBuilder<S, ManageableResource, ?> subtaskBuilder) {
+            return subtask(ManageableServerConfigurationTaskFactory.of(subtaskBuilder));
+        }
+
+        public Builder<S> subtask(final ManageableResourcesComponentTaskBuilder<S, ManageableResource, ?> subtaskBuilder) {
+            return subtask(ManageableServerConfigurationTaskFactory.of(subtaskBuilder));
+        }
+
         public Builder<S> subtask(final ManageableServerConfigurationTaskFactory<S, HostConfiguration> subtaskFactory) {
             return subtask(new HostConfigurationTaskFactory<S>() {
                 @Override
-                public ServerMigrationTask getTask(S source, HostConfiguration configuration) throws Exception {
+                public ServerMigrationTask getTask(S source, HostConfiguration configuration) {
                     return subtaskFactory.getTask(source, configuration);
                 }
             });
@@ -227,7 +221,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
         }
 */
         public HostMigration<S> build() {
-            return new HostMigration(this);
+            return new HostMigration<>(this);
         }
     }
 }

@@ -28,7 +28,7 @@ public class LeafTask extends ComponentTask {
         super(name, taskRunnable);
     }
 
-    protected static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> implements LeafTaskBuilder<P, T> {
+    protected abstract static class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> implements LeafTaskBuilder<P, T> {
 
         private TaskRunnable.Builder<? super P> runnableBuilder;
 

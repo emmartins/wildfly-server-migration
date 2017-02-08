@@ -18,8 +18,8 @@ package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ProductInfo;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
 
 /**

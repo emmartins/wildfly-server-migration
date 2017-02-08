@@ -22,14 +22,14 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 /**
  * The builder for leaf tasks, which add subsystem configs.
  * @author emmartins
  */
-public class AddSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeafTask.Builder<S, SubsystemConfiguration.Parent> {
+public class AddSubsystemConfigurationSubtaskBuilder<S> extends ManageableResourceLeafTask.Builder<S, SubsystemConfiguration.Parent> {
 
     private String subsystem;
 
@@ -50,7 +50,7 @@ public class AddSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeafTask
         });
     }
 
-    protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, TaskContext taskContext) {
+    protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemConfiguration.Parent> params, TaskContext taskContext) {
         final ModelNode op = Util.createAddOperation(params.getResource().getSubsystemConfigurationPathAddress(subsystem));
         params.getServerConfiguration().executeManagementOperation(op);
     }

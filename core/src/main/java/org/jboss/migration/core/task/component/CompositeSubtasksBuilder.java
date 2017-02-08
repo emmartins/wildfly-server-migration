@@ -34,13 +34,10 @@ public interface CompositeSubtasksBuilder<P extends BuildParameters, T extends C
     }
 
     default <Q extends BuildParameters> T subtask(BuildParameters.Mapper<P, Q> pqMapper, TaskRunnable.Builder<? super Q> qBuilder) {
-        return subtask(TaskRunnable.Builder.from(pqMapper, qBuilder));
+        return subtask(TaskRunnable.Builder.of(pqMapper, qBuilder));
     }
 
     default <Q extends BuildParameters> T subtask(BuildParameters.Mapper<P, Q> pqMapper, ComponentTaskBuilder<? super Q, ?> qBuilder) {
-        return subtask(TaskRunnable.Builder.from(pqMapper, qBuilder));
+        return subtask(TaskRunnable.Builder.of(pqMapper, qBuilder));
     }
-
-    @Override
-    CompositeSubtasks build(P params);
 }

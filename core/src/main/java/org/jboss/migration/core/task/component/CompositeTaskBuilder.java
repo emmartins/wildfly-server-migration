@@ -19,9 +19,11 @@ package org.jboss.migration.core.task.component;
 /**
  * @author emmartins
  */
-public interface CompositeTaskBuilder<P extends BuildParameters, T extends ComponentTaskBuilder<P, T>> extends ComponentTaskBuilder<P, T> {
+public interface CompositeTaskBuilder<P extends BuildParameters, T extends CompositeTaskBuilder<P, T>> extends ComponentTaskBuilder<P, T> {
 
+/*
     T subtasks(CompositeSubtasksBuilder<? super P, ?> subtasks);
 
     <Q extends BuildParameters> T subtasks(BuildParameters.Mapper<P, Q> mapper, CompositeSubtasksBuilder<? super Q, ?> subtasks);
+    */
 }

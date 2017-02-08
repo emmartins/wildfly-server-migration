@@ -28,7 +28,7 @@ public class CompositeTask extends ComponentTask {
         super(name, taskRunnable);
     }
 
-    protected static abstract class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> implements CompositeTaskBuilder<P, T> {
+    protected abstract static class BaseBuilder<P extends BuildParameters, T extends BaseBuilder<P, T>> extends ComponentTask.Builder<P, T> implements CompositeTaskBuilder<P, T> {
 
         private TaskRunnable.Builder<? super P> runnableBuilder;
 
@@ -37,14 +37,12 @@ public class CompositeTask extends ComponentTask {
             return getThis();
         }
 
-        @Override
         public T subtasks(CompositeSubtasksBuilder<? super P, ?> subtasks) {
             return runBuilder(subtasks);
         }
 
-        @Override
-        public <Q extends BuildParameters> T subtasks(BuildParameters.Mapper<P, Q> mapper, CompositeSubtasksBuilder<? super Q, ?> subtasks) {
-            return runBuilder(TaskRunnable.Builder.from(mapper, subtasks));
+        public  <Q extends BuildParameters> T subtasks(BuildParameters.Mapper<P, Q> mapper, CompositeSubtasksBuilder<? super Q, ?> subtasks) {
+            return runBuilder(TaskRunnable.Builder.of(mapper, subtasks));
         }
 
         @Override

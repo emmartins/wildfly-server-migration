@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationFailureException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.StartElement;
-import java.io.IOException;
 
 /**
  * A XML file content filter.

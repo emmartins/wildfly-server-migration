@@ -24,10 +24,9 @@ import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -35,7 +34,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Set socket binding's ports as value expressions.
  * @author emmartins
  */
-public class AddSocketBindingPortExpressions<S> extends ServerConfigurationCompositeTask.Builder<S> {
+public class AddSocketBindingPortExpressions<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     public static final String[] SOCKET_BINDINGS = {
             "ajp",
@@ -46,9 +45,9 @@ public class AddSocketBindingPortExpressions<S> extends ServerConfigurationCompo
     public AddSocketBindingPortExpressions() {
         name("add-socket-binding-port-expressions");
         beforeRun(context -> context.getLogger().infof("Adding socket binding's port expressions..."));
-        final ServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ServerConfigurationCompositeSubtasks.Builder<>();
+        final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
         for (String socketBinding : SOCKET_BINDINGS) {
-            subtasks.subtask(SocketBindingResource.class, socketBinding, new AddSocketBindingPortExpression<S>(socketBinding));
+            subtasks.subtask(SocketBindingResource.class, socketBinding, new AddSocketBindingPortExpression<>(socketBinding));
         }
         subtasks(subtasks);
         afterRun(context -> {
@@ -60,15 +59,15 @@ public class AddSocketBindingPortExpressions<S> extends ServerConfigurationCompo
         });
     }
 
-    public static class AddSocketBindingPortExpression<S> extends ResourceLeafTask.Builder<S, SocketBindingResource> {
+    public static class AddSocketBindingPortExpression<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingResource> {
 
         protected AddSocketBindingPortExpression(String resourceName) {
             this(resourceName, "jboss."+resourceName+".port");
         }
 
         protected AddSocketBindingPortExpression(String resourceName, String propertyName) {
-            name(parameters -> new ServerMigrationTaskName.Builder("add-"+resourceName+"-port-expression").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
-            run((ResourceTaskRunnableBuilder<S, SocketBindingResource>) (params, taskName1) -> context -> {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("add-"+resourceName+"-port-expression").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
+            runBuilder(params -> context -> {
                 // retrieve resource config
                 final SocketBindingResource socketBindingResource = params.getResource();
                 final ModelNode resourceConfig = socketBindingResource.getResourceConfiguration();
@@ -95,5 +94,4 @@ public class AddSocketBindingPortExpressions<S> extends ServerConfigurationCompo
             });
         }
     }
-
 }

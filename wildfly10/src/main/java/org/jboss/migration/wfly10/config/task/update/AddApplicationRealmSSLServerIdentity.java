@@ -18,16 +18,14 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.jboss.JBossServer;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskRunnable;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -35,14 +33,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Migration of security realms fully compatible with WildFly 10.
  * @author emmartins
  */
-public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> extends ServerConfigurationLeafTask.Builder<S> {
-
-
-
-    public static final AddApplicationRealmSSLServerIdentity INSTANCE = new AddApplicationRealmSSLServerIdentity();
-
-    private static final String TASK_NAME_NAME = "add-application-realm-ssl-server-identity";
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
+public class AddApplicationRealmSSLServerIdentity<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
     private static final String RESOURCE_NAME = "ApplicationRealm";
     public static final String SERVER_IDENTITY_NAME = "ssl";
@@ -54,9 +45,9 @@ public class AddApplicationRealmSSLServerIdentity<S extends JBossServer<S>> exte
         afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
     }
 
-    protected static class RunnableBuilder<S> implements ResourceTaskRunnableBuilder<S, SecurityRealmResource> {
+    protected static class RunnableBuilder<S> implements ManageableResourceTaskRunnableBuilder<S, SecurityRealmResource> {
         @Override
-        public TaskRunnable build(ResourceBuildParameters<S, SecurityRealmResource> params) {
+        public TaskRunnable build(ManageableResourceBuildParameters<S, SecurityRealmResource> params) {
             return context -> {
                 final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
                 final SecurityRealmResource resource = params.getResource();

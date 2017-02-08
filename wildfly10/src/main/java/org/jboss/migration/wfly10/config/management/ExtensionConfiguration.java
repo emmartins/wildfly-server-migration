@@ -27,10 +27,10 @@ import java.util.Set;
  */
 public interface ExtensionConfiguration extends ManageableResource {
 
-    Type<ExtensionConfiguration> RESOURCE_TYPE = new Type<>(ExtensionConfiguration.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(ExtensionConfiguration.class);
 
     @Override
-    default Type<ExtensionConfiguration> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

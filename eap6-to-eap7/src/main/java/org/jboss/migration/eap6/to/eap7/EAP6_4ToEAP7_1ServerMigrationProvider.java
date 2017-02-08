@@ -17,98 +17,101 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
-import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
-import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfileTaskBuilder;
-import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
-import org.jboss.migration.eap6.to.eap7.tasks.EAPSubsystemUpdates7_1;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEESubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEJB3Subsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateInfinispanSubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateMessagingActiveMQSubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateRemotingSubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateUndertowSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.SetupHttpUpgradeManagement;
-import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
+import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagingSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.requestcontroller.AddRequestControllerSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.web.MigrateWebSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
+import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
-import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
+import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
 
 /**
  * Server migration, from EAP 6.4 to EAP 7.1.
  * @author emmartins
  */
 public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigrationProvider7_1 {
-
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final CompositeServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
+        final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                        .subtask(MigrateSubsystemTasks.JACORB)
-                        .subtask(MigrateSubsystemTasks.WEB)
-                        .subtask(EAPSubsystemUpdates7_1.UNDERTOW)
-                        .subtask(MigrateSubsystemTasks.MESSAGING)
-                        .subtask(EAPSubsystemUpdates7_1.MESSAGING_ACTIVEMQ)
-                        .subtask(EAPSubsystemUpdates7_1.INFINISPAN)
-                        .subtask(EAPSubsystemUpdates7_1.EE)
-                        .subtask(EAPSubsystemUpdates7_1.EJB3)
-                        .subtask(EAPSubsystemUpdates7_1.REMOTING)
-                        .subtask(AddSubsystemTasks.BATCH_JBERET)
-                        .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
-                        .subtask(AddSubsystemTasks.SECURITY_MANAGER)
-                        .subtask(AddSubsystemTasks.SINGLETON)
-                        .subtask(SetupHttpUpgradeManagement.INSTANCE)
-                        .subtask(AddPrivateInterface.INSTANCE)
-                        .subtask(AddSocketBindingPortExpressions.INSTANCE)
-                        .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
-                        .subtask(RemoveDeployments.INSTANCE)
-                )
+                        .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                        .subtask(new MigrateReferencedModules<>())
+                        .subtask(new MigrateJacorbSubsystem<>())
+                        .subtask(new MigrateWebSubsystem<>())
+                        .subtask(new EAP6_4ToEAP7_1UpdateUndertowSubsystem<>())
+                        .subtask(new MigrateMessagingSubsystem<>())
+                        .subtask(new EAP6_4ToEAP7_1UpdateMessagingActiveMQSubsystem<>())
+                        .subtask(new EAP6_4ToEAP7_1UpdateInfinispanSubsystem<>())
+                        .subtask(new EAP6_4ToEAP7_1UpdateEESubsystem<>())
+                        .subtask(new EAP6_4ToEAP7_1UpdateEJB3Subsystem<>())
+                        .subtask(new EAP6_4ToEAP7_1UpdateRemotingSubsystem<>())
+                        .subtask(new AddBatchJBeretSubsystem<>())
+                        .subtask(new AddRequestControllerSubsystem<>())
+                        .subtask(new AddSecurityManagerSubsystem<>())
+                        .subtask(new AddSingletonSubsystem<>())
+                        .subtask(new SetupHttpUpgradeManagement<>())
+                        .subtask(new AddPrivateInterface<>())
+                        .subtask(new AddSocketBindingPortExpressions<>())
+                        .subtask(new AddSocketBindingMulticastAddressExpressions<>())
+                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                        .subtask(new AddApplicationRealmSSLServerIdentity<>())
+                        .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                                .subtask(MigrateSubsystemTasks.JACORB)
-                                .subtask(MigrateSubsystemTasks.WEB)
-                                .subtask(EAPSubsystemUpdates7_1.UNDERTOW)
-                                .subtask(MigrateSubsystemTasks.MESSAGING)
-                                .subtask(EAPSubsystemUpdates7_1.MESSAGING_ACTIVEMQ)
-                                .subtask(EAPSubsystemUpdates7_1.INFINISPAN)
-                                .subtask(EAPSubsystemUpdates7_1.EE)
-                                .subtask(EAPSubsystemUpdates7_1.EJB3)
-                                .subtask(EAPSubsystemUpdates7_1.REMOTING)
-                                .subtask(AddSubsystemTasks.BATCH_JBERET)
-                                .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
-                                .subtask(AddSubsystemTasks.SECURITY_MANAGER)
-                                .subtask(AddSubsystemTasks.SINGLETON)
-                                .subtask(UpdateUnsecureInterface.INSTANCE)
-                                .subtask(AddPrivateInterface.INSTANCE)
-                                .subtask(AddSocketBindingPortExpressions.INSTANCE)
-                                .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                                .subtask(AddLoadBalancerProfileTaskBuilder.INSTANCE)
-                                .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                .subtask(RemoveDeployments.INSTANCE)
-                                .build()
-                        )
+                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new MigrateReferencedModules<>())
+                                .subtask(new MigrateJacorbSubsystem<>())
+                                .subtask(new MigrateWebSubsystem<>())
+                                .subtask(new EAP6_4ToEAP7_1UpdateUndertowSubsystem<>())
+                                .subtask(new MigrateMessagingSubsystem<>())
+                                .subtask(new EAP6_4ToEAP7_1UpdateMessagingActiveMQSubsystem<>())
+                                .subtask(new EAP6_4ToEAP7_1UpdateInfinispanSubsystem<>())
+                                .subtask(new EAP6_4ToEAP7_1UpdateEESubsystem<>())
+                                .subtask(new EAP6_4ToEAP7_1UpdateEJB3Subsystem<>())
+                                .subtask(new EAP6_4ToEAP7_1UpdateRemotingSubsystem<>())
+                                .subtask(new AddBatchJBeretSubsystem<>())
+                                .subtask(new AddRequestControllerSubsystem<>())
+                                .subtask(new AddSecurityManagerSubsystem<>())
+                                .subtask(new AddSingletonSubsystem<>())
+                                .subtask(new UpdateUnsecureInterface<>())
+                                .subtask(new AddPrivateInterface<>())
+                                .subtask(new AddSocketBindingPortExpressions<>())
+                                .subtask(new AddSocketBindingMulticastAddressExpressions<>())
+                                .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                .subtask(new RemoveDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
+                                .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(AddJmxSubsystemToHosts.INSTANCE)
-                                        .subtask(UpdateUnsecureInterface.INSTANCE)
-                                        .subtask(SetupHttpUpgradeManagement.INSTANCE)
-                                        .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
-                                        .build()
-                                )
-                        )
-                )
+                                        .subtask(new AddJmxSubsystemToHosts<>())
+                                        .subtask(new RemoveUnsecureInterface<>())
+                                        .subtask(new SetupHttpUpgradeManagement<>())
+                                        .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                                        .subtask(new AddApplicationRealmSSLServerIdentity<>()))))
                 .build();
     }
 

@@ -22,32 +22,32 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.InterfaceResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
- * Setup EAP 7 http upgrade management.
+ * Updates unsecure interface.
  * @author emmartins
  */
-public class UpdateUnsecureInterface<S> extends ServerConfigurationCompositeTask.Builder<S> {
+public class UpdateUnsecureInterface<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     private static final String INTERFACE_NAME = "unsecure";
 
     public UpdateUnsecureInterface() {
         name("update-unsecure-interface");
         beforeRun(context -> context.getLogger().debugf("Updating unsecure interface configuration..."));
-        subtasks(InterfaceResource.class, INTERFACE_NAME, ResourceCompositeSubtasks.of(new SetUnsecureInterfaceInetAddress<>()));
+        subtasks(InterfaceResource.class, INTERFACE_NAME, ManageableResourceCompositeSubtasks.of(new SetUnsecureInterfaceInetAddress<>()));
         afterRun(context -> context.getLogger().debugf("Unsecure interface configuration updated."));
     }
 
-    public static class SetUnsecureInterfaceInetAddress<S> extends ResourceLeafTask.Builder<S, InterfaceResource> {
+    public static class SetUnsecureInterfaceInetAddress<S> extends ManageableResourceLeafTask.Builder<S, InterfaceResource> {
         protected SetUnsecureInterfaceInetAddress() {
             name("set-unsecure-interface-inet-address");
-            final ResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params -> context -> {
+            final ManageableResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params -> context -> {
                 final InterfaceResource resource = params.getResource();
                 final ModelNode resourceConfig = params.getResource().getResourceConfiguration();
                 if (resourceConfig == null) {

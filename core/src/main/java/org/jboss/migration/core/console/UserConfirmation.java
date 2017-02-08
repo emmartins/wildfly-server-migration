@@ -55,6 +55,10 @@ public class UserConfirmation {
         this(theConsole, new String[] { message }, prompt, resultHandler);
     }
 
+    public UserConfirmation(ConsoleWrapper theConsole, final String message, final ResultHandler resultHandler) {
+        this(theConsole, new String[] { message }, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler);
+    }
+
     public void execute() {
         theConsole.printf("%n");
         if (messageLines != null) {

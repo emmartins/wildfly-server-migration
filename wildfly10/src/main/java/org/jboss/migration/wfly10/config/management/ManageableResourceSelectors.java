@@ -47,7 +47,7 @@ public interface ManageableResourceSelectors {
         return resource -> new HashSet<>(resource.getChildResources(resourceType));
     }
 
-    static <T extends ManageableResource> ManageableResourceSelector<T> toChild(ManageableResource.Type<T> resourceType, String resourceName) {
+    static <T extends ManageableResource> ManageableResourceSelector<T> toChild(ManageableResourceType resourceType, String resourceName) {
         return resource -> {
             final T child = resource.getChildResource(resourceType, resourceName);
             return child != null ? Collections.singleton(child) : Collections.emptySet();

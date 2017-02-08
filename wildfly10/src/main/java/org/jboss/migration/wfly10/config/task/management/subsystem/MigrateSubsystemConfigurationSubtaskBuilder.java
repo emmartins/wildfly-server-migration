@@ -23,7 +23,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * The builder for leaf tasks, which add subsystem configs.
  * @author emmartins
  */
-public class MigrateSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeafTask.Builder<S, SubsystemConfiguration> {
+public class MigrateSubsystemConfigurationSubtaskBuilder<S> extends ManageableResourceLeafTask.Builder<S, SubsystemConfiguration> {
 
     private String subsystem;
 

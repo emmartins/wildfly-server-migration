@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface ServerGroupResource extends ManageableResource, JvmResource.Parent {
 
-    Type<ServerGroupResource> RESOURCE_TYPE = new Type<>(ServerGroupResource.class, JvmResource.RESOURCE_TYPE);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(ServerGroupResource.class, JvmResource.RESOURCE_TYPE);
 
     @Override
-    default Type<ServerGroupResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

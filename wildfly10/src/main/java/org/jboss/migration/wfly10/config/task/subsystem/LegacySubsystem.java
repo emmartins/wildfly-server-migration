@@ -15,22 +15,6 @@
  */
 package org.jboss.migration.wfly10.config.task.subsystem;
 
-import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTask;
-import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.wfly10.config.management.SubsystemResources;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
-
 /**
  * A legacy deprecated subsystem, the server only includes support to load and migrate its configuration to the subsystem which replaces it.
  * @author emmartins

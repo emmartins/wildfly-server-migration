@@ -21,7 +21,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.WildFlyServer10;
 
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * @author emmartins
@@ -36,12 +35,7 @@ public interface ManageableServerConfiguration extends ManageableResource, Exten
     Path resolvePath(String path) throws ManagementOperationException;
     ModelControllerClient getModelControllerClient();
 
-    class Type<T extends ManageableServerConfiguration> extends ManageableResource.Type<T> {
-
-        static final ManageableResource.Type<?>[] CHILD_TYPES =  { ExtensionConfiguration.RESOURCE_TYPE, InterfaceResource.RESOURCE_TYPE, SocketBindingGroupResource.RESOURCE_TYPE, SystemPropertyConfiguration.RESOURCE_TYPE };
-
-        protected Type(Class<T> type, ManageableResource.Type<?>... childTypes) {
-            super(type, Stream.concat(Stream.of(CHILD_TYPES), Stream.of(childTypes)).toArray(ManageableResource.Type<?>[]::new));
-        }
+    default ManageableServerConfigurationType getConfigurationType() {
+        return (ManageableServerConfigurationType) getResourceType();
     }
 }

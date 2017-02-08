@@ -168,9 +168,12 @@ public class TaskExecutionImpl implements TaskExecution {
         try {
             result = task.run(new TaskContextImpl(this));
         } catch (ServerMigrationFailureException e) {
-            throw (result = ServerMigrationTaskResult.fail(e)).getFailReason();
+            result = ServerMigrationTaskResult.fail(e);
+            throw e;
         } catch (Throwable t) {
-            throw (result = ServerMigrationTaskResult.fail(new ServerMigrationFailureException(t))).getFailReason();
+            final ServerMigrationFailureException e = new ServerMigrationFailureException(t);
+            result = ServerMigrationTaskResult.fail(e);
+            throw e;
         } finally {
             logger.debugf("Task %s execution completed with result status... %s", taskPath, result);
         }

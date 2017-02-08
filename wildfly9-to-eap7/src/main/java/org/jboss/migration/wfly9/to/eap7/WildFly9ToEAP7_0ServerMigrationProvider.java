@@ -17,15 +17,17 @@ package org.jboss.migration.wfly9.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
+import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagingSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
-import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
+import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly9.WildFlyServer9;
 
@@ -37,41 +39,36 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final CompositeServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
+        final ServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                        .subtask(WildFly9ToEAP7_0SubsystemUpdates.UNDERTOW)
-                        .subtask(MigrateSubsystemTasks.MESSAGING)
-                        .subtask(AddSubsystemTasks.BATCH_JBERET)
-                        .subtask(AddSubsystemTasks.SINGLETON)
-                        .subtask(AddPrivateInterface.INSTANCE)
-                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(RemoveDeployments.INSTANCE)
-                )
+                        .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                        .subtask(new MigrateReferencedModules<>())
+                        .subtask(new WildFly9ToEAP7_0UpdateUndertowSubsystem<>())
+                        .subtask(new MigrateMessagingSubsystem<>())
+                        .subtask(new AddBatchJBeretSubsystem<>())
+                        .subtask(new AddSingletonSubsystem<>())
+                        .subtask(new AddPrivateInterface<>())
+                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                        .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                                .subtask(WildFly9ToEAP7_0SubsystemUpdates.UNDERTOW)
-                                .subtask(MigrateSubsystemTasks.MESSAGING)
-                                .subtask(AddSubsystemTasks.BATCH_JBERET)
-                                .subtask(AddSubsystemTasks.SINGLETON)
-                                .subtask(UpdateUnsecureInterface.INSTANCE)
-                                .subtask(AddPrivateInterface.INSTANCE)
-                                .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                .subtask(RemoveDeployments.INSTANCE)
-                        )
+                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new MigrateReferencedModules<>())
+                                .subtask(new WildFly9ToEAP7_0UpdateUndertowSubsystem<>())
+                                .subtask(new MigrateMessagingSubsystem<>())
+                                .subtask(new AddBatchJBeretSubsystem<>())
+                                .subtask(new AddSingletonSubsystem<>())
+                                .subtask(new UpdateUnsecureInterface<>())
+                                .subtask(new AddPrivateInterface<>())
+                                .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                .subtask(new RemoveDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
+                                .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(UpdateUnsecureInterface.INSTANCE)
-                                        .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                )
-                        )
-                )
+                                        .subtask(new RemoveUnsecureInterface<>())
+                                        .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                        .subtask(new MigrateCompatibleSecurityRealms<>()))))
                 .build();
     }
 

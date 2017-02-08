@@ -21,10 +21,10 @@ package org.jboss.migration.wfly10.config.management;
  */
 public interface HostConfiguration extends ManageableServerConfiguration, JvmResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemConfiguration.Parent {
 
-    Type<HostConfiguration> RESOURCE_TYPE = new ManageableServerConfiguration.Type<>(HostConfiguration.class, JvmResource.RESOURCE_TYPE, ManagementInterfaceResource.RESOURCE_TYPE, SecurityRealmResource.RESOURCE_TYPE, SubsystemConfiguration.RESOURCE_TYPE);
+    ManageableServerConfigurationType RESOURCE_TYPE = new ManageableServerConfigurationType(HostConfiguration.class, JvmResource.RESOURCE_TYPE, ManagementInterfaceResource.RESOURCE_TYPE, SecurityRealmResource.RESOURCE_TYPE, SubsystemConfiguration.RESOURCE_TYPE);
 
     @Override
-    default ManageableResource.Type<HostConfiguration> getResourceType() {
+    default ManageableServerConfigurationType getResourceType() {
         return RESOURCE_TYPE;
     }
 

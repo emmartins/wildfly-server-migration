@@ -19,28 +19,28 @@ package org.jboss.migration.wfly10.config.task.update;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 /**
  * Removes deployments from configs.
  * @author emmartins
  */
-public class RemoveDeployments<S> extends ServerConfigurationCompositeTask.Builder<S> {
+public class RemoveDeployments<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
-    private RemoveDeployments() {
+    public RemoveDeployments() {
         name("remove-deployments");
         beforeRun(context -> context.getLogger().infof("Deployments removal starting..."));
-        subtasks(DeploymentResource.class, ResourceCompositeSubtasks.of(new Subtask<>()));
+        subtasks(DeploymentResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
         afterRun(context -> context.getLogger().infof("Deployments removal done."));
     }
 
-    public static class Subtask<S> extends ResourceLeafTask.Builder<S, DeploymentResource> {
+    public static class Subtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentResource> {
         protected Subtask() {
             nameBuilder(parameters -> new ServerMigrationTaskName.Builder("remove-deployment").addAttribute("name", parameters.getResource().getResourceName()).build());
-            final ResourceTaskRunnableBuilder<S, DeploymentResource> runnableBuilder = params-> context -> {
+            final ManageableResourceTaskRunnableBuilder<S, DeploymentResource> runnableBuilder = params-> context -> {
                 final DeploymentResource resource = params.getResource();
                 final String resourceName = resource.getResourceName();
                 resource.remove();

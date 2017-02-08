@@ -25,10 +25,10 @@ import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManagementInterfaceResource;
 import org.jboss.migration.wfly10.config.management.SocketBindingResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
@@ -36,7 +36,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Setup EAP 7 http upgrade management.
  * @author emmartins
  */
-public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeTask.Builder<S> {
+public class SetupHttpUpgradeManagement<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     private static final String TASK_NAME = "setup-http-upgrade-management";
 
@@ -44,11 +44,11 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
         name(TASK_NAME);
         skipPolicy(TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("HTTP upgrade management setup starting..."));
-        subtasks(ServerConfigurationCompositeSubtasks.of(new SetManagementInterfacesHttpUpgradeEnabled<>(), new UpdateManagementHttpsSocketBindingPort<>()));
+        subtasks(ManageableServerConfigurationCompositeSubtasks.of(new SetManagementInterfacesHttpUpgradeEnabled<>(), new UpdateManagementHttpsSocketBindingPort<>()));
         afterRun(context -> context.getLogger().infof("HTTP upgrade management setup completed."));
     }
 
-    public static class SetManagementInterfacesHttpUpgradeEnabled<S> extends ServerConfigurationLeafTask.Builder<S> {
+    public static class SetManagementInterfacesHttpUpgradeEnabled<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
         private static final String SUBTASK_NAME = "set-management-interfaces-http-upgrade-enabled";
         private static final String MANAGEMENT_INTERFACE_NAME = "http-interface";
@@ -56,7 +56,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
         protected SetManagementInterfacesHttpUpgradeEnabled() {
             name(SUBTASK_NAME);
             skipPolicy(TaskSkipPolicy.skipIfAnyPropertyIsSet(TASK_NAME+"."+SUBTASK_NAME+".skip"));
-            final ResourceTaskRunnableBuilder<S, ManagementInterfaceResource> runnableBuilder = params -> context -> {
+            final ManageableResourceTaskRunnableBuilder<S, ManagementInterfaceResource> runnableBuilder = params -> context -> {
                 // check if attribute is defined
                 final ManagementInterfaceResource resource = params.getResource();
                 final ModelNode resourceConfig = resource.getResourceConfiguration();
@@ -77,7 +77,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
         }
     }
 
-    static class UpdateManagementHttpsSocketBindingPort<S> extends ServerConfigurationLeafTask.Builder<S> {
+    static class UpdateManagementHttpsSocketBindingPort<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
         private static final String SUBTASK_NAME = "update-management-https-socket-binding-port";
 
@@ -106,7 +106,7 @@ public class SetupHttpUpgradeManagement<S> extends ServerConfigurationCompositeT
                 }
                 return false;
             });
-            final ResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
+            final ManageableResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
                 final SocketBindingResource resource = params.getResource();
                 final MigrationEnvironment env = context.getServerMigrationContext().getMigrationEnvironment();
                 String envPropertyPort = env.getPropertyAsString(UpdateManagementHttpsSocketBindingPort.EnvironmentProperties.PORT);

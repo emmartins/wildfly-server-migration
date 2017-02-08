@@ -16,11 +16,11 @@
 
 package org.jboss.migration.core.console;
 
+import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 
 /**
  * @author emmartins

@@ -31,6 +31,10 @@ public class ExtensionBuilder {
         this.name = name;
     }
 
+    public ExtensionBuilder addSubsystem(String subsystemName) {
+        return addSubsystem(new SubsystemBuilder().setName(subsystemName));
+    }
+
     public ExtensionBuilder addSubsystem(SubsystemBuilder subsystem) {
         subsystems.add(subsystem);
         return this;

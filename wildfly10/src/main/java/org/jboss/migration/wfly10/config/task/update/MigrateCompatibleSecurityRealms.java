@@ -28,10 +28,10 @@ import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,22 +42,22 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  * Migration of security realms fully compatible with WildFly 10.
  * @author emmartins
  */
-public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends ServerConfigurationCompositeTask.Builder<ServerPath<S>> {
+public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends ManageableServerConfigurationCompositeTask.Builder<ServerPath<S>> {
 
     public MigrateCompatibleSecurityRealms() {
         name("migrate-compatible-security-realms");
         beforeRun(context -> context.getLogger().infof("Migrating security realms..."));
-        subtasks(SecurityRealmResource.class, ResourceCompositeSubtasks.of(new Subtask<>()));
+        subtasks(SecurityRealmResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
         afterRun(context -> context.getLogger().infof("Security realms migration done."));
 
     }
 
-    protected static class Subtask<S extends JBossServer<S>> extends ResourceLeafTask.Builder<ServerPath<S>, SecurityRealmResource> {
+    protected static class Subtask<S extends JBossServer<S>> extends ManageableResourceLeafTask.Builder<ServerPath<S>, SecurityRealmResource> {
         protected Subtask() {
             nameBuilder(parameters -> new ServerMigrationTaskName.Builder("migrate-compatible-security-realm").addAttribute("name", parameters.getResource().getResourceName()).build());
             beforeRunBuilder(params-> context -> context.getLogger().debugf("Security realm %s migration starting...", params.getResource().getResourceName()));
             afterRunBuilder(params -> context -> context.getLogger().infof("Security realm %s migrated.", params.getResource().getResourceName()));
-            final ResourceTaskRunnableBuilder<ServerPath<S>, SecurityRealmResource> runnableBuilder = params -> context -> {
+            final ManageableResourceTaskRunnableBuilder<ServerPath<S>, SecurityRealmResource> runnableBuilder = params -> context -> {
                 final SecurityRealmResource securityRealmResource = params.getResource();
                 final ModelNode securityRealmConfig = securityRealmResource.getResourceConfiguration();
                 if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {

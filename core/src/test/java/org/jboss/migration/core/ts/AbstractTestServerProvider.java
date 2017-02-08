@@ -20,7 +20,6 @@ import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**

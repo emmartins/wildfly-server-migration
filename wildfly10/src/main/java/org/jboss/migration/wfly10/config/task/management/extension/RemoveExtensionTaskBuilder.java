@@ -19,13 +19,13 @@ package org.jboss.migration.wfly10.config.task.management.extension;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationLeafTask;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
 
 /**
  * A task which creates an extension if its missing from the server's config.
  * @author emmartins
  */
-public class RemoveExtensionTaskBuilder<S> extends ServerConfigurationLeafTask.Builder<S> {
+public class RemoveExtensionTaskBuilder<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
     public RemoveExtensionTaskBuilder(String extensionModule) {
         name(new ServerMigrationTaskName.Builder("remove-extension").addAttribute("name", extensionModule).build());
         runBuilder(params -> context -> {

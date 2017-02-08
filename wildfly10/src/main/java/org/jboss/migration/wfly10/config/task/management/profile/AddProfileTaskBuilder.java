@@ -24,19 +24,19 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.configuration.ServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 /**
  * @author emmartins
  */
-public class AddProfileTaskBuilder<S> extends ServerConfigurationCompositeTask.BaseBuilder<S, AddProfileTaskBuilder<S>> {
+public class AddProfileTaskBuilder<S> extends ManageableServerConfigurationCompositeTask.BaseBuilder<S, AddProfileTaskBuilder<S>> {
 
-    protected final ResourceCompositeSubtasks.Builder<S, SubsystemConfiguration.Parent> subsystemSubtasks;
-    protected final ServerConfigurationCompositeSubtasks.Builder<S> subtasks;
+    protected final ManageableResourceCompositeSubtasks.Builder<S, SubsystemConfiguration.Parent> subsystemSubtasks;
+    protected final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks;
 
     public AddProfileTaskBuilder(String profileName) {
         name("add-profile-"+profileName);
@@ -51,8 +51,8 @@ public class AddProfileTaskBuilder<S> extends ServerConfigurationCompositeTask.B
                     }
                 }));
         beforeRun(context -> context.getLogger().infof("Configuring profile %s...", profileName));
-        this.subsystemSubtasks = new ResourceCompositeSubtasks.Builder<>();
-        this.subtasks = new ServerConfigurationCompositeSubtasks.Builder<S>()
+        this.subsystemSubtasks = new ManageableResourceCompositeSubtasks.Builder<>();
+        this.subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(ProfileResource.Parent.class, new CreateProfileTask<>(profileName))
                 .subtask(ProfileResource.class, profileName, this.subsystemSubtasks);
         subtasks(subtasks);
@@ -64,10 +64,10 @@ public class AddProfileTaskBuilder<S> extends ServerConfigurationCompositeTask.B
         return this;
     }
 
-    public static class CreateProfileTask<S> extends ResourceLeafTask.Builder<S, ProfileResource.Parent> {
+    public static class CreateProfileTask<S> extends ManageableResourceLeafTask.Builder<S, ProfileResource.Parent> {
         protected CreateProfileTask(String profileName) {
             name(new ServerMigrationTaskName.Builder("create-profile").addAttribute("name", profileName).build());
-            final ResourceTaskRunnableBuilder<S, ProfileResource.Parent> runnableBuilder = params -> context -> {
+            final ManageableResourceTaskRunnableBuilder<S, ProfileResource.Parent> runnableBuilder = params -> context -> {
                 final ProfileResource.Parent resource = params.getResource();
                 final PathAddress pathAddress = resource.getProfileResourcePathAddress(profileName);
                 final ModelNode op = Util.createAddOperation(pathAddress);

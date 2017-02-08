@@ -27,10 +27,10 @@ import java.util.Set;
  */
 public interface SubsystemConfiguration extends ManageableResource {
 
-    Type<SubsystemConfiguration> RESOURCE_TYPE = new Type<>(SubsystemConfiguration.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(SubsystemConfiguration.class);
 
     @Override
-    default Type<SubsystemConfiguration> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

@@ -40,133 +40,133 @@ public class SupportedExtensions {
             .build();
 
     public static final Extension INFINISPAN = new ExtensionBuilder(ExtensionNames.INFINISPAN)
-            .addSupportedSubsystem(SubsystemNames.INFINISPAN)
+            .addSubsystem(SubsystemNames.INFINISPAN)
             .build();
 
     public static final Extension JGROUPS = new ExtensionBuilder(ExtensionNames.JGROUPS)
-            .addSupportedSubsystem(SubsystemNames.JGROUPS)
+            .addSubsystem(SubsystemNames.JGROUPS)
             .build();
 
     public static final Extension CONNECTOR = new ExtensionBuilder(ExtensionNames.CONNECTOR)
-            .addSupportedSubsystem(SubsystemNames.DATASOURCES)
-            .addSupportedSubsystem(SubsystemNames.JCA)
-            .addSupportedSubsystem(SubsystemNames.RESOURCE_ADAPTERS)
+            .addSubsystem(SubsystemNames.DATASOURCES)
+            .addSubsystem(SubsystemNames.JCA)
+            .addSubsystem(SubsystemNames.RESOURCE_ADAPTERS)
             .build();
 
     public static final Extension DEPLOYMENT_SCANNER = new ExtensionBuilder(ExtensionNames.DEPLOYMENT_SCANNER)
-            .addSupportedSubsystem(SubsystemNames.DEPLOYMENT_SCANNER)
+            .addSubsystem(SubsystemNames.DEPLOYMENT_SCANNER)
             .build();
 
     public static final Extension EE = new ExtensionBuilder(ExtensionNames.EE)
-            .addSupportedSubsystem(SubsystemNames.EE)
+            .addSubsystem(SubsystemNames.EE)
             .build();
 
     public static final Extension EJB3 = new ExtensionBuilder(ExtensionNames.EJB3)
-            .addSupportedSubsystem(SubsystemNames.EJB3)
+            .addSubsystem(SubsystemNames.EJB3)
             .build();
 
     public static final Extension JAXRS = new ExtensionBuilder(ExtensionNames.JAXRS)
-            .addSupportedSubsystem(SubsystemNames.JAXRS)
+            .addSubsystem(SubsystemNames.JAXRS)
             .build();
 
     public static final Extension JDR = new ExtensionBuilder(ExtensionNames.JDR)
-            .addSupportedSubsystem(SubsystemNames.JDR)
+            .addSubsystem(SubsystemNames.JDR)
             .build();
 
     public static final Extension JMX = new ExtensionBuilder(ExtensionNames.JMX)
-            .addSupportedSubsystem(SubsystemNames.JMX)
+            .addSubsystem(SubsystemNames.JMX)
             .build();
 
     public static final Extension JPA = new ExtensionBuilder(ExtensionNames.JPA)
-            .addSupportedSubsystem(SubsystemNames.JPA)
+            .addSubsystem(SubsystemNames.JPA)
             .build();
 
     public static final Extension JSF = new ExtensionBuilder(ExtensionNames.JSF)
-            .addSupportedSubsystem(SubsystemNames.JSF)
+            .addSubsystem(SubsystemNames.JSF)
             .build();
 
     public static final Extension JSR77 =new ExtensionBuilder(ExtensionNames.JSR77)
-            .addSupportedSubsystem(SubsystemNames.JSR77)
+            .addSubsystem(SubsystemNames.JSR77)
             .build();
 
     public static final Extension LOGGING = new ExtensionBuilder(ExtensionNames.LOGGING)
-            .addSupportedSubsystem(SubsystemNames.LOGGING)
+            .addSubsystem(SubsystemNames.LOGGING)
             .build();
 
     public static final Extension MAIL = new ExtensionBuilder(ExtensionNames.MAIL)
-            .addSupportedSubsystem(SubsystemNames.MAIL)
+            .addSubsystem(SubsystemNames.MAIL)
             .build();
 
     public static final Extension MODCLUSTER = new ExtensionBuilder(ExtensionNames.MODCLUSTER)
-            .addSupportedSubsystem(SubsystemNames.MODCLUSTER)
+            .addSubsystem(SubsystemNames.MODCLUSTER)
             .build();
 
     public static final Extension NAMING = new ExtensionBuilder(ExtensionNames.NAMING)
-            .addSupportedSubsystem(SubsystemNames.NAMING)
+            .addSubsystem(SubsystemNames.NAMING)
             .build();
 
     public static final Extension POJO = new ExtensionBuilder(ExtensionNames.POJO)
-            .addSupportedSubsystem(SubsystemNames.POJO)
+            .addSubsystem(SubsystemNames.POJO)
             .build();
 
     public static final Extension REMOTING = new ExtensionBuilder(ExtensionNames.REMOTING)
-            .addSupportedSubsystem(SubsystemNames.REMOTING)
+            .addSubsystem(SubsystemNames.REMOTING)
             .build();
 
     public static final Extension SAR = new ExtensionBuilder(ExtensionNames.SAR)
-            .addSupportedSubsystem(SubsystemNames.SAR)
+            .addSubsystem(SubsystemNames.SAR)
             .build();
 
     public static final Extension SECURITY = new ExtensionBuilder(ExtensionNames.SECURITY)
-            .addSupportedSubsystem(SubsystemNames.SECURITY)
+            .addSubsystem(SubsystemNames.SECURITY)
             .build();
 
     public static final Extension TRANSACTIONS = new ExtensionBuilder(ExtensionNames.TRANSACTIONS)
-            .addSupportedSubsystem(SubsystemNames.TRANSACTIONS)
+            .addSubsystem(SubsystemNames.TRANSACTIONS)
             .build();
 
     public static final Extension WEBSERVICES = new ExtensionBuilder(ExtensionNames.WEBSERVICES)
-            .addSupportedSubsystem(SubsystemNames.WEBSERVICES)
+            .addSubsystem(SubsystemNames.WEBSERVICES)
             .build();
 
     public static final Extension WELD = new ExtensionBuilder(ExtensionNames.WELD)
-            .addSupportedSubsystem(SubsystemNames.WELD)
+            .addSubsystem(SubsystemNames.WELD)
             .build();
 
     public static final Extension BATCH_JBERET = new ExtensionBuilder(ExtensionNames.BATCH_JBERET)
-            .addSupportedSubsystem(SubsystemNames.BATCH_JBERET)
+            .addSubsystem(SubsystemNames.BATCH_JBERET)
             .build();
 
     public static final Extension BEAN_VALIDATION = new ExtensionBuilder(ExtensionNames.BEAN_VALIDATION)
-            .addSupportedSubsystem(SubsystemNames.BEAN_VALIDATION)
+            .addSubsystem(SubsystemNames.BEAN_VALIDATION)
             .build();
 
     public static final Extension SINGLETON = new ExtensionBuilder(ExtensionNames.SINGLETON)
-            .addSupportedSubsystem(SubsystemNames.SINGLETON)
+            .addSubsystem(SubsystemNames.SINGLETON)
             .build();
 
     public static final Extension IO = new ExtensionBuilder(ExtensionNames.IO)
-            .addSupportedSubsystem(SubsystemNames.IO)
+            .addSubsystem(SubsystemNames.IO)
             .build();
 
     public static final Extension MESSAGING_ACTIVEMQ = new ExtensionBuilder(ExtensionNames.MESSAGING_ACTIVEMQ)
-            .addSupportedSubsystem(SubsystemNames.MESSAGING_ACTIVEMQ)
+            .addSubsystem(SubsystemNames.MESSAGING_ACTIVEMQ)
             .build();
 
     public static final Extension REQUEST_CONTROLLER = new ExtensionBuilder(ExtensionNames.REQUEST_CONTROLLER)
-            .addSupportedSubsystem(SubsystemNames.REQUEST_CONTROLLER)
+            .addSubsystem(SubsystemNames.REQUEST_CONTROLLER)
             .build();
 
     public static final Extension SECURITY_MANAGER = new ExtensionBuilder(ExtensionNames.SECURITY_MANAGER)
-            .addSupportedSubsystem(SubsystemNames.SECURITY_MANAGER)
+            .addSubsystem(SubsystemNames.SECURITY_MANAGER)
             .build();
 
     public static final Extension UNDERTOW = new ExtensionBuilder(ExtensionNames.UNDERTOW)
-            .addSupportedSubsystem(SubsystemNames.UNDERTOW)
+            .addSubsystem(SubsystemNames.UNDERTOW)
             .build();
 
     public static final Extension IIOP_OPENJDK = new ExtensionBuilder(ExtensionNames.IIOP_OPENJDK)
-            .addSupportedSubsystem(SubsystemNames.IIOP_OPENJDK)
+            .addSubsystem(SubsystemNames.IIOP_OPENJDK)
             .build();
 
     public static Set<Extension> all() {

@@ -16,21 +16,26 @@
 package org.jboss.migration.wfly8.to.wfly10;
 
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
+import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagingSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.requestcontroller.AddRequestControllerSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
+import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
-import org.jboss.migration.wfly10.config.task.update.AddSubsystemTasks;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.MigrateSubsystemTasks;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMs;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
-import org.jboss.migration.wfly10.config.task.update.CompositeServerUpdate;
+import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
+import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
-import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfileTaskBuilder;
+import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
 import org.jboss.migration.wfly8.WildFlyServer8;
 
 /**
@@ -41,55 +46,50 @@ public class WildFly8ToWildFly10_1ServerMigrationProvider implements WildFlyFull
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final CompositeServerUpdate.Builders<WildFlyServer8> serverUpdateBuilders = new CompositeServerUpdate.Builders<>();
+        final ServerUpdate.Builders<WildFlyServer8> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                        .subtask(WildFly8ToWildFly10_1SubsystemUpdates.INFINISPAN)
-                        .subtask(WildFly8ToWildFly10_1SubsystemUpdates.UNDERTOW)
-                        .subtask(MigrateSubsystemTasks.JACORB)
-                        .subtask(MigrateSubsystemTasks.MESSAGING)
-                        .subtask(AddSubsystemTasks.BATCH_JBERET)
-                        .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
-                        .subtask(AddSubsystemTasks.SECURITY_MANAGER)
-                        .subtask(AddSubsystemTasks.SINGLETON)
-                        .subtask(AddPrivateInterface.INSTANCE)
-                        .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
-                        .subtask(RemoveDeployments.INSTANCE)
-                )
+                        .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                        .subtask(new MigrateReferencedModules<>())
+                        .subtask(new WildFly8ToWildFly10_1UpdateInfinispanSubsystem<>())
+                        .subtask(new WildFly8ToWildFly10_1UpdateUndertowSubsystem<>())
+                        .subtask(new MigrateJacorbSubsystem<>())
+                        .subtask(new MigrateMessagingSubsystem<>())
+                        .subtask(new AddBatchJBeretSubsystem<>())
+                        .subtask(new AddRequestControllerSubsystem<>())
+                        .subtask(new AddSecurityManagerSubsystem<>())
+                        .subtask(new AddSingletonSubsystem<>())
+                        .subtask(new AddPrivateInterface<>())
+                        .subtask(new AddSocketBindingMulticastAddressExpressions<>())
+                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                        .subtask(new AddApplicationRealmSSLServerIdentity<>())
+                        .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                                .subtask(WildFly8ToWildFly10_1SubsystemUpdates.INFINISPAN)
-                                .subtask(WildFly8ToWildFly10_1SubsystemUpdates.UNDERTOW)
-                                .subtask(MigrateSubsystemTasks.JACORB)
-                                .subtask(MigrateSubsystemTasks.MESSAGING)
-                                .subtask(AddSubsystemTasks.BATCH_JBERET)
-                                .subtask(AddSubsystemTasks.REQUEST_CONTROLLER)
-                                .subtask(AddSubsystemTasks.SECURITY_MANAGER)
-                                .subtask(AddSubsystemTasks.SINGLETON)
-                                .subtask(UpdateUnsecureInterface.INSTANCE)
-                                .subtask(AddPrivateInterface.INSTANCE)
-                                .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                                .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                .subtask(AddLoadBalancerProfileTaskBuilder.INSTANCE)
-                                .subtask(RemoveDeployments.INSTANCE)
-                        )
+                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new MigrateReferencedModules<>())
+                                .subtask(new WildFly8ToWildFly10_1UpdateInfinispanSubsystem<>())
+                                .subtask(new WildFly8ToWildFly10_1UpdateUndertowSubsystem<>())
+                                .subtask(new MigrateJacorbSubsystem<>())
+                                .subtask(new MigrateMessagingSubsystem<>())
+                                .subtask(new AddBatchJBeretSubsystem<>())
+                                .subtask(new AddRequestControllerSubsystem<>())
+                                .subtask(new AddSecurityManagerSubsystem<>())
+                                .subtask(new AddSingletonSubsystem<>())
+                                .subtask(new UpdateUnsecureInterface<>())
+                                .subtask(new AddPrivateInterface<>())
+                                .subtask(new AddSocketBindingMulticastAddressExpressions<>())
+                                .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new RemoveDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
+                                .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(AddJmxSubsystemToHosts.INSTANCE)
-                                        .subtask(UpdateUnsecureInterface.INSTANCE)
-                                        .subtask(RemovePermgenAttributesFromJVMs.INSTANCE)
-                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
-                                )
-                        )
-                )
+                                        .subtask(new AddJmxSubsystemToHosts<>())
+                                        .subtask(new RemoveUnsecureInterface<>())
+                                        .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                                        .subtask(new AddApplicationRealmSSLServerIdentity<>()))))
                 .build();
     }
 

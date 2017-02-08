@@ -20,13 +20,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurationSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurationTaskBuilder;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemConfigurations;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
@@ -34,7 +33,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
  * A task which adds the jmx subsystem to host configs.
  * @author emmartins
  */
-public class AddJmxSubsystemToHosts<S> extends AddSubsystemConfigurationTaskBuilder<S> {
+public class AddJmxSubsystemToHosts<S> extends AddSubsystemConfigurations<S> {
 
     public AddJmxSubsystemToHosts() {
         super(ExtensionNames.JMX, new AddJMXSubsystemConfig<>());
@@ -53,8 +52,8 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemConfigurationTaskBuil
         }
 
         @Override
-        protected void addConfiguration(ResourceBuildParameters<S, SubsystemConfiguration.Parent> params, ServerMigrationTaskName taskName, TaskContext context) {
-            super.addConfiguration(params, taskName, context);
+        protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemConfiguration.Parent> params, TaskContext taskContext) {
+            super.addConfiguration(params, taskContext);
             // add jmx subsystem default config
             /*
             <profile>

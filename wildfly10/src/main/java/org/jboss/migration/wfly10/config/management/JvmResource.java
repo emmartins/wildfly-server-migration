@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface JvmResource extends ManageableResource {
 
-    Type<JvmResource> RESOURCE_TYPE = new Type<>(JvmResource.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(JvmResource.class);
 
     @Override
-    default Type<JvmResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

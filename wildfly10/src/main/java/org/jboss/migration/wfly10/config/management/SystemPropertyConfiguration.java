@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface SystemPropertyConfiguration extends ManageableResource {
 
-    Type<SystemPropertyConfiguration> RESOURCE_TYPE = new Type<>(SystemPropertyConfiguration.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(SystemPropertyConfiguration.class);
 
     @Override
-    default Type<SystemPropertyConfiguration> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

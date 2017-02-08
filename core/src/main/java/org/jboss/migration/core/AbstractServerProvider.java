@@ -18,7 +18,6 @@ package org.jboss.migration.core;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
@@ -39,7 +38,7 @@ public abstract class AbstractServerProvider implements ServerProvider {
      * @param baseDir the server's base dir
      * @param migrationEnvironment
      * @return the {@link ProductInfo} from the specified base dir
-     * @throws IOException if the product's info failed to be retrieved.
+     * @throws ServerMigrationFailureException if the product's info failed to be retrieved.
      */
     protected abstract ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws ServerMigrationFailureException;
 

@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface DeploymentResource extends ManageableResource {
 
-    Type<DeploymentResource> RESOURCE_TYPE = new Type<>(DeploymentResource.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(DeploymentResource.class);
 
     @Override
-    default Type<DeploymentResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

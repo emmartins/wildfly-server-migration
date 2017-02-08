@@ -21,9 +21,6 @@ import org.jboss.dmr.ModelNode;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
 
 /**
  * @author emmartins
@@ -31,7 +28,7 @@ import static java.util.stream.Collectors.toSet;
 public interface ManageableResource {
 
     // resource
-    <T extends ManageableResource> Type<T> getResourceType();
+    ManageableResourceType getResourceType();
     String getResourceName();
 
     default String getResourceAbsoluteName() {
@@ -42,56 +39,29 @@ public interface ManageableResource {
     ModelNode getResourceConfiguration() throws ManagementOperationException;
 
     // children
-    <T extends ManageableResource> T getChildResource(Type<T> resourceType, String resourceName) throws ManagementOperationException;
-    <T extends ManageableResource> List<T> getChildResources(Type<T> resourceType) throws ManagementOperationException;
+    <T extends ManageableResource> T getChildResource(ManageableResourceType resourceType, String resourceName) throws ManagementOperationException;
+    <T extends ManageableResource> List<T> getChildResources(ManageableResourceType resourceType) throws ManagementOperationException;
     <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType) throws ManagementOperationException;
     <T extends ManageableResource> List<T> getChildResources(Class<T> resourceType, String resourceName) throws ManagementOperationException;
-    Set<Type<?>> getChildResourceTypes();
-    Set<String> getChildResourceNames(Type<?> resourceType) throws ManagementOperationException;
+    default Set<ManageableResourceType> getChildResourceTypes() {
+        return getResourceType().getChildTypes();
+    }
+    Set<String> getChildResourceNames(ManageableResourceType resourceType) throws ManagementOperationException;
 
-    default <T extends ManageableResource> String getChildResourceAbsoluteName(Type<T> resourceType, String resourceName) {
+    default <T extends ManageableResource> String getChildResourceAbsoluteName(ManageableResourceType resourceType, String resourceName) {
         return getChildResourcePathAddress(resourceType, resourceName).toCLIStyleString();
     }
-    <T extends ManageableResource> PathAddress getChildResourcePathAddress(Type<T> resourceType, String resourceName);
-    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType) throws ManagementOperationException;
+    <T extends ManageableResource> PathAddress getChildResourcePathAddress(ManageableResourceType resourceType, String resourceName);
+    <T extends ManageableResource> Set<T> findResources(ManageableResourceType resourceType) throws ManagementOperationException;
     <T extends ManageableResource> Set<T> findResources(Class<T> resourceType) throws ManagementOperationException;
-    <T extends ManageableResource> Set<T> findResources(Type<T> resourceType, String resourceName) throws ManagementOperationException;
+    <T extends ManageableResource> Set<T> findResources(ManageableResourceType resourceType, String resourceName) throws ManagementOperationException;
     <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) throws ManagementOperationException;
 
     void remove() throws ManagementOperationException;
-    void removeResource(Type<?> resourceType, String resourceName) throws ManagementOperationException;
+    void removeResource(ManageableResourceType resourceType, String resourceName) throws ManagementOperationException;
     //ModelNode getResourceConfiguration(String name) throws IOException;
 
     // parent
     ManageableResource getParentResource();
     ManageableServerConfiguration getServerConfiguration();
-
-    class Type<T extends ManageableResource> {
-
-        private final Class<T> type;
-        private final Set<Type<?>> childTypes;
-        private final Set<Type<?>> descendantTypes;
-
-        protected Type(Class<T> type, Type<?>... childTypes) {
-            this.type = type;
-            final Stream<Type<?>> childTypesStream = Stream.of(childTypes);
-            this.childTypes = childTypesStream.collect(toSet());
-            this.descendantTypes = childTypesStream
-                    .flatMap(childType -> Stream.concat(Stream.of(childType), childType.getDescendantTypes().stream()))
-                    .collect(toSet());
-        }
-
-        public Class<T> getType() {
-            return type;
-        }
-
-        public Set<Type<?>> getChildTypes() {
-            return childTypes;
-        }
-
-        public Set<Type<?>> getDescendantTypes() {
-            return descendantTypes;
-        }
-    }
-
 }

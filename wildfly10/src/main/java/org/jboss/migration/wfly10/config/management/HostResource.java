@@ -26,10 +26,10 @@ import java.util.Set;
  */
 public interface HostResource extends ManageableResource {
 
-    Type<HostResource> RESOURCE_TYPE = new Type<>(HostResource.class);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(HostResource.class);
 
     @Override
-    default Type<HostResource> getResourceType() {
+    default ManageableResourceType getResourceType() {
         return RESOURCE_TYPE;
     }
 

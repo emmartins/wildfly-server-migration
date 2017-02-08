@@ -24,14 +24,14 @@ import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.component.TaskNameBuilder;
 import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.SubsystemConfiguration;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceBuildParameters;
-import org.jboss.migration.wfly10.config.task.management.resource.ResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 
 /**
  * @author emmartins
  */
-public abstract class UpdateSubsystemConfigurationSubtaskBuilder<S> extends ResourceLeafTask.Builder<S, SubsystemConfiguration> {
+public abstract class UpdateSubsystemConfigurationSubtaskBuilder<S> extends ManageableResourceLeafTask.Builder<S, SubsystemConfiguration> {
 
     public UpdateSubsystemConfigurationSubtaskBuilder(String taskName) {
         this(new ServerMigrationTaskName.Builder(taskName).build());
@@ -41,7 +41,7 @@ public abstract class UpdateSubsystemConfigurationSubtaskBuilder<S> extends Reso
         this(params -> taskName);
     }
 
-    public UpdateSubsystemConfigurationSubtaskBuilder(TaskNameBuilder<ResourceBuildParameters<S, SubsystemConfiguration>> nameBuilder) {
+    public UpdateSubsystemConfigurationSubtaskBuilder(TaskNameBuilder<ManageableResourceBuildParameters<S, SubsystemConfiguration>> nameBuilder) {
         nameBuilder(nameBuilder);
         skipPolicyBuilder(params -> context -> TaskSkipPolicy.skipByTaskEnvironment(EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(params.getResource().getResourceName(), context.getTaskName().getName())).isSkipped(context));
         runBuilder(params -> context -> {

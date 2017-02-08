@@ -43,7 +43,7 @@ import java.util.Map;
  * An abstract JBoss {@link org.jboss.migration.core.Server} impl, which is usable only as migration source.
  * @author emmartins
  */
-public abstract class JBossServer<S extends JBossServer> extends AbstractServer {
+public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServer {
 
     public interface EnvironmentProperties {
         String PROPERTIES_PREFIX = "server.";
