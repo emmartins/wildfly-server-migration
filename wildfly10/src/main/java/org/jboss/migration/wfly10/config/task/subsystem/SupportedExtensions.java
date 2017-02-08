@@ -211,9 +211,7 @@ public class SupportedExtensions {
 
     public static List<Extension> allExcept(String... extensionNames) {
         final Set<String> excludeSet = new HashSet<>();
-        for (String extensionName : extensionNames) {
-            excludeSet.add(extensionName);
-        }
+        Collections.addAll(excludeSet, extensionNames);
         final List<Extension> result = new ArrayList<>();
         for (Extension extension : all()) {
             if (!excludeSet.contains(extension.getName())) {

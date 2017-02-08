@@ -317,17 +317,6 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
             }
         }
 
-        public ModelNode getResourceConfiguration(String name) {
-            if (!getResourceNames().contains(name)) {
-                return null;
-            }
-            final PathAddress address = getResourcePathAddress(name);
-            final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
-            op.get(RECURSIVE).set(true);
-            final ModelNode result = serverConfiguration.executeManagementOperation(op);
-            return result.get(RESULT);
-        }
-
         public void removeResource(String resourceName) {
             final PathAddress address = getResourcePathAddress(resourceName);
             final ModelNode op = Util.createRemoveOperation(address);

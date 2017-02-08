@@ -43,7 +43,7 @@ public class ElementNode extends Node {
     public ElementNode(final ElementNode parent, final String name, final String namespace) {
         this.parent = parent;
         this.name = name;
-        this.namespace = namespace == null ? namespace : namespace.isEmpty() ? null : namespace;
+        this.namespace = (namespace != null && !namespace.isEmpty()) ? namespace : null;
     }
 
     public String getNamespace() {
@@ -125,12 +125,7 @@ public class ElementNode extends Node {
         }
 
         if (!empty) {
-            try {
-                writer.writeEndElement();
-            } catch(XMLStreamException e) {
-                //TODO REMOVE THIS
-                throw e;
-            }
+            writer.writeEndElement();
         }
     }
 

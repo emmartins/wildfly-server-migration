@@ -51,7 +51,7 @@ public class ServerMigrationTaskResult {
     /**
      * The possible result status.
      */
-    public enum Status { FAIL, SUCCESS, SKIPPED};
+    public enum Status { FAIL, SUCCESS, SKIPPED}
 
     private final Status status;
     private final ServerMigrationFailureException failReason;

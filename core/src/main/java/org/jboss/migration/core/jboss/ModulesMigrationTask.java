@@ -76,7 +76,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
     }
 
     protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
-        final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.<String>emptyList());
+        final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.emptyList());
         for (String module : includedModules) {
             moduleMigrator.migrateModule(module, "requested by environment", context);
         }
@@ -92,7 +92,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
             this.sourceModules = source.getModules();
             this.targetModules = target.getModules();
             this.excludedByEnvironment = new HashSet<>();
-            for (String excludedModule : environment.getPropertyAsList(ENVIRONMENT_PROPERTY_EXCLUDES, Collections.<String>emptyList())) {
+            for (String excludedModule : environment.getPropertyAsList(ENVIRONMENT_PROPERTY_EXCLUDES, Collections.emptyList())) {
                 this.excludedByEnvironment.add(ModuleIdentifier.fromString(excludedModule));
             }
         }

@@ -36,7 +36,7 @@ public class SubEnvironment implements Environment {
     }
 
     private String getAbsolutePropertyName(String propertyName) {
-        return new StringBuilder(propertyNamePrefix).append(propertyName).toString();
+        return propertyNamePrefix + propertyName;
     }
 
     public Boolean getPropertyAsBoolean(String propertyName) {

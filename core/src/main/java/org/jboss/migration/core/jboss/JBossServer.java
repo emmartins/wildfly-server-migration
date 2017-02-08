@@ -252,10 +252,9 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
             if (moduleId == null) {
                 throw new IllegalArgumentException("The module identifier cannot be null.");
             }
-            final Path modulePath = Paths.get(new StringBuilder(moduleId.getName().replace('.', File.separatorChar)).
-                    append(File.separator).
-                    append(moduleId.getSlot()).
-                    toString());
+            final Path modulePath = Paths.get(moduleId.getName().replace('.', File.separatorChar) +
+                    File.separator +
+                    moduleId.getSlot());
             if (overlayDir != null) {
                 final Path overlayModuleDir = overlayDir.resolve(modulePath);
                 if (Files.exists(overlayModuleDir)) {

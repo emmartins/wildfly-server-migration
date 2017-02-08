@@ -21,12 +21,7 @@ import org.jboss.migration.core.task.TaskContext;
 /**
  * @author emmartins
  */
-public /**
- *
- * @param <P>
- */
-
-interface AfterTaskRun {
+public interface AfterTaskRun {
 
     void afterRun(TaskContext context);
 

@@ -64,7 +64,6 @@ public class MigrationFiles {
         final Path existentCopySource = copiedFiles.get(target);
         if (existentCopySource != null) {
             ServerMigrationLogger.ROOT_LOGGER.debugf("Skipping previously copied file %s", source);
-            return;
         } else {
             try {
                 if (Files.exists(target)) {

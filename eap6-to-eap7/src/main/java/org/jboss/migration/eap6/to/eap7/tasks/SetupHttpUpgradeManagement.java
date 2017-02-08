@@ -101,10 +101,7 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
                     return true;
                 }
                 // only run on standalone configs
-                if (!(buildParameters.getServerConfiguration() instanceof StandaloneServerConfiguration)) {
-                    return true;
-                }
-                return false;
+                return !(buildParameters.getServerConfiguration() instanceof StandaloneServerConfiguration);
             });
             final ManageableResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
                 final SocketBindingResource resource = params.getResource();

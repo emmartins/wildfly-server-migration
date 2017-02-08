@@ -72,7 +72,6 @@ public class UserChoice {
              * line.
              */
             theConsole.printf(ConsoleWrapper.NEW_LINE);
-            return;
         } else {
             // default is first option, and the user may just press enter to opt for it
             int choice = DEFAULT_OPTION;

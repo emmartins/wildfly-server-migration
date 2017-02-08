@@ -140,7 +140,7 @@ public class NodeParser {
                 state = ATTRIBUTE;
             } else if (state == ATTRIBUTE) {
                 if (c == '\"') {
-                    attributes.put(name.toString(), builder.toString());
+                    attributes.put(name, builder.toString());
                     builder = new StringBuilder();
                     state = READ_NAME;
                 } else {

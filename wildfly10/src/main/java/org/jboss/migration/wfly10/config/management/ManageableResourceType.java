@@ -74,8 +74,11 @@ public class ManageableResourceType {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null) return false;
-        return type.equals(((ManageableResourceType) o).type);
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ManageableResourceType that = (ManageableResourceType) o;
+
+        return type.equals(that.type);
     }
 
     @Override

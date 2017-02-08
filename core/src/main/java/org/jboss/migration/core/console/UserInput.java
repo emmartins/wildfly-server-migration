@@ -55,7 +55,6 @@ public class UserInput {
              * line.
              */
             theConsole.printf(ConsoleWrapper.NEW_LINE);
-            return;
         } else {
             if (!temp.equals("")) {
                 resultHandler.onInput(temp);

@@ -56,7 +56,7 @@ public class SetDefaultHostResponseHeaderServer<S> extends SetDefaultHostRespons
             } else {
                 serverVersion = productInfo.getVersion().substring(0, dot);
             }
-            return new StringBuilder(serverName).append('/').append(serverVersion).toString();
+            return serverName + '/' + serverVersion;
         }
     }
 }

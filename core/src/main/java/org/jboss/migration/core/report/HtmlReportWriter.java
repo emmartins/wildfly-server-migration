@@ -228,10 +228,9 @@ public class HtmlReportWriter {
     }
 
     private String getTaskStatus(ServerMigrationTaskResult result, Object text) {
-        StringBuilder sb = new StringBuilder("<span class=\"task-result-");
-        sb.append(result.getStatus());
-        sb.append("\">").append(text).append("</span>");
-        return sb.toString();
+        String sb = "<span class=\"task-result-" + result.getStatus() +
+                "\">" + text + "</span>";
+        return sb;
     }
 
     public static class ReportTemplate {
