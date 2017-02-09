@@ -62,7 +62,6 @@ public class ManageableResourceType {
     public Set<ManageableResourceType> getDescendantTypes() {
         if (descendantTypes == null) {
             descendantTypes = findDescendantTypes();
-            System.out.println(toString()+"::findDescendantTypes() -> "+descendantTypes+")");
         }
         return descendantTypes;
     }
