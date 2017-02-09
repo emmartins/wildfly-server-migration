@@ -37,10 +37,14 @@ public class ServerGroupResourceImpl extends AbstractManageableResource<ServerGr
     }
 
     private final JvmResourceImpl.Factory jvmResources;
+    private final DeploymentResourceImpl.Factory deploymentResources;
 
     private ServerGroupResourceImpl(String resourceName, PathAddress pathAddress, ServerGroupResource.Parent parent) {
         super(resourceName, pathAddress, parent);
         jvmResources = new JvmResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(jvmResources);
+        deploymentResources = new DeploymentResourceImpl.Factory(pathAddress, this);
+        addChildResourceFactory(deploymentResources);
+
     }
 }

@@ -25,9 +25,9 @@ import java.util.Set;
 /**
  * @author emmartins
  */
-public interface ServerGroupResource extends ManageableResource, JvmResource.Parent {
+public interface ServerGroupResource extends ManageableResource, JvmResource.Parent, DeploymentResource.Parent {
 
-    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(ServerGroupResource.class, JvmResource.RESOURCE_TYPE);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(ServerGroupResource.class, JvmResource.RESOURCE_TYPE, DeploymentResource.RESOURCE_TYPE);
 
     @Override
     default ManageableResourceType getResourceType() {

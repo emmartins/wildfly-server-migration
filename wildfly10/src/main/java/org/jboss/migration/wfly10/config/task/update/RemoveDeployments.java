@@ -39,12 +39,11 @@ public class RemoveDeployments<S> extends ManageableServerConfigurationComposite
 
     public static class Subtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentResource> {
         protected Subtask() {
-            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("remove-deployment").addAttribute("name", parameters.getResource().getResourceName()).build());
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("remove-deployment").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
             final ManageableResourceTaskRunnableBuilder<S, DeploymentResource> runnableBuilder = params-> context -> {
                 final DeploymentResource resource = params.getResource();
-                final String resourceName = resource.getResourceName();
                 resource.removeResource();
-                context.getLogger().infof("Removed deployment %s", resourceName);
+                context.getLogger().infof("Removed deployment configuration %s", resource.getResourceAbsoluteName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);
