@@ -18,14 +18,15 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.wfly10.config.management.DeploymentOverlayResource;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 /**
- * Removes deployments from configs.
+ * Removes all deployments, and overlays, from a server configuration.
  * @author emmartins
  */
 public class RemoveDeployments<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
@@ -33,17 +34,33 @@ public class RemoveDeployments<S> extends ManageableServerConfigurationComposite
     public RemoveDeployments() {
         name("remove-deployments");
         beforeRun(context -> context.getLogger().infof("Deployments removal starting..."));
-        subtasks(DeploymentResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
+        final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
+                .subtask(DeploymentResource.class, new RemoveDeploymentSubtask<>())
+                .subtask(DeploymentOverlayResource.class, new RemoveDeploymentOverlaySubtask<>());
+        subtasks(subtasks);
         afterRun(context -> context.getLogger().infof("Deployments removal done."));
     }
 
-    public static class Subtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentResource> {
-        protected Subtask() {
+    public static class RemoveDeploymentSubtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentResource> {
+        protected RemoveDeploymentSubtask() {
             nameBuilder(parameters -> new ServerMigrationTaskName.Builder("remove-deployment").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
             final ManageableResourceTaskRunnableBuilder<S, DeploymentResource> runnableBuilder = params-> context -> {
                 final DeploymentResource resource = params.getResource();
                 resource.removeResource();
                 context.getLogger().infof("Removed deployment configuration %s", resource.getResourceAbsoluteName());
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            runBuilder(runnableBuilder);
+        }
+    }
+
+    public static class RemoveDeploymentOverlaySubtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentOverlayResource> {
+        protected RemoveDeploymentOverlaySubtask() {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("remove-deployment-overlay").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
+            final ManageableResourceTaskRunnableBuilder<S, DeploymentOverlayResource> runnableBuilder = params-> context -> {
+                final DeploymentOverlayResource resource = params.getResource();
+                resource.removeResource();
+                context.getLogger().infof("Removed deployment overlay configuration %s", resource.getResourceAbsoluteName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

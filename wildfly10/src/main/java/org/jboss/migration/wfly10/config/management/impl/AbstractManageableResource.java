@@ -246,11 +246,9 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
 
     @Override
     public <T extends ManageableResource> Set<T> findResources(Class<T> resourceType, String resourceName) {
-        //System.out.println(toString()+"::findResources(type="+String.valueOf(resourceType)+", name="+String.valueOf(resourceName)+")");
         final Set<T> result = new HashSet<>();
         // this
         if (resourceType.isInstance(this) && (resourceName == null || resourceName.equals(getResourceName()))) {
-            //System.out.println("'this' matches the search...");
             result.add((T) this);
         }
 
@@ -269,12 +267,10 @@ public abstract class AbstractManageableResource<P extends ManageableResource> i
         }
 
         // descendants
-        //System.out.println("'descendants factories' found: "+getDescendantResourceFactories(resourceType));
         for(Factory<?, ?> descendantFactory : getDescendantResourceFactories(resourceType)) {
             for (ManageableResource child : descendantFactory.getResources()) {
                 result.addAll(child.findResources(resourceType, resourceName));
             }
-            //System.out.println("Result after factory '"+descendantFactory+"' processed: "+result);
         }
         return result;
     }

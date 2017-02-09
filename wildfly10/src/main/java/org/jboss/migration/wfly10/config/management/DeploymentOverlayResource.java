@@ -25,9 +25,9 @@ import java.util.Set;
 /**
  * @author emmartins
  */
-public interface ServerGroupResource extends ManageableResource, DeploymentResource.Parent, DeploymentOverlayResource.Parent, JvmResource.Parent {
+public interface DeploymentOverlayResource extends ManageableResource {
 
-    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(ServerGroupResource.class, DeploymentResource.RESOURCE_TYPE, DeploymentOverlayResource.RESOURCE_TYPE, JvmResource.RESOURCE_TYPE);
+    ManageableResourceType RESOURCE_TYPE = new ManageableResourceType(DeploymentOverlayResource.class);
 
     @Override
     default ManageableResourceType getResourceType() {
@@ -38,31 +38,31 @@ public interface ServerGroupResource extends ManageableResource, DeploymentResou
     Parent getParentResource();
 
     /**
-     * A facade (with full defaults) for a {@link ManageableResource} which has {@link ServerGroupResource} children.
+     * A facade (with full defaults) for a {@link ManageableResource} which has {@link DeploymentOverlayResource} children.
      */
     interface Parent extends ManageableResource {
-        default ServerGroupResource getServerGroupResource(String resourceName) throws ManagementOperationException {
+        default DeploymentOverlayResource getDeploymentOverlayResource(String resourceName) throws ManagementOperationException {
             return getChildResource(RESOURCE_TYPE, resourceName);
         }
-        default List<ServerGroupResource> getServerGroupResources() throws ManagementOperationException {
+        default List<DeploymentOverlayResource> getDeploymentOverlayResources() throws ManagementOperationException {
             return getChildResources(RESOURCE_TYPE);
         }
-        default Set<String> getServerGroupResourceNames() throws ManagementOperationException {
+        default Set<String> getDeploymentOverlayResourceNames() throws ManagementOperationException {
             return getChildResourceNames(RESOURCE_TYPE);
         }
-        default PathAddress getServerGroupResourcePathAddress(String resourceName) {
+        default PathAddress getDeploymentOverlayResourcePathAddress(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName);
         }
-        default String getServerGroupResourceAbsoluteName(String resourceName) {
+        default String getDeploymentOverlayResourceAbsoluteName(String resourceName) {
             return getChildResourcePathAddress(RESOURCE_TYPE, resourceName).toCLIStyleString();
         }
-        default ModelNode getServerGroupResourceConfiguration(String resourceName) throws ManagementOperationException {
+        default ModelNode getDeploymentOverlayResourceConfiguration(String resourceName) throws ManagementOperationException {
             return getChildResourceConfiguration(RESOURCE_TYPE, resourceName);
         }
-        default boolean hasServerGroupResource(String resourceName) throws ManagementOperationException {
+        default boolean hasDeploymentOverlayResource(String resourceName) throws ManagementOperationException {
             return hasChildResource(RESOURCE_TYPE, resourceName);
         }
-        default void removeServerGroupResource(String resourceName) throws ManagementOperationException {
+        default void removeDeploymentOverlayResource(String resourceName) throws ManagementOperationException {
             removeChildResource(RESOURCE_TYPE, resourceName);
         }
     }
