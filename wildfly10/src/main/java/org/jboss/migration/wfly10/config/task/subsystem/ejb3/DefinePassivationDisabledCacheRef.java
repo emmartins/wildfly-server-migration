@@ -33,12 +33,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class DefinePassivationDisabledCacheRef<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
-    public static final DefinePassivationDisabledCacheRef INSTANCE = new DefinePassivationDisabledCacheRef();
-
     public static final String TASK_NAME = "setup-default-sfsb-passivation-disabled-cache";
 
     public DefinePassivationDisabledCacheRef() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String DEFAULT_SFSB_CACHE_ATTR_NAME = "default-sfsb-cache";

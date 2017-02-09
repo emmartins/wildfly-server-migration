@@ -16,6 +16,8 @@
 
 package org.jboss.migration.core.env;
 
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+
 /**
  * @author emmartins
  */
@@ -23,8 +25,16 @@ public class TaskEnvironment extends SubEnvironment {
 
     private static final String PROPERTY_SKIP = "skip";
 
-    public TaskEnvironment(Environment environment, String propertyNamePrefix) {
-        super(environment, propertyNamePrefix);
+    public TaskEnvironment(Environment environment, String propertyNamesBase) {
+        super(environment, propertyNamesBase+".");
+    }
+
+    public TaskEnvironment(Environment environment, ServerMigrationTaskName taskName) {
+        this(environment, taskName.getName());
+    }
+
+    public TaskEnvironment(Environment environment, ServerMigrationTaskName taskName, ServerMigrationTaskName subtaskName) {
+        this(environment, taskName.getName()+"."+subtaskName.getName());
     }
 
     public boolean isSkippedByEnvironment() {

@@ -17,6 +17,7 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
@@ -31,10 +32,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.ExtensionBuilder;
 import org.jboss.migration.wfly10.config.task.subsystem.Subsystem;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,23 +44,23 @@ import java.util.Set;
 /**
  * @author emmartins
  */
-public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<S> {
+public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<S> {
 
-    public static final ServerMigrationTaskName XML_CONFIG_SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("remove-unsupported-subsystems").build();
-    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM = "remove-unsupported-subsystem";
-    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION = "remove-unsupported-extension";
+    public static final ServerMigrationTaskName XML_CONFIG_SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("subsystems.remove-unsupported-subsystems").build();
+    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM = XML_CONFIG_SERVER_MIGRATION_TASK_NAME.getName()+".remove-unsupported-subsystem";
+    public static final String SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION = XML_CONFIG_SERVER_MIGRATION_TASK_NAME.getName()+".remove-unsupported-extension";
     public static final String SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_MODULE = "module";
     public static final String SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAMESPACE = "namespace";
 
     private final List<Extension> supportedExtensions;
 
-    protected RemoveUnsupportedExtensionsAndSubsystems(Builder<S> builder) {
+    protected RemoveUnsupportedSubsystems(Builder<S> builder) {
         this.supportedExtensions = Collections.unmodifiableList(builder.supportedExtensions);
     }
 
     @Override
     public ServerMigrationTask getTask(final S source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
-        return new ServerMigrationTask() {
+        final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
                 return XML_CONFIG_SERVER_MIGRATION_TASK_NAME;
@@ -76,6 +74,7 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
+        return new SkippableByEnvServerMigrationTask(task);
     }
 
     protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) {
@@ -84,73 +83,67 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
         final Set<String> extensionsRemoved = new HashSet<>();
         final Set<String> subsystemsRemoved = new HashSet<>();
         // setup the extensions filter
-        final XMLFileFilter extensionsFilter = new XMLFileFilter() {
-            @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) {
-                if (startElement.getName().getLocalPart().equals("extension")) {
-                    Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
-                    final String moduleName = moduleAttr.getValue();
-                    // keep if module matches a supported extension name
-                    for (Extension extension : migrationExtensions) {
-                        if (extension.getName().equals(moduleName)) {
-                            return Result.KEEP;
-                        }
+        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter) -> {
+            if (startElement.getName().getLocalPart().equals("extension")) {
+                Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
+                final String moduleName = moduleAttr.getValue();
+                // keep if module matches a supported extension name
+                for (Extension extension : migrationExtensions) {
+                    if (extension.getName().equals(moduleName)) {
+                        return XMLFileFilter.Result.KEEP;
                     }
-                    // not supported, remove it
-                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_MODULE, moduleName).build();
-                    final ServerMigrationTask subtask = new ServerMigrationTask() {
-                        @Override
-                        public ServerMigrationTaskName getName() {
-                            return subtaskName;
-                        }
-
-                        @Override
-                        public ServerMigrationTaskResult run(TaskContext context) {
-                            context.getLogger().debugf("Extension with module %s removed.", moduleName);
-                            extensionsRemoved.add(moduleName);
-                            return ServerMigrationTaskResult.SUCCESS;
-                        }
-                    };
-                    context.execute(subtask);
-                    return Result.REMOVE;
-                } else {
-                    return Result.NOT_APPLICABLE;
                 }
+                // not supported, remove it
+                final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_REMOVE_EXTENSION).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_MODULE, moduleName).build();
+                final ServerMigrationTask subtask = new ServerMigrationTask() {
+                    @Override
+                    public ServerMigrationTaskName getName() {
+                        return subtaskName;
+                    }
+
+                    @Override
+                    public ServerMigrationTaskResult run(TaskContext context1) {
+                        context1.getLogger().debugf("Extension with module %s removed.", moduleName);
+                        extensionsRemoved.add(moduleName);
+                        return ServerMigrationTaskResult.SUCCESS;
+                    }
+                };
+                context.execute(subtask);
+                return XMLFileFilter.Result.REMOVE;
+            } else {
+                return XMLFileFilter.Result.NOT_APPLICABLE;
             }
         };
         // setup subsystems filter
-        final XMLFileFilter subsystemsFilter = new XMLFileFilter() {
-            @Override
-            public Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) {
-                if (startElement.getName().getLocalPart().equals("subsystem")) {
-                    final String namespaceURI = startElement.getName().getNamespaceURI();
-                    // keep if the namespace uri starts with a supported subsystem's namespace without version
-                    for (Subsystem subsystem : migrationSubsystems) {
-                        final String namespaceWithoutVersion = subsystem.getNamespaceWithoutVersion();
-                        if (namespaceWithoutVersion != null && namespaceURI.startsWith(namespaceWithoutVersion + ':')) {
-                            return Result.KEEP;
-                        }
+        final XMLFileFilter subsystemsFilter = (startElement, xmlEventReader, xmlEventWriter) -> {
+            if (startElement.getName().getLocalPart().equals("subsystem")) {
+                final String namespaceURI = startElement.getName().getNamespaceURI();
+                // keep if the namespace uri starts with a supported subsystem's namespace without version
+                for (Subsystem subsystem : migrationSubsystems) {
+                    final String namespaceWithoutVersion = subsystem.getNamespaceWithoutVersion();
+                    if (namespaceWithoutVersion != null && namespaceURI.startsWith(namespaceWithoutVersion + ':')) {
+                        return XMLFileFilter.Result.KEEP;
                     }
-                    // not supported, remove subsystem
-                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAMESPACE, namespaceURI).build();
-                    final ServerMigrationTask subtask = new ServerMigrationTask() {
-                        @Override
-                        public ServerMigrationTaskName getName() {
-                            return subtaskName;
-                        }
-
-                        @Override
-                        public ServerMigrationTaskResult run(TaskContext context) {
-                            context.getLogger().debugf("Subsystem with namespace %s removed.", namespaceURI);
-                            subsystemsRemoved.add(namespaceURI);
-                            return ServerMigrationTaskResult.SUCCESS;
-                        }
-                    };
-                    context.execute(subtask);
-                    return Result.REMOVE;
-                } else {
-                    return Result.NOT_APPLICABLE;
                 }
+                // not supported, remove subsystem
+                final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_REMOVE_SUBSYSTEM).addAttribute(SERVER_MIGRATION_TASK_NAME_ATTRIBUTE_NAMESPACE, namespaceURI).build();
+                final ServerMigrationTask subtask = new ServerMigrationTask() {
+                    @Override
+                    public ServerMigrationTaskName getName() {
+                        return subtaskName;
+                    }
+
+                    @Override
+                    public ServerMigrationTaskResult run(TaskContext context12) {
+                        context12.getLogger().debugf("Subsystem with namespace %s removed.", namespaceURI);
+                        subsystemsRemoved.add(namespaceURI);
+                        return ServerMigrationTaskResult.SUCCESS;
+                    }
+                };
+                context.execute(subtask);
+                return XMLFileFilter.Result.REMOVE;
+            } else {
+                return XMLFileFilter.Result.NOT_APPLICABLE;
             }
         };
         XMLFiles.filter(xmlConfigurationPath, extensionsFilter, subsystemsFilter);
@@ -206,8 +199,8 @@ public class RemoveUnsupportedExtensionsAndSubsystems<S> implements ServerConfig
             return this;
         }
 
-        public RemoveUnsupportedExtensionsAndSubsystems<S> build() {
-            return new RemoveUnsupportedExtensionsAndSubsystems<>(this);
+        public RemoveUnsupportedSubsystems<S> build() {
+            return new RemoveUnsupportedSubsystems<>(this);
         }
     }
 }

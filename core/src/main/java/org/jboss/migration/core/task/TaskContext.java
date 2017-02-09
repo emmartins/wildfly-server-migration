@@ -19,6 +19,7 @@ package org.jboss.migration.core.task;
 import org.jboss.logging.Logger;
 import org.jboss.migration.core.ServerMigrationContext;
 import org.jboss.migration.core.ServerMigrationFailureException;
+import org.jboss.migration.core.task.component.TaskRunnable;
 
 import java.util.List;
 
@@ -33,6 +34,12 @@ public interface TaskContext {
      * @return the name of the task in context
      */
     ServerMigrationTaskName getTaskName();
+
+    /**
+     * Retrieves the task's parent.
+     * @return the task's parent, if exists, otherwise null.
+     */
+    TaskExecution getParentTask();
 
     /**
      * Retrieves the children task executions.
@@ -54,6 +61,16 @@ public interface TaskContext {
      * @throws ServerMigrationFailureException if the subtask execution failed
      */
     TaskExecution execute(ServerMigrationTask subtask) throws IllegalStateException, ServerMigrationFailureException;
+
+    /**
+     * Creates and executes a subtask, from the specified name and runnable components.
+     * @param taskName the subtask's name
+     * @param taskRunnable the subtask's runnable
+     * @return the
+     * @throws IllegalStateException
+     * @throws ServerMigrationFailureException
+     */
+    TaskExecution execute(ServerMigrationTaskName taskName, TaskRunnable taskRunnable) throws IllegalStateException, ServerMigrationFailureException;
 
     /**
      * Retrieves the server migration context.

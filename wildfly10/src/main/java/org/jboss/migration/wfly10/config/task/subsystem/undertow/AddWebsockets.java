@@ -39,7 +39,7 @@ public class AddWebsockets<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
     private static final String SETTING_NAME = "websockets";
 
     public AddWebsockets() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

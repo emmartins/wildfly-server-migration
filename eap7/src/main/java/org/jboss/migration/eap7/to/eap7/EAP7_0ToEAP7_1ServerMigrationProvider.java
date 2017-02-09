@@ -24,7 +24,7 @@ import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
@@ -41,7 +41,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(
                         serverUpdateBuilders.standaloneConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new EAP7_0ToEAP7_1UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP7_0ToEAP7_1UpdateUndertowSubsystem<>())
@@ -51,7 +51,7 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new EAP7_0ToEAP7_1UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP7_0ToEAP7_1UpdateUndertowSubsystem<>())

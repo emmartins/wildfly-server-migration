@@ -36,7 +36,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
     public static final String TASK_NAME = "add-infinispan-passivation-store-and-distributable-cache";
 
     public AddInfinispanPassivationStoreAndDistributableCache() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String CLUSTER_PASSIVATION_STORE = "cluster-passivation-store";

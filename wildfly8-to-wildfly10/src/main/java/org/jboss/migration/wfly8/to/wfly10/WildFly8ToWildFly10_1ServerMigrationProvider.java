@@ -28,7 +28,7 @@ import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
@@ -49,7 +49,7 @@ public class WildFly8ToWildFly10_1ServerMigrationProvider implements WildFlyFull
         final ServerUpdate.Builders<WildFlyServer8> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                        .subtask(new RemoveAllUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly8ToWildFly10_1UpdateInfinispanSubsystem<>())
                         .subtask(new WildFly8ToWildFly10_1UpdateUndertowSubsystem<>())
@@ -66,7 +66,7 @@ public class WildFly8ToWildFly10_1ServerMigrationProvider implements WildFlyFull
                         .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly8ToWildFly10_1UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly8ToWildFly10_1UpdateUndertowSubsystem<>())

@@ -19,7 +19,7 @@ package org.jboss.migration.eap6.to.eap7.tasks;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManagementInterfaceResource;
@@ -38,11 +38,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class SetupHttpUpgradeManagement<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
-    private static final String TASK_NAME = "setup-http-upgrade-management";
+    private static final String TASK_NAME = "management.setup-http-upgrade";
 
     public SetupHttpUpgradeManagement() {
         name(TASK_NAME);
-        skipPolicy(TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet());
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("HTTP upgrade management setup starting..."));
         subtasks(ManageableServerConfigurationCompositeSubtasks.of(new SetManagementInterfacesHttpUpgradeEnabled<>(), new UpdateManagementHttpsSocketBindingPort<>()));
         afterRun(context -> context.getLogger().infof("HTTP upgrade management setup completed."));
@@ -50,12 +50,12 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
 
     public static class SetManagementInterfacesHttpUpgradeEnabled<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
-        private static final String SUBTASK_NAME = "set-management-interfaces-http-upgrade-enabled";
         private static final String MANAGEMENT_INTERFACE_NAME = "http-interface";
+        private static final String SUBTASK_NAME = TASK_NAME + ".management-interface."+MANAGEMENT_INTERFACE_NAME+".enable-http-upgrade";
 
         protected SetManagementInterfacesHttpUpgradeEnabled() {
             name(SUBTASK_NAME);
-            skipPolicy(TaskSkipPolicy.skipIfAnyPropertyIsSet(TASK_NAME+"."+SUBTASK_NAME+".skip"));
+            skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
             final ManageableResourceTaskRunnableBuilder<S, ManagementInterfaceResource> runnableBuilder = params -> context -> {
                 // check if attribute is defined
                 final ManagementInterfaceResource resource = params.getResource();
@@ -79,34 +79,22 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
 
     static class UpdateManagementHttpsSocketBindingPort<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
-        private static final String SUBTASK_NAME = "update-management-https-socket-binding-port";
-
-        public interface EnvironmentProperties {
-            /**
-             * the prefix for the name of the management-https socket binding related properties
-             */
-            String PROPERTIES_PREFIX = TASK_NAME + "." + SUBTASK_NAME + ".";
-
-            String PORT = PROPERTIES_PREFIX + "port";
-        }
-
         public static final String DEFAULT_PORT = "${jboss.management.https.port:9993}";
-        private final String SOCKET_BINDING_NAME = "management-https";
-        private final String SOCKET_BINDING_PORT_ATTR = "port";
+        private static final String SOCKET_BINDING_NAME = "management-https";
+        private static final String SOCKET_BINDING_PORT_ATTR = "port";
+
+        private static final String SUBTASK_NAME = TASK_NAME + ".socket-binding." + SOCKET_BINDING_NAME + ".update-port";
+
+
 
         protected UpdateManagementHttpsSocketBindingPort() {
-            name("set-management-interfaces-http-upgrade-enabled");
-            skipPolicyBuilder(buildParameters -> context -> {
-                if(TaskSkipPolicy.skipIfAnyPropertyIsSet(TASK_NAME+"."+SUBTASK_NAME+".skip").isSkipped(context)) {
-                    return true;
-                }
-                // only run on standalone configs
-                return !(buildParameters.getServerConfiguration() instanceof StandaloneServerConfiguration);
-            });
+            name(SUBTASK_NAME);
+            skipPolicyBuilders(buildParameters -> TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet(),
+                buildParameters -> context -> !(buildParameters.getServerConfiguration() instanceof StandaloneServerConfiguration));
             final ManageableResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
                 final SocketBindingResource resource = params.getResource();
-                final MigrationEnvironment env = context.getServerMigrationContext().getMigrationEnvironment();
-                String envPropertyPort = env.getPropertyAsString(UpdateManagementHttpsSocketBindingPort.EnvironmentProperties.PORT);
+                final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), context.getTaskName());
+                String envPropertyPort = taskEnvironment.getPropertyAsString("port");
                 if (envPropertyPort == null || envPropertyPort.isEmpty()) {
                     envPropertyPort = DEFAULT_PORT;
                 }

@@ -36,7 +36,7 @@ public class UpdateWebCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
     public static final String TASK_NAME = "update-infinispan-web-cache";
 
     public UpdateWebCache() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String CACHE_CONTAINER = "cache-container";

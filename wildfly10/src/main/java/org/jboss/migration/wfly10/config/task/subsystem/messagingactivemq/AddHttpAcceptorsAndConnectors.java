@@ -52,7 +52,7 @@ public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemResourceSub
     public static final String TASK_NAME = "add-messaging-http-acceptors-and-connectors";
 
     public AddHttpAcceptorsAndConnectors() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String SERVER = "server";

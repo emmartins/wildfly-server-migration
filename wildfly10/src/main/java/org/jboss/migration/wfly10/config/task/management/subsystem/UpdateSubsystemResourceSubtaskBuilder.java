@@ -21,32 +21,24 @@ import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.core.task.component.TaskNameBuilder;
 import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 
 /**
  * @author emmartins
  */
 public abstract class UpdateSubsystemResourceSubtaskBuilder<S> extends ManageableResourceLeafTask.Builder<S, SubsystemResource> {
 
-    public UpdateSubsystemResourceSubtaskBuilder(String taskName) {
-        this(new ServerMigrationTaskName.Builder(taskName).build());
+    protected ManageableResourceLeafTask.Builder<S, SubsystemResource> subtaskName(String subtaskName) {
+        return nameBuilder(parameters -> new ServerMigrationTaskName.Builder("subsystem."+parameters.getResource().getResourceName()+".update."+subtaskName).addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
     }
 
-    public UpdateSubsystemResourceSubtaskBuilder(ServerMigrationTaskName taskName) {
-        this(params -> taskName);
-    }
-
-    public UpdateSubsystemResourceSubtaskBuilder(TaskNameBuilder<ManageableResourceBuildParameters<S, SubsystemResource>> nameBuilder) {
-        nameBuilder(nameBuilder);
-        skipPolicyBuilder(params -> context -> TaskSkipPolicy.skipByTaskEnvironment(EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(params.getResource().getResourceName(), context.getTaskName().getName())).isSkipped(context));
+    public UpdateSubsystemResourceSubtaskBuilder() {
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
             final SubsystemResource resource = params.getResource();
-            final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(resource.getResourceName(), context.getTaskName().getName()));
+            final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), context.getTaskName());
             final String configName = resource.getResourceAbsoluteName();
             final ModelNode config = resource.getResourceConfiguration();
             if (config == null) {

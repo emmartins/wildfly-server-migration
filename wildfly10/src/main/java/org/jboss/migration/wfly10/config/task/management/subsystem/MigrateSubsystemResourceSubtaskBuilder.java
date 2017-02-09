@@ -19,7 +19,6 @@ package org.jboss.migration.wfly10.config.task.management.subsystem;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationFailureException;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
@@ -41,7 +40,6 @@ public class MigrateSubsystemResourceSubtaskBuilder<S> extends ManageableResourc
 
     public MigrateSubsystemResourceSubtaskBuilder(String subsystem) {
         this.subsystem = subsystem;
-        nameBuilder(parameters -> new ServerMigrationTaskName.Builder("migrate-subsystem-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build());
         runBuilder(params -> context -> migrateConfiguration(params.getResource(), context));
     }
 

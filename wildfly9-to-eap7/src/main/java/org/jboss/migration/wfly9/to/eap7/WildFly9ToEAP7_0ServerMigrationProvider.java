@@ -23,7 +23,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagi
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
@@ -42,7 +42,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
         final ServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                        .subtask(new RemoveAllUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly9ToEAP7_0UpdateUndertowSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
@@ -53,7 +53,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly9ToEAP7_0UpdateUndertowSubsystem<>())
                                 .subtask(new MigrateMessagingSubsystem<>())

@@ -29,6 +29,7 @@ import org.jboss.migration.wfly10.config.task.management.configuration.Manageabl
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * Set socket binding's ports as value expressions.
@@ -43,7 +44,8 @@ public class AddSocketBindingPortExpressions<S> extends ManageableServerConfigur
     };
 
     public AddSocketBindingPortExpressions() {
-        name("add-socket-binding-port-expressions");
+        name("socket-bindings.add-port-expressions");
+        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Adding socket binding's port expressions..."));
         final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
         for (String socketBinding : SOCKET_BINDINGS) {
@@ -66,7 +68,8 @@ public class AddSocketBindingPortExpressions<S> extends ManageableServerConfigur
         }
 
         protected AddSocketBindingPortExpression(String resourceName, String propertyName) {
-            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("add-"+resourceName+"-port-expression").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("socket-binding."+resourceName+".add-port-expression").addAttribute("resource", parameters.getResource().getResourceAbsoluteName()).build());
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
             runBuilder(params -> context -> {
                 // retrieve resource config
                 final SocketBindingResource socketBindingResource = params.getResource();

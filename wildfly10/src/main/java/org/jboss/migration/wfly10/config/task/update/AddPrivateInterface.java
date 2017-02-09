@@ -29,15 +29,14 @@ import org.jboss.migration.wfly10.config.management.SocketBindingResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
-import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesCompositeTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.Builders.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * Adds private interface to config, and updates jgroup socket bindings to use it.
@@ -47,29 +46,32 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
 
     private static final String INTERFACE_NAME = "private";
     private static final String[] SOCKET_BINDING_NAMES = {"jgroups-mping", "jgroups-tcp", "jgroups-tcp-fd", "jgroups-udp", "jgroups-udp-fd"};
+    // TODO allow ^^ to be set on env
+    private static final String TASK_NAME = "interface."+INTERFACE_NAME+".setup";
+
 
     public AddPrivateInterface() {
-        name("setup-private-interface");
-        skipPolicyBuilder(buildParameters -> TaskSkipPolicy.skipIfAnySkips(
-                TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(),
-                context -> {
+        name(TASK_NAME);
+        skipPolicyBuilders(skipIfDefaultTaskSkipPropertyIsSet(),
+                buildParameters -> context -> {
                     for (String socketBindingName : SOCKET_BINDING_NAMES) {
                         if (!buildParameters.getServerConfiguration().findResources(SocketBindingResource.class, socketBindingName).isEmpty()) {
                             return false;
                         }
                     }
                     return true;
-                }));
+                });
         beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
         subtasks(new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(new AddInterface<>())
-                .subtask(SocketBindingGroupResource.class, new UpdateSocketBindingGroups<>()));
+                .subtask(SocketBindingGroupResource.class, new UpdateSocketBindings<>()));
         afterRun(context -> context.getLogger().infof("Private interface setup done."));
     }
 
     protected static class AddInterface<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
         protected AddInterface() {
-            name("add-interface");
+            name(TASK_NAME+".add-config");
+            skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
             runBuilder(params -> context -> {
                 final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
                 if (serverConfiguration.getInterfaceResourceNames().contains(INTERFACE_NAME)) {
@@ -85,16 +87,10 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
         }
     }
 
-    protected static class UpdateSocketBindingGroups<S> extends ManageableResourcesCompositeTask.Builder<S, SocketBindingGroupResource> {
-        protected UpdateSocketBindingGroups() {
-            name("update-socket-binding-groups");
-            subtasks(new ManageableResourceCompositeSubtasks.Builder<S, SocketBindingGroupResource>().subtask(new UpdateSocketBindingGroup<>()));
-        }
-    }
-
-    protected static class UpdateSocketBindingGroup<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingGroupResource> {
-        protected UpdateSocketBindingGroup() {
-            nameBuilder(params -> new ServerMigrationTaskName.Builder("update-socket-binding-group").addAttribute("name", params.getResource().getResourceName()).build());
+    protected static class UpdateSocketBindings<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingGroupResource> {
+        protected UpdateSocketBindings() {
+            nameBuilder(params -> new ServerMigrationTaskName.Builder(TASK_NAME+".update-socket-binding-group-"+params.getResource().getResourceName()).build());
+            skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
             final ManageableResourceTaskRunnableBuilder<S, SocketBindingGroupResource> runnableBuilder = params -> context -> {
                 final List<String> updated = new ArrayList<>();
                 for (String socketBinding : SOCKET_BINDING_NAMES) {
@@ -108,7 +104,7 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
                                 writeAttrOp.get(NAME).set(INTERFACE);
                                 writeAttrOp.get(VALUE).set(INTERFACE_NAME);
                                 socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                                context.getLogger().infof("Socket binding %s interface set to %s", pathAddress.toCLIStyleString(), INTERFACE_NAME);
+                                context.getLogger().infof("Socket binding %s interface set to %s", params.getResource().getResourceAbsoluteName(), INTERFACE_NAME);
                                 updated.add(socketBinding);
                             }
                         }

@@ -36,17 +36,6 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
     public static final String DOMAIN = "domain";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(DOMAIN).build();
 
-    public interface EnvironmentProperties {
-        /**
-         * the prefix for the name of related properties
-         */
-        String PROPERTIES_PREFIX = DOMAIN + ".";
-        /**
-         * Boolean property which if true skips the migration task execution
-         */
-        String SKIP = PROPERTIES_PREFIX + "skip";
-    }
-
     private final DomainConfigurationsMigration<S, ?> domainConfigurationsMigration;
     private final HostConfigurationsMigration<S, ?> hostConfigurationsMigration;
 
@@ -79,7 +68,7 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
-        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Setup the target's domain?"), EnvironmentProperties.SKIP);
+        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's managed domain?"));
     }
 
     public static class Builder<S extends Server>  {
