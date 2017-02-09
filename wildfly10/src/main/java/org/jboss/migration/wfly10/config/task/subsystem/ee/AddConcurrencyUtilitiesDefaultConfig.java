@@ -47,7 +47,7 @@ public class AddConcurrencyUtilitiesDefaultConfig<S> extends UpdateSubsystemReso
     public static final String TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE = "managed-scheduled-executor-service";
 
     public AddConcurrencyUtilitiesDefaultConfig() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

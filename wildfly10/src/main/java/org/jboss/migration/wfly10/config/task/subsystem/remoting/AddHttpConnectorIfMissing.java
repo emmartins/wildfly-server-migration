@@ -47,7 +47,7 @@ public class AddHttpConnectorIfMissing<S> extends UpdateSubsystemResourceSubtask
     public static final String TASK_NAME = "add-remoting-http-connector";
 
     public AddHttpConnectorIfMissing() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String HTTP_CONNECTOR = "http-connector";

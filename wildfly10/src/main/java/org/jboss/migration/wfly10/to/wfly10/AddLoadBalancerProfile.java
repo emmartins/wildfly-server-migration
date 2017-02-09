@@ -33,6 +33,8 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemR
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
+
 /**
  * @author emmartins
  */
@@ -52,7 +54,8 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
 
         protected AddLoadBalancerSocketBindingsGroup() {
             name("add-"+SOCKET_BINDING_GROUP_NAME);
-            skipPolicyBuilder(buildParameters -> context -> buildParameters.getServerConfiguration().getSocketBindingGroupResource(SOCKET_BINDING_GROUP_NAME) != null);
+            skipPolicyBuilders(buildParameters -> skipIfDefaultTaskSkipPropertyIsSet(),
+                    buildParameters -> context -> buildParameters.getServerConfiguration().hasSocketBindingGroupResource(SOCKET_BINDING_GROUP_NAME));
             runBuilder(params -> context -> {
                 final ManageableServerConfiguration configuration = params.getServerConfiguration();
                 final PathAddress socketBindingGroupPathAddress = configuration.getSocketBindingGroupResourcePathAddress(SOCKET_BINDING_GROUP_NAME);
@@ -93,6 +96,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
     public static class AddIOSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
         protected AddIOSubsystemConfig() {
             super(SubsystemNames.IO);
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         }
 
         @Override
@@ -113,6 +117,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
     public static class AddUndertowSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
         protected AddUndertowSubsystemConfig() {
             super(SubsystemNames.UNDERTOW);
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         }
 
         @Override
@@ -171,6 +176,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
     public static class AddLoggingSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
         protected AddLoggingSubsystemConfig() {
             super(SubsystemNames.LOGGING);
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         }
 
         @Override

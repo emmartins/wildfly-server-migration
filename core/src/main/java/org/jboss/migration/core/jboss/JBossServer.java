@@ -48,13 +48,13 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
     public interface EnvironmentProperties {
         String PROPERTIES_PREFIX = "server.";
 
-        String PROPERTIES_DOMAIN_PREFIX = PROPERTIES_PREFIX + "domain.";
+        String PROPERTIES_DOMAIN_PREFIX = "domain.";
         String PROPERTY_DOMAIN_BASE_DIR = PROPERTIES_DOMAIN_PREFIX + "domainDir";
         String PROPERTY_DOMAIN_CONFIG_DIR = PROPERTIES_DOMAIN_PREFIX + "configDir";
         String PROPERTY_DOMAIN_DOMAIN_CONFIG_FILES = PROPERTIES_DOMAIN_PREFIX + "domainConfigFiles";
         String PROPERTY_DOMAIN_HOST_CONFIG_FILES = PROPERTIES_DOMAIN_PREFIX + "hostConfigFiles";
 
-        String PROPERTIES_STANDALONE_PREFIX = PROPERTIES_PREFIX + "standalone.";
+        String PROPERTIES_STANDALONE_PREFIX = "standalone.";
         String PROPERTY_STANDALONE_SERVER_DIR = PROPERTIES_STANDALONE_PREFIX + "serverDir";
         String PROPERTY_STANDALONE_CONFIG_DIR = PROPERTIES_STANDALONE_PREFIX + "configDir";
         String PROPERTY_STANDALONE_CONFIG_FILES = PROPERTIES_STANDALONE_PREFIX + "configFiles";
@@ -102,7 +102,7 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
     }
 
     protected String getFullEnvironmentPropertyName(String propertyName) {
-        return getMigrationName() + "." + propertyName;
+        return EnvironmentProperties.PROPERTIES_PREFIX + getMigrationName() + "." + propertyName;
     }
 
     protected Collection<ServerPath<S>> getConfigs(final Path configurationDir, final String xmlDocumentElementName, final String envPropertyName) {

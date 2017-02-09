@@ -18,7 +18,6 @@ package org.jboss.migration.wfly10.config.task.management.extension;
 
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
@@ -31,7 +30,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MOD
  */
 public class AddExtensionTaskBuilder<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
     public AddExtensionTaskBuilder(String extensionModule) {
-        name(new ServerMigrationTaskName.Builder("add-extension").addAttribute("name", extensionModule).build());
+        name("extension."+extensionModule+".add");
         runBuilder(params -> context -> {
             final ManageableServerConfiguration extensionResourceParent = params.getServerConfiguration();
             if (!extensionResourceParent.getExtensionResourceNames().contains(extensionModule)) {

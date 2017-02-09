@@ -20,6 +20,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskRunnable;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -39,7 +40,8 @@ public class AddApplicationRealmSSLServerIdentity<S> extends ManageableServerCon
     public static final String SERVER_IDENTITY_NAME = "ssl";
 
     public AddApplicationRealmSSLServerIdentity() {
-        name("add-application-realm-ssl-server-identity");
+        name("security-realm."+RESOURCE_NAME+".add-"+SERVER_IDENTITY_NAME+"-"+SERVER_IDENTITY);
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
         runBuilder(SecurityRealmResource.class, RESOURCE_NAME, new RunnableBuilder<>());
         afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));

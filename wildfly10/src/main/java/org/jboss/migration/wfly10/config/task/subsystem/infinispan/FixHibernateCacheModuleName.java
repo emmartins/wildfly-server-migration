@@ -45,7 +45,7 @@ public class FixHibernateCacheModuleName<S> extends UpdateSubsystemResourceSubta
     public static final String TASK_NAME = "fix-hibernate-cache-module-name";
 
     public FixHibernateCacheModuleName() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String CACHE_CONTAINER = "cache-container";

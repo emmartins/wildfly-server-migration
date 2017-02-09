@@ -52,7 +52,7 @@ public class MigrationEnvironment implements Environment {
     }
 
     public String getPropertyAsString(String propertyName) {
-        //readed.add(propertyName);
+        readed.add(propertyName);
         final PropertyValue propertyValue = properties.get(propertyName);
         if (propertyValue == null) {
             return null;
@@ -66,7 +66,7 @@ public class MigrationEnvironment implements Environment {
     }
 
     public List<String> getPropertyAsList(String propertyName) {
-        //readed.add(propertyName);
+        readed.add(propertyName);
         final PropertyValue propertyValue = properties.get(propertyName);
         if (propertyValue == null) {
             return null;
@@ -133,8 +133,8 @@ public class MigrationEnvironment implements Environment {
                 result.add(propertyName);
             }
         }
-        return Collections.unmodifiableList(result);
-        //return Collections.unmodifiableList(new ArrayList<>(readed));
+        //return Collections.unmodifiableList(result);
+        return Collections.unmodifiableList(new ArrayList<>(readed));
     }
 
     private static class PropertyValue {

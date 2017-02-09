@@ -21,7 +21,6 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
@@ -30,6 +29,8 @@ import org.jboss.migration.wfly10.config.task.management.resource.ManageableReso
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
+
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.Builders.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * @author emmartins
@@ -41,22 +42,21 @@ public class AddProfileTaskBuilder<S> extends ManageableServerConfigurationCompo
 
     public AddProfileTaskBuilder(String profileName) {
         this.profileName = profileName;
-        name("add-profile-"+profileName);
-        skipPolicyBuilder(buildParameters -> TaskSkipPolicy.skipIfAnySkips(
-                TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet(),
-                context -> {
+        name("profile."+profileName+".add");
+        skipPolicyBuilders(skipIfDefaultTaskSkipPropertyIsSet(),
+                buildParameters -> context -> {
                     if (!buildParameters.getServerConfiguration().findResources(ProfileResource.class, profileName).isEmpty()) {
                         context.getLogger().infof("Profile %s already exists.", profileName);
                         return true;
                     } else {
                         return false;
                     }
-                }));
-        beforeRun(context -> context.getLogger().infof("Configuring profile %s...", profileName));
+                });
+        beforeRun(context -> context.getLogger().infof("Adding profile %s...", profileName));
         this.subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(ProfileResource.Parent.class, new CreateProfileTask<>(profileName));
         subtasks(subtasks);
-        afterRun(context -> context.getLogger().infof("Profile %s configured.", profileName));
+        afterRun(context -> context.getLogger().infof("Profile %s added.", profileName));
     }
 
     protected void addSubsystemSubtasks(AddSubsystemResources<S>... addSubsystemSubtasks) {

@@ -39,7 +39,7 @@ public class AddHttpsListener<S> extends UpdateSubsystemResourceSubtaskBuilder<S
     private static final String HTTPS_LISTENER_NAME = "https";
 
     public AddHttpsListener() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

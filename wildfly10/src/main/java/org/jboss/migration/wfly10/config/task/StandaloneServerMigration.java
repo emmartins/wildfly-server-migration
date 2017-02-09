@@ -36,17 +36,6 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
     public static final String STANDALONE = "standalone";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(STANDALONE).build();
 
-    public interface EnvironmentProperties {
-        /**
-         * the prefix for the name of related properties
-         */
-        String PROPERTIES_PREFIX = STANDALONE + ".";
-        /**
-         * Boolean property which if true skips the migration task execution
-         */
-        String SKIP = PROPERTIES_PREFIX + "skip";
-    }
-
     private final StandaloneServerConfigurationsMigration<S, ?> configFilesMigration;
 
     public StandaloneServerMigration(StandaloneServerConfigurationsMigration<S, ?> configFilesMigration) {
@@ -72,6 +61,6 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
-        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Setup the target's standalone server?"), EnvironmentProperties.SKIP);
+        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's standalone server?"));
     }
 }

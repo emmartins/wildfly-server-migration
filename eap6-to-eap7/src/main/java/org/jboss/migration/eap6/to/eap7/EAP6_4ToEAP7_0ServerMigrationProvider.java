@@ -37,7 +37,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.web.MigrateWebSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedExtensionsAndSubsystems;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
@@ -55,7 +55,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
         final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                        .subtask(new RemoveAllUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateJacorbSubsystem<>())
                         .subtask(new MigrateWebSubsystem<>())
@@ -77,7 +77,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                         .subtask(new RemoveDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedExtensionsAndSubsystems<>())
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
                                 .subtask(new MigrateWebSubsystem<>())

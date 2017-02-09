@@ -16,13 +16,12 @@
 
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
-import org.jboss.migration.core.task.ServerMigrationTaskName;
-import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesCompositeTask;
-import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
+
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * @author emmartins
@@ -30,8 +29,8 @@ import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 public class UpdateSubsystemResources<S> extends ManageableResourcesCompositeTask.Builder<S, ManageableResource> {
 
     public UpdateSubsystemResources(String subsystemName, UpdateSubsystemResourceSubtaskBuilder<S>... subtasks) {
-        name(new ServerMigrationTaskName.Builder("update-subsystem").addAttribute("name", subsystemName).build());
-        skipPolicy(TaskSkipPolicy.skipByTaskEnvironment(EnvironmentProperties.getSubsystemTaskPropertiesPrefix(subsystemName)));
+        name("subsystem."+subsystemName+".update");
+        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Updating subsystem %s configuration(s)...", subsystemName));
         final ManageableResourceCompositeSubtasks.Builder<S, SubsystemResource> subtasksBuilder = new ManageableResourceCompositeSubtasks.Builder<>();
         for (UpdateSubsystemResourceSubtaskBuilder<S> subtask : subtasks) {

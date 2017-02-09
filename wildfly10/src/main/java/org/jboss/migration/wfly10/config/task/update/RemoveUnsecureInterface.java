@@ -18,38 +18,31 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.InterfaceResource;
-import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
+
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * Removes Unsecure interface.
- * TODO lock for specific config type
+ * TODO lock for specific config type?
  * @author emmartins
  */
-public class RemoveUnsecureInterface<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
+public class RemoveUnsecureInterface<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
     public RemoveUnsecureInterface() {
-        name("remove-unsecure-interface");
-        beforeRun(context -> context.getLogger().debugf("Removing unsecure interface..."));
-        subtasks(InterfaceResource.class, "unsecure", ManageableResourceCompositeSubtasks.of(new Subtask<>()));
-        afterRun(context -> {
-          if (context.hasSucessfulSubtasks()) {
-              context.getLogger().debugf("Unsecure interface configuration removed.");
-          }
+        name("interface.unsecure.remove");
+        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+        beforeRun(context -> context.getLogger().infof("Unsecure interface removal task starting..."));
+        runBuilder(params -> context -> {
+            InterfaceResource resource = params.getServerConfiguration().getInterfaceResource("unsecure");
+            if (resource == null) {
+                context.getLogger().debugf("Unsecure interface not found, skipping task.");
+                return ServerMigrationTaskResult.SKIPPED;
+            }
+            resource.removeResource();
+            context.getLogger().infof("Interface configuration %s removed.", resource.getResourceAbsoluteName());
+            return ServerMigrationTaskResult.SUCCESS;
         });
-    }
-
-    public static class Subtask<S> extends ManageableResourceLeafTask.Builder<S, InterfaceResource> {
-        protected Subtask() {
-            name("remove-unsecure-interface-config");
-            final ManageableResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params-> context -> {
-                params.getResource().removeResource();
-                context.getLogger().info("Unsecure interface configuration removed.");
-                return ServerMigrationTaskResult.SUCCESS;
-            };
-            runBuilder(runnableBuilder);
-        }
+        afterRun(context -> context.getLogger().infof("Unsecure interface removal task done."));
     }
 }

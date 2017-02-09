@@ -51,7 +51,7 @@ public abstract class ComponentTask implements ServerMigrationTask {
     public abstract static class Builder<P extends BuildParameters, T extends Builder<P, T>> implements ComponentTaskBuilder<P, T> {
 
         private TaskNameBuilder<? super P> taskNameBuilder;
-        private TaskSkipPolicy.Builder<? super P> skipPolicyBuilder = TaskSkipPolicy.Builders.skipIfDefaultSkipPropertyIsSet();
+        private TaskSkipPolicy.Builder<? super P> skipPolicyBuilder;
         private BeforeTaskRun.Builder<? super P> beforeRunBuilder;
         private AfterTaskRun.Builder<? super P> afterRunBuilder;
 

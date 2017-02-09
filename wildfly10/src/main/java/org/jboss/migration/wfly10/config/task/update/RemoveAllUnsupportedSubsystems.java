@@ -21,8 +21,8 @@ import org.jboss.migration.wfly10.config.task.subsystem.SupportedExtensions;
 /**
  * @author emmartins
  */
-public class RemoveAllUnsupportedExtensionsAndSubsystems<S> extends RemoveUnsupportedExtensionsAndSubsystems<S> {
-    public RemoveAllUnsupportedExtensionsAndSubsystems() {
+public class RemoveAllUnsupportedSubsystems<S> extends RemoveUnsupportedSubsystems<S> {
+    public RemoveAllUnsupportedSubsystems() {
         super(new Builder<S>().extensions(SupportedExtensions.all()));
     }
 }

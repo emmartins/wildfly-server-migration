@@ -23,7 +23,6 @@ import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.extension.RemoveExtensionTaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.resources.ManageableResourcesCompositeTask;
-import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 
 /**
  * @author emmartins
@@ -35,12 +34,13 @@ public class MigrateSubsystemResources<S> extends ManageableResourcesCompositeTa
     }
 
     public MigrateSubsystemResources(final String extensionModule, MigrateSubsystemResourceSubtaskBuilder<S> subtask) {
-        name(new ServerMigrationTaskName.Builder("migrate-subsystem").addAttribute("name", subtask.getSubsystem()).build());
-        skipPolicy(TaskSkipPolicy.skipByTaskEnvironment(EnvironmentProperties.getSubsystemTaskPropertiesPrefix(subtask.getSubsystem())));
+        final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("subsystem."+subtask.getSubsystem()+".migrate").build();
+        name(taskName);
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Migrating subsystem %s configuration(s)...", subtask.getSubsystem()));
         subtasks(new ManageableResourcesCompositeSubtasks.Builder<S, ManageableResource>()
-                .subtask(SubsystemResource.class, subtask.getSubsystem(), subtask)
-                .subtask(new RemoveExtensionTaskBuilder<>(extensionModule)));
+                .subtask(SubsystemResource.class, subtask.getSubsystem(), subtask.nameBuilder(parameters -> new ServerMigrationTaskName.Builder(taskName.getName()+".migrate-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build()))
+                .subtask(new RemoveExtensionTaskBuilder<S>(extensionModule).name(new ServerMigrationTaskName.Builder(taskName.getName()+".remove-extension").addAttribute("module", extensionModule).build())));
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
                 context.getLogger().infof("Subsystem %s configuration(s) migrated.", subtask.getSubsystem());
@@ -49,4 +49,6 @@ public class MigrateSubsystemResources<S> extends ManageableResourcesCompositeTa
             }
         });
     }
+
+
 }

@@ -29,12 +29,12 @@ public interface TaskSkipPolicy {
 
     boolean isSkipped(TaskContext context);
 
-    static TaskSkipPolicy skipByTaskEnvironment(String taskEnvironmentPropertyNamePrefix) {
-        return context -> new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), taskEnvironmentPropertyNamePrefix).isSkippedByEnvironment();
+    static TaskSkipPolicy skipByTaskEnvironment(String propertyNamesBase) {
+        return context -> new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), propertyNamesBase).isSkippedByEnvironment();
     }
 
-    static TaskSkipPolicy skipIfDefaultSkipPropertyIsSet() {
-        return context -> context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(context.getTaskName().getName() + ".skip", Boolean.FALSE);
+    static TaskSkipPolicy skipIfDefaultTaskSkipPropertyIsSet() {
+        return context -> skipIfAnyPropertyIsSet(context.getTaskName().getName() + ".skip").isSkipped(context);
     }
 
     static TaskSkipPolicy skipIfAnyPropertyIsSet(String... propertyNames) {
@@ -97,8 +97,8 @@ public interface TaskSkipPolicy {
     }
 
     interface Builders {
-        static <P extends BuildParameters> Builder<P> skipIfDefaultSkipPropertyIsSet() {
-            return (buildParameters) -> TaskSkipPolicy.skipIfDefaultSkipPropertyIsSet();
+        static <P extends BuildParameters> Builder<P> skipIfDefaultTaskSkipPropertyIsSet() {
+            return (buildParameters) -> TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet();
         }
         static <P extends BuildParameters> Builder<P> skipByTaskEnvironment(String taskEnvironmentPropertyNamePrefix) {
             return (buildParameters) -> TaskSkipPolicy.skipByTaskEnvironment(taskEnvironmentPropertyNamePrefix);

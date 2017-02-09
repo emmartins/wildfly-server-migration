@@ -21,7 +21,6 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
@@ -36,7 +35,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  */
 public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
-    public static final String TASK_NAME = "add-default-host-response-header";
+    public static final String TASK_NAME = "add-response-header";
 
     private static final String SERVER_NAME = "default-server";
     private static final String HOST_NAME = "default-host";
@@ -57,7 +56,7 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubt
     }
 
     public SetDefaultHostResponseHeader(String filterName, String headerName, String headerValue) {
-        super(new ServerMigrationTaskName.Builder(TASK_NAME).addAttribute(RESPONSE_HEADER, filterName).build());
+        subtaskName(TASK_NAME+"."+filterName);
         this.filterName = filterName;
         this.headerName = headerName;
         this.headerValue = headerValue;

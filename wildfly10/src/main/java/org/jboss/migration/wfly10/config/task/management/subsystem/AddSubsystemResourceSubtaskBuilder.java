@@ -35,7 +35,7 @@ public class AddSubsystemResourceSubtaskBuilder<S> extends ManageableResourceLea
 
     public AddSubsystemResourceSubtaskBuilder(String subsystem) {
         this.subsystem = subsystem;
-        nameBuilder(parameters -> new ServerMigrationTaskName.Builder("add-subsystem-config").addAttribute("name", parameters.getResource().getSubsystemResourceAbsoluteName(subsystem)).build());
+        nameBuilder(parameters -> new ServerMigrationTaskName.Builder("subsystem."+subsystem+".add-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build());
         runBuilder(params -> taskContext -> {
             SubsystemResource.Parent parent = params.getResource();
             if (parent.hasSubsystemResource(subsystem)) {

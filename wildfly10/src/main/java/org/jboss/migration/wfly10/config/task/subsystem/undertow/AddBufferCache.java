@@ -37,7 +37,7 @@ public class AddBufferCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
     private static final String BUFFER_CACHE_NAME = "default";
 
     public AddBufferCache() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

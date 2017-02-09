@@ -40,7 +40,7 @@ public class SetDefaultHttpListenerRedirectSocket<S> extends UpdateSubsystemReso
     private static final String REDIRECT_SOCKET_ATTR_VALUE = "https";
 
     public SetDefaultHttpListenerRedirectSocket() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

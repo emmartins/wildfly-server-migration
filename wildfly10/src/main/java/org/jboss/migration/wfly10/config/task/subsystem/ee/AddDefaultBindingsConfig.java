@@ -60,7 +60,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
     public static final String TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY = "default-jms-connection-factory";
 
     public AddDefaultBindingsConfig() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String SERVER = "server";
@@ -83,17 +83,29 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
         final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
         final PathAddress pathAddress = subsystemPathAddress.append(pathElement("service", "default-bindings"));
         final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-        // add ee concurrency utils defaults if related task was not skipped
-        final boolean addConcurrencyUtilitiesDefaultConfigSkipped = new TaskEnvironment(migrationEnvironment, org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties.getSubsystemSubtaskPropertiesPrefix(subsystemResource.getResourceName(), AddConcurrencyUtilitiesDefaultConfig.TASK_NAME)).isSkippedByEnvironment();
-        if (!addConcurrencyUtilitiesDefaultConfigSkipped) {
-            addOp.get("context-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
-            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
-            addOp.get("managed-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
-            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
-            addOp.get("managed-scheduled-executor-service").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
-            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
-            addOp.get("managed-thread-factory").set(AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
-            taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, AddConcurrencyUtilitiesDefaultConfig.DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
+        // add ee concurrency utils defaults if configured
+        ModelNode eeSubsystemConfig = subsystemResource.getParentResource().getSubsystemResourceConfiguration(SubsystemNames.EE);
+        if (eeSubsystemConfig != null) {
+            if (eeSubsystemConfig.hasDefined("context-service", "default", "jndi-name")) {
+                final String jndiName = eeSubsystemConfig.get("context-service", "default", "jndi-name").asString();
+                addOp.get("context-service").set(jndiName);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, jndiName);
+            }
+            if (eeSubsystemConfig.hasDefined("managed-executor-service", "default", "jndi-name")) {
+                final String jndiName = eeSubsystemConfig.get("managed-executor-service", "default", "jndi-name").asString();
+                addOp.get("managed-executor-service").set(jndiName);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, jndiName);
+            }
+            if (eeSubsystemConfig.hasDefined("managed-scheduled-executor-service", "default", "jndi-name")) {
+                final String jndiName = eeSubsystemConfig.get("managed-scheduled-executor-service", "default", "jndi-name").asString();
+                addOp.get("managed-scheduled-executor-service").set(jndiName);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, jndiName);
+            }
+            if (eeSubsystemConfig.hasDefined("managed-thread-factory", "default", "jndi-name")) {
+                final String jndiName = eeSubsystemConfig.get("managed-thread-factory", "default", "jndi-name").asString();
+                addOp.get("managed-thread-factory").set(jndiName);
+                taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, jndiName);
+            }
         }
         setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, subsystemResource.getParentResource(), context, taskEnvironment, taskResultBuilder);
         setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, subsystemResource.getParentResource(), context, taskEnvironment, taskResultBuilder);

@@ -20,6 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.InterfaceResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
@@ -28,6 +29,7 @@ import org.jboss.migration.wfly10.config.task.management.resource.ManageableReso
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * Updates unsecure interface.
@@ -36,17 +38,22 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 public class UpdateUnsecureInterface<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     private static final String INTERFACE_NAME = "unsecure";
+    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("interface."+INTERFACE_NAME+".update").build();
 
     public UpdateUnsecureInterface() {
-        name("update-unsecure-interface");
-        beforeRun(context -> context.getLogger().debugf("Updating unsecure interface configuration..."));
+        name(TASK_NAME);
+        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+        beforeRun(context -> context.getLogger().infof("Unsecure interface update task starting..."));
         subtasks(InterfaceResource.class, INTERFACE_NAME, ManageableResourceCompositeSubtasks.of(new SetUnsecureInterfaceInetAddress<>()));
-        afterRun(context -> context.getLogger().debugf("Unsecure interface configuration updated."));
+        afterRun(context -> context.getLogger().debugf("Unsecure interface update task done."));
     }
 
+
     public static class SetUnsecureInterfaceInetAddress<S> extends ManageableResourceLeafTask.Builder<S, InterfaceResource> {
+        private static final ServerMigrationTaskName SUBTASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME.getName()+".set-inet-address").build();
         protected SetUnsecureInterfaceInetAddress() {
-            name("set-unsecure-interface-inet-address");
+            name(SUBTASK_NAME);
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
             final ManageableResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params -> context -> {
                 final InterfaceResource resource = params.getResource();
                 final ModelNode resourceConfig = params.getResource().getResourceConfiguration();

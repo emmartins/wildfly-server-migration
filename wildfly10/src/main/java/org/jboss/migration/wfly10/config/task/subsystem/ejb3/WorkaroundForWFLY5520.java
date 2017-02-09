@@ -36,7 +36,7 @@ public class WorkaroundForWFLY5520<S> extends UpdateSubsystemResourceSubtaskBuil
     public static final String TASK_NAME = "apply-wfly-5520-fix";
 
     public WorkaroundForWFLY5520() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

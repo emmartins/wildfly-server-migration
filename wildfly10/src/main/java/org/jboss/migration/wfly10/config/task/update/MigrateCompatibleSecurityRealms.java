@@ -27,6 +27,7 @@ import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.SecurityRealmResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
@@ -45,7 +46,8 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends ManageableServerConfigurationCompositeTask.Builder<ServerPath<S>> {
 
     public MigrateCompatibleSecurityRealms() {
-        name("migrate-compatible-security-realms");
+        name("security-realms.migrate-properties");
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Migrating security realms..."));
         subtasks(SecurityRealmResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
         afterRun(context -> context.getLogger().infof("Security realms migration done."));
@@ -54,11 +56,11 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
 
     protected static class Subtask<S extends JBossServer<S>> extends ManageableResourceLeafTask.Builder<ServerPath<S>, SecurityRealmResource> {
         protected Subtask() {
-            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("migrate-compatible-security-realm").addAttribute("name", parameters.getResource().getResourceName()).build());
-            beforeRunBuilder(params-> context -> context.getLogger().debugf("Security realm %s migration starting...", params.getResource().getResourceName()));
-            afterRunBuilder(params -> context -> context.getLogger().infof("Security realm %s migrated.", params.getResource().getResourceName()));
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("security-realm."+parameters.getResource().getResourceName()+".migrate-properties").build());
             final ManageableResourceTaskRunnableBuilder<ServerPath<S>, SecurityRealmResource> runnableBuilder = params -> context -> {
                 final SecurityRealmResource securityRealmResource = params.getResource();
+                final String securityRealmConfigName = securityRealmResource.getResourceAbsoluteName();
+                context.getLogger().debugf("Security realm %s migration starting...", securityRealmConfigName);
                 final ModelNode securityRealmConfig = securityRealmResource.getResourceConfiguration();
                 if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
                     copyPropertiesFile(AUTHENTICATION, securityRealmConfig, params.getSource(), securityRealmResource, context);
@@ -66,11 +68,13 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
                 if (securityRealmConfig.hasDefined(AUTHORIZATION, PROPERTIES)) {
                     copyPropertiesFile(AUTHORIZATION, securityRealmConfig, params.getSource(), securityRealmResource, context);
                 }
+                context.getLogger().infof("Security realm %s migrated.", securityRealmConfigName);
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);
         }
 
+        // TODO move this code to a generic path resolve + copy
         private void copyPropertiesFile(String propertiesName, ModelNode securityRealmConfig, ServerPath<S> source, SecurityRealmResource securityRealmResource, TaskContext context) throws ServerMigrationFailureException {
             final Server sourceServer = source.getServer();
             final Server targetServer = securityRealmResource.getServerConfiguration().getServer();

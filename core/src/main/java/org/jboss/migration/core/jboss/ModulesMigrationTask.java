@@ -33,12 +33,10 @@ import java.util.Set;
  */
 public class ModulesMigrationTask implements ServerMigrationTask {
 
-    public static final String MODULES = "modules";
-    public static final String ENVIRONMENT_PROPERTIES_PREFIX = MODULES + ".";
-    public static final String ENVIRONMENT_PROPERTY_INCLUDES = ENVIRONMENT_PROPERTIES_PREFIX + "includes";
-    public static final String ENVIRONMENT_PROPERTY_EXCLUDES = ENVIRONMENT_PROPERTIES_PREFIX + "excludes";
+    public static final String ENVIRONMENT_PROPERTY_INCLUDES = "modules.includes";
+    public static final String ENVIRONMENT_PROPERTY_EXCLUDES = "modules.excludes";
 
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(MODULES).build();
+    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("modules.migrate-modules-requested-by-user").build();
 
     private final JBossServer source;
     private final JBossServer target;
@@ -61,7 +59,8 @@ public class ModulesMigrationTask implements ServerMigrationTask {
 
     @Override
     public ServerMigrationTaskResult run(TaskContext context) {
-        if (new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), getName().getName()).isSkippedByEnvironment()) {
+        final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), getName());
+        if (taskEnvironment.isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
         context.getLogger().infof("Migrating modules requested by %s...", requestedBy);
@@ -114,7 +113,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
                 context.getLogger().debugf("Skipping module %s migration, already exists in target.", moduleIdentifier, reason);
                 return;
             }
-            final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("migrate-module").addAttribute("id", moduleIdentifier.toString()).build();
+            final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(context.getTaskName().getName()+".migrate-module").addAttribute("id", moduleIdentifier.toString()).build();
             final ServerMigrationTask subtask = new ServerMigrationTask() {
                 @Override
                 public ServerMigrationTaskName getName() {

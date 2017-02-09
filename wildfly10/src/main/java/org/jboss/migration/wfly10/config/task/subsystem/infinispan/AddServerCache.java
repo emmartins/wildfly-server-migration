@@ -37,7 +37,7 @@ public class AddServerCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
     public static final String TASK_NAME = "add-infinispan-server-cache";
 
     public AddServerCache() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     private static final String CACHE_CONTAINER = "cache-container";

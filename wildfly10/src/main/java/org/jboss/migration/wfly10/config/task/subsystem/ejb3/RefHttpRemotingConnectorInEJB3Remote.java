@@ -37,7 +37,7 @@ public class RefHttpRemotingConnectorInEJB3Remote<S> extends UpdateSubsystemReso
     public static final String TASK_NAME = "activate-ejb3-remoting-http-connector";
 
     public RefHttpRemotingConnectorInEJB3Remote() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

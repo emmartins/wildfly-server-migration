@@ -18,6 +18,7 @@ package org.jboss.migration.wfly10.config.task.module;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.ServerPath;
+import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTask;
@@ -55,25 +56,25 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
 
     @Override
     public ServerMigrationTask getTask(final ServerPath<S> source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
-        return new Task(source.getServer(), target, xmlConfigurationPath, modulesFinders);
+        return new SkippableByEnvServerMigrationTask(new Task(source.getServer(), target, xmlConfigurationPath, modulesFinders));
     }
 
     private static class Task extends ModulesMigrationTask {
 
-        private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("configuration-modules").build();
-
+        private final ServerMigrationTaskName taskName;
         private final Path xmlConfigurationPath;
         private final Map<String, List<ModulesFinder>> modulesFinders;
 
         public Task(JBossServer source, JBossServer target, Path xmlConfigurationPath, Map<String, List<ModulesFinder>> modulesFinders) {
             super(source, target, "configuration");
+            this.taskName = new ServerMigrationTaskName.Builder("modules.migrate-modules-requested-by-configuration").addAttribute("path", xmlConfigurationPath.toString()).build();
             this.xmlConfigurationPath = xmlConfigurationPath;
             this.modulesFinders = modulesFinders;
         }
 
         @Override
         public ServerMigrationTaskName getName() {
-            return TASK_NAME;
+            return taskName;
         }
 
         @Override

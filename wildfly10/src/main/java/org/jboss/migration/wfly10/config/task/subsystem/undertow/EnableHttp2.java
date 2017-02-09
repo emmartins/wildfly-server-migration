@@ -44,7 +44,7 @@ public class EnableHttp2<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
     private static final String ENABLE_HTTP2 = "enable-http2";
 
     public EnableHttp2() {
-        super(TASK_NAME);
+        subtaskName(TASK_NAME);
     }
 
     @Override

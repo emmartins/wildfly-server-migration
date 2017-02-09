@@ -17,6 +17,7 @@
 package org.jboss.migration.wfly10.config.task.management.subsystem;
 
 import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.extension.AddExtensionTaskBuilder;
@@ -33,11 +34,13 @@ public class AddSubsystemResources<S> extends ManageableResourcesCompositeTask.B
     }
 
     public AddSubsystemResources(final String extension, AddSubsystemResourceSubtaskBuilder<S> subtask) {
-        name(new ServerMigrationTaskName.Builder("add-subsystem").addAttribute("name", subtask.getSubsystem()).build());
+        final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("subsystem."+subtask.getSubsystem()+".add").build();
+        name(taskName);
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Adding subsystem %s configuration(s)...", subtask.getSubsystem()));
         subtasks(new ManageableResourcesCompositeSubtasks.Builder<S, ManageableResource>()
-                .subtask(new AddExtensionTaskBuilder<>(extension))
-                .subtask(SubsystemResource.Parent.class, subtask));
+                .subtask(new AddExtensionTaskBuilder<S>(extension).name(new ServerMigrationTaskName.Builder(taskName.getName()+".add-extension").addAttribute("module", extension).build()))
+                .subtask(SubsystemResource.Parent.class, subtask.nameBuilder(parameters -> new ServerMigrationTaskName.Builder(taskName.getName()+".add-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build())));
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
                 context.getLogger().infof("Subsystem %s configuration(s) added.", subtask.getSubsystem());

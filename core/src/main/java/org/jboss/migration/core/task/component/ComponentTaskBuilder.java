@@ -38,7 +38,29 @@ public interface ComponentTaskBuilder<P extends BuildParameters, T extends Compo
         return skipPolicyBuilder(parameters -> skipPolicy);
     }
 
+    default T skipPolicies(TaskSkipPolicy... skipPolicies) {
+        return skipPolicy(context -> {
+            for (TaskSkipPolicy skipPolicy : skipPolicies) {
+                if (skipPolicy.isSkipped(context)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
     T skipPolicyBuilder(TaskSkipPolicy.Builder<? super P> builder);
+
+    default T skipPolicyBuilders(TaskSkipPolicy.Builder<? super P>... builders) {
+        return skipPolicyBuilder(buildParameters -> context -> {
+                    for (TaskSkipPolicy.Builder<? super P> builder : builders) {
+                        if (builder.build(buildParameters).isSkipped(context)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+    }
 
     default T beforeRun(BeforeTaskRun beforeRun) {
         return beforeRunBuilder(parameters -> beforeRun);
