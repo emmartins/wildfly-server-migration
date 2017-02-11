@@ -16,20 +16,11 @@
 
 package org.jboss.migration.core.jboss;
 
-import org.jboss.migration.core.ServerMigrationFailureException;
-import org.jboss.migration.core.task.TaskContext;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PATH;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RELATIVE_TO;
-
 /**
  * @author emmartins
  */
 public interface PathMigrationUtils {
+    /*
     static boolean migrate(String path, String relativeTo, JBossServer source, JBossServer target, TaskContext taskContext) {
         //final Path path = Paths.get(content.get(PATH).asString());
         //final String relativeTo = content.hasDefined(RELATIVE_TO) ? content.get(RELATIVE_TO).asString() : null;
@@ -64,4 +55,5 @@ public interface PathMigrationUtils {
                 context.getMigrationFiles().copy(contentSource, contentTarget);
             }
     }
+    */
 }
