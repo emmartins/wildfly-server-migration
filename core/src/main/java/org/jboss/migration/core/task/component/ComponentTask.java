@@ -32,10 +32,8 @@ public abstract class ComponentTask implements ServerMigrationTask {
     private final TaskRunnable taskRunnable;
 
     protected ComponentTask(ServerMigrationTaskName name, TaskRunnable taskRunnable) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(taskRunnable);
-        this.name = name;
-        this.taskRunnable = taskRunnable;
+        this.name = Objects.requireNonNull(name);
+        this.taskRunnable = Objects.requireNonNull(taskRunnable);
     }
 
     @Override
@@ -109,13 +107,11 @@ public abstract class ComponentTask implements ServerMigrationTask {
         }
 
         protected ServerMigrationTaskName buildName(P parameters) {
-            Objects.requireNonNull(taskNameBuilder);
-            return taskNameBuilder.build(parameters);
+            return  Objects.requireNonNull(taskNameBuilder).build(parameters);
         }
 
         protected TaskRunnable buildRunnable(P parameters) {
-            final TaskRunnable.Builder<? super P> runnableBuilder = getRunnableBuilder();
-            Objects.requireNonNull(runnableBuilder);
+            final TaskRunnable.Builder<? super P> runnableBuilder = Objects.requireNonNull(getRunnableBuilder());
             final TaskRunnable runnable = runnableBuilder.build(parameters);
             final TaskSkipPolicy.Builder<? super P> skipPolicyBuilder = getSkipPolicyBuilder();
             final TaskSkipPolicy skipPolicy = skipPolicyBuilder != null ? skipPolicyBuilder.build(parameters) : null;

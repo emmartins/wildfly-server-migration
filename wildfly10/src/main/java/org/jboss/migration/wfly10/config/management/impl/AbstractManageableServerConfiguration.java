@@ -20,17 +20,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
+import org.jboss.migration.wfly10.config.management.PathResource;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
@@ -42,6 +40,7 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
     private ModelControllerClient modelControllerClient;
     private final ExtensionResourceImpl.Factory extensionConfigurations;
     private final InterfaceResourceImpl.Factory interfaceResources;
+    private final PathResourceImpl.Factory pathResources;
     private final SocketBindingGroupResourceImpl.Factory socketBindingGroupResources;
     private final SystemPropertyResourceImpl.Factory systemPropertyResources;
 
@@ -50,10 +49,12 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
         this.server = server;
         extensionConfigurations = new ExtensionResourceImpl.Factory(pathAddress, this);
         interfaceResources = new InterfaceResourceImpl.Factory(pathAddress, this);
+        pathResources = new PathResourceImpl.Factory(pathAddress, this);
         socketBindingGroupResources = new SocketBindingGroupResourceImpl.Factory(pathAddress, this);
         systemPropertyResources = new SystemPropertyResourceImpl.Factory(pathAddress, this);
         addChildResourceFactory(extensionConfigurations);
         addChildResourceFactory(interfaceResources);
+        addChildResourceFactory(pathResources);
         addChildResourceFactory(socketBindingGroupResources);
         addChildResourceFactory(systemPropertyResources);
     }
@@ -113,15 +114,22 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
 
     @Override
     public Path resolvePath(String pathName) throws ManagementOperationException {
-        final PathAddress address = pathAddress(pathElement(PATH, pathName));
-        final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
-        final ModelNode opResult = executeManagementOperation(op);
-        ServerMigrationLogger.ROOT_LOGGER.debugf("Resolve path Op result %s", opResult.toString());
-        String path = opResult.get(RESULT).get(PATH).asString();
-        if (!opResult.get(RESULT).hasDefined(RELATIVE_TO)) {
-            return Paths.get(path);
+        Path resolvedByServer = server.resolvePath(pathName);
+        if (resolvedByServer != null) {
+            return resolvedByServer;
         } else {
-            return resolvePath(opResult.get(RESULT).get(RELATIVE_TO).asString()).resolve(path);
+            final PathResource resource = getPathResource(pathName);
+            if (resource != null) {
+                final ModelNode resourceConfig = resource.getResourceConfiguration();
+                final String path = resourceConfig.get(PATH).asString();
+                if (resourceConfig.hasDefined(RELATIVE_TO)) {
+                    return resolvePath(resourceConfig.get(RELATIVE_TO).asString()).resolve(path);
+                } else {
+                    return Paths.get(path);
+                }
+            } else {
+                return null;
+            }
         }
     }
 

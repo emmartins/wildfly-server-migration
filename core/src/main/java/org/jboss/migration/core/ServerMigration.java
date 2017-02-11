@@ -138,7 +138,7 @@ public class ServerMigration {
         console.printf("----------------------------------------------------------%n");
         console.printf("%n");
 
-        final ServerMigrationContext serverMigrationContext = new ServerMigrationContext(console, interactive, migrationEnvironment);
+        final ServerMigrationContext serverMigrationContext = new ServerMigrationContextImpl(console, interactive, migrationEnvironment);
         final ServerMigrationTaskName serverMigrationTaskName = new ServerMigrationTaskName.Builder("server")
                 .build();
         final ServerMigrationTask serverMigrationTask = new ServerMigrationTask() {
@@ -149,9 +149,9 @@ public class ServerMigration {
 
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
-                context.getServerMigrationContext().getConsoleWrapper().printf("Server migration starting...%n");
+                context.getConsoleWrapper().printf("Server migration starting...%n");
                 final ServerMigrationTaskResult result = targetServer.migrate(sourceServer, context);
-                context.getServerMigrationContext().getConsoleWrapper().printf("%nServer migration done.%n%n");
+                context.getConsoleWrapper().printf("%nServer migration done.%n%n");
                 return result;
             }
         };

@@ -43,6 +43,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     private StandaloneServer standaloneServer;
 
     private final DeploymentResourceImpl.Factory deploymentResources;
+    private final DeploymentOverlayResourceImpl.Factory deploymentOverlayResources;
     private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
     private final SecurityRealmResourceImpl.Factory securityRealmResources;
     private final SubsystemResourceImpl.Factory subsystemResources;
@@ -52,6 +53,8 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         this.config = config;
         deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
         addChildResourceFactory(deploymentResources);
+        deploymentOverlayResources = new DeploymentOverlayResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(deploymentOverlayResources);
         subsystemResources = new SubsystemResourceImpl.Factory(getResourcePathAddress(), this);
         addChildResourceFactory(subsystemResources);
         final PathAddress managementCoreServicePathAddress = getResourcePathAddress().append(CORE_SERVICE, MANAGEMENT);

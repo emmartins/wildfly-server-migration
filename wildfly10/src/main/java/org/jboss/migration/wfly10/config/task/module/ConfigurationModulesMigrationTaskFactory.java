@@ -17,9 +17,9 @@
 package org.jboss.migration.wfly10.config.task.module;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
@@ -46,7 +46,7 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 /**
  * @author emmartins
  */
-public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<ServerPath<S>> {
+public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<JBossServerConfigurationPath<S>> {
 
     private final Map<String, List<ModulesFinder>> modulesFinders;
 
@@ -55,7 +55,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
     }
 
     @Override
-    public ServerMigrationTask getTask(final ServerPath<S> source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
+    public ServerMigrationTask getTask(final JBossServerConfigurationPath<S> source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
         return new SkippableByEnvServerMigrationTask(new Task(source.getServer(), target, xmlConfigurationPath, modulesFinders));
     }
 

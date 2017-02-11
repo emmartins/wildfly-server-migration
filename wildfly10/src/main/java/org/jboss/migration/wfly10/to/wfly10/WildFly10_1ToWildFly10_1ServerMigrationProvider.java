@@ -20,7 +20,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
@@ -40,12 +40,12 @@ public class WildFly10_1ToWildFly10_1ServerMigrationProvider implements WildFlyF
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly10_1ToWildFly10_1UpdateUndertowSubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
-                        .subtask(new RemoveDeployments<>()))
+                        .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly10_1ToWildFly10_1UpdateUndertowSubsystem<>())
-                                .subtask(new RemoveDeployments<>()))
+                                .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()

@@ -17,6 +17,7 @@
 package org.jboss.migration.core.env;
 
 import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.TaskContext;
 
 /**
  * @author emmartins
@@ -31,6 +32,10 @@ public class TaskEnvironment extends SubEnvironment {
 
     public TaskEnvironment(Environment environment, ServerMigrationTaskName taskName) {
         this(environment, taskName.getName());
+    }
+
+    public TaskEnvironment(TaskContext taskContext) {
+        this(taskContext.getMigrationEnvironment(), taskContext.getTaskName());
     }
 
     public TaskEnvironment(Environment environment, ServerMigrationTaskName taskName, ServerMigrationTaskName subtaskName) {

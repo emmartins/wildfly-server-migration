@@ -22,7 +22,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 
 /**
@@ -38,11 +38,11 @@ public class EAP7_0ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
-                        .subtask(new RemoveDeployments<>()))
+                        .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new RemoveDeployments<>()))
+                                .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()

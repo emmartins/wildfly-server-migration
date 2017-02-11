@@ -16,8 +16,11 @@
 package org.jboss.migration.core.task;
 
 import org.jboss.logging.Logger;
+import org.jboss.migration.core.MigrationFiles;
 import org.jboss.migration.core.ServerMigrationContext;
 import org.jboss.migration.core.ServerMigrationFailureException;
+import org.jboss.migration.core.console.ConsoleWrapper;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.task.component.TaskRunnable;
 
 import java.util.List;
@@ -79,9 +82,28 @@ public class TaskContextImpl implements TaskContext {
         });
     }
 
-    @Override
-    public ServerMigrationContext getServerMigrationContext() {
+    protected ServerMigrationContext getServerMigrationContext() {
         return taskExecution.getServerMigrationContext();
+    }
+
+    @Override
+    public ConsoleWrapper getConsoleWrapper() {
+        return getServerMigrationContext().getConsoleWrapper();
+    }
+
+    @Override
+    public MigrationFiles getMigrationFiles() {
+        return getServerMigrationContext().getMigrationFiles();
+    }
+
+    @Override
+    public boolean isInteractive() {
+        return getServerMigrationContext().isInteractive();
+    }
+
+    @Override
+    public MigrationEnvironment getMigrationEnvironment() {
+        return getServerMigrationContext().getMigrationEnvironment();
     }
 
     @Override

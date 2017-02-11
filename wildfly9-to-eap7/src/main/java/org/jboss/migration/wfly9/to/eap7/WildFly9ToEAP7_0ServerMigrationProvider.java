@@ -23,8 +23,8 @@ import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagi
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
-import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -50,7 +50,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
-                        .subtask(new RemoveDeployments<>()))
+                        .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new RemoveAllUnsupportedSubsystems<>())
@@ -62,7 +62,7 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
-                                .subtask(new RemoveDeployments<>()))
+                                .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()

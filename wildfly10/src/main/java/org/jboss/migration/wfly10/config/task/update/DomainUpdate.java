@@ -16,8 +16,8 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.DomainMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
@@ -37,11 +37,11 @@ public class DomainUpdate<S extends JBossServer<S>> extends DomainMigration<S> {
             return this;
         }
 
-        public Builder<S> domainConfigurations(DomainConfigurationMigration<ServerPath<S>> domainConfigurationUpdate) {
+        public Builder<S> domainConfigurations(DomainConfigurationMigration<JBossServerConfigurationPath<S>> domainConfigurationUpdate) {
             return domainConfigurations(new DomainConfigurationsUpdate<>(domainConfigurationUpdate));
         }
 
-        public Builder<S> domainConfigurations(DomainConfigurationMigration.Builder<ServerPath<S>> domainConfigurationUpdatebuilder) {
+        public Builder<S> domainConfigurations(DomainConfigurationMigration.Builder<JBossServerConfigurationPath<S>> domainConfigurationUpdatebuilder) {
             return domainConfigurations(domainConfigurationUpdatebuilder.build());
         }
 
@@ -50,11 +50,11 @@ public class DomainUpdate<S extends JBossServer<S>> extends DomainMigration<S> {
             return this;
         }
 
-        public Builder<S> hostConfigurations(HostConfigurationMigration<ServerPath<S>> hostConfigurationUpdate) {
+        public Builder<S> hostConfigurations(HostConfigurationMigration<JBossServerConfigurationPath<S>> hostConfigurationUpdate) {
             return hostConfigurations(new HostConfigurationsUpdate<>(hostConfigurationUpdate));
         }
 
-        public Builder<S> hostConfigurations(HostConfigurationMigration.Builder<ServerPath<S>> hostConfigurationUpdateBuilder) {
+        public Builder<S> hostConfigurations(HostConfigurationMigration.Builder<JBossServerConfigurationPath<S>> hostConfigurationUpdateBuilder) {
             return hostConfigurations(hostConfigurationUpdateBuilder.build());
         }
 

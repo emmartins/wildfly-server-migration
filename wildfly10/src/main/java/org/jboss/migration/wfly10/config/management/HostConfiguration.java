@@ -16,6 +16,8 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import java.nio.file.Path;
+
 /**
  * @author emmartins
  */
@@ -28,4 +30,18 @@ public interface HostConfiguration extends ManageableServerConfiguration, JvmRes
         return RESOURCE_TYPE;
     }
 
+    @Override
+    default Path getConfigurationDir() {
+        return getServer().getDomainConfigurationDir();
+    }
+
+    @Override
+    default Path getContentDir() {
+        return getServer().getDomainContentDir();
+    }
+
+    @Override
+    default Path getDataDir() {
+        return getServer().getDomainDataDir();
+    }
 }

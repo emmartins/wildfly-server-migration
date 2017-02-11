@@ -39,8 +39,8 @@ import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
-import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -78,7 +78,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new AddApplicationRealmSSLServerIdentity<>())
-                        .subtask(new RemoveDeployments<>()))
+                        .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new RemoveAllUnsupportedSubsystems<>())
@@ -102,7 +102,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
-                                .subtask(new RemoveDeployments<>()))
+                                .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()

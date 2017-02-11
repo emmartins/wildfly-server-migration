@@ -37,6 +37,8 @@ public interface DeploymentOverlayResource extends ManageableResource {
     @Override
     Parent getParentResource();
 
+    String[] getDeploymentLinks();
+
     /**
      * A facade (with full defaults) for a {@link ManageableResource} which has {@link DeploymentOverlayResource} children.
      */

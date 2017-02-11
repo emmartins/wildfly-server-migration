@@ -77,7 +77,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
 
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
-                final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
+                final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Migrating %s configuration %s", getConfigType(), source);
                 // create xml config
@@ -92,7 +92,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
                 // config through management
                 if (manageableConfigurationProvider != null) {
                     final T configurationManagement = manageableConfigurationProvider.getManageableConfiguration(xmlConfigurationPath, target);
-                    //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                    //context.getConsoleWrapper().printf("%n%n");
                     context.getLogger().debugf("Starting target configuration %s", xmlConfigurationPath.getFileName());
                     configurationManagement.start();
                     try {

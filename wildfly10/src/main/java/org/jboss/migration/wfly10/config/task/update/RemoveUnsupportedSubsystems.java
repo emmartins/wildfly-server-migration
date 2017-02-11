@@ -67,10 +67,12 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
             }
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
-                //context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
-                context.getLogger().debugf("Unsupported Extensions and Subsystems removal starting...");
+                //context.getConsoleWrapper().printf("%n%n");
+                context.getLogger().infof("Searching for extensions and subsystems not supported by the target server...");
                 removeExtensionsAndSubsystems(source, xmlConfigurationPath, target, context);
-                context.getLogger().debugf("Unsupported Extensions and Subsystems removal done.");
+                if (!context.hasSucessfulSubtasks()) {
+                    context.getLogger().infof("No unsupported extensions and subsystems found.");
+                }
                 return ServerMigrationTaskResult.SUCCESS;
             }
         };
@@ -78,8 +80,8 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
     }
 
     protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) {
-        final List<Extension> migrationExtensions = getMigrationExtensions(context.getServerMigrationContext().getMigrationEnvironment());
-        final List<Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getServerMigrationContext().getMigrationEnvironment());
+        final List<Extension> migrationExtensions = getMigrationExtensions(context.getMigrationEnvironment());
+        final List<Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();
         final Set<String> subsystemsRemoved = new HashSet<>();
         // setup the extensions filter
@@ -147,8 +149,8 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
             }
         };
         XMLFiles.filter(xmlConfigurationPath, extensionsFilter, subsystemsFilter);
-        context.getLogger().infof("Unsupported extensions removed: %s", extensionsRemoved);
-        context.getLogger().infof("Unsupported subsystems removed: %s", subsystemsRemoved);
+        context.getLogger().infof("Removed the following unsupported extensions: %s", extensionsRemoved);
+        context.getLogger().infof("Removed the following unsupported subsystems: %s", subsystemsRemoved);
 
     }
 

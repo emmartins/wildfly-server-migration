@@ -16,8 +16,8 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.core.ServerPath;
 import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationsMigration;
@@ -27,15 +27,15 @@ import java.util.Collection;
 /**
  * @author emmartins
  */
-class HostConfigurationsUpdate<S extends JBossServer<S>> extends HostConfigurationsMigration<S, ServerPath<S>> {
+class HostConfigurationsUpdate<S extends JBossServer<S>> extends HostConfigurationsMigration<S, JBossServerConfigurationPath<S>> {
 
-    HostConfigurationsUpdate(HostConfigurationMigration<ServerPath<S>> configurationMigration) {
+    HostConfigurationsUpdate(HostConfigurationMigration<JBossServerConfigurationPath<S>> configurationMigration) {
         super(new SourceHostConfigurations<S>(), configurationMigration);
     }
 
-    private static class SourceHostConfigurations<S extends JBossServer<S>> implements SourceConfigurations<S, ServerPath<S>> {
+    private static class SourceHostConfigurations<S extends JBossServer<S>> implements SourceConfigurations<S, JBossServerConfigurationPath<S>> {
         @Override
-        public Collection<ServerPath<S>> getConfigurations(S source, WildFlyServer10 target) {
+        public Collection<JBossServerConfigurationPath<S>> getConfigurations(S source, WildFlyServer10 target) {
             return source.getDomainHostConfigs();
         }
     }

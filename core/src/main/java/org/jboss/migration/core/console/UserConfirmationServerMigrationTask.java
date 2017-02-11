@@ -42,7 +42,7 @@ public class UserConfirmationServerMigrationTask implements ServerMigrationTask 
 
     protected ServerMigrationTaskResult confirmTaskRun(final TaskContext context) {
         final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
-        new UserConfirmation(context.getServerMigrationContext().getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
+        new UserConfirmation(context.getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
         switch (resultHandler.getResult()) {
             case NO:
                 return ServerMigrationTaskResult.SKIPPED;
@@ -60,6 +60,6 @@ public class UserConfirmationServerMigrationTask implements ServerMigrationTask 
 
     @Override
     public ServerMigrationTaskResult run(final TaskContext context) {
-        return context.getServerMigrationContext().isInteractive() ? confirmTaskRun(context) : runTask(context);
+        return context.isInteractive() ? confirmTaskRun(context) : runTask(context);
     }
 }

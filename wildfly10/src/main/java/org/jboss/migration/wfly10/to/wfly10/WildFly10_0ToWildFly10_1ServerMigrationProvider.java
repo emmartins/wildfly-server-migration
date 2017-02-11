@@ -22,8 +22,8 @@ import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
-import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_0;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
@@ -46,7 +46,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new AddApplicationRealmSSLServerIdentity<>())
-                        .subtask(new RemoveDeployments<>()))
+                        .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new RemoveAllUnsupportedSubsystems<>())
@@ -55,7 +55,7 @@ public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyF
                                 .subtask(new WildFly10_0ToWildFly10_1UpdateUndertowSubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
-                                .subtask(new RemoveDeployments<>()))
+                                .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()

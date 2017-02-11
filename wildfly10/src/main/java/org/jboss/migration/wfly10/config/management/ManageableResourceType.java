@@ -34,8 +34,7 @@ public class ManageableResourceType {
     private volatile Set<ManageableResourceType> descendantTypes;
 
     protected ManageableResourceType(Class<? extends ManageableResource> type) {
-        Objects.requireNonNull(type);
-        this.type = type;
+        this.type = Objects.requireNonNull(type);
         this.childTypes = new HashSet<>();
     }
 

@@ -28,15 +28,15 @@ public class UserInput {
     private final String prompt;
     private final ResultHandler resultHandler;
 
+    public UserInput(ConsoleWrapper theConsole, final String prompt, final ResultHandler resultHandler) {
+        this(theConsole, null, prompt, resultHandler);
+    }
+
     public UserInput(ConsoleWrapper theConsole, final String[] messageLines, final String prompt, final ResultHandler resultHandler) {
         this.theConsole = theConsole;
         this.messageLines = messageLines;
         this.prompt = prompt;
         this.resultHandler = resultHandler;
-    }
-
-    public UserInput(ConsoleWrapper theConsole, final String message, final String prompt, final ResultHandler resultHandler) {
-        this(theConsole, new String[] { message }, prompt, resultHandler);
     }
 
     public void execute() {
