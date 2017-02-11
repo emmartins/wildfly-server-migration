@@ -30,7 +30,7 @@ public interface TaskSkipPolicy {
     boolean isSkipped(TaskContext context);
 
     static TaskSkipPolicy skipByTaskEnvironment(String propertyNamesBase) {
-        return context -> new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), propertyNamesBase).isSkippedByEnvironment();
+        return context -> new TaskEnvironment(context.getMigrationEnvironment(), propertyNamesBase).isSkippedByEnvironment();
     }
 
     static TaskSkipPolicy skipIfDefaultTaskSkipPropertyIsSet() {
@@ -40,7 +40,7 @@ public interface TaskSkipPolicy {
     static TaskSkipPolicy skipIfAnyPropertyIsSet(String... propertyNames) {
         return context -> {
             for (String propertyName : propertyNames) {
-                if (context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsBoolean(propertyName, Boolean.FALSE)) {
+                if (context.getMigrationEnvironment().getPropertyAsBoolean(propertyName, Boolean.FALSE)) {
                     return true;
                 }
             }
@@ -78,7 +78,7 @@ public interface TaskSkipPolicy {
             }
             private boolean confirmTaskRun(final TaskContext context) {
                 final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
-                new UserConfirmation(context.getServerMigrationContext().getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
+                new UserConfirmation(context.getConsoleWrapper(), message, ServerMigrationLogger.ROOT_LOGGER.yesNo(), resultHandler).execute();
                 switch (resultHandler.getResult()) {
                     case NO:
                         return false;

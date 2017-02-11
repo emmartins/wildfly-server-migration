@@ -94,7 +94,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
                     if (sourcePath.startsWith(sourceServer.getBaseDir())) {
                         final Path targetPath = sourceServer.getBaseDir().resolve(targetServer.getBaseDir().relativize(sourcePath));
                         context.getLogger().debugf("Target Properties file path: %s", targetPath);
-                        context.getServerMigrationContext().getMigrationFiles().copy(sourcePath, targetPath);
+                        context.getMigrationFiles().copy(sourcePath, targetPath);
                         final PathAddress pathAddress = securityRealmResource.getResourcePathAddress().append(PathElement.pathElement(propertiesName, PROPERTIES));
                         final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
                         op.get(NAME).set(PATH);
@@ -118,7 +118,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
                     final Path targetPath = resolvedTargetPath.normalize().resolve(path);
                     context.getLogger().debugf("Target Properties file path: %s", targetPath);
                     if (!sourcePath.equals(targetPath)) {
-                        context.getServerMigrationContext().getMigrationFiles().copy(sourcePath, targetPath);
+                        context.getMigrationFiles().copy(sourcePath, targetPath);
                     } else {
                         context.getLogger().debugf("Resolved paths for Source and Target Properties files is the same.");
                     }

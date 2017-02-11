@@ -113,6 +113,10 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
 
     @Override
     public Path resolvePath(String pathName) throws ManagementOperationException {
+        Path resolvedByServer = server.resolvePath(pathName);
+        if (resolvedByServer != null) {
+            return resolvedByServer;
+        }
         final PathAddress address = pathAddress(pathElement(PATH, pathName));
         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
         final ModelNode opResult = executeManagementOperation(op);

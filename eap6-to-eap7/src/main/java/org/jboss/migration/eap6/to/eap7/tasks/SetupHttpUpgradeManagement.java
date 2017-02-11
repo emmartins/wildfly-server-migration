@@ -93,7 +93,7 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
                 buildParameters -> context -> !(buildParameters.getServerConfiguration() instanceof StandaloneServerConfiguration));
             final ManageableResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
                 final SocketBindingResource resource = params.getResource();
-                final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), context.getTaskName());
+                final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getMigrationEnvironment(), context.getTaskName());
                 String envPropertyPort = taskEnvironment.getPropertyAsString("port");
                 if (envPropertyPort == null || envPropertyPort.isEmpty()) {
                     envPropertyPort = DEFAULT_PORT;

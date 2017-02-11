@@ -38,7 +38,7 @@ public abstract class UpdateSubsystemResourceSubtaskBuilder<S> extends Manageabl
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
             final SubsystemResource resource = params.getResource();
-            final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), context.getTaskName());
+            final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getMigrationEnvironment(), context.getTaskName());
             final String configName = resource.getResourceAbsoluteName();
             final ModelNode config = resource.getResourceConfiguration();
             if (config == null) {

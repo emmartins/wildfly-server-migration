@@ -51,19 +51,30 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         String PROPERTIES_DOMAIN_PREFIX = "domain.";
         String PROPERTY_DOMAIN_BASE_DIR = PROPERTIES_DOMAIN_PREFIX + "domainDir";
         String PROPERTY_DOMAIN_CONFIG_DIR = PROPERTIES_DOMAIN_PREFIX + "configDir";
+        String PROPERTY_DOMAIN_DATA_DIR = PROPERTIES_DOMAIN_PREFIX + "dataDir";
+        String PROPERTY_DOMAIN_CONTENT_DIR = PROPERTIES_DOMAIN_PREFIX + "contentDir";
+
         String PROPERTY_DOMAIN_DOMAIN_CONFIG_FILES = PROPERTIES_DOMAIN_PREFIX + "domainConfigFiles";
         String PROPERTY_DOMAIN_HOST_CONFIG_FILES = PROPERTIES_DOMAIN_PREFIX + "hostConfigFiles";
 
         String PROPERTIES_STANDALONE_PREFIX = "standalone.";
         String PROPERTY_STANDALONE_SERVER_DIR = PROPERTIES_STANDALONE_PREFIX + "serverDir";
         String PROPERTY_STANDALONE_CONFIG_DIR = PROPERTIES_STANDALONE_PREFIX + "configDir";
+        String PROPERTY_STANDALONE_DATA_DIR = PROPERTIES_STANDALONE_PREFIX + "dataDir";
+        String PROPERTY_STANDALONE_CONTENT_DIR = PROPERTIES_STANDALONE_PREFIX + "contentDir";
         String PROPERTY_STANDALONE_CONFIG_FILES = PROPERTIES_STANDALONE_PREFIX + "configFiles";
     }
 
     private final Path domainBaseDir;
     private final Path domainConfigDir;
+    private final Path domainDataDir;
+    private final Path domainContentDir;
+
     private final Path standaloneServerDir;
     private final Path standaloneConfigDir;
+    private final Path standaloneDataDir;
+    private final Path standaloneContentDir;
+
     private final Map<String, Path> pathResolver;
     private final Modules modules;
 
@@ -80,6 +91,17 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
             domainConfigDir = domainBaseDir.resolve(domainConfigDir);
         }
         this.domainConfigDir = domainConfigDir;
+        Path domainDataDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_DATA_DIR), "data"));
+        if (!domainDataDir.isAbsolute()) {
+            domainDataDir = domainBaseDir.resolve(domainDataDir);
+        }
+        this.domainDataDir = domainDataDir;
+        Path domainContentDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_CONTENT_DIR), "content"));
+        if (!domainContentDir.isAbsolute()) {
+            domainContentDir = domainDataDir.resolve(domainContentDir);
+        }
+        this.domainContentDir = domainContentDir;
+
         Path standaloneServerDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_SERVER_DIR), "standalone"));
         if (!standaloneServerDir.isAbsolute()) {
             standaloneServerDir = baseDir.resolve(standaloneServerDir);
@@ -90,14 +112,27 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
             standaloneConfigDir = standaloneServerDir.resolve(standaloneConfigDir);
         }
         this.standaloneConfigDir = standaloneConfigDir;
+        Path standaloneDataDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_DATA_DIR), "data"));
+        if (!standaloneDataDir.isAbsolute()) {
+            standaloneDataDir = standaloneServerDir.resolve(standaloneDataDir);
+        }
+        this.standaloneDataDir = standaloneDataDir;
+        Path standaloneContentDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_STANDALONE_CONTENT_DIR), "content"));
+        if (!standaloneContentDir.isAbsolute()) {
+            standaloneContentDir = standaloneDataDir.resolve(standaloneContentDir);
+        }
+        this.standaloneContentDir = standaloneContentDir;
+
         this.pathResolver = new HashMap<>();
         this.pathResolver.put("jboss.server.base.dir", standaloneServerDir);
         this.pathResolver.put("jboss.server.config.dir", standaloneConfigDir);
-        this.pathResolver.put("jboss.server.data.dir", standaloneServerDir.resolve("data"));
+        this.pathResolver.put("jboss.server.data.dir", standaloneDataDir);
+        this.pathResolver.put("jboss.server.content.dir", standaloneContentDir);
         this.pathResolver.put("jboss.server.log.dir", standaloneServerDir.resolve("log"));
         this.pathResolver.put("jboss.domain.base.dir", domainBaseDir);
         this.pathResolver.put("jboss.domain.config.dir", domainConfigDir);
-        this.pathResolver.put("jboss.domain.data.dir", domainBaseDir.resolve("data"));
+        this.pathResolver.put("jboss.domain.data.dir", domainDataDir);
+        this.pathResolver.put("jboss.domain.content.dir", domainContentDir);
         this.modules = new Modules(baseDir);
     }
 
@@ -160,6 +195,14 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         return domainConfigDir;
     }
 
+    public Path getDomainDataDir() {
+        return domainDataDir;
+    }
+
+    public Path getDomainContentDir() {
+        return domainContentDir;
+    }
+
     public Path getStandaloneDir() {
         return standaloneServerDir;
     }
@@ -168,9 +211,27 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         return standaloneConfigDir;
     }
 
+    public Path getStandaloneDataDir() {
+        return standaloneDataDir;
+    }
+
+    public Path getStandaloneContentDir() {
+        return standaloneContentDir;
+    }
+
     @Override
     public Path resolvePath(String path) {
-        return pathResolver.get(path);
+        Path resolved = pathResolver.get(path);
+        if (resolved == null) {
+            String property = System.getProperty(path);
+            if (property != null) {
+                Path propertyPath = Paths.get(property);
+                if (Files.isDirectory(propertyPath)) {
+                    resolved = propertyPath;
+                }
+            }
+        }
+        return resolved;
     }
 
     public Modules getModules() {

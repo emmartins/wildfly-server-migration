@@ -59,12 +59,12 @@ public class ModulesMigrationTask implements ServerMigrationTask {
 
     @Override
     public ServerMigrationTaskResult run(TaskContext context) {
-        final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getServerMigrationContext().getMigrationEnvironment(), getName());
+        final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getMigrationEnvironment(), getName());
         if (taskEnvironment.isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
         context.getLogger().infof("Migrating modules requested by %s...", requestedBy);
-        final ModuleMigrator moduleMigrator = new ModuleMigrator(source, target, context.getServerMigrationContext().getMigrationEnvironment());
+        final ModuleMigrator moduleMigrator = new ModuleMigrator(source, target, context.getMigrationEnvironment());
         migrateModules(moduleMigrator, context);
         if (context.hasSucessfulSubtasks()) {
             return ServerMigrationTaskResult.SUCCESS;
@@ -75,7 +75,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
     }
 
     protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
-        final List<String> includedModules = context.getServerMigrationContext().getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.emptyList());
+        final List<String> includedModules = context.getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.emptyList());
         for (String module : includedModules) {
             moduleMigrator.migrateModule(module, "requested by environment", context);
         }
@@ -122,7 +122,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
 
                 @Override
                 public ServerMigrationTaskResult run(TaskContext context) {
-                    context.getServerMigrationContext().getMigrationFiles().copy(sourceModule.getModuleDir(), targetModules.getModuleDir(moduleIdentifier));
+                    context.getMigrationFiles().copy(sourceModule.getModuleDir(), targetModules.getModuleDir(moduleIdentifier));
                     context.getLogger().infof("Module %s migrated.", moduleIdentifier);
                     return new ServerMigrationTaskResult.Builder()
                             .success()

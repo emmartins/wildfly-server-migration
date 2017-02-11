@@ -71,7 +71,7 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
         return new ManageableResourceLeafTask.Builder<S, HostResource>()
                 .nameBuilder(parameters -> new ServerMigrationTaskName.Builder(HOST).addAttribute(MIGRATION_REPORT_TASK_ATTR_NAME, parameters.getResource().getResourceName()).build())
                 .beforeRunBuilder(parameters -> context -> {
-                    context.getServerMigrationContext().getConsoleWrapper().printf("%n%n");
+                    context.getConsoleWrapper().printf("%n%n");
                     context.getLogger().infof("Migrating host %s in host configuration %s ...", parameters.getResource().getResourceName(), parameters.getSource());
                 })
                 .afterRunBuilder(parameters -> context -> context.getLogger().infof("Migration of host %s in host configuration %s done.", parameters.getResource().getResourceName(), parameters.getSource()))

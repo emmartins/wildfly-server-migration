@@ -39,9 +39,9 @@ public class UpdateSubsystemResources<S> extends ManageableResourcesCompositeTas
         subtasks(SubsystemResource.class, subsystemName, subtasksBuilder);
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
-                context.getLogger().infof("Subsystem %s configuration(s) updated.", subsystemName);
+                context.getLogger().debugf("Subsystem %s configuration(s) update complete.", subsystemName);
             } else {
-                context.getLogger().infof("No subsystem %s configuration(s) updated.", subsystemName);
+                context.getLogger().debugf("No subsystem %s configuration(s) updated.", subsystemName);
             }
         });
     }

@@ -17,7 +17,6 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationContext;
 import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.console.BasicResultHandlers;
 import org.jboss.migration.core.console.ConsoleWrapper;
@@ -85,8 +84,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
 
         @Override
         public ServerMigrationTaskResult run(final TaskContext taskContext) {
-            final ServerMigrationContext serverMigrationContext = taskContext.getServerMigrationContext();
-            final ConsoleWrapper consoleWrapper = serverMigrationContext.getConsoleWrapper();
+            final ConsoleWrapper consoleWrapper = taskContext.getConsoleWrapper();
             consoleWrapper.printf("%n");
             taskContext.getLogger().infof("Retrieving source's %s configurations...", configFileMigration.getConfigType());
             if (!sourceConfigs.isEmpty()) {
@@ -98,7 +96,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
                 return ServerMigrationTaskResult.SKIPPED;
             }
 
-            if (serverMigrationContext.isInteractive()) {
+            if (taskContext.isInteractive()) {
                 final BasicResultHandlers.UserConfirmation resultHandler = new BasicResultHandlers.UserConfirmation();
                 new UserConfirmation(consoleWrapper, "Migrate all configurations?", ROOT_LOGGER.yesNo(), resultHandler).execute();
                 switch (resultHandler.getResult()) {
@@ -146,7 +144,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
                     confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
                 }
             };
-            final ConsoleWrapper consoleWrapper = taskContext.getServerMigrationContext().getConsoleWrapper();
+            final ConsoleWrapper consoleWrapper = taskContext.getConsoleWrapper();
             new UserConfirmation(consoleWrapper, "Migrate configuration "+sourceConfig+" ?", ROOT_LOGGER.yesNo(), resultHandler).execute();
         }
     }

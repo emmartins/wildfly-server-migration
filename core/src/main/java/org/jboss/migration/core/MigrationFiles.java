@@ -44,6 +44,8 @@ public class MigrationFiles {
 
     private final Map<Path, Path> copiedFiles;
 
+    private final long startTime = System.currentTimeMillis();
+
     MigrationFiles() {
         this.copiedFiles = new HashMap<>();
     }
@@ -67,7 +69,7 @@ public class MigrationFiles {
         } else {
             try {
                 if (Files.exists(target)) {
-                    Files.walkFileTree(target, new BackupVisitor(target));
+                    Files.walkFileTree(target, new BackupVisitor(target, startTime));
                 }
                 Files.createDirectories(target.getParent());
                 Files.walkFileTree(source, new CopyVisitor(source, target, copiedFiles));
@@ -82,9 +84,9 @@ public class MigrationFiles {
         private final Path source;
         private final Path backup;
 
-        BackupVisitor(Path source) {
+        BackupVisitor(Path source, long startTime) {
             this.source = source;
-            this.backup = source.resolveSibling(source.getFileName().toString()+".beforeMigration");
+            this.backup = source.resolveSibling(source.getFileName().toString()+".beforeMigration"+startTime);
         }
 
         @Override

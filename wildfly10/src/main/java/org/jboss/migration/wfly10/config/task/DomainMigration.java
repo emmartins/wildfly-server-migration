@@ -54,7 +54,7 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
 
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
-                final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
+                final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Domain migration starting...");
                 if (domainConfigurationsMigration != null) {

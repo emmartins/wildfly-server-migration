@@ -34,7 +34,7 @@ public class CopySourceXMLConfiguration<S extends JBossServer<S>> implements Ser
         final Path targetConfigFilePath = targetConfigDir.resolve(source.getPath().getFileName());
         context.getLogger().tracef("Target configuration file is %s", targetConfigFilePath);
         // copy xml from source to target
-        context.getServerMigrationContext().getMigrationFiles().copy(source.getPath(), targetConfigFilePath);
+        context.getMigrationFiles().copy(source.getPath(), targetConfigFilePath);
         context.getLogger().debugf("Source XML configuration copied to target server ( %s ).", targetConfigFilePath);
         return targetConfigFilePath;
     }

@@ -52,7 +52,7 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
 
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
-                final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
+                final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Standalone server migration starting...");
                 context.execute(configFilesMigration.getServerMigrationTask(source, target, target.getStandaloneConfigurationDir()));

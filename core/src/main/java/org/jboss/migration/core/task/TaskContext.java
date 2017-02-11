@@ -27,7 +27,7 @@ import java.util.List;
  * The task's context.
  * @author emmartins
  */
-public interface TaskContext {
+public interface TaskContext extends ServerMigrationContext {
 
     /**
      * Retrieves the name of the task in context.
@@ -71,12 +71,6 @@ public interface TaskContext {
      * @throws ServerMigrationFailureException
      */
     TaskExecution execute(ServerMigrationTaskName taskName, TaskRunnable taskRunnable) throws IllegalStateException, ServerMigrationFailureException;
-
-    /**
-     * Retrieves the server migration context.
-     * @return the server migration context
-     */
-    ServerMigrationContext getServerMigrationContext();
 
     /**
      * Retrieves the task logger.
