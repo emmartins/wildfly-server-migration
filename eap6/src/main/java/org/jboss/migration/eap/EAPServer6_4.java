@@ -15,9 +15,9 @@
  */
 package org.jboss.migration.eap;
 
-import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossServer;
 
 import java.nio.file.Path;
 

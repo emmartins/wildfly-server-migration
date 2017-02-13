@@ -16,16 +16,13 @@
 package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.SubsystemResource;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 
@@ -33,40 +30,25 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD
  * A task which adds Undertow's default buffer cache.
  * @author emmartins
  */
-public class AddBufferCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class AddBufferCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
-    public static final AddBufferCache INSTANCE = new AddBufferCache();
-
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("add-undertow-default-buffer-cache").build();
-
-    private AddBufferCache() {
-    }
-
+    public static final String TASK_NAME = "add-undertow-default-buffer-cache";
     private static final String BUFFER_CACHE = "buffer-cache";
     private static final String BUFFER_CACHE_NAME = "default";
 
+    public AddBufferCache() {
+        subtaskName(TASK_NAME);
+    }
+
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                if (config == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                if (!config.hasDefined(BUFFER_CACHE, BUFFER_CACHE_NAME)) {
-                    final PathAddress pathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName()).append(PathElement.pathElement(BUFFER_CACHE, BUFFER_CACHE_NAME));
-                    final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
-                    subsystemsManagement.getServerConfiguration().executeManagementOperation(addOp);
-                    context.getLogger().infof("Undertow's default buffer cache added.");
-                    return ServerMigrationTaskResult.SUCCESS;
-                } else {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-            }
-        };
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext taskContext, TaskEnvironment taskEnvironment) {
+        if (!config.hasDefined(BUFFER_CACHE, BUFFER_CACHE_NAME)) {
+            final PathAddress pathAddress = subsystemResource.getResourcePathAddress().append(BUFFER_CACHE, BUFFER_CACHE_NAME);
+            subsystemResource.getServerConfiguration().executeManagementOperation(Util.createEmptyOperation(ADD, pathAddress));
+            taskContext.getLogger().infof("Undertow's default buffer cache added to config %s.", subsystemResource.getResourceAbsoluteName());
+            return ServerMigrationTaskResult.SUCCESS;
+        } else {
+            return ServerMigrationTaskResult.SKIPPED;
+        }
     }
 }

@@ -16,6 +16,8 @@
 package org.jboss.migration.core;
 
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskExecution;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +31,11 @@ public class MigrationData {
 
     private final Server source;
     private final Server target;
-    private final ServerMigrationTaskExecution rootTask;
-    private final List<ServerMigrationTaskExecution> tasks;
+    private final TaskExecution rootTask;
+    private final List<TaskExecution> tasks;
     private final MigrationEnvironment migrationEnvironment;
 
-    MigrationData(Server source, Server target, ServerMigrationTaskExecution rootTask, MigrationEnvironment migrationEnvironment) {
+    MigrationData(Server source, Server target, TaskExecution rootTask, MigrationEnvironment migrationEnvironment) {
         this.source = source;
         this.target = target;
         this.rootTask = rootTask;
@@ -61,7 +63,7 @@ public class MigrationData {
      * Retrieves the root task execution.
      * @return the root task execution
      */
-    public ServerMigrationTaskExecution getRootTask() {
+    public TaskExecution getRootTask() {
         return rootTask;
     }
 
@@ -85,7 +87,7 @@ public class MigrationData {
      * Retrieves all tasks.
      * @return all tasks
      */
-    public List<ServerMigrationTaskExecution> getTasks() {
+    public List<TaskExecution> getTasks() {
         return tasks;
     }
 
@@ -96,7 +98,7 @@ public class MigrationData {
      */
     public int getTaskCount(ServerMigrationTaskResult.Status status) {
         int count = 0;
-        for (ServerMigrationTaskExecution task : tasks) {
+        for (TaskExecution task : tasks) {
             if (task.getResult().getStatus() == status) {
                 count++;
             }
@@ -104,17 +106,17 @@ public class MigrationData {
         return count;
     }
 
-    private List<ServerMigrationTaskExecution> initTasks() {
-        final List<ServerMigrationTaskExecution> results = new ArrayList<>();
+    private List<TaskExecution> initTasks() {
+        final List<TaskExecution> results = new ArrayList<>();
         results.add(getRootTask());
         addSubTasks(getRootTask(), results);
         return Collections.unmodifiableList(results);
     }
 
-    private void addSubTasks(ServerMigrationTaskExecution task, List<ServerMigrationTaskExecution> tasks) {
-        final List<ServerMigrationTaskExecution> subtasks = task.getSubtasks();
+    private void addSubTasks(TaskExecution task, List<TaskExecution> tasks) {
+        final List<TaskExecution> subtasks = task.getSubtasks();
         if (subtasks != null) {
-            for (ServerMigrationTaskExecution subtask : subtasks) {
+            for (TaskExecution subtask : subtasks) {
                 tasks.add(subtask);
                 addSubTasks(subtask, tasks);
             }

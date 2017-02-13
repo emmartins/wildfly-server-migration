@@ -22,49 +22,29 @@ import org.jboss.migration.core.env.MigrationEnvironment;
  * The server migration execution's context.
  * @author emmartins
  */
-public class ServerMigrationContext {
-
-    private final ConsoleWrapper consoleWrapper;
-    private final boolean interactive;
-    private final MigrationFiles migrationFiles;
-    private final MigrationEnvironment migrationEnvironment;
-
-    ServerMigrationContext(ConsoleWrapper consoleWrapper, boolean interactive, MigrationEnvironment migrationEnvironment) {
-        this.consoleWrapper = consoleWrapper;
-        this.interactive = interactive;
-        this.migrationEnvironment = migrationEnvironment;
-        this.migrationFiles = new MigrationFiles();
-    }
+public interface ServerMigrationContext {
 
     /**
      * Retrieves the migration's console.
      * @return the migration's console
      */
-    public ConsoleWrapper getConsoleWrapper() {
-        return consoleWrapper;
-    }
+    ConsoleWrapper getConsoleWrapper();
 
     /**
      * Retreives the migration files
      * @return the migration files
      */
-    public MigrationFiles getMigrationFiles() {
-        return migrationFiles;
-    }
+    MigrationFiles getMigrationFiles();
 
     /**
      * Indicates if the migration is interactive.
      * @return true if the migration is interactive, false otherwise
      */
-    public boolean isInteractive() {
-        return interactive;
-    }
+    boolean isInteractive();
 
     /**
      * Retrieves the migration's environment, used to customize the migration process.
      * @return the migrations's environment
      */
-    public MigrationEnvironment getMigrationEnvironment() {
-        return migrationEnvironment;
-    }
+    MigrationEnvironment getMigrationEnvironment();
 }

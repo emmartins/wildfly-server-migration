@@ -20,144 +20,63 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
-import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.config.management.HostConfiguration;
-import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
-import org.jboss.migration.wfly10.config.task.executor.InterfacesManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.factory.HostConfigurationTaskFactory;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.wfly10.config.management.InterfaceResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
- * Setup EAP 7 http upgrade management.
+ * Updates unsecure interface.
  * @author emmartins
  */
-public class UpdateUnsecureInterface<S> implements DomainConfigurationTaskFactory<S>, HostConfigurationTaskFactory<S> {
+public class UpdateUnsecureInterface<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
-    public static final UpdateUnsecureInterface INSTANCE = new UpdateUnsecureInterface();
+    private static final String INTERFACE_NAME = "unsecure";
+    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("interface."+INTERFACE_NAME+".update").build();
 
-    private static final String TASK_NAME_NAME = "update-unsecure-interface";
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
-
-    private UpdateUnsecureInterface() {
-    }
-
-    @Override
-    public ServerMigrationTask getTask(final S source, final HostControllerConfiguration configuration) throws Exception {
-        final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
-            @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
-                new SetUnsecureInterfaceInetAddress().executeSubtasks(source, configuration.getInterfacesManagement(), context);
-            }
-        };
-        return getTask(subtaskExecutor);
+    public UpdateUnsecureInterface() {
+        name(TASK_NAME);
+        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+        beforeRun(context -> context.getLogger().infof("Unsecure interface update task starting..."));
+        subtasks(InterfaceResource.class, INTERFACE_NAME, ManageableResourceCompositeSubtasks.of(new SetUnsecureInterfaceInetAddress<>()));
+        afterRun(context -> context.getLogger().debugf("Unsecure interface update task done."));
     }
 
 
-    @Override
-    public ServerMigrationTask getTask(final S source, final HostConfiguration configuration) throws Exception {
-        final ParentServerMigrationTask.SubtaskExecutor subtaskExecutor = new ParentServerMigrationTask.SubtaskExecutor() {
-            @Override
-            public void executeSubtasks(final ServerMigrationTaskContext context) throws Exception {
-                new RemoveUnsecureInterface().executeSubtasks(source, configuration.getInterfacesManagement(), context);
-            }
-        };
-        return getTask(subtaskExecutor);
-    }
-
-    protected ServerMigrationTask getTask(ParentServerMigrationTask.SubtaskExecutor subtaskExecutor) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
-                .eventListener(new ParentServerMigrationTask.EventListener() {
-                    @Override
-                    public void started(ServerMigrationTaskContext context) {
-                        context.getLogger().debugf("Updating unsecure interface configuration...");
-                    }
-                    @Override
-                    public void done(ServerMigrationTaskContext context) {
-                        context.getLogger().debugf("Unsecure interface configuration updated.");
-                    }
-                })
-                .subtask(subtaskExecutor)
-                .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
-    }
-
-    static class SetUnsecureInterfaceInetAddress<S> implements InterfacesManagementSubtaskExecutor<S> {
-
-        public static final String SERVER_MIGRATION_TASK_NAME_NAME = "set-unsecure-interface-inet-address";
-        public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).build();
-        private static final String INTERFACE_NAME = "unsecure";
-
-        @Override
-        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
-            final ServerMigrationTask subtask = new ServerMigrationTask() {
-                @Override
-                public ServerMigrationTaskName getName() {
-                    return SERVER_MIGRATION_TASK_NAME;
+    public static class SetUnsecureInterfaceInetAddress<S> extends ManageableResourceLeafTask.Builder<S, InterfaceResource> {
+        private static final ServerMigrationTaskName SUBTASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME.getName()+".set-inet-address").build();
+        protected SetUnsecureInterfaceInetAddress() {
+            name(SUBTASK_NAME);
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+            final ManageableResourceTaskRunnableBuilder<S, InterfaceResource> runnableBuilder = params -> context -> {
+                final InterfaceResource resource = params.getResource();
+                final ModelNode resourceConfig = params.getResource().getResourceConfiguration();
+                if (resourceConfig == null) {
+                    context.getLogger().debugf("Interface %s does not exists.", INTERFACE_NAME);
+                    return ServerMigrationTaskResult.SKIPPED;
                 }
-                @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                    // retrieve resource config
-                    final ModelNode resource = resourceManagement.getResource(INTERFACE_NAME);
-                    if (resource == null) {
-                        context.getLogger().debugf("Interface %s does not exists.", INTERFACE_NAME);
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
-                    // check if attribute is defined
-                    if (resource.hasDefined(INET_ADDRESS)) {
-                        context.getLogger().debugf("Interface %s inet address already defined.", INTERFACE_NAME);
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
-                    // set attribute value
-                    final ValueExpression valueExpression = new ValueExpression("${jboss.bind.address.unsecure:127.0.0.1}");
-                    final PathAddress pathAddress = resourceManagement.getResourcePathAddress(INTERFACE_NAME);
-                    final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                    writeAttrOp.get(NAME).set(INET_ADDRESS);
-                    writeAttrOp.get(VALUE).set(valueExpression);
-                    resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                    context.getLogger().infof("Interface %s inet address value set as %s.", INTERFACE_NAME, valueExpression.getExpressionString());
-                    return ServerMigrationTaskResult.SUCCESS;
+                // check if attribute is defined
+                if (resourceConfig.hasDefined(INET_ADDRESS)) {
+                    context.getLogger().debugf("Interface %s inet address already defined.", INTERFACE_NAME);
+                    return ServerMigrationTaskResult.SKIPPED;
                 }
+                // set attribute value
+                final ValueExpression valueExpression = new ValueExpression("${jboss.bind.address.unsecure:127.0.0.1}");
+                final PathAddress pathAddress = resource.getResourcePathAddress();
+                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                writeAttrOp.get(NAME).set(INET_ADDRESS);
+                writeAttrOp.get(VALUE).set(valueExpression);
+                resource.getServerConfiguration().executeManagementOperation(writeAttrOp);
+                context.getLogger().infof("Interface %s inet address value set as %s.", INTERFACE_NAME, valueExpression.getExpressionString());
+                return ServerMigrationTaskResult.SUCCESS;
             };
-            context.execute(new SkippableByEnvServerMigrationTask(subtask, UpdateUnsecureInterface.TASK_NAME_NAME+"."+SERVER_MIGRATION_TASK_NAME_NAME+".skip"));
-        }
-    }
-
-    static class RemoveUnsecureInterface<S> implements InterfacesManagementSubtaskExecutor<S> {
-
-        public static final String SERVER_MIGRATION_TASK_NAME_NAME = "remove-unsecure-interface";
-        public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(SERVER_MIGRATION_TASK_NAME_NAME).build();
-        private static final String INTERFACE_NAME = "unsecure";
-
-        @Override
-        public void executeSubtasks(S source, final InterfacesManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
-            final ServerMigrationTask subtask = new ServerMigrationTask() {
-                @Override
-                public ServerMigrationTaskName getName() {
-                    return SERVER_MIGRATION_TASK_NAME;
-                }
-                @Override
-                public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                    // retrieve resource config
-                    if (!resourceManagement.getResourceNames().contains(INTERFACE_NAME)) {
-                        context.getLogger().debugf("Interface %s does not exists.", INTERFACE_NAME);
-                        return ServerMigrationTaskResult.SKIPPED;
-                    }
-                    final PathAddress pathAddress = resourceManagement.getResourcePathAddress(INTERFACE_NAME);
-                    final ModelNode removeOp = Util.createRemoveOperation(pathAddress);
-                    resourceManagement.getServerConfiguration().executeManagementOperation(removeOp);
-                    context.getLogger().infof("Interface %s removed.", INTERFACE_NAME);
-                    return ServerMigrationTaskResult.SUCCESS;
-                }
-            };
-            context.execute(new SkippableByEnvServerMigrationTask(subtask, UpdateUnsecureInterface.TASK_NAME_NAME+"."+SERVER_MIGRATION_TASK_NAME_NAME+".skip"));
+            runBuilder(runnableBuilder);
         }
     }
 }

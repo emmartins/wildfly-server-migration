@@ -19,26 +19,18 @@ package org.jboss.migration.wfly10.config.management.impl;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
+import org.jboss.migration.wfly10.config.management.DeploymentResource;
+import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
 import org.wildfly.core.embedded.StandaloneServer;
 
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
-import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MANAGEMENT;
 
@@ -49,32 +41,27 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
 
     private final String config;
     private StandaloneServer standaloneServer;
-    private final DeploymentsManagement deploymentsManagement;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
-    private final ManagementInterfacesManagement managementInterfacesManagement;
-    private final SecurityRealmsManagement securityRealmsManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
-    private final SubsystemsManagement subsystemsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
+
+    private final DeploymentResourceImpl.Factory deploymentResources;
+    private final DeploymentOverlayResourceImpl.Factory deploymentOverlayResources;
+    private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
+    private final SecurityRealmResourceImpl.Factory securityRealmResources;
+    private final SubsystemResourceImpl.Factory subsystemResources;
 
     public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
-        super(server);
+        super("", PathAddress.EMPTY_ADDRESS, server);
         this.config = config;
-        this.deploymentsManagement = new DeploymentsManagementImpl(null, this);
-        this.extensionsManagement = new ExtensionsManagementImpl(null, this) {
-            @Override
-            public Set<String> getSubsystems() throws IOException {
-                return getSubsystemsManagement().getResourceNames();
-            }
-        };
-        this.subsystemsManagement = new SubsystemsManagementImpl(null, this);
-        this.interfacesManagement = new InterfacesManagementImpl(null, this);
-        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
-        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
-        final PathAddress managementCoreServicePathAddress = pathAddress(pathElement(CORE_SERVICE, MANAGEMENT));
-        this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
-        this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
+        deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(deploymentResources);
+        deploymentOverlayResources = new DeploymentOverlayResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(deploymentOverlayResources);
+        subsystemResources = new SubsystemResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(subsystemResources);
+        final PathAddress managementCoreServicePathAddress = getResourcePathAddress().append(CORE_SERVICE, MANAGEMENT);
+        managementInterfaceResources = new ManagementInterfaceResourceImpl.Factory(managementCoreServicePathAddress, this);
+        addChildResourceFactory(managementInterfaceResources);
+        securityRealmResources = new SecurityRealmResourceImpl.Factory(managementCoreServicePathAddress, this);
+        addChildResourceFactory(securityRealmResources);
     }
 
     @Override
@@ -85,7 +72,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         try {
             standaloneServer.start();
         } catch (EmbeddedProcessStartException e) {
-            throw new RuntimeException(e);
+            throw new ManagementOperationException(e);
         }
         return standaloneServer.getModelControllerClient();
     }
@@ -97,42 +84,29 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         standaloneServer = null;
     }
 
-    public DeploymentsManagement getDeploymentsManagement() {
-        return deploymentsManagement;
+    @Override
+    public DeploymentResource getDeploymentResource(String resourceName) throws ManagementOperationException {
+        return deploymentResources.getResource(resourceName);
     }
 
     @Override
-    public ExtensionsManagement getExtensionsManagement() {
-        return extensionsManagement;
+    public List<DeploymentResource> getDeploymentResources() throws ManagementOperationException {
+        return deploymentResources.getResources();
     }
 
     @Override
-    public InterfacesManagement getInterfacesManagement() {
-        return interfacesManagement;
+    public Set<String> getDeploymentResourceNames() throws ManagementOperationException {
+        return deploymentResources.getResourceNames();
     }
 
     @Override
-    public SystemPropertiesManagement getSystemPropertiesManagement() {
-        return systemPropertiesManagement;
+    public PathAddress getDeploymentResourcePathAddress(String resourceName) {
+        return deploymentResources.getResourcePathAddress(resourceName);
     }
 
     @Override
-    public SecurityRealmsManagement getSecurityRealmsManagement() {
-        return securityRealmsManagement;
-    }
-
-    @Override
-    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
-        return socketBindingGroupsManagement;
-    }
-
-    public SubsystemsManagement getSubsystemsManagement() {
-        return subsystemsManagement;
-    }
-
-    @Override
-    public ManagementInterfacesManagement getManagementInterfacesManagement() {
-        return managementInterfacesManagement;
+    public void removeDeploymentResource(String resourceName) throws ManagementOperationException {
+        deploymentResources.removeResource(resourceName);
     }
 
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
@@ -141,4 +115,6 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
             return new EmbeddedStandaloneServerConfiguration(configFile.getFileName().toString(), server);
         }
     }
+
+
 }

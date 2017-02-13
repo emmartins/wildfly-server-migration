@@ -25,7 +25,7 @@ import java.util.IllegalFormatException;
  */
 public interface ConsoleWrapper {
 
-    String NEW_LINE = String.format("%n", new Object[0]);
+    String NEW_LINE = String.format("%n");
     String SPACE = " ";
 
     /**

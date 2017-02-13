@@ -18,14 +18,12 @@ package org.jboss.migration.wfly10.config.task.subsystem.ejb3;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.wfly10.config.management.SubsystemResource;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 
@@ -33,13 +31,12 @@ import static org.jboss.as.controller.PathElement.pathElement;
  * A task which adds EJB3 subsystem's infinipan passivation-store, and distributable cache, if missing.
  * @author emmartins
  */
-public class AddInfinispanPassivationStoreAndDistributableCache implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class AddInfinispanPassivationStoreAndDistributableCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
-    public static final AddInfinispanPassivationStoreAndDistributableCache INSTANCE = new AddInfinispanPassivationStoreAndDistributableCache();
+    public static final String TASK_NAME = "add-infinispan-passivation-store-and-distributable-cache";
 
-    public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder("add-infinispan-passivation-store-and-distributable-cache").build();
-
-    private AddInfinispanPassivationStoreAndDistributableCache() {
+    public AddInfinispanPassivationStoreAndDistributableCache() {
+        subtaskName(TASK_NAME);
     }
 
     private static final String CLUSTER_PASSIVATION_STORE = "cluster-passivation-store";
@@ -67,98 +64,86 @@ public class AddInfinispanPassivationStoreAndDistributableCache implements Updat
     public static final String TASK_RESULT_ATTR_DISTRIBUTABLE_CACHE_ADDED = "distributable-cache-added";
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return SERVER_MIGRATION_TASK_NAME;
-            }
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, final ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                if (config == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final PathAddress subsystemPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final ManageableServerConfiguration configurationManagement = subsystemsManagement.getServerConfiguration();
-                final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
-                boolean legacyFilePassivationStoreRemoved = false;
-                boolean legacyClusteredPassivationStoreRemoved = false;
-                boolean infinispanPassivationStoreAdded = false;
-                boolean legacyPassivatingCacheRemoved = false;
-                boolean legacyClusteredCacheRemoved = false;
-                boolean distributableCacheAdded = false;
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
+        final PathAddress subsystemPathAddress = subsystemResource.getResourcePathAddress();
+        final ManageableServerConfiguration configurationManagement = subsystemResource.getServerConfiguration();
+        final ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder();
+        boolean legacyFilePassivationStoreRemoved = false;
+        boolean legacyClusteredPassivationStoreRemoved = false;
+        boolean infinispanPassivationStoreAdded = false;
+        boolean legacyPassivatingCacheRemoved = false;
+        boolean legacyClusteredCacheRemoved = false;
+        boolean distributableCacheAdded = false;
 
-                boolean configUpdated = false;
-                if (!config.hasDefined(PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
-                    // replace all passivation stores with WFLY 10 default one
-                    // remove file-passivation-store
-                    if (config.hasDefined(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME)) {
-                        final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME));
-                        final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
-                        configurationManagement.executeManagementOperation(filePassivationStoreRemoveperation);
-                        context.getLogger().infof("Legacy file passivation store removed from EJB3 subsystem configuration.");
-                        legacyFilePassivationStoreRemoved = true;
-                    }
-                    // remove cluster-passivation-store infinispan
-                    if (config.hasDefined(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
-                        final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME));
-                        final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
-                        configurationManagement.executeManagementOperation(filePassivationStoreRemoveperation);
-                        context.getLogger().infof("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
-                        legacyClusteredPassivationStoreRemoved = true;
-                    }
-                    // add default wfly 10 / eap 7 infinispan passivation store
-                    final PathAddress passivationStorePathAddress =  subsystemPathAddress.append(pathElement(PASSIVATION_STORE, PASSIVATION_STORE_NAME));
-                    final ModelNode passivationStoreAddOperation = Util.createAddOperation(passivationStorePathAddress);
-                    passivationStoreAddOperation.get(CACHE_CONTAINER_ATTR_NAME).set(CACHE_CONTAINER_ATTR_VALUE);
-                    passivationStoreAddOperation.get(MAX_SIZE_ATTR_NAME).set(MAX_SIZE_ATTR_VALUE);
-                    configurationManagement.executeManagementOperation(passivationStoreAddOperation);
-                    configUpdated = true;
-                    context.getLogger().infof("Infinispan passivation store added to EJB3 subsystem configuration.");
-                    infinispanPassivationStoreAdded = true;
-                }
-                if (!config.hasDefined(CACHE, CACHE_NAME_DISTRIBUTABLE)) {
-                    // remove legacy passivating cache
-                    if (config.hasDefined(CACHE, CACHE_NAME_PASSIVATING)) {
-                        final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_PASSIVATING));
-                        final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
-                        configurationManagement.executeManagementOperation(cacheRemoveOperation);
-                        context.getLogger().infof("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
-                        legacyPassivatingCacheRemoved = true;
-                    }
-                    // remove legacy clustered cache
-                    if (config.hasDefined(CACHE, CACHE_NAME_CLUSTERED)) {
-                        final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_CLUSTERED));
-                        final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
-                        configurationManagement.executeManagementOperation(cacheRemoveOperation);
-                        context.getLogger().infof("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
-                        legacyClusteredCacheRemoved = true;
-                    }
-                    // add wfly 10 / eap 7 default distributable cache
-                    final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_DISTRIBUTABLE));
-                    final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
-                    cacheAddOperation.get(PASSIVATION_STORE).set(PASSIVATION_STORE_NAME);
-                    for (String alias : ALIASES_ATTR_VALUE) {
-                        cacheAddOperation.get(ALIASES_ATTR_NAME).add(alias);
-                    }
-                    configurationManagement.executeManagementOperation(cacheAddOperation);
-                    configUpdated = true;
-                    context.getLogger().infof("Distributable cache added to EJB3 subsystem configuration.");
-                    distributableCacheAdded = true;
-                }
-                if (configUpdated) {
-                    taskResultBuilder.sucess();
-                } else {
-                    taskResultBuilder.skipped();
-                }
-                return taskResultBuilder.addAttribute(TASK_RESULT_ATTR_LEGACY_FILE_PASSIVATION_STORE_REMOVED, legacyFilePassivationStoreRemoved)
-                        .addAttribute(TASK_RESULT_ATTR_LEGACY_CLUSTERED_PASSIVATION_STORE_REMOVED, legacyClusteredPassivationStoreRemoved)
-                        .addAttribute(TASK_RESULT_ATTR_INFINISPAN_PASSIVATION_STORE_ADDED, infinispanPassivationStoreAdded)
-                        .addAttribute(TASK_RESULT_ATTR_LEGACY_PASSIVATING_CACHE_REMOVED, legacyPassivatingCacheRemoved)
-                        .addAttribute(TASK_RESULT_ATTR_LEGACY_CLUSTERED_CACHE_REMOVED, legacyClusteredCacheRemoved)
-                        .addAttribute(TASK_RESULT_ATTR_DISTRIBUTABLE_CACHE_ADDED, distributableCacheAdded).build();
-
+        boolean configUpdated = false;
+        if (!config.hasDefined(PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
+            // replace all passivation stores with WFLY 10 default one
+            // remove file-passivation-store
+            if (config.hasDefined(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME)) {
+                final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME));
+                final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
+                configurationManagement.executeManagementOperation(filePassivationStoreRemoveperation);
+                context.getLogger().infof("Legacy file passivation store removed from EJB3 subsystem configuration.");
+                legacyFilePassivationStoreRemoved = true;
             }
-        };
+            // remove cluster-passivation-store infinispan
+            if (config.hasDefined(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME)) {
+                final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME));
+                final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
+                configurationManagement.executeManagementOperation(filePassivationStoreRemoveperation);
+                context.getLogger().infof("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
+                legacyClusteredPassivationStoreRemoved = true;
+            }
+            // add default wfly 10 / eap 7 infinispan passivation store
+            final PathAddress passivationStorePathAddress =  subsystemPathAddress.append(pathElement(PASSIVATION_STORE, PASSIVATION_STORE_NAME));
+            final ModelNode passivationStoreAddOperation = Util.createAddOperation(passivationStorePathAddress);
+            passivationStoreAddOperation.get(CACHE_CONTAINER_ATTR_NAME).set(CACHE_CONTAINER_ATTR_VALUE);
+            passivationStoreAddOperation.get(MAX_SIZE_ATTR_NAME).set(MAX_SIZE_ATTR_VALUE);
+            configurationManagement.executeManagementOperation(passivationStoreAddOperation);
+            configUpdated = true;
+            context.getLogger().infof("Infinispan passivation store added to EJB3 subsystem configuration.");
+            infinispanPassivationStoreAdded = true;
+        }
+        if (!config.hasDefined(CACHE, CACHE_NAME_DISTRIBUTABLE)) {
+            // remove legacy passivating cache
+            if (config.hasDefined(CACHE, CACHE_NAME_PASSIVATING)) {
+                final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_PASSIVATING));
+                final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
+                configurationManagement.executeManagementOperation(cacheRemoveOperation);
+                context.getLogger().infof("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
+                legacyPassivatingCacheRemoved = true;
+            }
+            // remove legacy clustered cache
+            if (config.hasDefined(CACHE, CACHE_NAME_CLUSTERED)) {
+                final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_CLUSTERED));
+                final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
+                configurationManagement.executeManagementOperation(cacheRemoveOperation);
+                context.getLogger().infof("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
+                legacyClusteredCacheRemoved = true;
+            }
+            // add wfly 10 / eap 7 default distributable cache
+            final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_DISTRIBUTABLE));
+            final ModelNode cacheAddOperation = Util.createAddOperation(cachePathAddress);
+            cacheAddOperation.get(PASSIVATION_STORE).set(PASSIVATION_STORE_NAME);
+            for (String alias : ALIASES_ATTR_VALUE) {
+                cacheAddOperation.get(ALIASES_ATTR_NAME).add(alias);
+            }
+            configurationManagement.executeManagementOperation(cacheAddOperation);
+            configUpdated = true;
+            context.getLogger().infof("Distributable cache added to EJB3 subsystem configuration.");
+            distributableCacheAdded = true;
+        }
+        if (configUpdated) {
+            taskResultBuilder.success();
+        } else {
+            taskResultBuilder.skipped();
+        }
+        return taskResultBuilder.addAttribute(TASK_RESULT_ATTR_LEGACY_FILE_PASSIVATION_STORE_REMOVED, legacyFilePassivationStoreRemoved)
+                .addAttribute(TASK_RESULT_ATTR_LEGACY_CLUSTERED_PASSIVATION_STORE_REMOVED, legacyClusteredPassivationStoreRemoved)
+                .addAttribute(TASK_RESULT_ATTR_INFINISPAN_PASSIVATION_STORE_ADDED, infinispanPassivationStoreAdded)
+                .addAttribute(TASK_RESULT_ATTR_LEGACY_PASSIVATING_CACHE_REMOVED, legacyPassivatingCacheRemoved)
+                .addAttribute(TASK_RESULT_ATTR_LEGACY_CLUSTERED_CACHE_REMOVED, legacyClusteredCacheRemoved)
+                .addAttribute(TASK_RESULT_ATTR_DISTRIBUTABLE_CACHE_ADDED, distributableCacheAdded).build();
+
     }
 }

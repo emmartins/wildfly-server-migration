@@ -23,7 +23,7 @@ import java.util.Collections;
  * @author emmartins
  */
 public class TestSourceServerProvider extends AbstractTestServerProvider {
-    static final TestServer SERVER = new TestServer(new ProductInfo("TestSourceServerName","TestSourceServerVersion"), Collections.<ProductInfo>emptySet());
+    static final TestServer SERVER = new TestServer(new ProductInfo("TestSourceServerName","TestSourceServerVersion"), Collections.emptySet());
     public TestSourceServerProvider() {
         super(SERVER);
     }

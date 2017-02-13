@@ -16,28 +16,18 @@
 
 package org.jboss.migration.wfly10.config.management.impl;
 
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.HostsManagement;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
-import org.jboss.migration.wfly10.config.management.ProfilesManagement;
-import org.jboss.migration.wfly10.config.management.ServerGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
 import org.wildfly.core.embedded.HostController;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author emmartins
@@ -47,36 +37,27 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     private final String domainConfig;
     private final String hostConfig;
     private HostController hostController;
-    private final DeploymentsManagement deploymentsManagement;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
-    private final HostsManagement hostsManagement;
-    private final ProfilesManagement profilesManagement;
-    private final ServerGroupsManagement serverGroupsManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
+
+    private final DeploymentResourceImpl.Factory deploymentResources;
+    private final DeploymentOverlayResourceImpl.Factory deploymentOverlayResources;
+    private final HostResourceImpl.Factory hostResources;
+    private final ProfileResourceImpl.Factory profileResources;
+    private final ServerGroupResourceImpl.Factory serverGroupResources;
 
     protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, WildFlyServer10 server) {
-        super(server);
+        super("", PathAddress.EMPTY_ADDRESS, server);
         this.domainConfig = domainConfig;
-        this.extensionsManagement = new ExtensionsManagementImpl(null, this) {
-            @Override
-            public Set<String> getSubsystems() throws IOException {
-                Set<String> subsystems = new HashSet<>();
-                for (String profile : getProfilesManagement().getResourceNames()) {
-                    subsystems.addAll(profilesManagement.getProfileManagement(profile).getSubsystemsManagement().getResourceNames());
-                }
-                return subsystems;
-            }
-        };
         this.hostConfig = hostConfig;
-        this.deploymentsManagement = new DeploymentsManagementImpl(null, this);
-        this.hostsManagement = new HostsManagementImpl(null, this);
-        this.profilesManagement = new ProfilesManagementImpl(null, this);
-        this.serverGroupsManagement = new ServerGroupsManagementImpl(null, this);
-        this.interfacesManagement = new InterfacesManagementImpl(null, this);
-        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(null, this);
-        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(null, this);
+        deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(deploymentResources);
+        deploymentOverlayResources = new DeploymentOverlayResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(deploymentOverlayResources);
+        hostResources = new HostResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(hostResources);
+        profileResources = new ProfileResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(profileResources);
+        serverGroupResources = new ServerGroupResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(serverGroupResources);
     }
 
     @Override
@@ -107,44 +88,6 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         }
         hostController.stop();
         hostController = null;
-    }
-
-    public DeploymentsManagement getDeploymentsManagement() {
-        return deploymentsManagement;
-    }
-
-    @Override
-    public ExtensionsManagement getExtensionsManagement() {
-        return extensionsManagement;
-    }
-
-    public HostsManagement getHostsManagement() {
-        return hostsManagement;
-    }
-
-    @Override
-    public InterfacesManagement getInterfacesManagement() {
-        return interfacesManagement;
-    }
-
-    @Override
-    public ProfilesManagement getProfilesManagement() {
-        return profilesManagement;
-    }
-
-    @Override
-    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
-        return socketBindingGroupsManagement;
-    }
-
-    @Override
-    public SystemPropertiesManagement getSystemPropertiesManagement() {
-        return systemPropertiesManagement;
-    }
-
-    @Override
-    public ServerGroupsManagement getServerGroupsManagement() {
-        return serverGroupsManagement;
     }
 
     public static class DomainConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {

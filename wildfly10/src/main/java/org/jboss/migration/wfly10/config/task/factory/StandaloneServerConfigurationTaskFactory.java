@@ -16,7 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.factory;
 
-import org.jboss.migration.core.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 
 /**
@@ -24,5 +24,5 @@ import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguratio
  */
 public interface StandaloneServerConfigurationTaskFactory<S> {
 
-    ServerMigrationTask getTask(S source, StandaloneServerConfiguration configuration) throws Exception;
+    ServerMigrationTask getTask(S source, StandaloneServerConfiguration configuration);
 }

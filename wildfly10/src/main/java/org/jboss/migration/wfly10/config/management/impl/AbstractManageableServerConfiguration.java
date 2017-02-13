@@ -20,29 +20,43 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
+import org.jboss.migration.wfly10.config.management.PathResource;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author emmartins
  */
-public abstract class AbstractManageableServerConfiguration implements ManageableServerConfiguration {
+public abstract class AbstractManageableServerConfiguration extends AbstractManageableResource implements ManageableServerConfiguration {
 
     private final WildFlyServer10 server;
     private ModelControllerClient modelControllerClient;
+    private final ExtensionResourceImpl.Factory extensionConfigurations;
+    private final InterfaceResourceImpl.Factory interfaceResources;
+    private final PathResourceImpl.Factory pathResources;
+    private final SocketBindingGroupResourceImpl.Factory socketBindingGroupResources;
+    private final SystemPropertyResourceImpl.Factory systemPropertyResources;
 
-    protected AbstractManageableServerConfiguration(WildFlyServer10 server) {
+    protected AbstractManageableServerConfiguration(String resourceName, PathAddress pathAddress, WildFlyServer10 server) {
+        super(resourceName, pathAddress, null);
         this.server = server;
+        extensionConfigurations = new ExtensionResourceImpl.Factory(pathAddress, this);
+        interfaceResources = new InterfaceResourceImpl.Factory(pathAddress, this);
+        pathResources = new PathResourceImpl.Factory(pathAddress, this);
+        socketBindingGroupResources = new SocketBindingGroupResourceImpl.Factory(pathAddress, this);
+        systemPropertyResources = new SystemPropertyResourceImpl.Factory(pathAddress, this);
+        addChildResourceFactory(extensionConfigurations);
+        addChildResourceFactory(interfaceResources);
+        addChildResourceFactory(pathResources);
+        addChildResourceFactory(socketBindingGroupResources);
+        addChildResourceFactory(systemPropertyResources);
     }
 
     @Override
@@ -83,28 +97,39 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     }
 
     @Override
-    public ModelNode executeManagementOperation(ModelNode operation) throws IOException {
+    public ModelNode executeManagementOperation(ModelNode operation) throws ManagementOperationException {
         final ModelControllerClient modelControllerClient = getModelControllerClient();
         if (modelControllerClient == null) {
             throw new IllegalStateException("configuration not started");
         }
-        final ModelNode result = modelControllerClient.execute(operation);
-        //ServerMigrationLogger.ROOT_LOGGER.infof("Op result %s", result.toString());
-        processResult(result);
-        return  result;
+        try {
+            final ModelNode result = modelControllerClient.execute(operation);
+            //ServerMigrationLogger.ROOT_LOGGER.infof("Op result %s", result.toString());
+            processResult(result);
+            return result;
+        } catch (IOException e) {
+            throw new ManagementOperationException(e);
+        }
     }
 
     @Override
-    public Path resolvePath(String pathName) throws IOException {
-        final PathAddress address = pathAddress(pathElement(PATH, pathName));
-        final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, address);
-        final ModelNode opResult = executeManagementOperation(op);
-        ServerMigrationLogger.ROOT_LOGGER.debugf("Resolve path Op result %s", opResult.toString());
-        String path = opResult.get(RESULT).get(PATH).asString();
-        if (!opResult.get(RESULT).hasDefined(RELATIVE_TO)) {
-            return Paths.get(path);
+    public Path resolvePath(String pathName) throws ManagementOperationException {
+        Path resolvedByServer = server.resolvePath(pathName);
+        if (resolvedByServer != null) {
+            return resolvedByServer;
         } else {
-            return resolvePath(opResult.get(RESULT).get(RELATIVE_TO).asString()).resolve(path);
+            final PathResource resource = getPathResource(pathName);
+            if (resource != null) {
+                final ModelNode resourceConfig = resource.getResourceConfiguration();
+                final String path = resourceConfig.get(PATH).asString();
+                if (resourceConfig.hasDefined(RELATIVE_TO)) {
+                    return resolvePath(resourceConfig.get(RELATIVE_TO).asString()).resolve(path);
+                } else {
+                    return Paths.get(path);
+                }
+            } else {
+                return null;
+            }
         }
     }
 
@@ -116,12 +141,8 @@ public abstract class AbstractManageableServerConfiguration implements Manageabl
     protected void writeConfiguration() {
         // force write of xml config by tmp setting a system property
         final String systemPropertyName = "org.jboss.migration.tmp."+System.nanoTime();
-        final PathAddress pathAddress = getSystemPropertiesManagement().getResourcePathAddress(systemPropertyName);
-        try {
-            executeManagementOperation(Util.createAddOperation(pathAddress));
-            executeManagementOperation(Util.createRemoveOperation(pathAddress));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final PathAddress pathAddress = getSystemPropertyResourcePathAddress(systemPropertyName);
+        executeManagementOperation(Util.createAddOperation(pathAddress));
+        executeManagementOperation(Util.createRemoveOperation(pathAddress));
     }
 }

@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class ExtensionBuilder {
 
-    private final List<WildFly10SubsystemBuilder> subsystems = new ArrayList<>();
+    private final List<SubsystemBuilder> subsystems = new ArrayList<>();
 
     private final String name;
 
@@ -31,30 +31,18 @@ public class ExtensionBuilder {
         this.name = name;
     }
 
-    public ExtensionBuilder addSubsystem(WildFly10SubsystemBuilder subsystem) {
+    public ExtensionBuilder addSubsystem(String subsystemName) {
+        return addSubsystem(new SubsystemBuilder().setName(subsystemName));
+    }
+
+    public ExtensionBuilder addSubsystem(SubsystemBuilder subsystem) {
         subsystems.add(subsystem);
         return this;
     }
 
-    public ExtensionBuilder addSupportedSubsystem(String subsystemName) {
-        return addSubsystem(subsystemName, "supported-subsystem", null);
-    }
-
-    public ExtensionBuilder addSubsystem(String subsystemName, String taskName, WildFly10SubsystemMigrationTaskFactory... tasks) {
-        final WildFly10SubsystemBuilder subsystemBuilder = new WildFly10SubsystemBuilder()
-                .setName(subsystemName)
-                .setTaskName(taskName);
-        if (tasks != null) {
-            for (WildFly10SubsystemMigrationTaskFactory task : tasks) {
-                subsystemBuilder.addTask(task);
-            }
-        }
-        return addSubsystem(subsystemBuilder);
-    }
-
     public Extension build() {
         final Extension extension = new Extension(name);
-        for (WildFly10SubsystemBuilder subsystem : subsystems) {
+        for (SubsystemBuilder subsystem : subsystems) {
             extension.subsystems.add(subsystem.setExtension(extension).build());
         }
         return extension;

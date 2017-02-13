@@ -30,11 +30,11 @@ public class LegacyExtensionBuilder {
         this.name = name;
     }
 
-    public LegacyExtensionBuilder addMigratedSubsystem(String subsystemName) {
-        return addMigratedSubsystem(subsystemName, null);
+    public LegacyExtensionBuilder subsystem(String subsystemName) {
+        return subsystem(subsystemName, null);
     }
 
-    public LegacyExtensionBuilder addMigratedSubsystem(String subsystemName, String namespaceWithoutVersion) {
+    public LegacyExtensionBuilder subsystem(String subsystemName, String namespaceWithoutVersion) {
         subsystems.add(new Subsystem(subsystemName, namespaceWithoutVersion));
         return this;
     }
@@ -42,7 +42,7 @@ public class LegacyExtensionBuilder {
     public LegacyExtension build() {
         final LegacyExtension extension = new LegacyExtension(name);
         for (Subsystem subsystem : subsystems) {
-            extension.subsystems.add(new WildFly10LegacySubsystem(subsystem.name, subsystem.namespaceWithoutVersion, extension));
+            extension.subsystems.add(new LegacySubsystem(subsystem.name, subsystem.namespaceWithoutVersion, extension));
         }
         return extension;
     }

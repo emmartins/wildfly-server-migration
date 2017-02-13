@@ -28,6 +28,10 @@ public class UserInput {
     private final String prompt;
     private final ResultHandler resultHandler;
 
+    public UserInput(ConsoleWrapper theConsole, final String prompt, final ResultHandler resultHandler) {
+        this(theConsole, null, prompt, resultHandler);
+    }
+
     public UserInput(ConsoleWrapper theConsole, final String[] messageLines, final String prompt, final ResultHandler resultHandler) {
         this.theConsole = theConsole;
         this.messageLines = messageLines;
@@ -35,11 +39,7 @@ public class UserInput {
         this.resultHandler = resultHandler;
     }
 
-    public UserInput(ConsoleWrapper theConsole, final String message, final String prompt, final ResultHandler resultHandler) {
-        this(theConsole, new String[] { message }, prompt, resultHandler);
-    }
-
-    public void execute() throws Exception {
+    public void execute() {
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);
@@ -55,7 +55,6 @@ public class UserInput {
              * line.
              */
             theConsole.printf(ConsoleWrapper.NEW_LINE);
-            return;
         } else {
             if (!temp.equals("")) {
                 resultHandler.onInput(temp);
@@ -67,7 +66,7 @@ public class UserInput {
     }
 
     public interface ResultHandler {
-        void onInput(String input) throws Exception;
-        void onError() throws Exception;
+        void onInput(String input);
+        void onError();
     }
 }

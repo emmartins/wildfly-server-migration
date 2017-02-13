@@ -17,65 +17,44 @@
 package org.jboss.migration.wfly10.config.task.subsystem.undertow;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.env.TaskEnvironment;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.task.subsystem.UpdateSubsystemTaskFactory;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.SubsystemResource;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SECURITY_REALM;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * A task which adds Undertow's default https listener.
  * @author emmartins
  */
-public class AddHttpsListener implements UpdateSubsystemTaskFactory.SubtaskFactory {
+public class AddHttpsListener<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
-    public static final AddHttpsListener INSTANCE = new AddHttpsListener();
-
-    public static final String TASK_NAME_NAME = "add-undertow-https-listener";
-    public static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
-
+    public static final String TASK_NAME = "add-undertow-https-listener";
     private static final String SERVER_NAME = "default-server";
     private static final String HTTPS_LISTENER = "https-listener";
     private static final String HTTPS_LISTENER_NAME = "https";
 
-    private AddHttpsListener() {
+    public AddHttpsListener() {
+        subtaskName(TASK_NAME);
     }
 
     @Override
-    public ServerMigrationTask getServerMigrationTask(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement) {
-        return new UpdateSubsystemTaskFactory.Subtask(config, subsystem, subsystemsManagement) {
-            @Override
-            public ServerMigrationTaskName getName() {
-                return TASK_NAME;
-            }
-
-            @Override
-            protected ServerMigrationTaskResult run(ModelNode config, UpdateSubsystemTaskFactory subsystem, SubsystemsManagement subsystemsManagement, ServerMigrationTaskContext context, TaskEnvironment taskEnvironment) throws Exception {
-                // refresh subsystem config to see any changes possibly made during migration
-                config = subsystemsManagement.getResource(subsystem.getName());
-                if (config == null) {
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final PathAddress configPathAddress = subsystemsManagement.getResourcePathAddress(subsystem.getName());
-                final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));
-                if (!config.hasDefined(SERVER, SERVER_NAME)) {
-                    context.getLogger().debugf("Skipping task, server '%s' not found in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
-                final ModelNode server = config.get(SERVER, SERVER_NAME);
-                if (server.hasDefined(HTTPS_LISTENER, HTTPS_LISTENER_NAME)) {
-                    context.getLogger().debugf("Skipping task, https listener already defined by server '%s', in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                    return ServerMigrationTaskResult.SKIPPED;
-                }
+    protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
+        final PathAddress configPathAddress = subsystemResource.getResourcePathAddress();
+        final PathAddress serverPathAddress = configPathAddress.append(SERVER, SERVER_NAME);
+        if (!config.hasDefined(SERVER, SERVER_NAME)) {
+            context.getLogger().debugf("Skipping task, server '%s' not found in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        final ModelNode server = config.get(SERVER, SERVER_NAME);
+        if (server.hasDefined(HTTPS_LISTENER, HTTPS_LISTENER_NAME)) {
+            context.getLogger().debugf("Skipping task, https listener already defined by server '%s', in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
+            return ServerMigrationTaskResult.SKIPPED;
+        }
                 /*
                 add to server's config
                 "https-listener" => {
@@ -85,14 +64,12 @@ public class AddHttpsListener implements UpdateSubsystemTaskFactory.SubtaskFacto
                     }
                 }
                 */
-                final PathAddress httpsListenerPathAddress = serverPathAddress.append(PathElement.pathElement(HTTPS_LISTENER, HTTPS_LISTENER_NAME));
-                final ModelNode op = Util.createAddOperation(httpsListenerPathAddress);
-                op.get(SOCKET_BINDING).set("https");
-                op.get(SECURITY_REALM).set("ApplicationRealm");
-                subsystemsManagement.getServerConfiguration().executeManagementOperation(op);
-                context.getLogger().infof("Default HTTPS listener added to server '%s', in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                return ServerMigrationTaskResult.SUCCESS;
-            }
-        };
+        final PathAddress httpsListenerPathAddress = serverPathAddress.append(HTTPS_LISTENER, HTTPS_LISTENER_NAME);
+        final ModelNode op = Util.createAddOperation(httpsListenerPathAddress);
+        op.get(SOCKET_BINDING).set("https");
+        op.get(SECURITY_REALM).set("ApplicationRealm");
+        subsystemResource.getServerConfiguration().executeManagementOperation(op);
+        context.getLogger().infof("Default HTTPS listener added to server '%s', in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
+        return ServerMigrationTaskResult.SUCCESS;
     }
 }

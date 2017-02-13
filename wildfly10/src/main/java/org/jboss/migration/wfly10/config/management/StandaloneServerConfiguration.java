@@ -16,12 +16,32 @@
 
 package org.jboss.migration.wfly10.config.management;
 
+import java.nio.file.Path;
+
 /**
  * @author emmartins
  */
-public interface StandaloneServerConfiguration extends ManageableServerConfiguration {
-    DeploymentsManagement getDeploymentsManagement();
-    ManagementInterfacesManagement getManagementInterfacesManagement();
-    SecurityRealmsManagement getSecurityRealmsManagement();
-    SubsystemsManagement getSubsystemsManagement();
+public interface StandaloneServerConfiguration extends ManageableServerConfiguration, DeploymentResource.Parent, DeploymentOverlayResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemResource.Parent {
+
+    ManageableServerConfigurationType RESOURCE_TYPE = new ManageableServerConfigurationType(StandaloneServerConfiguration.class, DeploymentResource.RESOURCE_TYPE, DeploymentOverlayResource.RESOURCE_TYPE, ManagementInterfaceResource.RESOURCE_TYPE, SecurityRealmResource.RESOURCE_TYPE, SubsystemResource.RESOURCE_TYPE);
+
+    @Override
+    default ManageableServerConfigurationType getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
+    @Override
+    default Path getConfigurationDir() {
+        return getServer().getStandaloneConfigurationDir();
+    }
+
+    @Override
+    default Path getContentDir() {
+        return getServer().getStandaloneContentDir();
+    }
+
+    @Override
+    default Path getDataDir() {
+        return getServer().getStandaloneDataDir();
+    }
 }

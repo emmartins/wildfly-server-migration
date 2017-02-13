@@ -16,15 +16,32 @@
 
 package org.jboss.migration.wfly10.config.management;
 
-import org.jboss.as.controller.PathAddress;
+import java.nio.file.Path;
 
 /**
  * @author emmartins
  */
-public interface HostConfiguration extends ManageableServerConfiguration {
-    SubsystemsManagement getSubsystemsManagement();
-    SecurityRealmsManagement getSecurityRealmsManagement();
-    JVMsManagement getJVMsManagement();
-    ManagementInterfacesManagement getManagementInterfacesManagement();
-    PathAddress getPathAddress();
+public interface HostConfiguration extends ManageableServerConfiguration, JvmResource.Parent, ManagementInterfaceResource.Parent, SecurityRealmResource.Parent, SubsystemResource.Parent {
+
+    ManageableServerConfigurationType RESOURCE_TYPE = new ManageableServerConfigurationType(HostConfiguration.class, JvmResource.RESOURCE_TYPE, ManagementInterfaceResource.RESOURCE_TYPE, SecurityRealmResource.RESOURCE_TYPE, SubsystemResource.RESOURCE_TYPE);
+
+    @Override
+    default ManageableServerConfigurationType getResourceType() {
+        return RESOURCE_TYPE;
+    }
+
+    @Override
+    default Path getConfigurationDir() {
+        return getServer().getDomainConfigurationDir();
+    }
+
+    @Override
+    default Path getContentDir() {
+        return getServer().getDomainContentDir();
+    }
+
+    @Override
+    default Path getDataDir() {
+        return getServer().getDomainDataDir();
+    }
 }

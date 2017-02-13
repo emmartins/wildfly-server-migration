@@ -16,8 +16,8 @@
 package org.jboss.migration.core.report;
 
 import org.jboss.migration.core.MigrationData;
-import org.jboss.migration.core.ServerMigrationTaskExecution;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskExecution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class SummaryReportWriter {
         return  summaryTaskEntries;
     }
 
-    protected void getSummaryTaskEntry(ServerMigrationTaskExecution task, String prefix, List<SummaryTaskEntry> summaryTaskEntries, int taskDepth, int maxTaskPathSizeToDisplaySubtasks) {
+    protected void getSummaryTaskEntry(TaskExecution task, String prefix, List<SummaryTaskEntry> summaryTaskEntries, int taskDepth, int maxTaskPathSizeToDisplaySubtasks) {
         if (task.getResult().getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
             return;
         }
@@ -75,7 +75,7 @@ public class SummaryReportWriter {
         if (taskDepth > maxTaskPathSizeToDisplaySubtasks) {
             return;
         }
-        for (ServerMigrationTaskExecution subtask : task.getSubtasks()) {
+        for (TaskExecution subtask : task.getSubtasks()) {
             getSummaryTaskEntry(subtask, subtaskPrefix, summaryTaskEntries, taskDepth, maxTaskPathSizeToDisplaySubtasks);
         }
     }

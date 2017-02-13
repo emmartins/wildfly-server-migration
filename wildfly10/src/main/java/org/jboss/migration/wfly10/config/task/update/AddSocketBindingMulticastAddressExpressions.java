@@ -21,122 +21,79 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.ValueExpression;
-import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingsManagement;
-import org.jboss.migration.wfly10.config.task.executor.SocketBindingGroupsManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
-import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.wfly10.config.management.SocketBindingResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * Set socket binding's multicast address as value expressions.
  * @author emmartins
  */
-public class AddSocketBindingMulticastAddressExpressions<S> implements ManageableServerConfigurationTaskFactory<S, ManageableServerConfiguration> {
+public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     public static final String[] SOCKET_BINDINGS = {
             "modcluster"
     };
 
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder("add-socket-binding-multicast-address-expressions").build();
-
-    public static final AddSocketBindingMulticastAddressExpressions INSTANCE = new AddSocketBindingMulticastAddressExpressions();
-
-    private AddSocketBindingMulticastAddressExpressions() {
+    public AddSocketBindingMulticastAddressExpressions() {
+        name("socket-bindings.multicast-address.add-expressions");
+        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+        beforeRun(context -> context.getLogger().infof("Adding socket binding's multicast address expressions..."));
+        final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
+        for (String socketBinding : SOCKET_BINDINGS) {
+            subtasks.subtask(SocketBindingResource.class, socketBinding, new AddSocketBindingMulticastAddressExpression<>(socketBinding));
+        }
+        subtasks(subtasks);
+        afterRun(context -> {
+            if (context.hasSucessfulSubtasks()) {
+                context.getLogger().infof("Socket binding's multicast address expressions added.");
+            } else {
+                context.getLogger().infof("No socket binding's multicast address expressions added.");
+            }
+        });
     }
 
-    @Override
-    public ServerMigrationTask getTask(S source, ManageableServerConfiguration configuration) throws Exception {
-        final ParentServerMigrationTask.Builder taskBuilder = new ParentServerMigrationTask.Builder(TASK_NAME)
-                .subtask(SubtaskExecutorAdapters.of(source, configuration, new SubtaskExecutor<S>()))
-                .eventListener(new ParentServerMigrationTask.EventListener() {
-                    @Override
-                    public void started(ServerMigrationTaskContext context) {
-                        context.getLogger().infof("Adding socket binding's multicast address expressions...");
-                    }
+    public static class AddSocketBindingMulticastAddressExpression<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingResource> {
 
-                    @Override
-                    public void done(ServerMigrationTaskContext context) {
-                        context.getLogger().infof("Socket binding's multicast address expressions added.");
-                    }
-                });
-        return new SkippableByEnvServerMigrationTask(taskBuilder.build(), TASK_NAME + ".skip");
-    }
+        protected AddSocketBindingMulticastAddressExpression(String resourceName) {
+            this(resourceName, "jboss."+resourceName+".multicast.adress");
+        }
 
-    public static class SubtaskExecutor<S> implements SocketBindingGroupsManagementSubtaskExecutor<S> {
-        @Override
-        public void executeSubtasks(S source, SocketBindingGroupsManagement resourceManagement, ServerMigrationTaskContext context) throws Exception {
-            for (String socketBindingGroupName : resourceManagement.getResourceNames()) {
-                context.getLogger().debugf("Processing socket binding group %s...", socketBindingGroupName);
-                final SocketBindingGroupManagement socketBindingGroupManagement = resourceManagement.getSocketBindingGroupManagement(socketBindingGroupName);
-                for (String socketBindingName : SOCKET_BINDINGS) {
-                    final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("add-"+socketBindingName+"-multicast-address-expression")
-                            .addAttribute("group", socketBindingGroupManagement.getSocketBindingGroupName())
-                            .build();
-                    final String propertyName = "jboss."+socketBindingName+".multicast.adress";
-                    final AddSocketBindingMulticastAddressExpression subtask = new AddSocketBindingMulticastAddressExpression(socketBindingName, subtaskName, propertyName , socketBindingGroupManagement.getSocketBindingsManagement());
-                    context.execute(new SkippableByEnvServerMigrationTask(subtask, TASK_NAME + "." + subtaskName.getName() + ".skip"));
+        protected AddSocketBindingMulticastAddressExpression(String resourceName, String propertyName) {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("socket-binding."+parameters.getResource().getResourceName()+".multicast-address.add-expression").build());
+            skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+            runBuilder(params -> context -> {
+                // retrieve resource config
+                final SocketBindingResource socketBindingResource = params.getResource();
+                final String absoluteResourceName = socketBindingResource.getResourceAbsoluteName();
+                final ModelNode resourceConfig = socketBindingResource.getResourceConfiguration();
+                // check if attribute is defined
+                if (!resourceConfig.hasDefined(MULTICAST_ADDRESS)) {
+                    context.getLogger().debugf("Socket binding %s has no multicast address defined, task to add multicast address property skipped.", absoluteResourceName);
+                    return ServerMigrationTaskResult.SKIPPED;
                 }
-            }
-        }
-    }
-
-    static class AddSocketBindingMulticastAddressExpression implements ServerMigrationTask {
-
-        private final String resourceName;
-        private final String propertyName;
-        private final ServerMigrationTaskName taskName;
-        private final SocketBindingsManagement resourceManagement;
-
-        AddSocketBindingMulticastAddressExpression(String resourceName, ServerMigrationTaskName taskName, String propertyName, SocketBindingsManagement resourceManagement) {
-            this.resourceName = resourceName;
-            this.propertyName = propertyName;
-            this.resourceManagement = resourceManagement;
-            this.taskName = taskName;
-        }
-
-        @Override
-        public ServerMigrationTaskName getName() {
-            return taskName;
-        }
-
-        @Override
-        public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-            // retrieve resource config
-            final ModelNode resource = resourceManagement.getResource(resourceName);
-            if (resource == null) {
-                context.getLogger().debugf("Socket binding %s does not exists, task to add multicast address property skipped.", resourceName);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            // check if attribute is defined
-            if (!resource.hasDefined(MULTICAST_ADDRESS)) {
-                context.getLogger().debugf("Socket binding %s has no multicast address defined, task to add multicast address property skipped.", resourceName);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            // check current attribute value
-            final ModelNode resourceAttr = resource.get(MULTICAST_ADDRESS);
-            if (resourceAttr.getType() == ModelType.EXPRESSION) {
-                context.getLogger().debugf("Socket binding %s unexpected multicast address value %s, task to add multicast address property skipped.", resourceName, resourceAttr.asExpression().getExpressionString());
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            // update attribute value
-            final ValueExpression valueExpression = new ValueExpression("${"+propertyName+":"+resourceAttr.asString()+"}");
-            final PathAddress pathAddress = resourceManagement.getResourcePathAddress(resourceName);
-            final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-            writeAttrOp.get(NAME).set(MULTICAST_ADDRESS);
-            writeAttrOp.get(VALUE).set(valueExpression);
-            resourceManagement.getServerConfiguration().executeManagementOperation(writeAttrOp);
-            context.getLogger().infof("Socket binding %s multicast address value expression set as %s.", pathAddress.toCLIStyleString(), valueExpression.getExpressionString());
-            return ServerMigrationTaskResult.SUCCESS;
+                // check current attribute value
+                final ModelNode resourceAttr = resourceConfig.get(MULTICAST_ADDRESS);
+                if (resourceAttr.getType() == ModelType.EXPRESSION) {
+                    context.getLogger().debugf("Socket binding %s unexpected multicast address value %s, task to add multicast address property skipped.", absoluteResourceName, resourceAttr.asExpression().getExpressionString());
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                // update attribute value
+                final ValueExpression valueExpression = new ValueExpression("${"+propertyName+":"+resourceAttr.asString()+"}");
+                final PathAddress pathAddress = socketBindingResource.getResourcePathAddress();
+                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
+                writeAttrOp.get(NAME).set(MULTICAST_ADDRESS);
+                writeAttrOp.get(VALUE).set(valueExpression);
+                socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
+                context.getLogger().infof("Socket binding %s multicast address value expression set as %s.", absoluteResourceName, valueExpression.getExpressionString());
+                return ServerMigrationTaskResult.SUCCESS;
+            });
         }
     }
 }

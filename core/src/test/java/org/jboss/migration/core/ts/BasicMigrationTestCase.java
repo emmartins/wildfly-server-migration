@@ -17,7 +17,7 @@ package org.jboss.migration.core.ts;
 
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
-import org.jboss.migration.core.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -18,13 +18,14 @@ package org.jboss.migration.eap7.to.eap7;
 
 import org.jboss.migration.eap.EAPServer7_0;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.config.task.module.ConfigurationModulesMigrationTaskFactory;
+import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.RemoveDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensionsAndSubsystems;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
+import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.to.wfly10.AddLoadBalancerProfile;
 
@@ -36,38 +37,32 @@ public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigration
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders serverUpdateBuilders = new ServerUpdate.Builders();
+        final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
-                .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                        .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                        .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
-                        .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
-                        .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
-                        .subtask(RemoveDeployments.INSTANCE)
-                )
+                .standaloneServer(
+                        serverUpdateBuilders.standaloneConfigurationBuilder()
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
+                                .subtask(new MigrateReferencedModules<>())
+                                .subtask(new EAP7_0ToEAP7_1UpdateInfinispanSubsystem<>())
+                                .subtask(new EAP7_0ToEAP7_1UpdateUndertowSubsystem<>())
+                                .subtask(new AddSocketBindingMulticastAddressExpressions<>())
+                                .subtask(new MigrateCompatibleSecurityRealms<>())
+                                .subtask(new AddApplicationRealmSSLServerIdentity<>())
+                                .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(RemoveUnsupportedExtensionsAndSubsystems.INSTANCE)
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
-                                .subtask(EAP7_0ToEAP7_1SubsystemUpdates.UNDERTOW)
-                                .subtask(EAP7_0ToEAP7_1SubsystemUpdates.INFINISPAN)
-                                .subtask(AddSocketBindingMulticastAddressExpressions.INSTANCE)
-                                .subtask(AddLoadBalancerProfile.INSTANCE)
-                                .subtask(RemoveDeployments.INSTANCE)
-                                .build()
-                        )
+                                .subtask(new RemoveAllUnsupportedSubsystems<>())
+                                .subtask(new MigrateReferencedModules<>())
+                                .subtask(new EAP7_0ToEAP7_1UpdateInfinispanSubsystem<>())
+                                .subtask(new EAP7_0ToEAP7_1UpdateUndertowSubsystem<>())
+                                .subtask(new AddSocketBindingMulticastAddressExpressions<>())
+                                .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
-                                .subtask(ConfigurationModulesMigrationTaskFactory.TASK_WITH_ALL_DEFAULT_MODULE_FINDERS)
+                                .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(MigrateCompatibleSecurityRealms.INSTANCE)
-                                        .subtask(AddApplicationRealmSSLServerIdentity.INSTANCE)
-                                        .build()
-                                )
-                        )
-                )
+                                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                                        .subtask(new AddApplicationRealmSSLServerIdentity<>()))))
                 .build();
     }
 

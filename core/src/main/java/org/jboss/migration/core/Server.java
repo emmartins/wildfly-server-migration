@@ -15,6 +15,9 @@
  */
 package org.jboss.migration.core;
 
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
+
 import java.nio.file.Path;
 
 /**
@@ -48,12 +51,5 @@ public interface Server {
      * @return the server migration task result
      * @throws IllegalArgumentException if the server is not able to migrate from the specified source
      */
-    ServerMigrationTaskResult migrate(Server source, ServerMigrationTaskContext context) throws IllegalArgumentException;
-
-    /**
-     * Resolves a path.
-     * @param path the path's name
-     * @return the resolved path if the server is able to resolve it's name, null otherwise
-     */
-    Path resolvePath(String path);
+    ServerMigrationTaskResult migrate(Server source, TaskContext context) throws IllegalArgumentException;
 }

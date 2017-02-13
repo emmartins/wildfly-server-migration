@@ -18,24 +18,38 @@ package org.jboss.migration.wfly10.config.management;
 
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.jboss.AbsolutePathResolver;
 import org.jboss.migration.wfly10.WildFlyServer10;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
  * @author emmartins
  */
-public interface ManageableServerConfiguration {
+public interface ManageableServerConfiguration extends AbsolutePathResolver, ManageableResource, ExtensionResource.Parent, InterfaceResource.Parent, PathResource.Parent, SocketBindingGroupResource.Parent, SystemPropertyResource.Parent {
+
     void start();
     void stop();
     boolean isStarted();
-    ModelNode executeManagementOperation(ModelNode operation) throws IOException, ManagementOperationException;
+    ModelNode executeManagementOperation(ModelNode operation) throws ManagementOperationException;
     WildFlyServer10 getServer();
-    ExtensionsManagement getExtensionsManagement();
-    InterfacesManagement getInterfacesManagement();
-    SocketBindingGroupsManagement getSocketBindingGroupsManagement();
-    SystemPropertiesManagement getSystemPropertiesManagement();
-    Path resolvePath(String path)  throws IOException, ManagementOperationException;
+    Path resolvePath(String path) throws ManagementOperationException;
     ModelControllerClient getModelControllerClient();
+    Path getConfigurationDir();
+    Path getDataDir();
+    Path getContentDir();
+
+    default ManageableServerConfigurationType getConfigurationType() {
+        return (ManageableServerConfigurationType) getResourceType();
+    }
+
+    @Override
+    default Path resolveNamedPath(String string) {
+        PathResource pathResource = getPathResource(string);
+        if (pathResource != null) {
+            return resolvePath(pathResource.getResourceConfiguration());
+        } else {
+            return getServer().resolveNamedPath(string);
+        }
+    }
 }

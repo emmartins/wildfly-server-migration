@@ -21,13 +21,13 @@ package org.jboss.migration.core.console;
  */
 public class BasicResultHandlers {
 
-    public enum Result {
-        ERROR,
-        NO,
-        YES
-    }
-
     public static class UserConfirmation implements org.jboss.migration.core.console.UserConfirmation.ResultHandler {
+
+        public enum Result {
+            ERROR,
+            NO,
+            YES
+        }
 
         private Result result;
 
@@ -36,18 +36,37 @@ public class BasicResultHandlers {
         }
 
         @Override
-        public void onNo() throws Exception {
+        public void onNo() {
             result = Result.NO;
         }
 
         @Override
-        public void onYes() throws Exception {
+        public void onYes() {
             result = Result.YES;
         }
 
         @Override
-        public void onError() throws Exception {
+        public void onError() {
             result = Result.ERROR;
+        }
+    }
+
+    public static class UserInput implements org.jboss.migration.core.console.UserInput.ResultHandler {
+
+        private String result;
+
+        public String getResult() {
+            return result;
+        }
+
+        @Override
+        public void onInput(String input) {
+            result = input;
+        }
+
+        @Override
+        public void onError() {
+            result = null;
         }
     }
 }

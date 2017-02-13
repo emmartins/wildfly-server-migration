@@ -16,83 +16,56 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.migration.core.ParentServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
-import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
-import org.jboss.migration.wfly10.config.management.DeploymentsManagement;
-import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
-import org.jboss.migration.wfly10.config.task.executor.DeploymentsManagementSubtaskExecutor;
-import org.jboss.migration.wfly10.config.task.executor.SubtaskExecutorAdapters;
-import org.jboss.migration.wfly10.config.task.factory.DomainConfigurationTaskFactory;
-import org.jboss.migration.wfly10.config.task.factory.StandaloneServerConfigurationTaskFactory;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
+import org.jboss.migration.wfly10.config.management.DeploymentOverlayResource;
+import org.jboss.migration.wfly10.config.management.DeploymentResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceLeafTask;
+import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
 
 /**
- * Removes deployments from configs.
+ * Removes all deployments, and overlays, from a server configuration.
  * @author emmartins
  */
-public class RemoveDeployments<S> implements StandaloneServerConfigurationTaskFactory<S>, DomainConfigurationTaskFactory<S> {
+public class RemoveDeployments<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
-    public static final RemoveDeployments INSTANCE  = new RemoveDeployments();
-
-    private static final String TASK_NAME_NAME = "remove-deployments";
-    private static final ServerMigrationTaskName TASK_NAME = new ServerMigrationTaskName.Builder(TASK_NAME_NAME).build();
-
-    private RemoveDeployments() {
+    public RemoveDeployments() {
+        name("deployments.remove");
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
+        beforeRun(context -> context.getLogger().infof("Deployments removal starting..."));
+        final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
+                .subtask(DeploymentResource.class, new RemoveDeploymentSubtask<>())
+                .subtask(DeploymentOverlayResource.class, new RemoveDeploymentOverlaySubtask<>());
+        subtasks(subtasks);
+        afterRun(context -> context.getLogger().infof("Deployments removal done."));
     }
 
-    @Override
-    public ServerMigrationTask getTask(S source, StandaloneServerConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getDeploymentsManagement());
+    public static class RemoveDeploymentSubtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentResource> {
+        protected RemoveDeploymentSubtask() {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("deployment."+parameters.getResource().getResourceName()+".remove").build());
+            final ManageableResourceTaskRunnableBuilder<S, DeploymentResource> runnableBuilder = params-> context -> {
+                final DeploymentResource resource = params.getResource();
+                resource.removeResource();
+                context.getLogger().infof("Removed deployment configuration %s", resource.getResourceAbsoluteName());
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            runBuilder(runnableBuilder);
+        }
     }
 
-    @Override
-    public ServerMigrationTask getTask(S source, HostControllerConfiguration configuration) throws Exception {
-        return getTask(source, configuration.getDeploymentsManagement());
-    }
-
-    protected ServerMigrationTask getTask(S source, DeploymentsManagement deploymentsManagement) throws Exception {
-        final ServerMigrationTask parentTask = new ParentServerMigrationTask.Builder(TASK_NAME)
-                .subtask(SubtaskExecutorAdapters.of(source, deploymentsManagement, new SubtaskExecutor()))
-                .eventListener(new ParentServerMigrationTask.EventListener() {
-                    @Override
-                    public void started(ServerMigrationTaskContext context) {
-                        context.getLogger().infof("Deployments removal starting...");
-                    }
-                    @Override
-                    public void done(ServerMigrationTaskContext context) {
-                        context.getLogger().infof("Deployments removal done.");
-                    }
-                })
-                .build();
-        return new SkippableByEnvServerMigrationTask(parentTask, TASK_NAME_NAME + ".skip");
-    }
-
-    public static class SubtaskExecutor<S> implements DeploymentsManagementSubtaskExecutor<S> {
-        private static final String SUBTASK_NAME_NAME = "remove-deployment";
-        @Override
-        public void executeSubtasks(S source, final DeploymentsManagement deploymentsManagement, ServerMigrationTaskContext context) throws Exception {
-            for (final String resourceName : deploymentsManagement.getResourceNames()) {
-                final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(SUBTASK_NAME_NAME)
-                        .addAttribute("name", resourceName)
-                        .build();
-                final ServerMigrationTask subtask = new ServerMigrationTask() {
-                    @Override
-                    public ServerMigrationTaskName getName() {
-                        return taskName;
-                    }
-                    @Override
-                    public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                        deploymentsManagement.removeResource(resourceName);
-                        context.getLogger().infof("Removed deployment %s", resourceName);
-                        return ServerMigrationTaskResult.SUCCESS;
-                    }
-                };
-                context.execute(subtask);
-            }
+    public static class RemoveDeploymentOverlaySubtask<S> extends ManageableResourceLeafTask.Builder<S, DeploymentOverlayResource> {
+        protected RemoveDeploymentOverlaySubtask() {
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("deployment-overlay."+parameters.getResource().getResourceName()+".remove").build());
+            final ManageableResourceTaskRunnableBuilder<S, DeploymentOverlayResource> runnableBuilder = params-> context -> {
+                final DeploymentOverlayResource resource = params.getResource();
+                resource.removeResource();
+                context.getLogger().infof("Removed deployment overlay configuration %s", resource.getResourceAbsoluteName());
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            runBuilder(runnableBuilder);
         }
     }
 }

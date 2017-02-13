@@ -16,10 +16,11 @@
 
 package org.jboss.migration.core.util.xml;
 
+import org.jboss.migration.core.ServerMigrationFailureException;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.StartElement;
-import java.io.IOException;
 
 /**
  * A XML file content filter.
@@ -33,9 +34,9 @@ public interface XMLFileFilter {
      * @param xmlEventReader the source XML file reader
      * @param xmlEventWriter the target xml file writer
      * @return the {@link Result} of the element filtering
-     * @throws IOException if there was a failure filtering the element
+     * @throws ServerMigrationFailureException if there was a failure filtering the element
      */
-    Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws IOException;
+    Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws ServerMigrationFailureException;
 
     /**
      * The element filtering result.

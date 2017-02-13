@@ -59,18 +59,18 @@ public class UserChoiceWithOtherOption extends UserChoice {
         }
 
         @Override
-        public void onChoice(String choice) throws Exception {
+        public void onChoice(String choice) {
             if (!otherChoice.equals(choice)) {
                 resultHandler.onChoice(choice);
             } else {
                 // user opted for "other" option, read it
                 final UserInput.ResultHandler inputResultHandler = new UserInput.ResultHandler() {
                     @Override
-                    public void onInput(String input) throws Exception {
+                    public void onInput(String input) {
                         resultHandler.onOther(input);
                     }
                     @Override
-                    public void onError() throws Exception {
+                    public void onError() {
                         resultHandler.onError();
                     }
                 };
@@ -79,12 +79,12 @@ public class UserChoiceWithOtherOption extends UserChoice {
         }
 
         @Override
-        public void onError() throws Exception {
+        public void onError() {
             resultHandler.onError();
         }
     }
 
     public interface ResultHandler extends UserChoice.ResultHandler {
-        void onOther(String otherChoice) throws Exception;
+        void onOther(String otherChoice);
     }
 }

@@ -17,13 +17,13 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
-import org.jboss.migration.core.ServerMigrationTask;
-import org.jboss.migration.core.ServerMigrationTaskContext;
-import org.jboss.migration.core.ServerMigrationTaskName;
-import org.jboss.migration.core.ServerMigrationTaskResult;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTask;
+import org.jboss.migration.core.task.ServerMigrationTaskName;
+import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
@@ -35,17 +35,6 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
 
     public static final String DOMAIN = "domain";
     public static final ServerMigrationTaskName SERVER_MIGRATION_TASK_NAME = new ServerMigrationTaskName.Builder(DOMAIN).build();
-
-    public interface EnvironmentProperties {
-        /**
-         * the prefix for the name of related properties
-         */
-        String PROPERTIES_PREFIX = DOMAIN + ".";
-        /**
-         * Boolean property which if true skips the migration task execution
-         */
-        String SKIP = PROPERTIES_PREFIX + "skip";
-    }
 
     private final DomainConfigurationsMigration<S, ?> domainConfigurationsMigration;
     private final HostConfigurationsMigration<S, ?> hostConfigurationsMigration;
@@ -64,8 +53,8 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
             }
 
             @Override
-            public ServerMigrationTaskResult run(ServerMigrationTaskContext context) throws Exception {
-                final ConsoleWrapper consoleWrapper = context.getServerMigrationContext().getConsoleWrapper();
+            public ServerMigrationTaskResult run(TaskContext context) {
+                final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Domain migration starting...");
                 if (domainConfigurationsMigration != null) {
@@ -79,7 +68,7 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
-        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Setup the target's domain?"), EnvironmentProperties.SKIP);
+        return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's managed domain?"));
     }
 
     public static class Builder<S extends Server>  {

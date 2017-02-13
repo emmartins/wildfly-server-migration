@@ -18,23 +18,11 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.migration.wfly10.config.management.ExtensionsManagement;
 import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
-import org.jboss.migration.wfly10.config.management.InterfacesManagement;
-import org.jboss.migration.wfly10.config.management.JVMsManagement;
-import org.jboss.migration.wfly10.config.management.ManagementInterfacesManagement;
-import org.jboss.migration.wfly10.config.management.SecurityRealmsManagement;
-import org.jboss.migration.wfly10.config.management.SocketBindingGroupsManagement;
-import org.jboss.migration.wfly10.config.management.SubsystemsManagement;
-import org.jboss.migration.wfly10.config.management.SystemPropertiesManagement;
 import org.jboss.migration.wfly10.config.task.HostMigration;
 
-import java.io.IOException;
-import java.util.Set;
-
 import static org.jboss.as.controller.PathAddress.pathAddress;
-import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
@@ -42,39 +30,27 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public class EmbeddedHostConfiguration extends AbstractManageableServerConfiguration implements HostConfiguration {
 
-    private final String host;
     private final HostControllerConfiguration hostController;
-    private final SubsystemsManagement subsystemsManagement;
-    private final SecurityRealmsManagement securityRealmsManagement;
-    private final ExtensionsManagement extensionsManagement;
-    private final InterfacesManagement interfacesManagement;
-    private final ManagementInterfacesManagement managementInterfacesManagement;
-    private final JVMsManagement JVMsManagement;
-    private final SocketBindingGroupsManagement socketBindingGroupsManagement;
-    private final SystemPropertiesManagement systemPropertiesManagement;
 
-    private final PathAddress hostPathAddress;
+    private final JvmResourceImpl.Factory jvmResources;
+    private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
+    private final SecurityRealmResourceImpl.Factory securityRealmResources;
+    private final SubsystemResourceImpl.Factory subsystemResources;
+
 
     public EmbeddedHostConfiguration(HostControllerConfiguration hostController, String host) {
-        super(hostController.getServer());
+        super(host, pathAddress(HOST, host), hostController.getServer());
         this.hostController = hostController;
-        this.host = host;
-        this.hostPathAddress = pathAddress(pathElement(HOST, host));
-        this.extensionsManagement = new ExtensionsManagementImpl(hostPathAddress, this){
-            @Override
-            public Set<String> getSubsystems() throws IOException {
-                return getSubsystemsManagement().getResourceNames();
-            }
-        };
-        this.interfacesManagement = new InterfacesManagementImpl(hostPathAddress, this);
-        this.subsystemsManagement = new SubsystemsManagementImpl(hostPathAddress, this);
-        this.JVMsManagement = new JVMsManagementImpl(hostPathAddress, this);
-        this.socketBindingGroupsManagement = new SocketBindingGroupsManagementImpl(hostPathAddress, this);
-        this.systemPropertiesManagement = new SystemPropertiesManagementImpl(hostPathAddress, this);
 
-        final PathAddress managementCoreServicePathAddress = hostPathAddress.append(pathElement(CORE_SERVICE, MANAGEMENT));
-        this.securityRealmsManagement = new SecurityRealmsManagementImpl(managementCoreServicePathAddress, this);
-        this.managementInterfacesManagement = new ManagementInterfacesManagementImpl(managementCoreServicePathAddress, this);
+        jvmResources = new JvmResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(jvmResources);
+        subsystemResources = new SubsystemResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(subsystemResources);
+        final PathAddress managementCoreServicePathAddress = getResourcePathAddress().append(CORE_SERVICE, MANAGEMENT);
+        managementInterfaceResources = new ManagementInterfaceResourceImpl.Factory(managementCoreServicePathAddress, this);
+        addChildResourceFactory(managementInterfaceResources);
+        securityRealmResources = new SecurityRealmResourceImpl.Factory(managementCoreServicePathAddress, this);
+        addChildResourceFactory(securityRealmResources);
     }
 
     @Override
@@ -87,53 +63,9 @@ public class EmbeddedHostConfiguration extends AbstractManageableServerConfigura
         writeConfiguration();
     }
 
-    @Override
-    public ExtensionsManagement getExtensionsManagement() {
-        return extensionsManagement;
-    }
-
-    @Override
-    public InterfacesManagement getInterfacesManagement() {
-        return interfacesManagement;
-    }
-
-    @Override
-    public SecurityRealmsManagement getSecurityRealmsManagement() {
-        return securityRealmsManagement;
-    }
-
-    @Override
-    public SubsystemsManagement getSubsystemsManagement() {
-        return subsystemsManagement;
-    }
-
-    @Override
-    public SocketBindingGroupsManagement getSocketBindingGroupsManagement() {
-        return socketBindingGroupsManagement;
-    }
-
-    @Override
-    public SystemPropertiesManagement getSystemPropertiesManagement() {
-        return systemPropertiesManagement;
-    }
-
-    public JVMsManagement getJVMsManagement() {
-        return JVMsManagement;
-    }
-
-    @Override
-    public ManagementInterfacesManagement getManagementInterfacesManagement() {
-        return managementInterfacesManagement;
-    }
-
-    @Override
-    public PathAddress getPathAddress() {
-        return hostPathAddress;
-    }
-
     public static class HostConfigFileMigrationFactory implements HostMigration.HostConfigurationProvider {
         @Override
-        public EmbeddedHostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) throws Exception {
+        public EmbeddedHostConfiguration getHostConfiguration(String host, HostControllerConfiguration hostController) {
             return new EmbeddedHostConfiguration(hostController, host);
         }
     }
