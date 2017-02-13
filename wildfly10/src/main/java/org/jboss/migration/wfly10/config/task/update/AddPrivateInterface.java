@@ -61,11 +61,11 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
                     }
                     return true;
                 });
-        beforeRun(context -> context.getLogger().infof("Private interface setup starting..."));
+        beforeRun(context -> context.getLogger().debugf("Private interface setup starting..."));
         subtasks(new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(new AddInterface<>())
                 .subtask(SocketBindingGroupResource.class, new UpdateSocketBindings<>()));
-        afterRun(context -> context.getLogger().infof("Private interface setup done."));
+        afterRun(context -> context.getLogger().debugf("Private interface setup done."));
     }
 
     protected static class AddInterface<S> extends ManageableServerConfigurationLeafTask.Builder<S> {

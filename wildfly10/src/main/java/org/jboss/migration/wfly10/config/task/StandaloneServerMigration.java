@@ -55,12 +55,20 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
                 final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Standalone server migration starting...");
+                beforeConfigurationsMigration(source, target, context);
                 context.execute(configFilesMigration.getServerMigrationTask(source, target, target.getStandaloneConfigurationDir()));
+                afterConfigurationsMigration(source, target, context);
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Standalone server migration done.");
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
         return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's standalone server?"));
+    }
+
+    protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    }
+
+    protected void afterConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
     }
 }

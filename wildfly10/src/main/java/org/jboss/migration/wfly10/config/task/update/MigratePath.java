@@ -41,7 +41,7 @@ public class MigratePath implements TaskRunnable {
         context.getLogger().debugf("Target's path: %s", targetPath);
         if (!sourcePath.equals(targetPath)) {
             context.getMigrationFiles().copy(sourcePath, targetPath);
-            context.getLogger().infof("Source's path %s migrated to %s.", sourcePath, targetPath);
+            context.getLogger().infof("Resource with path %s migrated.", sourcePath, targetPath);
             return ServerMigrationTaskResult.SUCCESS;
         } else {
             return ServerMigrationTaskResult.SKIPPED;

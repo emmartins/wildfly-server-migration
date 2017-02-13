@@ -68,10 +68,10 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
                 //context.getConsoleWrapper().printf("%n%n");
-                context.getLogger().infof("Searching for extensions and subsystems not supported by the target server...");
+                context.getLogger().debugf("Searching for extensions and subsystems not supported by the target server...");
                 removeExtensionsAndSubsystems(source, xmlConfigurationPath, target, context);
                 if (!context.hasSucessfulSubtasks()) {
-                    context.getLogger().infof("No unsupported extensions and subsystems found.");
+                    context.getLogger().debugf("No unsupported extensions and subsystems found.");
                 }
                 return ServerMigrationTaskResult.SUCCESS;
             }

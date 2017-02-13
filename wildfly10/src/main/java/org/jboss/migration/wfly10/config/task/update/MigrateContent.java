@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task.update;
 
-import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.jboss.ContentHashToPathMapper;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
@@ -25,8 +24,6 @@ import org.jboss.migration.core.task.component.TaskRunnable;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 import java.nio.file.Path;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HASH;
 
 /**
  * @author emmartins
@@ -43,19 +40,20 @@ public class MigrateContent implements TaskRunnable {
         this.targetConfiguration = targetConfiguration;
     }
 
-    public MigrateContent(ModelNode contentResource, JBossServerConfigurationPath sourceConfiguration, ManageableServerConfiguration targetConfiguration) {
-        this(contentResource.get(HASH).asBytes(), sourceConfiguration, targetConfiguration);
-    }
-
     @Override
     public ServerMigrationTaskResult run(TaskContext context) {
         final Path contentPath = new ContentHashToPathMapper().apply(contentHash);
         final Path contentSource = sourceConfiguration.getContentDir().resolve(contentPath);
-        context.getLogger().debugf("Source content's path: %s", contentSource);
+        context.getLogger().infof("Source content's path: %s", contentSource);
         final Path contentTarget = targetConfiguration.getContentDir().resolve(contentPath);
-        context.getLogger().debugf("Target content's path: %s", contentTarget);
-        context.getMigrationFiles().copy(contentSource, contentTarget);
-        context.getLogger().infof("Source's content %s migrated to %s.", contentSource, contentTarget);
-        return ServerMigrationTaskResult.SUCCESS;
+        context.getLogger().infof("Target content's path: %s", contentTarget);
+        if (!contentSource.equals(contentTarget)) {
+            context.getMigrationFiles().copy(contentSource, contentTarget);
+            context.getLogger().infof("Source's content %s migrated to %s.", contentSource, contentTarget);
+            return ServerMigrationTaskResult.SUCCESS;
+        } else {
+            context.getLogger().infof("Source equals target content path, skipping content migration");
+            return  ServerMigrationTaskResult.SKIPPED;
+        }
     }
 }

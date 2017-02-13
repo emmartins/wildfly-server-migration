@@ -37,8 +37,8 @@ public class RemovePermgenAttributesFromJVMConfigs<S> extends ManageableServerCo
     public RemovePermgenAttributesFromJVMConfigs() {
         name("jvms.remove-permgen-attributes");
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Removal of permgen attributes from JVM configs starting..."));
-        afterRun(context -> context.getLogger().infof("Removal of permgen attributes from JVM configs done."));
+        beforeRun(context -> context.getLogger().debugf("Removal of permgen attributes from JVM configs starting..."));
+        afterRun(context -> context.getLogger().debugf("Removal of permgen attributes from JVM configs done."));
         subtasks(JvmResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
     }
 
@@ -63,7 +63,7 @@ public class RemovePermgenAttributesFromJVMConfigs<S> extends ManageableServerCo
                 if (!updated) {
                     return ServerMigrationTaskResult.SKIPPED;
                 }
-                context.getLogger().infof("Permgen removed from JVM %s", resource.getResourceAbsoluteName());
+                context.getLogger().infof("Permgen attributes removed from JVM %s", resource.getResourceAbsoluteName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

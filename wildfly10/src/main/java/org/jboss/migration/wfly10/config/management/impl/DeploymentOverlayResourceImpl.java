@@ -19,6 +19,11 @@ package org.jboss.migration.wfly10.config.management.impl;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.wfly10.config.management.DeploymentOverlayResource;
+import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
+import org.jboss.migration.wfly10.config.management.ManageableResourceSelectors;
+import org.jboss.migration.wfly10.config.management.ServerGroupResource;
+
+import java.util.Collection;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEPLOYMENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEPLOYMENT_OVERLAY;
@@ -40,14 +45,26 @@ public class DeploymentOverlayResourceImpl extends AbstractManageableResource<De
         if (resourceConfig == null) {
             throw new IllegalStateException("resource does not exists");
         } else {
-            if (!resourceConfig.hasDefined(DEPLOYMENT)) {
-                return EMPTY;
+            if (getServerConfiguration() instanceof HostControllerConfiguration) {
+                // in domain these are in the server groups overlays, with same name
+                final Collection<DeploymentOverlayResource> resources = ManageableResourceSelectors.selectResources(ServerGroupResource.class)
+                        .andThen(ManageableResourceSelectors.selectResources(DeploymentOverlayResource.class, getResourceName()))
+                        .fromResources(getServerConfiguration());
+                return resources.stream()
+                        .map(resource -> resource.getResourceConfiguration())
+                        .filter(config -> config.hasDefined(DEPLOYMENT))
+                        .flatMap(config -> config.get(DEPLOYMENT).keys().stream())
+                        .distinct()
+                        .toArray(String[]::new);
             } else {
-                resourceConfig.get(DEPLOYMENT).keys().stream().toArray(String[]::new);
+                // deployment links are in config
+                if (!resourceConfig.hasDefined(DEPLOYMENT)) {
+                    return EMPTY;
+                } else {
+                    return resourceConfig.get(DEPLOYMENT).keys().stream().toArray(String[]::new);
+                }
             }
         }
-
-        return new String[0];
     }
 
     public static class Factory extends AbstractManageableResource.Factory<DeploymentOverlayResource, Parent> {

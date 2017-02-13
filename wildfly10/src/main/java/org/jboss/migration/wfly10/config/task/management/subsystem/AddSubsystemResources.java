@@ -43,9 +43,9 @@ public class AddSubsystemResources<S> extends ManageableResourcesCompositeTask.B
                 .subtask(SubsystemResource.Parent.class, subtask.nameBuilder(parameters -> new ServerMigrationTaskName.Builder(taskName.getName()+".add-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build())));
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
-                context.getLogger().infof("Subsystem %s configuration(s) added.", subtask.getSubsystem());
+                context.getLogger().debugf("Subsystem %s configuration(s) added.", subtask.getSubsystem());
             } else {
-                context.getLogger().infof("No subsystem %s configuration(s) added.", subtask.getSubsystem());
+                context.getLogger().debugf("No subsystem %s configuration(s) added.", subtask.getSubsystem());
             }
         });
     }
