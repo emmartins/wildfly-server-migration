@@ -39,7 +39,7 @@ public class AddSubsystemResourceSubtaskBuilder<S> extends ManageableResourceLea
         runBuilder(params -> taskContext -> {
             SubsystemResource.Parent parent = params.getResource();
             if (parent.hasSubsystemResource(subsystem)) {
-                taskContext.getLogger().infof("Skipped adding subsystem config %s, already exists.", parent.getSubsystemResourceAbsoluteName(subsystem));
+                taskContext.getLogger().debugf("Skipped adding subsystem config %s, already exists.", parent.getSubsystemResourceAbsoluteName(subsystem));
                 return ServerMigrationTaskResult.SKIPPED;
             }
             final String configName = parent.getSubsystemResourceAbsoluteName(subsystem);

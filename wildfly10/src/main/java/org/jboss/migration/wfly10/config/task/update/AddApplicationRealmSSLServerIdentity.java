@@ -42,9 +42,9 @@ public class AddApplicationRealmSSLServerIdentity<S> extends ManageableServerCon
     public AddApplicationRealmSSLServerIdentity() {
         name("security-realm."+RESOURCE_NAME+".add-"+SERVER_IDENTITY_NAME+"-"+SERVER_IDENTITY);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
+        beforeRun(context -> context.getLogger().debugf("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
         runBuilder(SecurityRealmResource.class, RESOURCE_NAME, new RunnableBuilder<>());
-        afterRun(context -> context.getLogger().infof("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
+        afterRun(context -> context.getLogger().debugf("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
     }
 
     protected static class RunnableBuilder<S> implements ManageableResourceTaskRunnableBuilder<S, SecurityRealmResource> {

@@ -44,7 +44,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().infof("Migrating security realms..."));
         subtasks(SecurityRealmResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
-        afterRun(context -> context.getLogger().infof("Security realms migration done."));
+        afterRun(context -> context.getLogger().debugf("Security realms migration done."));
 
     }
 

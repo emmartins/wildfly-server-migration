@@ -21,7 +21,6 @@ import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.jboss.DeploymentOverlayLinkMatcher;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
-import org.jboss.migration.core.jboss.ResolvablePath;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskRunnable;
@@ -37,7 +36,7 @@ import org.jboss.migration.wfly10.config.task.management.configuration.Manageabl
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CONTENT;
 import static org.jboss.migration.wfly10.config.management.ManageableResourceSelectors.selectResources;
 
 /**
@@ -50,11 +49,11 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
         name("deployments.overlays.migrate");
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
-            context.getLogger().infof("Retrieving the source configuration's deployment overlays...");
+            context.getLogger().debugf("Retrieving the configuration's deployment overlays...");
             // only deployment overlay resources which are direct children of the server config, so it doesn't end up handling here domain server groups' deployment overlays
             final List<DeploymentOverlayResource> overlays = params.getServerConfiguration().getChildResources(DeploymentOverlayResource.RESOURCE_TYPE);
             if (overlays.isEmpty()) {
-                context.getLogger().infof("No deployment overlays found.");
+                context.getLogger().debugf("No deployment overlays found.");
                 return ServerMigrationTaskResult.SKIPPED;
             } else {
                 context.getLogger().infof("Deployment overlays found: %s", overlays.stream().map(overlay -> overlay.getResourceName()).collect(toList()));
@@ -66,13 +65,17 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
                     final List<DeploymentResource> deployments = params.getServerConfiguration().getChildResources(DeploymentResource.RESOURCE_TYPE);
                     for (DeploymentResource deployment : deployments) {
                         if (matcher.matches(deployment.getResourceName(), deploymentLinks)) {
-                            context.getLogger().infof("Migrating overlay %s, it's linked to deployment %s", overlay.getResourceName(), deployment.getResourceName());
+                            context.getLogger().infof("Migrating deployment overlay '%s', it's linked to deployment %s", overlay.getResourceName(), deployment.getResourceName());
                             migrateResource = true;
                             break;
                         }
                     }
-                    final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = migrateResource ? new MigrateResourceSubtask<>(overlay) : new RemoveResourceSubtask<>(overlay);
-                    context.execute(subtaskBuilder.build(params));
+                    // until deployment overlays missing content don't fail to boot server we first copy all content, and then filter
+                    //final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = migrateResource ? new MigrateResourceSubtask<>(overlay) : new RemoveResourceSubtask<>(overlay);
+                    if (!migrateResource) {
+                        final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = new RemoveResourceSubtask<>(overlay);
+                        context.execute(subtaskBuilder.build(params));
+                    }
                 }
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
@@ -88,13 +91,18 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
                     throw new ServerMigrationFailureException("Unexpected deployment overlay "+resource.getResourceName()+" configuration: "+resourceConfig.asString());
                 }
                 for (ModelNode content : resourceConfig.get(CONTENT).asList()) {
-                    if (content.hasDefined(HASH)) {
-                        new MigrateContent(content, params.getSource(), params.getServerConfiguration()).run(context);
+                    /* FIXME needs to be reworked
+                    if (content.hasDefined(CONTENT)) {
+                        // some servers ha
+                        new MigrateContent(content.get(CONTENT).asBytes(), params.getSource(), params.getServerConfiguration()).run(context);
+                    } else if (content.hasDefined(HASH)) {
+                        new MigrateContent(content.get(HASH).asBytes(), params.getSource(), params.getServerConfiguration()).run(context);
                     } else if (content.hasDefined(PATH)) {
                         new MigrateResolvablePath(new ResolvablePath(content), params.getSource(), params.getServerConfiguration()).run(context);
                     } else {
                         throw new ServerMigrationFailureException("Unexpected deployment overlay "+resource.getResourceName()+" content: "+content.asString());
                     }
+                    */
                 }
                 return ServerMigrationTaskResult.SUCCESS;
             };
@@ -110,11 +118,11 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
                     // the resource may be referenced in server groups, remove these first
                     for (DeploymentOverlayResource serverGroupDeploymentResource : selectResources(ServerGroupResource.class).andThen(selectResources(DeploymentOverlayResource.class, resource.getResourceName())).fromResources(params.getServerConfiguration())) {
                         serverGroupDeploymentResource.removeResource();
-                        context.getLogger().infof("Removed (server group) deployment overlay configuration %s", resource.getResourceAbsoluteName());
+                        context.getLogger().infof("Removed deployment overlay from server group %s", resource.getResourceAbsoluteName());
                     }
                 }
                 resource.removeResource();
-                context.getLogger().infof("Removed deployment overlay configuration %s", resource.getResourceAbsoluteName());
+                context.getLogger().infof("Removed deployment overlay from configuration %s", resource.getResourceAbsoluteName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

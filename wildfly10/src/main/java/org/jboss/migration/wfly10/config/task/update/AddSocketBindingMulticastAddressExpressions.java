@@ -44,7 +44,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableSe
     public AddSocketBindingMulticastAddressExpressions() {
         name("socket-bindings.multicast-address.add-expressions");
         skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Adding socket binding's multicast address expressions..."));
+        beforeRun(context -> context.getLogger().debugf("Adding socket binding's multicast address expressions..."));
         final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
         for (String socketBinding : SOCKET_BINDINGS) {
             subtasks.subtask(SocketBindingResource.class, socketBinding, new AddSocketBindingMulticastAddressExpression<>(socketBinding));
@@ -52,9 +52,9 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableSe
         subtasks(subtasks);
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
-                context.getLogger().infof("Socket binding's multicast address expressions added.");
+                context.getLogger().debugf("Socket binding's multicast address expressions added.");
             } else {
-                context.getLogger().infof("No socket binding's multicast address expressions added.");
+                context.getLogger().debugf("No socket binding's multicast address expressions added.");
             }
         });
     }

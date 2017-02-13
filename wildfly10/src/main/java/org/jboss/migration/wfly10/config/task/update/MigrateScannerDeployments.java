@@ -62,7 +62,7 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
             final JBossServerConfigurationPath sourceConfiguration = params.getSource();
             final ManageableServerConfiguration targetConfiguration = params.getServerConfiguration();
             for (SubsystemResource subsystemResource : targetConfiguration.findResources(SubsystemResource.class, SubsystemNames.DEPLOYMENT_SCANNER)) {
-                context.getLogger().infof("Deployment-scanner subsystem found, processing its configuration %s...", subsystemResource.getResourceAbsoluteName());
+                context.getLogger().debugf("Deployment-scanner found, analysing its configuration %s...", subsystemResource.getResourceAbsoluteName());
                 ModelNode subsystemConfig = subsystemResource.getResourceConfiguration();
                 if (subsystemConfig != null && subsystemConfig.hasDefined(SCANNER)) {
                     for (Property property : subsystemConfig.get(SCANNER).asPropertyList()) {
@@ -97,11 +97,11 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                             final List<String> processedDeploymentScannerDirs = ENV_PROPERTY_PROCESSED_DEPLOYMENT_SCANNER_DIRS.getValue(taskEnvironment);
                             final String sourceDeploymentsDirAsString = sourceDeploymentsDir.toString();
                             if (processedDeploymentScannerDirs.contains(sourceDeploymentsDirAsString)) {
-                                context.getLogger().infof("Already processed source's deployments directory '%s', skipping it...", sourceDeploymentsDir);
+                                context.getLogger().debugf("Already processed source's deployments directory '%s', skipping it...", sourceDeploymentsDir);
                             } else {
                                 processedDeploymentScannerDirs.add(sourceDeploymentsDirAsString);
                                 ENV_PROPERTY_PROCESSED_DEPLOYMENT_SCANNER_DIRS.setValue(processedDeploymentScannerDirs, taskEnvironment);
-                                context.getLogger().infof("Source's deployment scanner '%s' is watching directory '%s', retrieving deployments in it...", property.getName(), sourceDeploymentsDir);
+                                context.getLogger().infof("Found deployment scanner '%s' watching directory '%s', searching for deployments in it...", property.getName(), sourceDeploymentsDir);
                                 final List<Path> deployments;
                                 try {
                                     deployments = Files.list(sourceDeploymentsDir)
@@ -112,9 +112,9 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                     throw new ServerMigrationFailureException("Failed to read the scanner's deployments directory", e);
                                 }
                                 if (deployments.isEmpty()) {
-                                    context.getLogger().infof("No deployments found in '%s'.", sourceDeploymentsDir);
+                                    context.getLogger().debugf("No deployments found in '%s'.", sourceDeploymentsDir);
                                 } else {
-                                    context.getLogger().infof("Deployments found in '%s': %s", sourceDeploymentsDir, deployments);
+                                    context.getLogger().infof("Deployments found: %s", sourceDeploymentsDir, deployments);
                                     // find out if all deployments should be migrated
                                     final boolean confirmEachDeployment;
                                     if (context.isInteractive()) {
@@ -133,7 +133,7 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                         final boolean migrateDeployment;
                                         if (confirmEachDeployment) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate found deployment named '" + deployment + "'?", "yes/no?", userConfirmation).execute();
+                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate deployment '" + deployment + "'?", "yes/no?", userConfirmation).execute();
                                             migrateDeployment = userConfirmation.getResult() == YES;
                                         } else {
                                             // TODO add env property for a config on this decision

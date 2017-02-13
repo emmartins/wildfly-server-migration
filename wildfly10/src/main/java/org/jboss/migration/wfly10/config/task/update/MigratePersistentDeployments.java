@@ -52,11 +52,11 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
         name("deployments.migrate-persistent-deployments");
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
-            context.getLogger().infof("Retrieving the configuration's persistent deployments...");
+            context.getLogger().debugf("Retrieving the configuration's persistent deployments...");
             // FIXME only deployment resources which are direct children of the server config
             final List<DeploymentResource> deploymentResources = params.getServerConfiguration().getChildResources(DeploymentResource.RESOURCE_TYPE);
             if (deploymentResources.isEmpty()) {
-                context.getLogger().infof("No persistent deployments found.");
+                context.getLogger().debugf("No deployments found.");
                 return ServerMigrationTaskResult.SKIPPED;
             } else {
                 context.getLogger().infof("Persistent deployments found: %s", deploymentResources.stream().map(resource -> resource.getResourceName()).collect(toList()));
@@ -65,7 +65,7 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                 if (context.isInteractive()) {
                     if (deploymentResources.size() > 1) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all persisted deployments?","yes/no?", userConfirmation).execute();
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all persistent deployments found?","yes/no?", userConfirmation).execute();
                         confirmEachResource = userConfirmation.getResult() == NO;
                     } else {
                         confirmEachResource = true;
@@ -78,14 +78,18 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                     final boolean migrateDeployment;
                     if (confirmEachResource) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persisted deployment named '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
                         migrateDeployment = userConfirmation.getResult() == YES;
                     } else {
                         // TODO add env property for a config on this decision
                         migrateDeployment = true;
                     }
-                    final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = migrateDeployment ? new MigrateDeploymentSubtask<>(deploymentResource) : new RemoveDeploymentSubtask<>(deploymentResource);
-                    context.execute(subtaskBuilder.build(params));
+                    // until deployment overlays missing content don't fail to boot server we first copy all content, and then filter
+                    //final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = migrateDeployment ? new MigrateDeploymentSubtask<>(deploymentResource) : new RemoveDeploymentSubtask<>(deploymentResource);
+                    if (!migrateDeployment) {
+                        final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = new RemoveDeploymentSubtask<>(deploymentResource);
+                        context.execute(subtaskBuilder.build(params));
+                    }
                 }
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
@@ -98,15 +102,15 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
             final TaskRunnable.Builder<ManageableServerConfigurationBuildParameters<JBossServerConfigurationPath<S>>> runnableBuilder = params -> context -> {
                 final ModelNode deploymentConfig = resource.getResourceConfiguration();
                 if (!deploymentConfig.hasDefined(CONTENT)) {
-                    throw new ServerMigrationFailureException("Unexpected persistent deployment "+resource.getResourceName()+" configuration: "+deploymentConfig.asString());
+                    throw new ServerMigrationFailureException("Unexpected deployment "+resource.getResourceName()+" configuration: "+deploymentConfig.asString());
                 }
                 for (ModelNode content : deploymentConfig.get(CONTENT).asList()) {
                     if (content.hasDefined(HASH)) {
-                        new MigrateContent(content, params.getSource(), params.getServerConfiguration()).run(context);
+                        new MigrateContent(content.get(HASH).asBytes(), params.getSource(), params.getServerConfiguration()).run(context);
                     } else if (content.hasDefined(PATH)) {
                         new MigrateResolvablePath(new ResolvablePath(content), params.getSource(), params.getServerConfiguration()).run(context);
                     } else {
-                        throw new ServerMigrationFailureException("Unexpected persistent deployment "+resource.getResourceName()+" content: "+content.asString());
+                        throw new ServerMigrationFailureException("Unexpected deployment "+resource.getResourceName()+" content: "+content.asString());
                     }
                 }
                 return ServerMigrationTaskResult.SUCCESS;
@@ -117,17 +121,17 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
 
     public static class RemoveDeploymentSubtask<S extends JBossServer<S>> extends ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> {
         protected RemoveDeploymentSubtask(DeploymentResource resource) {
-            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("deployments.remove-persistent-resource").addAttribute("resource", resource.getResourceAbsoluteName()).build());
+            nameBuilder(parameters -> new ServerMigrationTaskName.Builder("deployments.remove-persistent-deployment").addAttribute("resource", resource.getResourceAbsoluteName()).build());
             final TaskRunnable.Builder<ManageableServerConfigurationBuildParameters<JBossServerConfigurationPath<S>>> runnableBuilder = params -> context -> {
                 if (params.getServerConfiguration() instanceof HostControllerConfiguration) {
                     // the deployment may be referenced in server groups, remove these first
                     for (DeploymentResource serverGroupDeploymentResource : selectResources(ServerGroupResource.class).andThen(selectResources(DeploymentResource.class, resource.getResourceName())).fromResources(params.getServerConfiguration())) {
                         serverGroupDeploymentResource.removeResource();
-                        context.getLogger().infof("Removed server group persistent deployment configuration %s", resource.getResourceAbsoluteName());
+                        context.getLogger().infof("Removed persistent deployment from server group %s", resource.getResourceAbsoluteName());
                     }
                 }
                 resource.removeResource();
-                context.getLogger().infof("Removed persistent deployment configuration %s", resource.getResourceAbsoluteName());
+                context.getLogger().infof("Removed persistent deployment from configuration %s", resource.getResourceAbsoluteName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

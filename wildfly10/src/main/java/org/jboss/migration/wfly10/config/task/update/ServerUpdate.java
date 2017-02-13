@@ -20,13 +20,11 @@ import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
-import org.jboss.migration.wfly10.config.task.DomainMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.MigrationBuilders;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.ServerMigration;
 import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationMigration;
-import org.jboss.migration.wfly10.config.task.StandaloneServerMigration;
 
 /**
  * @author emmartins
@@ -49,20 +47,20 @@ public class ServerUpdate<S extends JBossServer<S>> extends ServerMigration<S> {
             return this;
         }
 
-        public Builder<S> domain(DomainMigration<S> domainUpdate) {
+        public Builder<S> domain(DomainUpdate<S> domainUpdate) {
             return subtask(domainUpdate);
         }
 
-        public Builder<S> domain(DomainMigration.Builder<S> domainUpdateBuilder) {
+        public Builder<S> domain(DomainUpdate.Builder<S> domainUpdateBuilder) {
             return domain(domainUpdateBuilder.build());
         }
 
-        public Builder<S> standaloneServer(StandaloneServerMigration<S> standaloneServerUpdate) {
+        public Builder<S> standaloneServer(StandaloneServerUpdate<S> standaloneServerUpdate) {
             return subtask(standaloneServerUpdate);
         }
 
         public Builder<S> standaloneServer(StandaloneServerConfigurationsUpdate<S> configurationsMigration) {
-            return standaloneServer(new StandaloneServerMigration<>(configurationsMigration));
+            return standaloneServer(new StandaloneServerUpdate<>(configurationsMigration));
         }
 
         public Builder<S> standaloneServer(StandaloneServerConfigurationMigration<JBossServerConfigurationPath<S>> standaloneServerConfigurationUpdate) {

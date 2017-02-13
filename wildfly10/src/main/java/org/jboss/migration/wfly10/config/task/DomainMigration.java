@@ -57,18 +57,26 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
                 final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Domain migration starting...");
+                beforeConfigurationsMigration(source, target, context);
                 if (domainConfigurationsMigration != null) {
                     context.execute(domainConfigurationsMigration.getServerMigrationTask(source, target, target.getDomainConfigurationDir()));
                 }
                 if (hostConfigurationsMigration != null) {
                     context.execute(hostConfigurationsMigration.getServerMigrationTask(source, target, target.getDomainConfigurationDir()));
                 }
+                afterConfigurationsMigration(source, target, context);
                 consoleWrapper.printf("%n");
                 context.getLogger().infof("Domain migration done.");
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };
         return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's managed domain?"));
+    }
+
+    protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    }
+
+    protected void afterConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
     }
 
     public static class Builder<S extends Server>  {

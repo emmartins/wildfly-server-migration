@@ -63,13 +63,13 @@ public class ModulesMigrationTask implements ServerMigrationTask {
         if (taskEnvironment.isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
-        context.getLogger().infof("Migrating modules requested by %s...", requestedBy);
+        context.getLogger().debugf("Migrating modules requested by %s...", requestedBy);
         final ModuleMigrator moduleMigrator = new ModuleMigrator(source, target, context.getMigrationEnvironment());
         migrateModules(moduleMigrator, context);
         if (context.hasSucessfulSubtasks()) {
             return ServerMigrationTaskResult.SUCCESS;
         } else {
-            context.getLogger().infof("No modules required migration.", requestedBy);
+            context.getLogger().debugf("No modules required migration.", requestedBy);
             return ServerMigrationTaskResult.SKIPPED;
         }
     }
@@ -102,7 +102,7 @@ public class ModulesMigrationTask implements ServerMigrationTask {
 
         public void migrateModule(final ModuleIdentifier moduleIdentifier, final String reason, final TaskContext context) throws IllegalStateException {
             if (excludedByEnvironment.contains(moduleIdentifier)) {
-                context.getLogger().infof("Skipping module %s migration, it's excluded by environment.", moduleIdentifier);
+                context.getLogger().debugf("Skipping module %s migration, it's excluded by environment.", moduleIdentifier);
                 return;
             }
             final JBossServer.Module sourceModule = sourceModules.getModule(moduleIdentifier);
