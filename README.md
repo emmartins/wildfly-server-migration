@@ -47,8 +47,8 @@ Run the Server Migration Tool
         ----------------------------------------
         ----------------------------------------
         Server migration starting...
-        INFO  [org.jboss.migration.core.task.ServerMigrationTask#3] (main) Retrieving source's standalone server config files...
-        INFO  [org.jboss.migration.core.task.ServerMigrationTask#3] (main) /home/username/tools/jboss-eap-6.4/standalone/configuration/standalone_xml_history/standalone-full.initial.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#3] (main) Retrieving source's standalone server config files...
+        INFO  [org.jboss.migration.core.ServerMigrationTask#3] (main) /home/username/tools/jboss-eap-6.4/standalone/configuration/standalone_xml_history/standalone-full.initial.xml
 
         Migrate all configurations?
         yes/no?
