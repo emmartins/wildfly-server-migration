@@ -47,31 +47,139 @@ Run the Server Migration Tool
         ----------------------------------------
         ----------------------------------------
         Server migration starting...
-        INFO  [org.jboss.migration.core.ServerMigrationTask#3] (main) Retrieving source's standalone server config files...
-        INFO  [org.jboss.migration.core.ServerMigrationTask#3] (main) /home/username/tools/jboss-eap-6.4/standalone/configuration/standalone_xml_history/standalone-full.initial.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#2] (main) Migrating modules requested by environment...
+        INFO  [org.jboss.migration.core.ServerMigrationTask#2] (main) No modules required migration.
+
+        Setup the target's standalone server?
+        yes/no?
+
+    Type `yes` to continue with the migration.
+4. You are presented with the following information and prompts.
+
+        INFO  [org.jboss.migration.core.ServerMigrationTask#3] (main) Standalone server migration starting...
+
+        INFO  [org.jboss.migration.core.ServerMigrationTask#4] (main) Retrieving source's standalone configurations...
+        INFO  [org.jboss.migration.core.ServerMigrationTask#4] (main) /path/to/source/standalone-full-ha.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#4] (main) /path/to/source/standalone-full.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#4] (main) /path/to/source/standalone-ha.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#4] (main) /path/to/source/standalone-osgi.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#4] (main) /path/to/source/standalone.xml
 
         Migrate all configurations?
         yes/no?
-    Enter `y` to continue with the migration.
-5. The tool reports on the progress throughout the migration. You should see the following message when it completes.
 
+    Type `yes` to continue with the migration of all of the standalone server configuration files. Type `no` to choose the select the files individually.
+5. You are presented with a long list of tasks that were completed for the standalone server migration, and the following prompt.
+
+        [org.jboss.migration.core.ServerMigrationTask#3] (main) Standalone server migration done.
+
+        Setup the target's domain?
+        yes/no?
+    Type `yes` to continue with the migration of the managed domain configuration files.
+6. You are presented with the list of available domain configuration files.
+
+        INFO  [org.jboss.migration.core.ServerMigrationTask#327] (main) Domain migration starting...
+
+        INFO  [org.jboss.migration.core.ServerMigrationTask#328] (main) Retrieving source's domain configurations...
+        INFO  [org.jboss.migration.core.ServerMigrationTask#328] (main) /path/to/source/domain.xml
+
+        Migrate all configurations?
+        yes/no?
+
+    Type `yes` to continue with the migration of all of the managed domain configuration files. Type `no` to choose the select the files individually.
+
+7. You are presented with a long list of tasks that were completed for the managed domain migration, and the following prompt.
+
+        INFO  [org.jboss.migration.core.ServerMigrationTask#482] (main) Retrieving source's host configurations...
+        INFO  [org.jboss.migration.core.ServerMigrationTask#482] (main) /path/to/source/host-master.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#482] (main) /path/to/source/host-slave.xml
+        INFO  [org.jboss.migration.core.ServerMigrationTask#482] (main) /path/to/source/host.xml
+
+        Migrate all configurations?
+        yes/no?
+
+    Type `yes` to continue with the migration of all of the displayed configuration files. Type `no` to choose the select the files individually.
+8. The messages are followed by a `Task Summary` report that summarizes the result of the migration of each task.
+
+        -------------------------
+        Task Summary
+        -------------------------
+        server ...................................................................... SUCCESS
+         standalone ................................................................. SUCCESS
+          standalone-configurations  ........................................................................... SUCCESS
+           standalone-configuration(source=/path/to/source/standalone-full-ha.xml) .. SUCCESS
+           standalone-configuration(source=/path/to/source/standalone-full.xml) ..... SUCCESS
+           standalone-configuration(source=/path/to/source/standalone-ha.xml) ....... SUCCESS
+           standalone-configuration(source=/path/to/source/standalone-osgi.xml) ..... SUCCESS
+           standalone-configuration(source=/path/to/source/standalone.xml) .......... SUCCESS
+         domain ..................................................................... SUCCESS
+          domain-configurations ..................................................... SUCCESS
+           domain-configuration(source=/path/to/source/domain.xml) .................. SUCCESS
+          host-configurations ....................................................... SUCCESS
+           host-configuration(source=/path/to/source/host-master.xml) ............... SUCCESS
+           host-configuration(source=/path/to/source/host-slave.xml) ................ SUCCESS
+           host-configuration(source=/path/to/source/host.xml) ...................... SUCCESS
+9. You should see the following message when it completes.
+
+        -------------------------
         Migration Result: SUCCESS
-6. Review the information in the output log. The log contains detailed information about the modified configuration files and subsystems.
+        -------------------------
+10. Review the information in the `output/` directory.
+  * `migration.log`: The log contains detailed information about the modified configuration files and subsystems. For more information, see [Review the Migration Log](#review-the-migration-log).
+  * `migration-report.html`: The HTML report is a nicely formatted report showing the detailed results of the migration. For more information, see [Review the Migration Report](#review-the-migration-report).
+  * `migration-report.xml`: The XML file is used to format the HTML report. For more information, see [Review the Migration XML File](#review-the-migration-xml-file).
+11. Review the updated files in target server installation directory. Note the original configuration and properties files are backed up and now have the suffix `.beforeMigration`.
 
-   * Informational messages report information about the conversion of the named file, for example:
 
-            INFO  [org.jboss.as.remoting] (Controller Boot Thread) WFLYRMT0024: The remoting subsystem is present but no io subsystem was found. An io subsystem was not required when remoting schema 'urn:jboss:domain:remoting:1.2' was current but now is, so a default subsystem is being added.
-            INFO  [org.jboss.as.connector] (Controller Boot Thread) WFLYJCA0093: The 'enable' operation is deprecated. Use of the 'add' or 'remove' operations is preferred, or if required the 'write-attribute' operation can used to set the deprecated 'enabled' attribute
-            INFO  [org.jboss.as.controller.management-deprecated] (Controller Boot Thread) WFLYCTL0028: Attribute 'default-clustered-sfsb-cache' in the resource at address '/subsystem=ejb3' is deprecated, and may be removed in future version. See the attribute description in the output of the read-resource-description operation to learn more about the deprecation.
-            INFO  [org.jboss.as.controller.management-deprecated] (Controller Boot Thread) WFLYCTL0028: Attribute 'default-stack' in the resource at address '/subsystem=jgroups' is deprecated, and may be removed in future version. See the attribute description in the output of the read-resource-description operation to learn more about the deprecation.
+<a name="review-the-migration-log"/>
+Review the Migration Log
+-----------------------
 
-   * Error messages appear in red and describe the problem encountered in the migration and often how to resolve it. This error requires action.
+The migration log contains detailed information about the modified configuration files and subsystems.
 
-            ERROR [org.jboss.as.ejb3] (Controller Boot Thread) WFLYEJB0474: Attribute 'default-clustered-sfsb-cache' is not supported on current version servers; it is only allowed if its value matches 'default-sfsb-cache'. This attribute should be removed.
+* Informational messages about the tasks performed and migration results begin with `INFO`. Look for message codes beginning with `WFLY` for more detailed information about the migration results. Some informational messages might require action or review. The following are examples of informational messages.
+
+        INFO  [org.jboss.as] (MSC service thread 2-8) WFLYSRV0049: JBoss EAP 7.0.0.GA (WildFly Core 2.1.2.Final-redhat-1) starting
+        INFO  [org.jboss.as.remoting] (Controller Boot Thread) WFLYRMT0024: The remoting subsystem is present but no io subsystem was found. An io subsystem was not required when remoting schema 'urn:jboss:domain:remoting:1.2' was current but now is, so a default subsystem is being added.
+         INFO  [org.jboss.as.connector] (Controller Boot Thread) WFLYJCA0093: The 'enable' operation is deprecated. Use of the 'add' or 'remove' operations is preferred, or if required the 'write-attribute' operation can used to set the deprecated 'enabled' attribute
+        ...
+        INFO  [org.jboss.as] (MSC service thread 9-6) WFLYSRV0049: JBoss EAP 7.0.0.GA (WildFly Core 2.1.2.Final-redhat-1) starting
+        INFO  [org.jboss.as.controller.management-deprecated] (Controller Boot Thread) WFLYCTL0028: Attribute 'permgen-size' in the resource at address '/host=master/jvm=default' is deprecated, and may be removed in future version. See the attribute description in the output of the read-resource-description operation to learn more about the deprecation.
+        INFO  [org.jboss.as.controller.management-deprecated] (Controller Boot Thread) WFLYCTL0028: Attribute 'max-permgen-size' in the resource at address '/host=master/jvm=default' is deprecated, and may be removed in future version. See the attribute description in the output of the read-resource-description operation to learn more about the deprecation.
+        INFO  [org.jboss.as.controller.management-deprecated] (Controller Boot Thread) WFLYCTL0028: Attribute 'default-stack' in the resource at address '/profile=ha/subsystem=jgroups' is deprecated, and may be removed in future version. See the attribute description in the output of the read-resource-description operation to learn more about the deprecation.
+        INFO  [org.jboss.as.controller.management-deprecated] (Controller Boot Thread) WFLYCTL0028: Attribute 'default-stack' in the resource at address '/profile=full-ha/subsystem=jgroups' is deprecated, and may be removed in future version. See the attribute description in the output of the read-resource-description operation to learn more about the deprecation.
+
+* Error messages, which appear in red in the server console, describe the problem encountered in the migration and often how to resolve it. Most errors require action. The following are examples of an error messages.
+
+        ERROR [org.jboss.as.ejb3] (Controller Boot Thread) WFLYEJB0474: Attribute 'default-clustered-sfsb-cache' is not supported on current version servers; it is only allowed if its value matches 'default-sfsb-cache'. This attribute should be removed.
+        ...
+        ERROR [org.jboss.as.controller] (main) WFLYCTL0369: Required capabilities are not available:
+          org.wildfly.domain.server-group.main-server-group in context 'server-config'; There are no known registration points which can provide this capability.
+          org.wildfly.domain.server-group.other-server-group in context 'server-config'; There are no known registration points which can provide this capability.
+        ERROR [org.jboss.as.controller] (main) WFLYCTL0369: Required capabilities are not available:
+          org.wildfly.domain.server-group.main-server-group in context 'server-config'; There are no known registration points which can provide this capability.
+          org.wildfly.domain.server-group.other-server-group in context 'server-config'; There are no known registration points which can provide this capability.
+        ERROR [org.jboss.as.controller] (main) WFLYCTL0369: Required capabilities are not available:
+          org.wildfly.domain.server-group.main-server-group in context 'server-config'; There are no known registration points which can provide this capability.
+          org.wildfly.domain.server-group.other-server-group in context 'server-config'; There are no known registration points which can provide this capability.
 
     _NOTE:_ If you have any deployments to your old server configuration, you may see error messages similar to the following.
 
-          ERROR [org.jboss.as.server] (Controller Boot Thread) WFLYSRV0057: No deployment content with hash 029f689e292c7cbe680ad330edd50440da51d7a3 is available in the deployment content repository for deployment jboss-mail.war. Because this Host Controller is booting in ADMIN-ONLY mode, boot will be allowed to proceed to provide administrators an opportunity to correct this problem. If this Host Controller were not in ADMIN-ONLY mode this would be a fatal boot failure.
-6. The messages are followed by a `Task Summary` report that summarizes the result of the migration of each task.
+        ERROR [org.jboss.as.server] (Controller Boot Thread) WFLYSRV0057: No deployment content with hash 029f689e292c7cbe680ad330edd50440da51d7a3 is available in the deployment content repository for deployment jboss-mail.war. Because this Host Controller is booting in ADMIN-ONLY mode, boot will be allowed to proceed to provide administrators an opportunity to correct this problem. If this Host Controller were not in ADMIN-ONLY mode this would be a fatal boot failure.
 
-7. Review the updated files in target server installation directory. Note the original configuration and properties files are backed up and now have the suffix `.beforeMigration`.
+<a name="review-the-migration-report"/>
+Review the Migration Report
+---------------------------
+
+The `output/migration-report.html` HTML report file is a nicely formatted output detailing the results of the migration. It contains the following sections.
+
+* _Summary_: This section displays the time of the migration, the source and target server releases and paths, and the result of the migration.
+* _Environment_: This section describes the reporting environment, including the path of the migration tool.
+* _Tasks_: This section summarizes the tasks that were run during the migration. It then provides the details of those tasks in a hierarchical, collapsible, easy to read format. Tasks are grouped by server, and within server, by server type and configuration.
+
+
+<a name="review-the-migration--xml-file"/>
+Review the Migration XML File
+-----------------------------
+
+The XML file is used to format the HTML report. This file can be imported into your favorite spreadsheet or other tool where you can manipulate and process the data.
