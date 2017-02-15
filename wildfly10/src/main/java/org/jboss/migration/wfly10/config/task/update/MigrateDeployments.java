@@ -30,7 +30,7 @@ public class MigrateDeployments<S extends JBossServer<S>> extends ManageableServ
     public MigrateDeployments() {
         name("deployments.migrate-deployments");
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().info("Processing source configuration's deployments..."));
+        beforeRun(context -> context.getLogger().debugf("Processing source configuration's deployments..."));
         subtasks(new ManageableServerConfigurationCompositeSubtasks.Builder<JBossServerConfigurationPath<S>>()
                 .subtask(new MigratePersistentDeployments<>())
                 .subtask(new MigrateScannerDeployments<>())
