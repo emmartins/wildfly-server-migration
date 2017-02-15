@@ -1,0 +1,5 @@
+connect
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld1.war
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld2.war —-unmanaged
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld3.war
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld4.war —-unmanaged
