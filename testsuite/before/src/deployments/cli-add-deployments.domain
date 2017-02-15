@@ -1,0 +1,7 @@
+connect
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld1.war --all-server-groups
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld2.war --all-server-groups —-unmanaged
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld3.war --server-groups=main-server-group
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld4.war --server-groups=main-server-group —-unmanaged
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld5.war --server-groups=other-server-group
+deploy SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/deployments/cmtool-helloworld6.war --server-groups=other-server-group —-unmanaged

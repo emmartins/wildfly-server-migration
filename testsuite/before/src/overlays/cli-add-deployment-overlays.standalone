@@ -1,0 +1,5 @@
+connect
+deployment-overlay add --name=overlay1 --content=/WEB-INF/classes/org/jboss/as/quickstarts/helloworld/HelloWorldServlet1.class=SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/overlays/HelloWorldServlet1.class --deployments=cmtool-helloworld1.war
+deployment-overlay add --name=overlay2 --content=/WEB-INF/classes/org/jboss/as/quickstarts/helloworld/HelloService1.class=SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/overlays/HelloService1.class --deployments=cmtool-helloworld1.war
+deployment-overlay add --name=overlay3 --content=/WEB-INF/classes/org/jboss/as/quickstarts/helloworld/HelloService2.class=SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/overlays/HelloService2.class --deployments=cmtool-*2.war
+deployment-overlay add --name=overlay4 --content=/WEB-INF/classes/org/jboss/as/quickstarts/helloworld/HelloWorldServlet2.class=SURPRISE_SURPRISE_YOU_NEED_TO_REPLACE_THIS/before/src/overlays/HelloWorldServlet2.class --deployments=cmtool-helloworld2*
