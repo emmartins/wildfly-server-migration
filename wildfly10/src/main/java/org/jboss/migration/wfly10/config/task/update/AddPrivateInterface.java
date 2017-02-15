@@ -104,7 +104,7 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
                                 writeAttrOp.get(NAME).set(INTERFACE);
                                 writeAttrOp.get(VALUE).set(INTERFACE_NAME);
                                 socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                                context.getLogger().infof("Socket binding %s interface set to %s", params.getResource().getResourceAbsoluteName(), INTERFACE_NAME);
+                                context.getLogger().infof("Socket binding %s interface set to %s", socketBindingResource.getResourceAbsoluteName(), INTERFACE_NAME);
                                 updated.add(socketBinding);
                             }
                         }
