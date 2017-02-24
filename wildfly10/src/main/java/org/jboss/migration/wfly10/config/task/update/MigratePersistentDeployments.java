@@ -59,13 +59,13 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                 context.getLogger().debugf("No deployments found.");
                 return ServerMigrationTaskResult.SKIPPED;
             } else {
-                context.getLogger().infof("Persistent deployments found: %s", deploymentResources.stream().map(resource -> resource.getResourceName()).collect(toList()));
+                context.getLogger().infof("Deployments found: %s", deploymentResources.stream().map(resource -> resource.getResourceName()).collect(toList()));
                 // find out if all deployments should be migrated
                 final boolean confirmEachResource;
                 if (context.isInteractive()) {
                     if (deploymentResources.size() > 1) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all persistent deployments found?","yes/no?", userConfirmation).execute();
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all deployments?","yes/no?", userConfirmation).execute();
                         confirmEachResource = userConfirmation.getResult() == NO;
                     } else {
                         confirmEachResource = true;
@@ -78,7 +78,7 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                     final boolean migrateDeployment;
                     if (confirmEachResource) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
                         migrateDeployment = userConfirmation.getResult() == YES;
                     } else {
                         // TODO add env property for a config on this decision

@@ -114,13 +114,13 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                 if (deployments.isEmpty()) {
                                     context.getLogger().debugf("No deployments found in '%s'.", sourceDeploymentsDir);
                                 } else {
-                                    context.getLogger().infof("Deployments found: %s", sourceDeploymentsDir, deployments);
+                                    context.getLogger().infof("Deployments found: %s", deployments);
                                     // find out if all deployments should be migrated
                                     final boolean confirmEachDeployment;
                                     if (context.isInteractive()) {
                                         if (deployments.size() > 1) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate all deployments found?", "yes/no?", userConfirmation).execute();
+                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate all deployments?", "yes/no?", userConfirmation).execute();
                                             confirmEachDeployment = userConfirmation.getResult() == NO;
                                         } else {
                                             confirmEachDeployment = true;
