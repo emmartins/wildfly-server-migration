@@ -18,7 +18,6 @@ package org.jboss.migration.eap6.to.eap7.tasks;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddBufferCache;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
@@ -30,8 +29,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpL
 public class EAP6_4ToEAP7_0UpdateUndertowSubsystem<S> extends UpdateSubsystemResources<S> {
     public EAP6_4ToEAP7_0UpdateUndertowSubsystem() {
         super(SubsystemNames.UNDERTOW,
-                new AddBufferCache<>(),
-                new SetDefaultHttpListenerRedirectSocket<>(),
+                new SetDefaultHttpListenerRedirectSocket<>("http"),
                 new AddWebsockets<>(),
                 new SetDefaultHostResponseHeaderServer<>(),
                 new SetDefaultHostResponseHeaderXPoweredBy<>());

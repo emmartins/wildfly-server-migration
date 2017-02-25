@@ -35,21 +35,27 @@ public class SetDefaultHttpListenerRedirectSocket<S> extends UpdateSubsystemReso
     public static final String TASK_NAME = "set-default-http-listener-redirect-socket";
     private static final String SERVER_NAME = "default-server";
     private static final String HTTP_LISTENER = "http-listener";
-    private static final String HTTP_LISTENER_NAME = "http";
     private static final String REDIRECT_SOCKET_ATTR_NAME = "redirect-socket";
     private static final String REDIRECT_SOCKET_ATTR_VALUE = "https";
 
+    private final String httpListenerName;
+
     public SetDefaultHttpListenerRedirectSocket() {
+        this("default");
+    }
+
+    public SetDefaultHttpListenerRedirectSocket(String defaultHttpListenerName) {
+        this.httpListenerName = defaultHttpListenerName;
         subtaskName(TASK_NAME);
     }
 
     @Override
     protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
-        if (config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME) && !config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, HTTP_LISTENER_NAME, REDIRECT_SOCKET_ATTR_NAME)) {
-            final PathAddress pathAddress = subsystemResource.getResourcePathAddress().append(SERVER, SERVER_NAME).append(HTTP_LISTENER, HTTP_LISTENER_NAME);
+        if (config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, httpListenerName) && !config.hasDefined(SERVER, SERVER_NAME, HTTP_LISTENER, httpListenerName, REDIRECT_SOCKET_ATTR_NAME)) {
+            final PathAddress pathAddress = subsystemResource.getResourcePathAddress().append(SERVER, SERVER_NAME).append(HTTP_LISTENER, httpListenerName);
             final ModelNode op = Util.getWriteAttributeOperation(pathAddress, REDIRECT_SOCKET_ATTR_NAME, REDIRECT_SOCKET_ATTR_VALUE);
             subsystemResource.getServerConfiguration().executeManagementOperation(op);
-            context.getLogger().infof("Undertow's default HTTP listener 'redirect-socket' set as 'https'.");
+            context.getLogger().infof("Undertow's default HTTP listener '%s' redirect-socket set as 'https'.", httpListenerName);
             return ServerMigrationTaskResult.SUCCESS;
         } else {
             return ServerMigrationTaskResult.SKIPPED;
