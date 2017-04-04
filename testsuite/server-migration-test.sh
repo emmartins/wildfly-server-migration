@@ -4,7 +4,7 @@ set -o pipefail
 
 DIRNAME=`dirname "$0"`
 TEST_DIR=`cd "$DIRNAME"; pwd`
-TEST_BEFORE_DIR=$TEST_DIR/before/bin
+TEST_BEFORE_DIR=$TEST_DIR/before/dist
 TEST_AFTER_DIR=$TEST_DIR/after
 TOOL_DIR="$TEST_DIR/jboss-server-migration"
 SOURCE_DIST_DIR="$1"
