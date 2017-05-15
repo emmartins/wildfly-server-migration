@@ -26,7 +26,8 @@ public class SystemEnvironment extends MigrationEnvironment {
 
     public static final SystemEnvironment INSTANCE = new SystemEnvironment();
 
-    private SystemEnvironment() {
+    // package-private for testing
+    SystemEnvironment() {
         super();
         final Properties systemProperties = System.getProperties();
         for (String systemPropertyName: systemProperties.stringPropertyNames()) {
