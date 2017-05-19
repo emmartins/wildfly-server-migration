@@ -77,16 +77,21 @@
         <module>build</module>
         <module>cli</module>
         <module>core</module>
-        <module>eap6</module>
-        <module>eap6-to-eap7</module>
-        <module>eap7</module>
-        <module>wildfly8</module>
-        <module>wildfly8-to-eap7</module>        
-        <module>wildfly8-to-wildfly10</module>        
-        <module>wildfly9</module>
-        <module>wildfly9-to-eap7</module>                
-        <module>wildfly9-to-wildfly10</module>
-        <module>wildfly10</module>
+        <module>eap6.4</module>
+        <module>eap6.4-to-eap7.0</module>
+        <module>eap6.4-to-eap7.1</module>
+        <module>eap7.0</module>
+        <module>eap7.0-to-eap7.1</module>
+        <module>eap7.1</module>
+        <module>wildfly8.2</module>
+        <module>wildfly8.2-to-eap7.0</module>
+        <module>wildfly8.2-to-wildfly10.1</module>
+        <module>wildfly9.0</module>
+        <module>wildfly9.0-to-eap7.0</module>
+        <module>wildfly9.0-to-wildfly10.1</module>
+        <module>wildfly10.0</module>
+        <module>wildfly10.0-to-wildfly10.1</module>
+        <module>wildfly10.1</module>
     </modules>
 
     <build>
@@ -219,61 +224,85 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-eap6</artifactId>
+                <artifactId>jboss-server-migration-eap6.4</artifactId>
                 <version>${project.version}</version>
             </dependency>
             
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-eap6-to-eap7</artifactId>
+                <artifactId>jboss-server-migration-eap6.4-to-eap7.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-eap7</artifactId>
+                <artifactId>jboss-server-migration-eap6.4-to-eap7.1</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8-to-eap7</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8-to-wildfly10</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9</artifactId>
+                <artifactId>jboss-server-migration-eap7.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9-to-eap7</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9-to-wildfly10</artifactId>
+                <artifactId>jboss-server-migration-eap7.1</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10</artifactId>
+                <artifactId>jboss-server-migration-wildfly8.2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly8.2-to-eap7.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly8.2-to-wildfly10.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly9.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly9.0-to-eap7.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly9.0-to-wildfly10.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly10.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly10.0-to-wildfly10.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly10.1</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -282,7 +311,7 @@
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-core-parent</artifactId>
-                <version>3.0.0.Alpha12</version>
+                <version>${version.org.wildfly.core}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -291,6 +320,21 @@
     </dependencyManagement>
 
     <repositories>
+        <!-- keep this repository the first -->
+        <repository>
+            <id>jboss-eap-7.0-product-repository</id>
+            <name>JBoss EAP Product Repository</name>
+            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.0-rhel-7-maven-build/latest/maven/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
@@ -305,9 +349,37 @@
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>central</id>
+            <name>Main Apache Maven Repository</name>
+            <url>http://central.maven.org/maven2/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
     </repositories>
 
     <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-eap-7.0-product-repository</id>
+            <name>JBoss EAP Product Repository</name>
+            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.0-rhel-7-maven-build/latest/maven/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
@@ -319,6 +391,21 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>central</id>
+            <name>Main Apache Maven Repository</name>
+            <url>http://central.maven.org/maven2/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
+
 
 </project>

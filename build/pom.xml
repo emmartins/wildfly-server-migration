@@ -49,52 +49,78 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap6</artifactId>
+            <artifactId>jboss-server-migration-eap6.4</artifactId>
         </dependency>       
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap6-to-eap7</artifactId>
-        </dependency>       
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap7</artifactId>
+            <artifactId>jboss-server-migration-eap6.4-to-eap7.0</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly8</artifactId>
+            <artifactId>jboss-server-migration-eap6.4-to-eap7.1</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly8-to-eap7</artifactId>
+            <artifactId>jboss-server-migration-eap7.0</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly8-to-wildfly10</artifactId>
+            <artifactId>jboss-server-migration-eap7.0-to-eap7.1</artifactId>
+            <version>1.0.0.Final-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly9</artifactId>
+            <artifactId>jboss-server-migration-eap7.1</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly9-to-eap7</artifactId>
+            <artifactId>jboss-server-migration-wildfly8.2</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly9-to-wildfly10</artifactId>
+            <artifactId>jboss-server-migration-wildfly8.2-to-eap7.0</artifactId>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly10</artifactId>
+            <artifactId>jboss-server-migration-wildfly8.2-to-wildfly10.1</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly9.0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly9.0-to-eap7.0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly9.0-to-wildfly10.1</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.0-to-wildfly10.1</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.1</artifactId>
         </dependency>
 
         <dependency>
