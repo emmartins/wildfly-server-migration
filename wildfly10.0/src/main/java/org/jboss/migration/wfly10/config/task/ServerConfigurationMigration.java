@@ -19,11 +19,11 @@ package org.jboss.migration.wfly10.config.task;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.console.ConsoleWrapper;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableResource;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.task.factory.ManageableServerConfigurationTaskFactory;
@@ -67,7 +67,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
         return configType;
     }
 
-    protected ServerMigrationTask getServerMigrationTask(final S source, final Path targetConfigDir, final WildFlyServer10 target) {
+    protected ServerMigrationTask getServerMigrationTask(final S source, final Path targetConfigDir, final TargetJBossServer target) {
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder(getConfigType()+"-configuration").addAttribute(MIGRATION_REPORT_TASK_ATTR_SOURCE, source.toString()).build();
         return new ServerMigrationTask() {
             @Override
@@ -122,7 +122,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
      * @param <S>
      */
     public interface XMLConfigurationProvider<S> {
-        Path getXMLConfiguration(S source, Path targetConfigDir, WildFlyServer10 target, TaskContext context);
+        Path getXMLConfiguration(S source, Path targetConfigDir, TargetJBossServer target, TaskContext context);
     }
 
     /**
@@ -130,11 +130,11 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
      * @param <T>
      */
     public interface ManageableConfigurationProvider<T extends ManageableServerConfiguration> {
-        T getManageableConfiguration(Path targetConfigFilePath, WildFlyServer10 target);
+        T getManageableConfiguration(Path targetConfigFilePath, TargetJBossServer target);
     }
 
     public interface XMLConfigurationSubtaskFactory<S> {
-        ServerMigrationTask getTask(S source, Path xmlConfigurationPath, WildFlyServer10 target);
+        ServerMigrationTask getTask(S source, Path xmlConfigurationPath, TargetJBossServer target);
     }
 
 

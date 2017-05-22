@@ -17,8 +17,8 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.StandaloneServerConfigurationsMigration;
 import org.jboss.migration.wfly10.config.task.StandaloneServerMigration;
 
@@ -31,7 +31,7 @@ public class StandaloneServerUpdate<S extends JBossServer<S>> extends Standalone
     }
 
     @Override
-    protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    protected void beforeConfigurationsMigration(S source, TargetJBossServer target, TaskContext context) {
         context.execute(new MigrateContentDir<>("standalone", source.getStandaloneContentDir(), target.getStandaloneContentDir()).build());
         super.beforeConfigurationsMigration(source, target, context);
     }

@@ -16,8 +16,8 @@
 
 package org.jboss.migration.wfly10.to.wfly10;
 
-import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.core.jboss.TargetJBossServer;
+import org.jboss.migration.core.jboss.TargetJBossServerMigration;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
@@ -36,8 +36,8 @@ import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10
 public class WildFly10_0ToWildFly10_1ServerMigrationProvider implements WildFlyFullServerMigrationProvider10_1 {
 
     @Override
-    public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
+    public TargetJBossServerMigration getServerMigration() {
+        final ServerUpdate.Builders<TargetJBossServer> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
                         .subtask(new RemoveAllUnsupportedSubsystems<>())

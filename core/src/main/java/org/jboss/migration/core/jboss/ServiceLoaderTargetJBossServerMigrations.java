@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10;
+package org.jboss.migration.core.jboss;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
@@ -21,21 +21,21 @@ import org.jboss.migration.core.logger.ServerMigrationLogger;
 import java.util.ServiceLoader;
 
 /**
- * WildFly 10 server migrations trough a service loader.
+ * Target's server migrations trough a service loader.
  * @author emmartins
  */
-public class ServiceLoaderWildFlyServerMigrations10<T extends WildFlyServerMigrationProvider10> implements WildFlyServerMigrations10 {
+public class ServiceLoaderTargetJBossServerMigrations<T extends TargetJBossServerMigrationProvider> implements TargetJBossServerMigrations {
 
     private final ServiceLoader<T> serviceLoader;
 
-    public ServiceLoaderWildFlyServerMigrations10(ServiceLoader<T> serviceLoader) {
+    public ServiceLoaderTargetJBossServerMigrations(ServiceLoader<T> serviceLoader) {
         this.serviceLoader = serviceLoader;
     }
 
     @Override
-    public WildFlyServerMigration10 getMigrationFrom(Server sourceServer) {
+    public TargetJBossServerMigration getMigrationFrom(Server sourceServer) {
         ServerMigrationLogger.ROOT_LOGGER.debugf("Retrieving server migration for source %s", sourceServer.getClass());
-        for (WildFlyServerMigrationProvider10 serverMigrationProvider : serviceLoader) {
+        for (TargetJBossServerMigrationProvider serverMigrationProvider : serviceLoader) {
             if (serverMigrationProvider.getSourceType().isInstance(sourceServer)) {
                 ServerMigrationLogger.ROOT_LOGGER.debugf("Found server migration for source %s: %s", sourceServer.getClass(), serverMigrationProvider.getClass());
                 return serverMigrationProvider.getServerMigration();

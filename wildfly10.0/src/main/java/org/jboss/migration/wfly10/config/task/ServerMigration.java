@@ -17,11 +17,11 @@
 package org.jboss.migration.wfly10.config.task;
 
 import org.jboss.migration.core.Server;
+import org.jboss.migration.core.jboss.TargetJBossServer;
+import org.jboss.migration.core.jboss.TargetJBossServerMigration;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author emmartins
  */
-public class ServerMigration<S extends Server> implements WildFlyServerMigration10<S> {
+public class ServerMigration<S extends Server> implements TargetJBossServerMigration<S> {
 
     protected final List<SubtaskFactory<S>> subtaskFactories;
 
@@ -38,7 +38,8 @@ public class ServerMigration<S extends Server> implements WildFlyServerMigration
         subtaskFactories = Collections.unmodifiableList(builder.subtaskFactories);
     }
 
-    public ServerMigrationTaskResult run(S source, WildFlyServer10 target, TaskContext context) {
+    @Override
+    public ServerMigrationTaskResult run(S source, TargetJBossServer target, TaskContext context) {
         for (SubtaskFactory subtaskFactory : subtaskFactories) {
             ServerMigrationTask subtask = subtaskFactory.getTask(source, target);
             if (subtask != null) {
@@ -49,7 +50,7 @@ public class ServerMigration<S extends Server> implements WildFlyServerMigration
     }
 
     public interface SubtaskFactory<S extends Server> {
-        ServerMigrationTask getTask(S source, WildFlyServer10 target);
+        ServerMigrationTask getTask(S source, TargetJBossServer target);
     }
 
     public static class Builder<S extends Server> {

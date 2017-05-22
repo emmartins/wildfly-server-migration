@@ -21,10 +21,10 @@ import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 
 import javax.xml.stream.XMLInputFactory;
@@ -55,7 +55,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
     }
 
     @Override
-    public ServerMigrationTask getTask(final JBossServerConfigurationPath<S> source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
+    public ServerMigrationTask getTask(final JBossServerConfigurationPath<S> source, final Path xmlConfigurationPath, final TargetJBossServer target) {
         return new SkippableByEnvServerMigrationTask(new Task(source.getServer(), target, xmlConfigurationPath, modulesFinders));
     }
 

@@ -20,11 +20,11 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
  * Implementation for the standalone server migration.
@@ -43,7 +43,7 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
     }
 
     @Override
-    public ServerMigrationTask getTask(final S source, final WildFlyServer10 target) {
+    public ServerMigrationTask getTask(final S source, final TargetJBossServer target) {
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -66,9 +66,9 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
         return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's standalone server?"));
     }
 
-    protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    protected void beforeConfigurationsMigration(S source, TargetJBossServer target, TaskContext context) {
     }
 
-    protected void afterConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    protected void afterConfigurationsMigration(S source, TargetJBossServer target, TaskContext context) {
     }
 }

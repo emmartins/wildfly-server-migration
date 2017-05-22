@@ -19,7 +19,7 @@ package org.jboss.migration.wfly10.config.management;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.jboss.AbsolutePathResolver;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 
 import java.nio.file.Path;
 
@@ -32,7 +32,7 @@ public interface ManageableServerConfiguration extends AbsolutePathResolver, Man
     void stop();
     boolean isStarted();
     ModelNode executeManagementOperation(ModelNode operation) throws ManagementOperationException;
-    WildFlyServer10 getServer();
+    TargetJBossServer getServer();
     Path resolvePath(String path) throws ManagementOperationException;
     ModelControllerClient getModelControllerClient();
     Path getConfigurationDir();

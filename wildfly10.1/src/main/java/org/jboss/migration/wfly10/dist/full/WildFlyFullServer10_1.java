@@ -17,9 +17,9 @@ package org.jboss.migration.wfly10.dist.full;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
-import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.WildFlyServerMigrations10;
+import org.jboss.migration.core.jboss.ServiceLoaderTargetJBossServerMigrations;
+import org.jboss.migration.core.jboss.TargetJBossServer;
+import org.jboss.migration.core.jboss.TargetJBossServerMigrations;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -27,9 +27,9 @@ import java.util.ServiceLoader;
 /**
  * @author emmartins
  */
-public class WildFlyFullServer10_1 extends WildFlyServer10 {
+public class WildFlyFullServer10_1 extends TargetJBossServer {
 
-    private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(WildFlyFullServerMigrationProvider10_1.class));
+    private static final TargetJBossServerMigrations SERVER_MIGRATIONS = new ServiceLoaderTargetJBossServerMigrations<>(ServiceLoader.load(WildFlyFullServerMigrationProvider10_1.class));
 
     public WildFlyFullServer10_1(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
         super(migrationName, productInfo, baseDir, migrationEnvironment, SERVER_MIGRATIONS);

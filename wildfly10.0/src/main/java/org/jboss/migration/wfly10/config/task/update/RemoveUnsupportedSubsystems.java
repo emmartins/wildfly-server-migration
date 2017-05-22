@@ -18,13 +18,13 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.util.xml.XMLFileFilter;
 import org.jboss.migration.core.util.xml.XMLFiles;
-import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.subsystem.EnvironmentProperties;
 import org.jboss.migration.wfly10.config.task.subsystem.Extension;
@@ -59,7 +59,7 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
     }
 
     @Override
-    public ServerMigrationTask getTask(final S source, final Path xmlConfigurationPath, final WildFlyServer10 target) {
+    public ServerMigrationTask getTask(final S source, final Path xmlConfigurationPath, final TargetJBossServer target) {
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -79,7 +79,7 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
         return new SkippableByEnvServerMigrationTask(task);
     }
 
-    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final WildFlyServer10 targetServer, final TaskContext context) {
+    protected void removeExtensionsAndSubsystems(final S source, final Path xmlConfigurationPath, final TargetJBossServer targetServer, final TaskContext context) {
         final List<Extension> migrationExtensions = getMigrationExtensions(context.getMigrationEnvironment());
         final List<Subsystem> migrationSubsystems = getMigrationSubsystems(migrationExtensions, context.getMigrationEnvironment());
         final Set<String> extensionsRemoved = new HashSet<>();

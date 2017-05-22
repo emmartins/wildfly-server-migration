@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly8.to.wfly10;
 
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
+import org.jboss.migration.core.jboss.TargetJBossServerMigration;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
@@ -45,7 +45,7 @@ import org.jboss.migration.wfly8.WildFlyServer8;
 public class WildFly8ToWildFly10_1ServerMigrationProvider implements WildFlyFullServerMigrationProvider10_1 {
 
     @Override
-    public WildFlyServerMigration10 getServerMigration() {
+    public TargetJBossServerMigration getServerMigration() {
         final ServerUpdate.Builders<WildFlyServer8> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()

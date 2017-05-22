@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10;
+package org.jboss.migration.core.jboss;
 
 /**
  * @author emmartins
  */
-public interface WildFlyServerMigrationProvider10 {
+public interface TargetJBossServerMigrationProvider {
 
     /**
      *
      * @return
      */
-    WildFlyServerMigration10 getServerMigration();
+    TargetJBossServerMigration getServerMigration();
 
     /**
      * Retrieves the type of the supported source server.

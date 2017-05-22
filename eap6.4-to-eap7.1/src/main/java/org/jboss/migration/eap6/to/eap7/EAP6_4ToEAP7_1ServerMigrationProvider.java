@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.eap6.to.eap7;
 
+import org.jboss.migration.core.jboss.TargetJBossServerMigration;
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
@@ -25,7 +26,6 @@ import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateMessagingActiv
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateUndertowSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.SetupHttpUpgradeManagement;
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
@@ -53,7 +53,7 @@ import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
  */
 public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigrationProvider7_1 {
     @Override
-    public WildFlyServerMigration10 getServerMigration() {
+    public TargetJBossServerMigration getServerMigration() {
         final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()

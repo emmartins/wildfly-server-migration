@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10;
+package org.jboss.migration.core.jboss;
 
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
@@ -22,7 +22,7 @@ import org.jboss.migration.core.task.TaskContext;
 /**
  * @author emmartins
  */
-public interface WildFlyServerMigration10<S extends Server> {
+public interface TargetJBossServerMigration<S extends Server> {
 
     /**
      * Runs the server migration.
@@ -31,5 +31,5 @@ public interface WildFlyServerMigration10<S extends Server> {
      * @param context
      * @return
      */
-    ServerMigrationTaskResult run(S source, WildFlyServer10 target, TaskContext context);
+    ServerMigrationTaskResult run(S source, TargetJBossServer target, TaskContext context);
 }

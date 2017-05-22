@@ -20,7 +20,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 import org.jboss.migration.wfly10.config.management.PathResource;
@@ -36,7 +36,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
  */
 public abstract class AbstractManageableServerConfiguration extends AbstractManageableResource implements ManageableServerConfiguration {
 
-    private final WildFlyServer10 server;
+    private final TargetJBossServer server;
     private ModelControllerClient modelControllerClient;
     private final ExtensionResourceImpl.Factory extensionConfigurations;
     private final InterfaceResourceImpl.Factory interfaceResources;
@@ -44,7 +44,7 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
     private final SocketBindingGroupResourceImpl.Factory socketBindingGroupResources;
     private final SystemPropertyResourceImpl.Factory systemPropertyResources;
 
-    protected AbstractManageableServerConfiguration(String resourceName, PathAddress pathAddress, WildFlyServer10 server) {
+    protected AbstractManageableServerConfiguration(String resourceName, PathAddress pathAddress, TargetJBossServer server) {
         super(resourceName, pathAddress, null);
         this.server = server;
         extensionConfigurations = new ExtensionResourceImpl.Factory(pathAddress, this);
@@ -86,7 +86,7 @@ public abstract class AbstractManageableServerConfiguration extends AbstractMana
     }
 
     @Override
-    public WildFlyServer10 getServer() {
+    public TargetJBossServer getServer() {
         return server;
     }
 

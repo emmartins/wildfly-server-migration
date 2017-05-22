@@ -21,11 +21,11 @@ import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.console.BasicResultHandlers;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmation;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 import java.nio.file.Path;
@@ -49,7 +49,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         this.taskName = new ServerMigrationTaskName.Builder(configFileMigration.getConfigType()+"-configurations").build();
     }
 
-    public ServerMigrationTask getServerMigrationTask(S source, WildFlyServer10 target, Path targetConfigDir) {
+    public ServerMigrationTask getServerMigrationTask(S source, TargetJBossServer target, Path targetConfigDir) {
         return new Task<>(getServerMigrationTaskName(), sourceConfigurations.getConfigurations(source, target), target, targetConfigDir, configFileMigration);
     }
 
@@ -66,10 +66,10 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         private final ServerMigrationTaskName name;
         private final Collection<S> sourceConfigs;
         private final Path targetConfigDir;
-        private final WildFlyServer10 target;
+        private final TargetJBossServer target;
         private final ServerConfigurationMigration<S, T> configFileMigration;
 
-        protected Task(ServerMigrationTaskName name, Collection<S> sourceConfigs, WildFlyServer10 target, Path targetConfigDir, ServerConfigurationMigration<S, T> configFileMigration) {
+        protected Task(ServerMigrationTaskName name, Collection<S> sourceConfigs, TargetJBossServer target, Path targetConfigDir, ServerConfigurationMigration<S, T> configFileMigration) {
             this.name = name;
             this.sourceConfigs = sourceConfigs;
             this.targetConfigDir = targetConfigDir;
@@ -117,19 +117,19 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
             return taskContext.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
         }
 
-        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) {
+        protected void migrateAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, TargetJBossServer target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
                 taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigDir, target));
             }
         }
 
-        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, WildFlyServer10 target, final TaskContext taskContext) {
+        protected void confirmAllConfigs(Collection<S> sourceConfigs, final Path targetConfigDir, TargetJBossServer target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
                 confirmConfig(sourceConfig, targetConfigDir, target, taskContext);
             }
         }
 
-        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final WildFlyServer10 target, final TaskContext taskContext) {
+        protected void confirmConfig(final S sourceConfig, final Path targetConfigDir, final TargetJBossServer target, final TaskContext taskContext) {
             final UserConfirmation.ResultHandler resultHandler = new UserConfirmation.ResultHandler() {
                 @Override
                 public void onNo() {
@@ -155,6 +155,6 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
      * @param <C> the source configuration type
      */
     public interface SourceConfigurations<S extends Server, C> {
-        Collection<C> getConfigurations(S source, WildFlyServer10 target);
+        Collection<C> getConfigurations(S source, TargetJBossServer target);
     }
 }

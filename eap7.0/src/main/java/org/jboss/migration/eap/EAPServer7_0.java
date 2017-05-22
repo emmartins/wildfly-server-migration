@@ -16,12 +16,10 @@
 package org.jboss.migration.eap;
 
 import org.jboss.migration.core.ProductInfo;
-import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
-import org.jboss.migration.wfly10.WildFlyServerMigrations10;
-import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_0;
+import org.jboss.migration.core.jboss.ServiceLoaderTargetJBossServerMigrations;
+import org.jboss.migration.core.jboss.TargetJBossServer;
+import org.jboss.migration.core.jboss.TargetJBossServerMigrations;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -30,20 +28,14 @@ import java.util.ServiceLoader;
  * The EAP 7 {@link org.jboss.migration.core.Server}
  * @author emmartins
  */
-public class EAPServer7_0 extends WildFlyFullServer10_0 {
+public class EAPServer7_0 extends TargetJBossServer {
 
     /**
-     * the server migrations exclusive to EAP 7.0
+     * the supported migrations to EAP 7.0
      */
-    private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(EAPServerMigrationProvider7_0.class));
+    private static final TargetJBossServerMigrations SERVER_MIGRATIONS = new ServiceLoaderTargetJBossServerMigrations<>(ServiceLoader.load(EAPServerMigrationProvider7_0.class));
 
     public EAPServer7_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment);
-    }
-
-    @Override
-    protected WildFlyServerMigration10 getMigration(Server source) {
-        final WildFlyServerMigration10 serverMigration = SERVER_MIGRATIONS.getMigrationFrom(source);
-        return serverMigration != null ? serverMigration : super.getMigration(source);
+        super(migrationName, productInfo, baseDir, migrationEnvironment, SERVER_MIGRATIONS);
     }
 }

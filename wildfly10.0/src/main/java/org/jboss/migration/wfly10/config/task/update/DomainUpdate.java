@@ -18,8 +18,8 @@ package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.DomainMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
@@ -34,7 +34,7 @@ public class DomainUpdate<S extends JBossServer<S>> extends DomainMigration<S> {
     }
 
     @Override
-    protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    protected void beforeConfigurationsMigration(S source, TargetJBossServer target, TaskContext context) {
         // FIXME first let's migrate all domain's contents, to go around current limitation where content missing for deployment overlays fails to boot target server...
         context.execute(new MigrateContentDir<>("domain", source.getDomainContentDir(), target.getDomainContentDir()).build());
         super.beforeConfigurationsMigration(source, target, context);

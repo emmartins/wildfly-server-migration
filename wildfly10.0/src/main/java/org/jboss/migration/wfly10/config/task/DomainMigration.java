@@ -20,11 +20,11 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.console.ConsoleWrapper;
 import org.jboss.migration.core.console.UserConfirmationServerMigrationTask;
 import org.jboss.migration.core.env.SkippableByEnvServerMigrationTask;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.core.task.ServerMigrationTask;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.WildFlyServer10;
 
 /**
  * Implementation for the domain migration.
@@ -45,7 +45,7 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
     }
 
     @Override
-    public ServerMigrationTask getTask(final S source, final WildFlyServer10 target) {
+    public ServerMigrationTask getTask(final S source, final TargetJBossServer target) {
         final ServerMigrationTask task = new ServerMigrationTask() {
             @Override
             public ServerMigrationTaskName getName() {
@@ -73,10 +73,10 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
         return new SkippableByEnvServerMigrationTask(new UserConfirmationServerMigrationTask(task, "Migrate the source's managed domain?"));
     }
 
-    protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    protected void beforeConfigurationsMigration(S source, TargetJBossServer target, TaskContext context) {
     }
 
-    protected void afterConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+    protected void afterConfigurationsMigration(S source, TargetJBossServer target, TaskContext context) {
     }
 
     public static class Builder<S extends Server>  {

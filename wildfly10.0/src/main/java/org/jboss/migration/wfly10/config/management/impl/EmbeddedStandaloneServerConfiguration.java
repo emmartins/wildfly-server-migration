@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
 import org.jboss.migration.wfly10.config.management.ManagementOperationException;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
@@ -48,7 +48,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     private final SecurityRealmResourceImpl.Factory securityRealmResources;
     private final SubsystemResourceImpl.Factory subsystemResources;
 
-    public EmbeddedStandaloneServerConfiguration(String config, WildFlyServer10 server) {
+    public EmbeddedStandaloneServerConfiguration(String config, TargetJBossServer server) {
         super("", PathAddress.EMPTY_ADDRESS, server);
         this.config = config;
         deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
@@ -111,7 +111,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
 
     public static class ConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
-        public StandaloneServerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
+        public StandaloneServerConfiguration getManageableConfiguration(Path configFile, TargetJBossServer server) {
             return new EmbeddedStandaloneServerConfiguration(configFile.getFileName().toString(), server);
         }
     }

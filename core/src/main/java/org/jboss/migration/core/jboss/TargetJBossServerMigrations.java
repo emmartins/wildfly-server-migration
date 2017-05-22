@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly10;
+package org.jboss.migration.core.jboss;
 
 import org.jboss.migration.core.Server;
 
@@ -22,6 +22,6 @@ import org.jboss.migration.core.Server;
  * WildFly 10 server migrations.
  * @author emmartins
  */
-public interface WildFlyServerMigrations10 {
-    WildFlyServerMigration10 getMigrationFrom(Server sourceServer);
+public interface TargetJBossServerMigrations {
+    TargetJBossServerMigration getMigrationFrom(Server sourceServer);
 }

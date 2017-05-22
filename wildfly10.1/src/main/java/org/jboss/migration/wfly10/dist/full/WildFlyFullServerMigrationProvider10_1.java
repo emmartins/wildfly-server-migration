@@ -16,11 +16,11 @@
 
 package org.jboss.migration.wfly10.dist.full;
 
-import org.jboss.migration.wfly10.WildFlyServerMigrationProvider10;
+import org.jboss.migration.core.jboss.TargetJBossServerMigrationProvider;
 
 /**
  * The interface that WildFly 10 Full migration providers must implement. Such implementations are loaded through ServiceLoader framework, thus a service descriptor must be in classpath.
  * @author emmartins
  */
-public interface WildFlyFullServerMigrationProvider10_1 extends WildFlyServerMigrationProvider10 {
+public interface WildFlyFullServerMigrationProvider10_1 extends TargetJBossServerMigrationProvider {
 }

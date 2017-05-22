@@ -15,8 +15,8 @@
  */
 package org.jboss.migration.wfly9.to.eap7;
 
+import org.jboss.migration.core.jboss.TargetJBossServerMigration;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagingSubsystem;
@@ -38,7 +38,7 @@ import org.jboss.migration.wfly9.WildFlyServer9;
 public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrationProvider7_0 {
 
     @Override
-    public WildFlyServerMigration10 getServerMigration() {
+    public TargetJBossServerMigration getServerMigration() {
         final ServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()

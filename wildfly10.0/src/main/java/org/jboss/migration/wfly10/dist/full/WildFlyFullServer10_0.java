@@ -17,14 +17,14 @@ package org.jboss.migration.wfly10.dist.full;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.jboss.JBossServer;
 
 import java.nio.file.Path;
 
 /**
  * @author emmartins
  */
-public class WildFlyFullServer10_0 extends WildFlyServer10 {
+public class WildFlyFullServer10_0 extends JBossServer<WildFlyFullServer10_0> {
 
     public WildFlyFullServer10_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
         super(migrationName, productInfo, baseDir, migrationEnvironment);

@@ -16,10 +16,10 @@
 
 package org.jboss.migration.eap7.to.eap7;
 
+import org.jboss.migration.core.jboss.TargetJBossServer;
+import org.jboss.migration.core.jboss.TargetJBossServerMigration;
 import org.jboss.migration.eap.EAPServer7_0;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
-import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
@@ -36,8 +36,8 @@ import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 public class EAP7_0ToEAP7_1ServerMigrationProvider implements EAPServerMigrationProvider7_1 {
 
     @Override
-    public WildFlyServerMigration10 getServerMigration() {
-        final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
+    public TargetJBossServerMigration getServerMigration() {
+        final ServerUpdate.Builders<TargetJBossServer> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(
                         serverUpdateBuilders.standaloneConfigurationBuilder()

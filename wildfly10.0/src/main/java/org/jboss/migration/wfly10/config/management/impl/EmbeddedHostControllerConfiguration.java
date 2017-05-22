@@ -18,7 +18,7 @@ package org.jboss.migration.wfly10.config.management.impl;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.core.jboss.TargetJBossServer;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
@@ -44,7 +44,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     private final ProfileResourceImpl.Factory profileResources;
     private final ServerGroupResourceImpl.Factory serverGroupResources;
 
-    protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, WildFlyServer10 server) {
+    protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, TargetJBossServer server) {
         super("", PathAddress.EMPTY_ADDRESS, server);
         this.domainConfig = domainConfig;
         this.hostConfig = hostConfig;
@@ -92,14 +92,14 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
 
     public static class DomainConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
-        public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
+        public HostControllerConfiguration getManageableConfiguration(Path configFile, TargetJBossServer server) {
             return new EmbeddedHostControllerConfiguration(configFile.getFileName().toString(), null, server);
         }
     }
 
     public static class HostConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
-        public HostControllerConfiguration getManageableConfiguration(Path configFile, WildFlyServer10 server) {
+        public HostControllerConfiguration getManageableConfiguration(Path configFile, TargetJBossServer server) {
             return new EmbeddedHostControllerConfiguration(null, configFile.getFileName().toString(), server);
         }
     }

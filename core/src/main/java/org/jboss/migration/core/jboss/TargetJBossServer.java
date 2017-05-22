@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10;
+package org.jboss.migration.core.jboss;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 
@@ -27,22 +26,18 @@ import java.nio.file.Path;
 /**
  * @author emmartins
  */
-public abstract class WildFlyServer10 extends JBossServer<WildFlyServer10> {
+public abstract class TargetJBossServer extends JBossServer<TargetJBossServer> {
 
-    protected final WildFlyServerMigrations10 serverMigrations;
+    protected final TargetJBossServerMigrations serverMigrations;
 
-    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        this(migrationName, productInfo, baseDir, migrationEnvironment, null);
-    }
-
-    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment,  WildFlyServerMigrations10 serverMigrations) {
+    public TargetJBossServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, TargetJBossServerMigrations serverMigrations) {
         super(migrationName, productInfo, baseDir, migrationEnvironment);
         this.serverMigrations = serverMigrations;
     }
 
     @Override
     public ServerMigrationTaskResult migrate(Server source, TaskContext context) throws IllegalArgumentException {
-        final WildFlyServerMigration10 migration = getMigration(source);
+        final TargetJBossServerMigration migration = getMigration(source);
         if (migration != null) {
             return migration.run(source, this, context);
         } else {
@@ -50,7 +45,7 @@ public abstract class WildFlyServer10 extends JBossServer<WildFlyServer10> {
         }
     }
 
-    protected WildFlyServerMigration10 getMigration(Server source) {
+    protected TargetJBossServerMigration getMigration(Server source) {
         return serverMigrations != null ? serverMigrations.getMigrationFrom(source) : null;
     }
 }
