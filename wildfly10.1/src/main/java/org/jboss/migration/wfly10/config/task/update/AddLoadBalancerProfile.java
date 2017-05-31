@@ -17,6 +17,7 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ValueExpression;
@@ -122,16 +123,18 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
 
         @Override
         protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemResource.Parent> params, TaskContext taskContext) {
-            // adds subsystem
-            super.addConfiguration(params, taskContext);
             final ManageableServerConfiguration configuration = params.getServerConfiguration();
+            // all ops will be executed in composed
+            final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+            // add subsystem
             final PathAddress subsystemPathAddress = params.getResource().getSubsystemResourcePathAddress(getSubsystem());
+            compositeOperationBuilder.addStep(Util.createAddOperation(subsystemPathAddress));
             // add default servlet container
             final PathAddress defaultServletContainerPathAddress = subsystemPathAddress.append("servlet-container","default");
-            configuration.executeManagementOperation(Util.createAddOperation(defaultServletContainerPathAddress));
+            compositeOperationBuilder.addStep(Util.createAddOperation(defaultServletContainerPathAddress));
             // add configuration filter
             final PathAddress configurationFilterPathAddress = subsystemPathAddress.append("configuration","filter");
-            configuration.executeManagementOperation(Util.createAddOperation(configurationFilterPathAddress));
+            compositeOperationBuilder.addStep(Util.createAddOperation(configurationFilterPathAddress));
             // add modcluster load-balancer
             final PathAddress modClusterLoadBalancerPathAddress = configurationFilterPathAddress.append("mod-cluster","load-balancer");
             final ModelNode modClusterLoadBalancerOp = Util.createAddOperation(modClusterLoadBalancerPathAddress);
@@ -139,37 +142,39 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
             modClusterLoadBalancerOp.get("advertise-socket-binding").set("modcluster");
             modClusterLoadBalancerOp.get("enable-http2").set(true);
             modClusterLoadBalancerOp.get("max-retries").set(3);
-            configuration.executeManagementOperation(modClusterLoadBalancerOp);
+            compositeOperationBuilder.addStep(modClusterLoadBalancerOp);
             // add configuration handler
             final PathAddress configurationHandlerPathAddress = subsystemPathAddress.append("configuration","handler");
-            configuration.executeManagementOperation(Util.createAddOperation(configurationHandlerPathAddress));
+            compositeOperationBuilder.addStep(Util.createAddOperation(configurationHandlerPathAddress));
             // add default server
             final PathAddress serverDefaultServerPathAddress = subsystemPathAddress.append("server","default-server");
-            configuration.executeManagementOperation(Util.createAddOperation(serverDefaultServerPathAddress));
+            compositeOperationBuilder.addStep(Util.createAddOperation(serverDefaultServerPathAddress));
             // add default host
             final PathAddress hostDefaultHostPathAddress = serverDefaultServerPathAddress.append("host","default-host");
             final ModelNode hostDefaultHostOp = Util.createAddOperation(hostDefaultHostPathAddress);
             hostDefaultHostOp.get("alias").setEmptyList().add("localhost");
-            configuration.executeManagementOperation(hostDefaultHostOp);
+            compositeOperationBuilder.addStep(hostDefaultHostOp);
             // add default host filter ref
             final PathAddress filterRefLoadBalancerPathAddress = hostDefaultHostPathAddress.append("filter-ref","load-balancer");
-            configuration.executeManagementOperation(Util.createAddOperation(filterRefLoadBalancerPathAddress));
+            compositeOperationBuilder.addStep(Util.createAddOperation(filterRefLoadBalancerPathAddress));
             // add default http-listener
             final PathAddress httpListenerDefaultPathAddress = serverDefaultServerPathAddress.append("http-listener","default");
             final ModelNode httpListenerDefaultOp = Util.createAddOperation(httpListenerDefaultPathAddress);
             httpListenerDefaultOp.get("socket-binding").set("http");
             httpListenerDefaultOp.get("redirect-socket").set("https");
             httpListenerDefaultOp.get("enable-http2").set(true);
-            configuration.executeManagementOperation(httpListenerDefaultOp);
+            compositeOperationBuilder.addStep(httpListenerDefaultOp);
             // add management http-listener
             final PathAddress httpListenerManagementPathAddress = serverDefaultServerPathAddress.append("http-listener","management");
             final ModelNode httpListenerManagementOp = Util.createAddOperation(httpListenerManagementPathAddress);
             httpListenerManagementOp.get("socket-binding").set("mcmp-management");
             httpListenerManagementOp.get("enable-http2").set(true);
-            configuration.executeManagementOperation(httpListenerManagementOp);
+            compositeOperationBuilder.addStep(httpListenerManagementOp);
             // add buffer cache
             final PathAddress bufferCacheDefaultPathAddress = subsystemPathAddress.append("buffer-cache","default");
-            configuration.executeManagementOperation(Util.createAddOperation(bufferCacheDefaultPathAddress));
+            compositeOperationBuilder.addStep(Util.createAddOperation(bufferCacheDefaultPathAddress));
+            // execute composed
+            configuration.executeManagementOperation(compositeOperationBuilder.build().getOperation());
         }
     }
 
