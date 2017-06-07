@@ -70,6 +70,7 @@
         <!-- Checkstyle configuration -->
         <linkXRef>false</linkXRef>
         <version.checkstyle>6.8</version.checkstyle>
+        <version.org.wildfly.build-tools>1.1.7.Final</version.org.wildfly.build-tools>
         <version.org.wildfly.checkstyle-config>1.0.5.Final</version.org.wildfly.checkstyle-config>
     </properties>
 
@@ -83,6 +84,7 @@
         <module>eap7.0</module>
         <module>eap7.0-to-eap7.1</module>
         <module>eap7.1</module>
+        <module>feature-pack</module>
         <module>wildfly8.2</module>
         <module>wildfly8.2-to-eap7.0</module>
         <module>wildfly8.2-to-wildfly10.1</module>
@@ -187,6 +189,11 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.wildfly.build</groupId>
+                    <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
+                    <version>${version.org.wildfly.build-tools}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -222,6 +229,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+			<dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-feature-pack</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap6.4</artifactId>
@@ -246,6 +259,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+			<dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.0-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap7.1</artifactId>
