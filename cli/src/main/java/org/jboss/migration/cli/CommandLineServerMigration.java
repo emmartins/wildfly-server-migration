@@ -118,8 +118,8 @@ public class CommandLineServerMigration {
                 throw new RuntimeException("system environment does not specifies the tool's base dir");
             }
             final Path baseDirPath = Paths.get(baseDir);
-            final Path configDirPath = baseDirPath.resolve("config");
-            final Path outputDirPath = baseDirPath.resolve("output");
+            final Path configDirPath = baseDirPath.resolve("configuration");
+            final Path reportsDirPath = baseDirPath.resolve("reports");
 
             // setup user environment
             final MigrationEnvironment userEnvironment = new MigrationEnvironment();
@@ -146,14 +146,14 @@ public class CommandLineServerMigration {
                 try {
                     final String htmlReportTemplateFileName = userEnvironment.getPropertyAsString(EnvironmentProperties.REPORT_HTML_TEMPLATE_FILE_NAME, "migration-report-template.html");
                     final Path htmlReportTemplatePath = configDirPath.resolve(htmlReportTemplateFileName);
-                    HtmlReportWriter.INSTANCE.toPath(outputDirPath.resolve(htmlReportFileName), migrationData, HtmlReportWriter.ReportTemplate.from(htmlReportTemplatePath));
+                    HtmlReportWriter.INSTANCE.toPath(reportsDirPath.resolve(htmlReportFileName), migrationData, HtmlReportWriter.ReportTemplate.from(htmlReportTemplatePath));
                 } catch (Throwable e) {
                     ServerMigrationLogger.ROOT_LOGGER.error("HTML Report write failed", e);
                 }
             }
             if (xmlReportFileName != null) {
                 try {
-                    XmlReportWriter.INSTANCE.writeContent(outputDirPath.resolve(xmlReportFileName).toFile(), migrationData);
+                    XmlReportWriter.INSTANCE.writeContent(reportsDirPath.resolve(xmlReportFileName).toFile(), migrationData);
                 } catch (Throwable e) {
                     ServerMigrationLogger.ROOT_LOGGER.error("XML Report write failed", e);
                 }

@@ -15,7 +15,7 @@ if "%OS%" == "Windows_NT" (
   set DIRNAME=.\
 )
 
-pushd "%DIRNAME%..\.."
+pushd "%DIRNAME%.."
 set "RESOLVED_JBOSS_HOME=%CD%"
 popd
 
@@ -58,12 +58,12 @@ if "x%JBOSS_MODULEPATH%" == "x" (
   set "JBOSS_MODULEPATH=%JBOSS_HOME%\modules"
 )
 
-set "TOOL_BASEDIR=%JBOSS_HOME%\bin\migration"
+set "TOOL_BASEDIR=%JBOSS_HOME%\migration"
 set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.baseDir=%TOOL_BASEDIR%"
 
 echo "%JAVA_OPTS%" | findstr /I "logging.configuration" > nul
 if errorlevel == 1 (
-  set "JAVA_OPTS=%JAVA_OPTS% -Dlogging.configuration=file:%JBOSS_HOME%\bin\migration\config\logging.properties -Djboss.server.migration.logfile=%JBOSS_HOME%\bin\migration\output\migration.log"
+  set "JAVA_OPTS=%JAVA_OPTS% -Dlogging.configuration=file:%TOOL_BASEDIR%\configuration\logging.properties -Djboss.server.migration.logfile=%TOOL_BASEDIR%\logs\migration.log"
 ) else (
   echo logging.configuration already set in JAVA_OPTS
 )

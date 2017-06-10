@@ -38,7 +38,7 @@ if $cygwin ; then
 fi
 
 # Setup JBOSS_HOME
-RESOLVED_JBOSS_HOME=`cd "$DIRNAME/../.."; pwd`
+RESOLVED_JBOSS_HOME=`cd "$DIRNAME/.."; pwd`
 if [ "x$JBOSS_HOME" = "x" ]; then
     # get the full path (without any relative bits)
     JBOSS_HOME=$RESOLVED_JBOSS_HOME
@@ -74,7 +74,7 @@ fi
 # Sample JPDA settings for remote socket debugging
 #JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
 
-TOOL_BASEDIR="$JBOSS_HOME/bin/migration"
+TOOL_BASEDIR="$JBOSS_HOME/migration"
 JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.baseDir=$TOOL_BASEDIR\""
 
 TARGET_BASEDIR_SET=`echo $ARGS | grep "\-\-target"`
@@ -84,8 +84,8 @@ fi
 
 LOG_CONF=`echo $JAVA_OPTS | grep "logging.configuration"`
 if [ "x$LOG_CONF" = "x" ]; then
-    JAVA_OPTS=""$JAVA_OPTS" \"-Dlogging.configuration=file:"$TOOL_BASEDIR"/config/logging.properties\""
-    JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.logfile="$TOOL_BASEDIR"/output/migration.log\""
+    JAVA_OPTS=""$JAVA_OPTS" \"-Dlogging.configuration=file:"$TOOL_BASEDIR"/configuration/logging.properties\""
+    JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.logfile="$TOOL_BASEDIR"/logs/migration.log\""
 else
     echo "logging.configuration already set in JAVA_OPTS"
     JAVA_OPTS="$JAVA_OPTS"
