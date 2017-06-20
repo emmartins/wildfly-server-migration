@@ -70,7 +70,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-eap7.0-to-eap7.1</artifactId>
-            <version>1.0.0.Final-SNAPSHOT</version>
         </dependency>
 
         <dependency>

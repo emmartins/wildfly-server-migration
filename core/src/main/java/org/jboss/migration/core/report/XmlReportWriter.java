@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -57,6 +58,7 @@ public class XmlReportWriter implements XMLElementWriter<MigrationData> {
     }
 
     public void writeContent(File file, MigrationData value) throws XMLStreamException, IOException {
+        Files.createDirectories(file.toPath().getParent());
         try (FileOutputStream out = new FileOutputStream(file)) {
             final XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
             try {

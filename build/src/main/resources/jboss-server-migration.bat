@@ -31,7 +31,7 @@ set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.baseDir=%BASE_DIR%"
 
 echo "%JAVA_OPTS%" | findstr /I "logging.configuration" > nul
 if errorlevel == 1 (
-  set "JAVA_OPTS=%JAVA_OPTS% -Dlogging.configuration=file:%BASE_DIR%\config\logging.properties -Djboss.server.migration.logfile=%BASE_DIR%\output\migration.log"
+  set "JAVA_OPTS=%JAVA_OPTS% -Dlogging.configuration=file:%BASE_DIR%\configuration\logging.properties -Djboss.server.migration.logfile=%BASE_DIR%\logs\migration.log"
 ) else (
   echo logging.configuration already set in JAVA_OPTS
 )

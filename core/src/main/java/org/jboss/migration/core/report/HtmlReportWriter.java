@@ -44,6 +44,7 @@ public class HtmlReportWriter {
 
     public void toPath(Path path, MigrationData migrationData, ReportTemplate template) throws IOException {
         final String s = toString(migrationData,template);
+        Files.createDirectories(path.getParent());
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             writer.write(s, 0, s.length());
         }

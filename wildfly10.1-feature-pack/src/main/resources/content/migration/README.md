@@ -1,36 +1,24 @@
 JBoss Server Migration Tool
 =================
 
-The JBoss Server Migration Tool is a tool that migrates JBoss Application Servers. It reads the server configurations files for a previous release of WildFly or JBoss EAP, referred to as the source server, and migrates them to the latest release or target server. Besides the configurations, the tool is also capable of migrating modules, deployments and other resources found in the source server.
+The JBoss Server Migration Tool is a tool that migrates JBoss Application Servers. It reads the server configurations files for a previous release of WildFly or JBoss EAP, referred to as the source server, and migrates them to this (target) server. Besides the configurations, the tool is also capable of migrating modules, deployments and other resources found in the source server.
 
 System Requirements
 ------------
 
 * [Java 8.0 (Java SDK 1.8)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) or later
-* [Apache Maven](http://maven.apache.org/download.cgi)
 
-Build the Server Migration Tool
+Run the Server Migration Tool
 ------------
 
-1. Use the following command to build the tool from source:
+1. Open a terminal and navigate to the `../bin/` directory.
+2. Run the following command.
 
-        mvn clean install
-
-Run the Server Migration Tool (Standalone Build)
-------------
-
-1. Navigate to the `build/target/` directory and unzip the ` jboss-server-migration-VERSION_NUMBER.zip` file
-
-        unzip jboss-server-migration-1.0.0.CR1.zip
-2. Open a terminal and navigate to the `build/target/jboss-server-migration/` directory.
-3. Run the following command.
-
-        For Linux|Mac:   ./jboss-server-migration.sh --source SOURCE_SERVER_PATH --target TARGET_SERVER_PATH
-        For Windows: jboss-server-migration.bat --source SOURCE_SERVER_PATH --target SOURCE_SERVER_PATH
+        For Linux|Mac:   ./jboss-server-migration.sh --source SOURCE_SERVER_PATH
+        For Windows: jboss-server-migration.bat --source SOURCE_SERVER_PATH
 
     Replace `SOURCE_SERVER_PATH` with the path to previous version of the server installation that you want to migrate from, for example:  `${user.home}/jboss-eap-6.4/`
 
-    Replace `TARGET_SERVER_PATH` with the path to current version of the server installation that you want the old configuration migrated to, for example:  `${user.home}/jboss-eap-7.0/`
 3. When you execute the command, the tool displays a list of the files to be migrated and then prompts you whether you want to continue.
 
         ----------------------------------------

@@ -58,8 +58,8 @@ JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.baseDir="$BASE_DIR"\""
 
 LOG_CONF=`echo $JAVA_OPTS | grep "logging.configuration"`
 if [ "x$LOG_CONF" = "x" ]; then
-    JAVA_OPTS=""$JAVA_OPTS" \"-Dlogging.configuration=file:"$BASE_DIR"/config/logging.properties\""
-    JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.logfile="$BASE_DIR"/output/migration.log\""
+    JAVA_OPTS=""$JAVA_OPTS" \"-Dlogging.configuration=file:"$BASE_DIR"/configuration/logging.properties\""
+    JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.logfile="$BASE_DIR"/logs/migration.log\""
 else
     echo "logging.configuration already set in JAVA_OPTS"
     JAVA_OPTS="$JAVA_OPTS"
