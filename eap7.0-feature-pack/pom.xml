@@ -33,9 +33,9 @@
         <version>1.0.0.Final-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jboss-server-migration-feature-pack</artifactId>
+    <artifactId>jboss-server-migration-eap7.0-feature-pack</artifactId>
 
-    <name>JBoss Server Migration: Feature Pack</name>
+    <name>JBoss Server Migration: JBoss EAP 7.0 Feature Pack</name>
     
     <packaging>pom</packaging>
 
@@ -156,40 +156,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap6.4-to-eap7.1</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-eap7.0</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap7.0-to-eap7.1</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap7.1</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -222,17 +189,6 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly8.2-to-wildfly10.1</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly9.0</artifactId>
             <exclusions>
                 <exclusion>
@@ -255,40 +211,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly9.0-to-wildfly10.1</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly10.0</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly10.0-to-wildfly10.1</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly10.1</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
