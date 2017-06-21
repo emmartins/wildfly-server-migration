@@ -327,7 +327,10 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
                 }
             }
             final Path systemLayersBaseModuleDir = systemLayersBaseDir.resolve(modulePath);
-            return systemLayersBaseModuleDir;
+            if (Files.exists(systemLayersBaseModuleDir)) {
+                return systemLayersBaseModuleDir;
+            }
+            return modulesDir.resolve(modulePath);
         }
     }
 }
