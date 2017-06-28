@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.wfly8.to.eap7;
 
+import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
@@ -34,7 +35,6 @@ import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFrom
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
-import org.jboss.migration.wfly10.dist.full.WildFlyFullServerMigrationProvider10_1;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly8.WildFlyServer8;
 
@@ -42,7 +42,7 @@ import org.jboss.migration.wfly8.WildFlyServer8;
  * Server migration, from WildFly 8 to JBoss EAP 7.1.
  * @author emmartins
  */
-public class WildFly8ToEAP7_1ServerMigrationProvider implements WildFlyFullServerMigrationProvider10_1 {
+public class WildFly8ToEAP7_1ServerMigrationProvider implements EAPServerMigrationProvider7_1 {
 
     @Override
     public WildFlyServerMigration10 getServerMigration() {
