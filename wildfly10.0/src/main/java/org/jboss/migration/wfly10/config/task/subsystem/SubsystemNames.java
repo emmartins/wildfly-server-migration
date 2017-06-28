@@ -27,6 +27,7 @@ public interface SubsystemNames {
     String DEPLOYMENT_SCANNER = "deployment-scanner";
     String EE = "ee";
     String EJB3 = "ejb3";
+    String ELYTRON = "elytron";
     String IIOP_OPENJDK = "iiop-openjdk";
     String INFINISPAN = "infinispan";
     String IO = "io";

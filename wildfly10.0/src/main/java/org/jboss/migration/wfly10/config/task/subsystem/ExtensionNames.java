@@ -27,6 +27,7 @@ public interface ExtensionNames {
     String DEPLOYMENT_SCANNER = "org.jboss.as.deployment-scanner";
     String EE = "org.jboss.as.ee";
     String EJB3 = "org.jboss.as.ejb3";
+    String ELYTRON = "org.wildfly.extension.elytron";
     String IIOP_OPENJDK = "org.wildfly.iiop-openjdk";
     String INFINISPAN = "org.jboss.as.clustering.infinispan";
     String IO = "org.wildfly.extension.io";

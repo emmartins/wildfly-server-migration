@@ -41,12 +41,12 @@
         <artifact name="${org.jboss.migration:jboss-server-migration-eap7.1}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly8.2}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly8.2-to-eap7.0}"/>
-        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly8.2-to-wildfly10.1}"/>
+        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly8.2-to-eap7.1}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly9.0}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly9.0-to-eap7.0}"/>
-        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly9.0-to-wildfly10.1}"/>
+        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly9.0-to-eap7.1}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.0}"/>
-        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.0-to-wildfly10.1}"/>
+        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.0-to-eap7.1}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.1}"/>
     </resources>
 
