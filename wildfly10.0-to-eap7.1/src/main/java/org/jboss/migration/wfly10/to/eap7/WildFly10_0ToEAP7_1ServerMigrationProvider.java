@@ -17,6 +17,7 @@
 package org.jboss.migration.wfly10.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.eap.task.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -44,6 +45,7 @@ public class WildFly10_0ToEAP7_1ServerMigrationProvider implements EAPServerMigr
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly10_0ToEAP7_1UpdateInfinispanSubsystem<>())
                         .subtask(new WildFly10_0ToEAP7_1UpdateUndertowSubsystem<>())
+                        .subtask(new AddCoreManagementSubsystem<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new AddApplicationRealmSSLServerIdentity<>())
@@ -54,12 +56,14 @@ public class WildFly10_0ToEAP7_1ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly10_0ToEAP7_1UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly10_0ToEAP7_1UpdateUndertowSubsystem<>())
+                                .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
+                                        .subtask(new AddCoreManagementSubsystem<>())
                                         .subtask(new MigrateCompatibleSecurityRealms<>())
                                         .subtask(new AddApplicationRealmSSLServerIdentity<>()))))
                 .build();

@@ -16,13 +16,14 @@
 package org.jboss.migration.wfly10.config.task.subsystem;
 
 /**
- * The names of WildFly 10 subsystems.
+ * The names of supported subsystems.
  * @author emmartins
  */
 public interface SubsystemNames {
 
     String BATCH_JBERET = "batch-jberet";
     String BEAN_VALIDATION = "bean-validation";
+    String CORE_MANAGEMENT = "core-management";
     String DATASOURCES = "datasources";
     String DEPLOYMENT_SCANNER = "deployment-scanner";
     String EE = "ee";
