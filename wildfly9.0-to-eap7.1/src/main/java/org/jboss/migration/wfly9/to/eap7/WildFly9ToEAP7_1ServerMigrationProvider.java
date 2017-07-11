@@ -16,6 +16,7 @@
 package org.jboss.migration.wfly9.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.eap.task.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
@@ -51,6 +52,7 @@ public class WildFly9ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new WildFly9ToEAP7_1UpdateUndertowSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
+                        .subtask(new AddCoreManagementSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
@@ -65,6 +67,7 @@ public class WildFly9ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new WildFly9ToEAP7_1UpdateUndertowSubsystem<>())
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
+                                .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
@@ -75,6 +78,7 @@ public class WildFly9ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
+                                        .subtask(new AddCoreManagementSubsystem<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                         .subtask(new MigrateCompatibleSecurityRealms<>())
