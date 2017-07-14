@@ -59,7 +59,7 @@ if "x%JBOSS_MODULEPATH%" == "x" (
 )
 
 set "TOOL_BASEDIR=%JBOSS_HOME%\migration"
-set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.baseDir=%TOOL_BASEDIR%"
+set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.baseDir=%TOOL_BASEDIR% -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
 echo "%JAVA_OPTS%" | findstr /I "logging.configuration" > nul
 if errorlevel == 1 (

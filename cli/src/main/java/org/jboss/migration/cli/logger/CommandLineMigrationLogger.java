@@ -60,6 +60,9 @@ public interface CommandLineMigrationLogger extends BasicLogger {
     @Message(id = Message.NONE, value = "Path to the base dir of the server to migrate to.")
     String argTarget();
 
-    @Message(id = Message.NONE, value = "Usage: %s [args...]%nwhere args include:")
+    @Message(id = Message.NONE, value = "%s")
     String argUsage(String executableName);
+
+    @Message(id = Message.NONE, value = "Get help with usage of this command")
+    String argHelp();
 }

@@ -15,12 +15,33 @@
  */
 package org.jboss.migration.cli;
 
+//import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
+
+import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
+
 /**
  * @author emmartins
  */
-public interface CommandLineConstants {
-    String ENVIRONMENT = "--environment";
-    String INTERACTIVE = "--interactive";
-    String SOURCE = "--source";
-    String TARGET = "--target";
+public enum CommandLineConstants {
+   ENVIRONMENT("environment", CommandLineMigrationLogger.ROOT_LOGGER.argEnvironment()),
+   INTERACTIVE("interactive", CommandLineMigrationLogger.ROOT_LOGGER.argInteractive()),
+   SOURCE("source", CommandLineMigrationLogger.ROOT_LOGGER.argSource()),
+   TARGET("target", CommandLineMigrationLogger.ROOT_LOGGER.argTarget()),
+   HELP("help", CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"));
+
+   private final String argument;
+   private final String description;
+
+   CommandLineConstants(String argument, String description) {
+      this.argument = argument;
+      this.description = description;
+   }
+
+   public String getArgument() {
+      return this.argument;
+   }
+
+   public String getDescription() {
+      return this.description;
+   }
 }

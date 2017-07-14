@@ -55,5 +55,6 @@
         <module name="javax.api"/>
         <module name="ibm.jdk" />
         <module name="sun.jdk" />
+        <module name="org.apache.commons.cli" />
     </dependencies>
 </module>

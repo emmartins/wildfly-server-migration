@@ -114,7 +114,7 @@ cp $SOURCE_DIST_DOMAIN_CONFIG_DIR/domain.xml $SOURCE_DIST_DOMAIN_CONFIG_DIR/cmto
 sed -f $TEST_BEFORE_DIR/cmtool-domain.xml.patch -i '' $SOURCE_DIST_DOMAIN_CONFIG_DIR/cmtool-domain.xml
 
 echo "### Executing the migration..."
-$TOOL_DIR/jboss-server-migration.sh --source $SOURCE_DIST_DIR --target $TARGET_DIST_DIR --interactive false -Djboss.server.migration.modules.includes="cmtool.module1" -Djboss.server.migration.modules.excludes="cmtool.module2,cmtool.module3"
+$TOOL_DIR/jboss-server-migration.sh --source=$SOURCE_DIST_DIR --target=$TARGET_DIST_DIR --interactive=false -Djboss.server.migration.modules.includes="cmtool.module1" -Djboss.server.migration.modules.excludes="cmtool.module2,cmtool.module3"
 
 echo "### Patching target server's migrated config files..."
 sed -f $TEST_AFTER_DIR/target-server.patch -i '' $TARGET_DIST_STANDALONE_CONFIG_DIR/standalone.xml $TARGET_DIST_STANDALONE_CONFIG_DIR/standalone-full.xml $TARGET_DIST_DOMAIN_CONFIG_DIR/domain.xml

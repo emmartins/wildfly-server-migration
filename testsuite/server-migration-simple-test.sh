@@ -8,7 +8,7 @@ TEST_BEFORE_DIR=$TEST_DIR/before/dist
 TEST_AFTER_DIR=$TEST_DIR/after
 TOOL_DIR="$TEST_DIR/jboss-server-migration"
 SOURCE_DIST_DIR="$1"
-TARGET_SRC_DIR="$2"
+TARGET_DIST_DIR="$2"
 
 if [ "x$SOURCE_DIST_DIR" != "x" ]; then
     if [[ $SOURCE_DIST_DIR != /* ]]; then
@@ -18,33 +18,13 @@ else
     echo "### Usage: ./server-migration-test.sh SOURCE_DIST_DIR TARGET_SRC_DIR"
     exit
 fi
+
 if [ ! -d $SOURCE_DIST_DIR ]; then
     echo "### Source Server base directory $SOURCE_DIST_DIR does not exists!"
     exit 1;
 fi
 echo "### Source Server base directory: $SOURCE_DIST_DIR"
 
-if [ "x$TARGET_SRC_DIR" != "x" ]; then
-    if [[ $TARGET_SRC_DIR != /* ]]; then
-        TARGET_SRC_DIR="$TEST_DIR/$TARGET_SRC_DIR"
-    fi
-else
-    echo "### Usage: ./server-migration-test.sh SOURCE_DIST_DIR TARGET_SRC_DIR"
-    exit
-fi
-if [ ! -d $TARGET_SRC_DIR ]; then
-    echo "### Target Server base directory $TARGET_SRC_DIR does not exists!"
-    exit 1;
-fi
-echo "### Target Server base directory: $TARGET_SRC_DIR"
-
-for i in "$TARGET_SRC_DIR/dist/target"/*
-do
-  if [[ $i == *.jar ]]; then
-    TARGET_DIST_DIR="${i%.jar}"
-    break
-  fi
-done
 if [ ! -d $TARGET_DIST_DIR ]; then
     echo "### Target Server dist directory $TARGET_DIST_DIR does not exists!"
     exit 1;
@@ -114,4 +94,4 @@ cp $SOURCE_DIST_DOMAIN_CONFIG_DIR/domain.xml $SOURCE_DIST_DOMAIN_CONFIG_DIR/cmto
 sed -f $TEST_BEFORE_DIR/cmtool-domain.xml.patch -i '' $SOURCE_DIST_DOMAIN_CONFIG_DIR/cmtool-domain.xml
 
 echo "### Executing the migration..."
-$TOOL_DIR/jboss-server-migration.sh --source $SOURCE_DIST_DIR --target $TARGET_DIST_DIR --interactive false -Djboss.server.migration.modules.includes="cmtool.module1" -Djboss.server.migration.modules.excludes="cmtool.module2,cmtool.module3"
+$TOOL_DIR/jboss-server-migration.sh --source=$SOURCE_DIST_DIR --target=$TARGET_DIST_DIR --interactive=false -Djboss.server.migration.modules.includes="cmtool.module1" -Djboss.server.migration.modules.excludes="cmtool.module2,cmtool.module3"

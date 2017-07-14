@@ -5,6 +5,9 @@ ARGS=""
 while [ "$#" -gt 0 ]
 do
     case "$1" in
+      -D*)
+          JAVA_OPTS=""$JAVA_OPTS" \"$1\""
+          ;;
       *)
           ARGS="$ARGS '$1'"
           ;;
@@ -75,7 +78,7 @@ fi
 #JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
 
 TOOL_BASEDIR="$JBOSS_HOME/migration"
-JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.baseDir=$TOOL_BASEDIR\""
+JAVA_OPTS=""$JAVA_OPTS" \"-Djboss.server.migration.baseDir=$TOOL_BASEDIR\" \"-Djava.util.logging.manager=org.jboss.logmanager.LogManager\""
 
 TARGET_BASEDIR_SET=`echo $ARGS | grep "\-\-target"`
 if [ "x$TARGET_BASEDIR_SET" = "x" ]; then
