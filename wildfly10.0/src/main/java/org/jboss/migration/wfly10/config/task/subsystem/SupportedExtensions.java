@@ -53,6 +53,10 @@ public class SupportedExtensions {
             .addSubsystem(SubsystemNames.RESOURCE_ADAPTERS)
             .build();
 
+    public static final Extension CORE_MANAGEMENT = new ExtensionBuilder(ExtensionNames.CORE_MANAGEMENT)
+            .addSubsystem(SubsystemNames.CORE_MANAGEMENT)
+            .build();
+
     public static final Extension DEPLOYMENT_SCANNER = new ExtensionBuilder(ExtensionNames.DEPLOYMENT_SCANNER)
             .addSubsystem(SubsystemNames.DEPLOYMENT_SCANNER)
             .build();
@@ -63,6 +67,10 @@ public class SupportedExtensions {
 
     public static final Extension EJB3 = new ExtensionBuilder(ExtensionNames.EJB3)
             .addSubsystem(SubsystemNames.EJB3)
+            .build();
+
+    public static final Extension ELYTRON = new ExtensionBuilder(ExtensionNames.ELYTRON)
+            .addSubsystem(SubsystemNames.ELYTRON)
             .build();
 
     public static final Extension JAXRS = new ExtensionBuilder(ExtensionNames.JAXRS)
@@ -172,9 +180,11 @@ public class SupportedExtensions {
     public static Set<Extension> all() {
         final Set<Extension> result = new HashSet<>();
         result.add(CONNECTOR);
+        result.add(CORE_MANAGEMENT);
         result.add(DEPLOYMENT_SCANNER);
         result.add(EE);
         result.add(EJB3);
+        result.add(ELYTRON);
         result.add(IIOP_OPENJDK);
         result.add(JACORB);
         result.add(JAXRS);
