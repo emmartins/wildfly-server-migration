@@ -29,6 +29,9 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemR
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
@@ -68,10 +71,19 @@ public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
             compositeOperationBuilder.addStep(getAddPropertiesRealmOp(subsystemPathAddress, "ManagementRealm", "mgmt-users.properties", "jboss.server.config.dir", "ManagementRealm", "mgmt-groups.properties", "jboss.server.config.dir"));
             // add permission mappers
             compositeOperationBuilder.addStep(getLogicalPermissionMapperAddOperation(subsystemPathAddress, "default-permission-mapper", "unless", "constant-permission-mapper", "anonymous-permission-mapper"));
-            compositeOperationBuilder.addStep(getSimplePermissionMapperAddOperation(subsystemPathAddress, "default-permission-mapper", "unless", "constant-permission-mapper", "anonymous-permission-mapper"));
-
-
-
+            compositeOperationBuilder.addStep(getSimplePermissionMapperAddOperation(subsystemPathAddress, "anonymous-permission-mapper", Arrays.asList("anonymous"), Arrays.asList(new Permission("org.wildfly.security.auth.permission.LoginPermission"))));
+            compositeOperationBuilder.addStep(getConstantPermissionMapperAddOperation(subsystemPathAddress, "constant-permission-mapper",
+                    Arrays.asList(new Permission("org.wildfly.security.auth.permission.LoginPermission"),
+                            new Permission("org.wildfly.extension.batch.jberet.deployment.BatchPermission", "org.wildfly.extension.batch.jberet", "*"),
+                            new Permission("org.wildfly.transaction.client.RemoteTransactionPermission", "org.wildfly.transaction.client"),
+                            new Permission("org.jboss.ejb.client.RemoteEJBPermission", "org.jboss.ejb-client"))));
+            // add realm mapper
+            compositeOperationBuilder.addStep(getConstantRealmMapperOp(subsystemPathAddress, "local", "local"));
+            // add simple role decoder
+            compositeOperationBuilder.addStep(getSimpleRoleDecoderOp(subsystemPathAddress, "groups-to-roles", "groups"));
+            // add http authentication factories
+            compositeOperationBuilder.addStep(getHttpAuthenticationFactoryOp(subsystemPathAddress, "management-http-authentication", "ManagementDomain", "global", Arrays.asList(new MechanismConfiguration("DIGEST", Arrays.asList(new MechanismRealmConfiguration("ManagementRealm"))))));
+            compositeOperationBuilder.addStep(getHttpAuthenticationFactoryOp(subsystemPathAddress, "application-http-authentication", "ApplicationDomain", "global", Arrays.asList(new MechanismConfiguration("BASIC", Arrays.asList(new MechanismRealmConfiguration("Application Realm"))), new MechanismConfiguration("FORM"))));
             // execute composed
             configuration.executeManagementOperation(compositeOperationBuilder.build().getOperation());
         }
@@ -253,7 +265,7 @@ public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
             return operation;
         }
 
-        private ModelNode getSimplePermissionMapperAddOperation(final PathAddress subsystemPathAddress, String simplePermissionMapper, String logicalOperation, String left, String right) {
+        private ModelNode getSimplePermissionMapperAddOperation(final PathAddress subsystemPathAddress, String simplePermissionMapper, List<String> principals, List<Permission> permissions) {
             /*
             "permission-mappings" => [{
                 "principals" => ["anonymous"],
@@ -265,17 +277,23 @@ public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
                 ("simple-permission-mapper" => "anonymous-permission-mapper")
             ]
              */
-            final PathAddress pathAddress = subsystemPathAddress.append("logical-permission-mapper", logicalPermissionMapper);
+            final PathAddress pathAddress = subsystemPathAddress.append("simple-permission-mapper", simplePermissionMapper);
             final ModelNode operation = Util.createAddOperation(pathAddress);
-            operation.get("logical-operation").set(logicalOperation);
-            operation.get("left").set(left);
-            operation.get("right").set(right);
+            final ModelNode permissionMappings = new ModelNode();
+            final ModelNode principalsNode = permissionMappings.get("principals").setEmptyList();
+            for (String principal : principals) {
+                principalsNode.add(principal);
+            }
+            final ModelNode permissionsNode = permissionMappings.get("permissions").setEmptyList();
+            for (Permission permission : permissions) {
+                permissionsNode.add(permission.toModelNode());
+            }
+            operation.get("permission-mappings").set(permissionMappings);
             return operation;
         }
 
-        /* TODO
-
-        {
+        private ModelNode getConstantPermissionMapperAddOperation(final PathAddress subsystemPathAddress, String contanstPermissionMapper, List<Permission> permissions) {
+            /*
             "permissions" => [
                 {"class-name" => "org.wildfly.security.auth.permission.LoginPermission"},
                 {
@@ -297,41 +315,68 @@ public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
                 ("subsystem" => "elytron"),
                 ("constant-permission-mapper" => "constant-permission-mapper")
             ]
-        },
+             */
+            final PathAddress pathAddress = subsystemPathAddress.append("constant-permission-mapper", contanstPermissionMapper);
+            final ModelNode operation = Util.createAddOperation(pathAddress);
+            final ModelNode permissionsNode = operation.get("permissions").setEmptyList();
+            for (Permission permission : permissions) {
+                permissionsNode.add(permission.toModelNode());
+            }
+            return operation;
+        }
 
-
-        {
-            "realm-name" => "local",
+        private ModelNode getConstantRealmMapperOp(final PathAddress subsystemPathAddress, String constantRealmMapper, String realmName) {
+            /*
+              "realm-name" => "local",
             "operation" => "add",
             "address" => [
                 ("subsystem" => "elytron"),
                 ("constant-realm-mapper" => "local")
             ]
-        },
+             */
+            final PathAddress pathAddress = subsystemPathAddress.append("constant-realm-mapper", constantRealmMapper);
+            final ModelNode operation = Util.createAddOperation(pathAddress);
+            operation.get("realm-name").set(realmName);
+            return operation;
+        }
 
-
-        {
-            "attribute" => "groups",
+        private ModelNode getSimpleRoleDecoderOp(final PathAddress subsystemPathAddress, String simpleRoleDecoder, String attribute) {
+            /*
+              "attribute" => "groups",
             "operation" => "add",
             "address" => [
                 ("subsystem" => "elytron"),
                 ("simple-role-decoder" => "groups-to-roles")
             ]
-        },
+             */
+            final PathAddress pathAddress = subsystemPathAddress.append("simple-role-decoder", simpleRoleDecoder);
+            final ModelNode operation = Util.createAddOperation(pathAddress);
+            operation.get("attribute").set(attribute);
+            return operation;
+        }
 
-
-        {
-            "roles" => ["SuperUser"],
+        private ModelNode getConstantRoleMapperOp(final PathAddress subsystemPathAddress, String constantRoleMapper, List<String> roles) {
+            /*
+              "roles" => ["SuperUser"],
             "operation" => "add",
             "address" => [
                 ("subsystem" => "elytron"),
                 ("constant-role-mapper" => "super-user-mapper")
             ]
-        },
+             */
+            final PathAddress pathAddress = subsystemPathAddress.append("constant-role-mapper", constantRoleMapper);
+            final ModelNode operation = Util.createAddOperation(pathAddress);
+            final ModelNode rolesNode = operation.get("roles").setEmptyList();
+            for (String role : roles) {
+                rolesNode.add(role);
+            }
+            return operation;
+        }
 
 
-        {
-            "security-domain" => "ManagementDomain",
+        private ModelNode getHttpAuthenticationFactoryOp(final PathAddress subsystemPathAddress, String httpAuthenticationFactory, String securityDomain, String httpServerMechanismFactory, List<MechanismConfiguration> mechanismConfigurations) {
+            /*
+              "security-domain" => "ManagementDomain",
             "http-server-mechanism-factory" => "global",
             "mechanism-configurations" => [{
                 "mechanism-name" => "DIGEST",
@@ -342,26 +387,18 @@ public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
                 ("subsystem" => "elytron"),
                 ("http-authentication-factory" => "management-http-authentication")
             ]
-        },
-
-
-        {
-            "security-domain" => "ApplicationDomain",
-            "http-server-mechanism-factory" => "global",
-            "mechanism-configurations" => [
-                {
-                    "mechanism-name" => "BASIC",
-                    "mechanism-realm-configurations" => [{"realm-name" => "Application Realm"}]
-                },
-                {"mechanism-name" => "FORM"}
-            ],
-            "operation" => "add",
-            "address" => [
-                ("subsystem" => "elytron"),
-                ("http-authentication-factory" => "application-http-authentication")
-            ]
-        },
-
+             */
+            final PathAddress pathAddress = subsystemPathAddress.append("http-authentication-factory", httpAuthenticationFactory);
+            final ModelNode operation = Util.createAddOperation(pathAddress);
+            operation.get("security-domain").set(securityDomain);
+            operation.get("http-server-mechanism-factory").set(httpServerMechanismFactory);
+            final ModelNode mechanismConfigurationsNode = operation.get("mechanism-configurations").setEmptyList();
+            for (MechanismConfiguration mechanismConfiguration : mechanismConfigurations) {
+                mechanismConfigurationsNode.add(mechanismConfiguration.toModelNode());
+            }
+            return operation;
+        }
+        /* TODO
 
         {
             "operation" => "add",
@@ -448,4 +485,78 @@ public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
 
     }
 
+    /**
+     "class-name" => "org.wildfly.extension.batch.jberet.deployment.BatchPermission",
+     "module" => "org.wildfly.extension.batch.jberet",
+     "target-name" => "*"
+     */
+    private static class Permission {
+        final String className;
+        final String module;
+        final String targetName;
+        Permission(String className) {
+            this(className, null, null);
+        }
+        Permission(String className, String module) {
+            this(className, module, null);
+        }
+        Permission(String className, String module, String targetName) {
+            this.className = className;
+            this.module = module;
+            this.targetName = targetName;
+        }
+        ModelNode toModelNode() {
+            final ModelNode modelNode = new ModelNode();
+            modelNode.get("class-name").set(className);
+            if (module != null) {
+                modelNode.get("module").set(module);
+            }
+            if (targetName != null) {
+                modelNode.get("target-name").set(targetName);
+            }
+            return modelNode;
+        }
+    }
+
+    /**
+     "mechanism-name" => "DIGEST",
+     "mechanism-realm-configurations" => [{"realm-name" => "ManagementRealm"}]
+     */
+    private static class MechanismConfiguration {
+        final String mechanismName;
+        final List<MechanismRealmConfiguration> mechanismRealmConfigurations;
+        MechanismConfiguration(String mechanismName) {
+            this(mechanismName, null);
+        }
+        MechanismConfiguration(String mechanismName, List<MechanismRealmConfiguration> mechanismRealmConfigurations) {
+            this.mechanismName = mechanismName;
+            this.mechanismRealmConfigurations = mechanismRealmConfigurations;
+        }
+        ModelNode toModelNode() {
+            final ModelNode modelNode = new ModelNode();
+            modelNode.get("mechanism-name").set(mechanismName);
+            if (mechanismRealmConfigurations != null && !mechanismRealmConfigurations.isEmpty()) {
+                final ModelNode mechanismRealmConfigurationsNode = modelNode.get("mechanism-realm-configurations").setEmptyList();
+                for (MechanismRealmConfiguration mechanismRealmConfiguration : mechanismRealmConfigurations) {
+                    mechanismRealmConfigurationsNode.add(mechanismRealmConfiguration.toModelNode());
+                }
+            }
+            return modelNode;
+        }
+    }
+
+    /**
+     "realm-name" => "ManagementRealm"
+     */
+    private static class MechanismRealmConfiguration {
+        final String realmName;
+        MechanismRealmConfiguration(String realmName) {
+            this.realmName = realmName;
+        }
+        ModelNode toModelNode() {
+            final ModelNode modelNode = new ModelNode();
+            modelNode.get("realm-name").set(realmName);
+            return modelNode;
+        }
+    }
 }
