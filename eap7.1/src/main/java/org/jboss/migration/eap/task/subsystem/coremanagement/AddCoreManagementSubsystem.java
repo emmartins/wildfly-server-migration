@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap.task;
+package org.jboss.migration.eap.task.subsystem.coremanagement;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
