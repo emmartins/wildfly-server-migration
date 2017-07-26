@@ -61,7 +61,7 @@
             versions, add the artifactId or other qualifier to the property name.
             For example: <version.org.jboss.as.console>
          -->
-        <version.org.wildfly.core>3.0.0.Beta10</version.org.wildfly.core>
+        <version.org.wildfly.core>3.0.0.Beta28</version.org.wildfly.core>
 
         <!-- Surefire args -->
         <surefire.jpda.args/>

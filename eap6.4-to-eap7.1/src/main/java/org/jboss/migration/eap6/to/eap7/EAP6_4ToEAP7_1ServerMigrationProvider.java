@@ -17,7 +17,9 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
-import org.jboss.migration.eap.task.AddCoreManagementSubsystem;
+import org.jboss.migration.eap.task.subsystem.coremanagement.AddCoreManagementSubsystem;
+import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
+import org.jboss.migration.eap.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEJB3Subsystem;
@@ -71,6 +73,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                         .subtask(new EAP6_4ToEAP7_1UpdateRemotingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
+                        .subtask(new AddElytronSubsystem<>())
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
@@ -96,6 +99,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP6_4ToEAP7_1UpdateRemotingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
+                                .subtask(new AddElytronSubsystem<>())
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
@@ -104,12 +108,14 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddSocketBindingPortExpressions<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
+                                        .subtask(new AddElytronSubsystem<>())
                                         .subtask(new AddJmxSubsystemToHosts<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new SetupHttpUpgradeManagement<>())

@@ -16,7 +16,9 @@
 package org.jboss.migration.wfly8.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
-import org.jboss.migration.eap.task.AddCoreManagementSubsystem;
+import org.jboss.migration.eap.task.subsystem.coremanagement.AddCoreManagementSubsystem;
+import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
+import org.jboss.migration.eap.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
@@ -58,6 +60,7 @@ public class WildFly8ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
+                        .subtask(new AddElytronSubsystem<>())
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
@@ -76,6 +79,7 @@ public class WildFly8ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
+                                .subtask(new AddElytronSubsystem<>())
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
@@ -84,11 +88,13 @@ public class WildFly8ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                 .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
+                                        .subtask(new AddElytronSubsystem<>())
                                         .subtask(new AddJmxSubsystemToHosts<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
