@@ -15,6 +15,13 @@
  */
 package org.jboss.migration.cli;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.ParseException;
+import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
 import org.jboss.migration.core.env.MigrationEnvironment;
@@ -23,7 +30,6 @@ import org.jboss.migration.core.logger.ServerMigrationLogger;
 import org.jboss.migration.core.report.HtmlReportWriter;
 import org.jboss.migration.core.report.XmlReportWriter;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.wildfly.security.manager.WildFlySecurityManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,10 +48,8 @@ public class CommandLineServerMigration {
     // Capture System.out and System.err before they are redirected by STDIO
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
-
-    private static void usage() {
-        CommandLineArgumentUsageImpl.printUsage(STDOUT);
-    }
+    private static final CommandLineParser cmdLineParser = new DefaultParser();
+    private static final CommandLineOptions cmdOptions = new CommandLineOptions();
 
     private CommandLineServerMigration() {
     }
@@ -57,60 +61,30 @@ public class CommandLineServerMigration {
      */
     public static void main(String[] args) {
 
-        WildFlySecurityManager.setPropertyPrivileged("java.util.logging.manager", "org.jboss.logmanager.LogManager");
+        CommandLine cmdLine;
 
         try {
-            if(args.length < 4) {
-                usage();
-                abort(null);
+            cmdLine = cmdLineParser.parse(cmdOptions.getOptions(), args);
+
+            if (cmdLine.hasOption(CommandLineConstants.HELP.getArgument())) {
+                help();
             }
-            Path source = null;
-            Path target = null;
-            Path environment = null;
-            Boolean interactive = null;
-            for(int i = 0; i < args.length; ++i) {
-                String arg = args[i];
-                switch (arg) {
-                    case CommandLineConstants.ENVIRONMENT: {
-                        ++i;
-                        if(i == args.length || environment != null) {
-                            usage();
-                            abort(null);
-                        }
-                        environment = resolvePath(args[i]);
-                        break;
-                    }
-                    case CommandLineConstants.INTERACTIVE: {
-                        ++i;
-                        if(i == args.length || interactive != null) {
-                            usage();
-                            abort(null);
-                        }
-                        interactive = Boolean.valueOf(args[i]);
-                        break;
-                    }
-                    case CommandLineConstants.SOURCE: {
-                        ++i;
-                        if(i == args.length || source != null) {
-                            usage();
-                            abort(null);
-                        }
-                        source = resolvePath(args[i]);
-                        break;
-                    }
-                    case CommandLineConstants.TARGET: {
-                        ++i;
-                        if(i == args.length || target != null) {
-                            usage();
-                            abort(null);
-                        }
-                        target = resolvePath(args[i]);
-                        break;
-                    }
-                }
+
+            if (!cmdLine.hasOption(CommandLineConstants.SOURCE.getArgument())) {
+                throw new MissingOptionException("Missing required option: " + CommandLineConstants.SOURCE.getArgument());
             }
-            if (interactive == null) {
-                interactive = true;
+
+            if (!cmdLine.hasOption(CommandLineConstants.TARGET.getArgument())) {
+                throw new MissingOptionException("Missing required option: " + CommandLineConstants.TARGET.getArgument());
+            }
+
+            Path source = resolvePath(cmdLine.getOptionValue(CommandLineConstants.SOURCE.getArgument()));
+            Path target = resolvePath(cmdLine.getOptionValue(CommandLineConstants.TARGET.getArgument()));
+            Path environment = cmdLine.hasOption(CommandLineConstants.ENVIRONMENT.getArgument()) ? resolvePath(cmdLine.getOptionValue(CommandLineConstants.ENVIRONMENT.getArgument())) : null;
+            boolean interactive = !cmdLine.hasOption(CommandLineConstants.INTERACTIVE.getArgument()) || Boolean.parseBoolean(cmdLine.getOptionValue(CommandLineConstants.INTERACTIVE.getArgument()));
+
+            if (!cmdLine.getArgList().isEmpty()) {
+                System.out.printf("Argument(s), %s, will be discarded.\n", cmdLine.getArgList());
             }
 
             final String baseDir = SystemEnvironment.INSTANCE.getPropertyAsString(EnvironmentProperties.BASE_DIR);
@@ -161,9 +135,19 @@ public class CommandLineServerMigration {
             if (migrationData.getRootTask().getResult().getStatus() == ServerMigrationTaskResult.Status.FAIL) {
                 System.exit(1);
             }
+        } catch (ParseException pex) {
+            System.err.println(pex.getLocalizedMessage());
+            help();
         } catch (Throwable t) {
             abort(t);
         }
+    }
+
+    private static void help() {
+        HelpFormatter help = new HelpFormatter();
+        help.setWidth(1024);
+        help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("server-migration"), cmdOptions.getOptions(),true);
+        abort(null);
     }
 
     private static Properties loadProperties(Path propertiesFilePath) throws IOException {
