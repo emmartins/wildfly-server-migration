@@ -101,6 +101,7 @@
         <module>wildfly10.0-to-wildfly10.1</module>
         <module>wildfly10.1</module>
         <module>wildfly10.1-feature-pack</module>
+        <module>wildfly10.1-to-eap7.1</module>
     </modules>
 
     <build>
@@ -359,6 +360,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly10.1-feature-pack</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly10.1-to-eap7.1</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

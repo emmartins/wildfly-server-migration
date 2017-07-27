@@ -48,6 +48,7 @@
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.0}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.0-to-eap7.1}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.1}"/>
+        <artifact name="${org.jboss.migration:jboss-server-migration-wildfly10.1-to-eap7.1}"/>
     </resources>
 
     <dependencies>
