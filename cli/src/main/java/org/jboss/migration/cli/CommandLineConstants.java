@@ -15,8 +15,6 @@
  */
 package org.jboss.migration.cli;
 
-//import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
-
 import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
 
 /**
