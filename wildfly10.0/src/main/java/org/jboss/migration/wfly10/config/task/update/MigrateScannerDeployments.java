@@ -23,13 +23,13 @@ import org.jboss.migration.core.console.BasicResultHandlers;
 import org.jboss.migration.core.console.UserConfirmation;
 import org.jboss.migration.core.env.EnvironmentProperties;
 import org.jboss.migration.core.env.EnvironmentProperty;
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.jboss.ResolvablePath;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
-import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
@@ -47,6 +47,7 @@ import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmat
 import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.YES;
 
 /**
+ * Task which handles the migration/removal of a server configuration's scanner deployments.  When used this task can't be skipped, since any deployments found must either be migrated, or removed.
  * @author emmartins
  */
 public class MigrateScannerDeployments<S extends JBossServer<S>> extends ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> {
@@ -57,7 +58,6 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
 
     public MigrateScannerDeployments() {
         name("deployments.migrate-deployment-scanner-deployments");
-        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
             final JBossServerConfigurationPath sourceConfiguration = params.getSource();
             final ManageableServerConfiguration targetConfiguration = params.getServerConfiguration();
@@ -112,37 +112,38 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                     throw new ServerMigrationFailureException("Failed to read the scanner's deployments directory", e);
                                 }
                                 if (deployments.isEmpty()) {
-                                    context.getLogger().debugf("No deployments found in '%s'.", sourceDeploymentsDir);
+                                    context.getLogger().debugf("No scanner's deployments found in '%s'.", sourceDeploymentsDir);
                                 } else {
-                                    context.getLogger().infof("Deployments found: %s", deployments);
-                                    // find out if all deployments should be migrated
-                                    final boolean confirmEachDeployment;
+                                    context.getLogger().infof("Scanner's deployments found: %s", deployments);
+                                    // deployments are migrated if this task's is not skipped on env, skip env property is set, or if parent's skip env property is set
+                                    final MigrationEnvironment environment = context.getMigrationEnvironment();
+                                    boolean migrateDeployments = !(new TaskEnvironment(environment, context.getTaskName()).isSkippedByEnvironment() || new TaskEnvironment(environment, context.getParentTask().getTaskName()).isSkippedByEnvironment());
+                                    boolean confirmEachDeployment = false;
+                                    // confirm deployments migration if environment does not skip it, and migration is interactive
                                     if (context.isInteractive()) {
-                                        if (deployments.size() > 1) {
+                                        final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
+                                        new UserConfirmation(context.getConsoleWrapper(), "Skip the migration of the scanner's deployments found?","yes/no?", migrateUserConfirmation).execute();
+                                        migrateDeployments = migrateUserConfirmation.getResult() == NO;
+                                        if (migrateDeployments && deployments.size() > 1) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate all deployments?", "yes/no?", userConfirmation).execute();
+                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate all scanner's deployments found?", "yes/no?", userConfirmation).execute();
                                             confirmEachDeployment = userConfirmation.getResult() == NO;
-                                        } else {
-                                            confirmEachDeployment = true;
                                         }
-                                    } else {
-                                        confirmEachDeployment = false;
                                     }
                                     // execute subtasks
                                     for (Path deployment : deployments) {
                                         final boolean migrateDeployment;
                                         if (confirmEachDeployment) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate deployment '" + deployment + "'?", "yes/no?", userConfirmation).execute();
+                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate scanner's deployment '" + deployment + "'?", "yes/no?", userConfirmation).execute();
                                             migrateDeployment = userConfirmation.getResult() == YES;
                                         } else {
-                                            // TODO add env property for a config on this decision
-                                            migrateDeployment = true;
+                                            migrateDeployment = migrateDeployments;
                                         }
                                         if (migrateDeployment) {
                                             final Path sourcePath = sourceDeploymentsDir.resolve(deployment);
                                             final Path targetPath = targetDeploymentsDir.resolve(deployment);
-                                            final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("deployments.migrate-not-persistent-deployment")
+                                            final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("deployments.migrate-scanner-deployment")
                                                     .addAttribute("source", sourcePath.toString())
                                                     .addAttribute("target", targetPath.toString())
                                                     .build();
