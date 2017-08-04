@@ -24,7 +24,6 @@ import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskRunnable;
-import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.DeploymentOverlayResource;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
@@ -40,14 +39,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CON
 import static org.jboss.migration.wfly10.config.management.ManageableResourceSelectors.selectResources;
 
 /**
- * Task which handles the migration/removal of a server configuration's deployment overlays.
+ * Task which handles the migration/removal of a server configuration's deployment overlays.  When used this task can't be skipped, since any deployments found must either be migrated, or removed.
  * @author emmartins
  */
 public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends ManageableServerConfigurationCompositeTask.Builder<JBossServerConfigurationPath<S>> {
 
     public MigrateDeploymentOverlays() {
         name("deployments.overlays.migrate");
-        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
             context.getLogger().debugf("Retrieving the configuration's deployment overlays...");
             // only deployment overlay resources which are direct children of the server config, so it doesn't end up handling here domain server groups' deployment overlays
