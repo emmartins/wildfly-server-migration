@@ -20,14 +20,13 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.console.BasicResultHandlers;
 import org.jboss.migration.core.console.UserConfirmation;
-import org.jboss.migration.core.env.MigrationEnvironment;
-import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfigurationPath;
 import org.jboss.migration.core.jboss.ResolvablePath;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.TaskRunnable;
+import org.jboss.migration.core.task.component.TaskSkipPolicy;
 import org.jboss.migration.wfly10.config.management.DeploymentResource;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ServerGroupResource;
@@ -44,46 +43,46 @@ import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmat
 import static org.jboss.migration.wfly10.config.management.ManageableResourceSelectors.selectResources;
 
 /**
- * Task which handles the migration/removal of a server configuration's persisted deployments.  When used this task can't be skipped, since any deployments found must either be migrated, or removed.
+ * Task which handles the migration/removal of a server configuration's persisted deployments.
  * @author emmartins
  */
 public class MigratePersistentDeployments<S extends JBossServer<S>> extends ManageableServerConfigurationCompositeTask.Builder<JBossServerConfigurationPath<S>> {
 
     public MigratePersistentDeployments() {
         name("deployments.migrate-persistent-deployments");
+        skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         runBuilder(params -> context -> {
             context.getLogger().debugf("Retrieving the configuration's persistent deployments...");
             // FIXME only deployment resources which are direct children of the server config
             final List<DeploymentResource> deploymentResources = params.getServerConfiguration().getChildResources(DeploymentResource.RESOURCE_TYPE);
             if (deploymentResources.isEmpty()) {
-                context.getLogger().debugf("No persistent deployments found.");
+                context.getLogger().debugf("No deployments found.");
                 return ServerMigrationTaskResult.SKIPPED;
             } else {
-                context.getLogger().infof("Persistent deployments found: %s", deploymentResources.stream().map(resource -> resource.getResourceName()).collect(toList()));
-                // deployments are migrated if this task's is not skipped on env, skip env property is set, or if parent's skip env property is set
-                final MigrationEnvironment environment = context.getMigrationEnvironment();
-                boolean migrateDeployments = !(new TaskEnvironment(environment, context.getTaskName()).isSkippedByEnvironment() || new TaskEnvironment(environment, context.getParentTask().getTaskName()).isSkippedByEnvironment());
-                boolean confirmEachDeployment = false;
-                // confirm deployments migration if environment does not skip it, and migration is interactive
+                context.getLogger().infof("Deployments found: %s", deploymentResources.stream().map(resource -> resource.getResourceName()).collect(toList()));
+                // find out if all deployments should be migrated
+                final boolean confirmEachResource;
                 if (context.isInteractive()) {
-                    final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
-                    new UserConfirmation(context.getConsoleWrapper(), "Skip the migration of persistent deployments found?","yes/no?", migrateUserConfirmation).execute();
-                    migrateDeployments = migrateUserConfirmation.getResult() == NO;
-                    if (migrateDeployments && deploymentResources.size() > 1) {
+                    if (deploymentResources.size() > 1) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all persistent deployments found?", "yes/no?", userConfirmation).execute();
-                        confirmEachDeployment = userConfirmation.getResult() == NO;
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all deployments?","yes/no?", userConfirmation).execute();
+                        confirmEachResource = userConfirmation.getResult() == NO;
+                    } else {
+                        confirmEachResource = true;
                     }
+                } else {
+                    confirmEachResource = false;
                 }
                 // execute subtasks
                 for (DeploymentResource deploymentResource : deploymentResources) {
                     final boolean migrateDeployment;
-                    if (confirmEachDeployment) {
+                    if (confirmEachResource) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
                         migrateDeployment = userConfirmation.getResult() == YES;
                     } else {
-                        migrateDeployment = migrateDeployments;
+                        // TODO add env property for a config on this decision
+                        migrateDeployment = true;
                     }
                     // until deployment overlays missing content don't fail to boot server we first copy all content, and then filter
                     //final ManageableServerConfigurationLeafTask.Builder<JBossServerConfigurationPath<S>> subtaskBuilder = migrateDeployment ? new MigrateDeploymentSubtask<>(deploymentResource) : new RemoveDeploymentSubtask<>(deploymentResource);
