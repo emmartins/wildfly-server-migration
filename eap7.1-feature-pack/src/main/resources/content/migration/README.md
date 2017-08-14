@@ -27,7 +27,7 @@ Run the Server Migration Tool
 
         Retrieving servers...
         [org.jboss.migration.core.logger] (main) SOURCE server name: EAP, version: 6.4.0.GA.
-        [org.jboss.migration.core.logger] (main) TARGET server name: JBoss EAP, version: 7.0.0.GA.
+        [org.jboss.migration.core.logger] (main) TARGET server name: JBoss EAP, version: 7.1.0.GA.
         
         ----------------------------------------------------------
         ----------------------------------------------------------
