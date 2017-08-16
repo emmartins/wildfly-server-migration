@@ -122,7 +122,7 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                     // confirm deployments migration if environment does not skip it, and migration is interactive
                                     if (context.isInteractive()) {
                                         final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
-                                        new UserConfirmation(context.getConsoleWrapper(), "Skip the migration of the scanner's deployments found?","yes/no?", migrateUserConfirmation).execute();
+                                        new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if the scanner's deployments found are compatible with the target server, skip scanner's deployments migration?","yes/no?", migrateUserConfirmation).execute();
                                         migrateDeployments = migrateUserConfirmation.getResult() == NO;
                                         if (migrateDeployments && deployments.size() > 1) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();

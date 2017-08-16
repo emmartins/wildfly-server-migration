@@ -67,7 +67,7 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                 // confirm deployments migration if environment does not skip it, and migration is interactive
                 if (context.isInteractive()) {
                     final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
-                    new UserConfirmation(context.getConsoleWrapper(), "Skip the migration of persistent deployments found?","yes/no?", migrateUserConfirmation).execute();
+                    new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if persistent deployments found are compatible with the target server, skip persistent deployments migration?","yes/no?", migrateUserConfirmation).execute();
                     migrateDeployments = migrateUserConfirmation.getResult() == NO;
                     if (migrateDeployments && deploymentResources.size() > 1) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
