@@ -5,6 +5,9 @@ ARGS=""
 while [ "$#" -gt 0 ]
 do
     case "$1" in
+      -D*)
+          JAVA_OPTS=""$JAVA_OPTS" \"$1\""
+          ;;
       *)
           ARGS="$ARGS '$1'"
           ;;
