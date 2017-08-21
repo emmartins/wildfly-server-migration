@@ -27,24 +27,24 @@ public class CommandLineOptions {
     public CommandLineOptions() {
         options = new Options();
 
-        Option opt = Option.builder("e").longOpt(CommandLineConstants.ENVIRONMENT.getArgument()).argName("environment file")
-                .desc(CommandLineConstants.ENVIRONMENT.getDescription()).hasArg(true).build();
+        Option opt = new Option("e", CommandLineConstants.ENVIRONMENT.getArgument(), true, CommandLineConstants.ENVIRONMENT.getDescription());
+        opt.setArgName("environment file");
         options.addOption(opt);
 
-        opt = Option.builder("i").longOpt(CommandLineConstants.INTERACTIVE.getArgument()).argName("true/false")
-                .desc(CommandLineConstants.INTERACTIVE.getDescription()).hasArg(true).build();
+        opt = new Option("i", CommandLineConstants.INTERACTIVE.getArgument(), true, CommandLineConstants.INTERACTIVE.getDescription());
+        opt.setArgName("true/false");
         options.addOption(opt);
 
-        opt = Option.builder("s").longOpt(CommandLineConstants.SOURCE.getArgument()).argName("source")
-                .desc(CommandLineConstants.SOURCE.getDescription()).hasArg(true).build();
+        opt = new Option("s", CommandLineConstants.SOURCE.getArgument(), true, CommandLineConstants.SOURCE.getDescription());
+        opt.setArgName("source");
         options.addOption(opt);
 
-        opt = Option.builder("t").longOpt(CommandLineConstants.TARGET.getArgument()).argName("target")
-                .desc(CommandLineConstants.TARGET.getDescription()).hasArg(true).build();
+        opt = new Option("t", CommandLineConstants.TARGET.getArgument(), true, CommandLineConstants.TARGET.getDescription());
+        opt.setArgName("target");
         options.addOption(opt);
 
-        opt = Option.builder("h").longOpt(CommandLineConstants.HELP.getArgument()).argName("help")
-                .desc(CommandLineConstants.HELP.getDescription()).hasArg(false).build();
+        opt = new Option("h", CommandLineConstants.HELP.getArgument(), false, CommandLineConstants.HELP.getDescription());
+        opt.setArgName("help");
         options.addOption(opt);
     }
 

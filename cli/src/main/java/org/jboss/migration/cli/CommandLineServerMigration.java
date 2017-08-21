@@ -15,9 +15,9 @@
  */
 package org.jboss.migration.cli;
 
+import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.ParseException;
@@ -48,7 +48,7 @@ public class CommandLineServerMigration {
     // Capture System.out and System.err before they are redirected by STDIO
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
-    private static final CommandLineParser cmdLineParser = new DefaultParser();
+    private static final CommandLineParser cmdLineParser = new BasicParser();
     private static final CommandLineOptions cmdOptions = new CommandLineOptions();
 
     private CommandLineServerMigration() {
