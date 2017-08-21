@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.jboss.migration</groupId>
         <artifactId>jboss-server-migration-parent</artifactId>
-        <version>1.0.1.Final-SNAPSHOT</version>
+        <version>1.0.1.Final</version>
     </parent>
 
     <artifactId>jboss-server-migration-wildfly10.1-feature-pack</artifactId>
