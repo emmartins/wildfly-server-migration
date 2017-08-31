@@ -22,7 +22,7 @@ import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
  */
 public enum CommandLineConstants {
    ENVIRONMENT("environment", CommandLineMigrationLogger.ROOT_LOGGER.argEnvironment()),
-   INTERACTIVE("interactive", CommandLineMigrationLogger.ROOT_LOGGER.argInteractive()),
+   NON_INTERACTIVE("non-interactive", CommandLineMigrationLogger.ROOT_LOGGER.argInteractive()),
    SOURCE("source", CommandLineMigrationLogger.ROOT_LOGGER.argSource()),
    TARGET("target", CommandLineMigrationLogger.ROOT_LOGGER.argTarget()),
    HELP("help", CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"));
