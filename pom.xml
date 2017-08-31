@@ -70,7 +70,6 @@
         <!-- Checkstyle configuration -->
         <linkXRef>false</linkXRef>
         <version.checkstyle>6.8</version.checkstyle>
-        <version.commons-cli>1.3.1</version.commons-cli>
         <version.junit>4.12</version.junit>
         <version.org.wildfly.build-tools>1.1.7.Final</version.org.wildfly.build-tools>
         <version.org.wildfly.checkstyle-config>1.0.5.Final</version.org.wildfly.checkstyle-config>
@@ -377,12 +376,6 @@
                 <version>${version.org.wildfly.core}</version>
                 <scope>import</scope>
                 <type>pom</type>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${version.commons-cli}</version>
             </dependency>
 
         </dependencies>

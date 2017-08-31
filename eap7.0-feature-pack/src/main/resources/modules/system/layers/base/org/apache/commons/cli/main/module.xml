@@ -26,8 +26,4 @@
    <properties>
       <property name="jboss.api" value="private"/>
    </properties>
-
-   <resources>
-      <artifact name="${commons-cli:commons-cli}"/>
-   </resources>
 </module>

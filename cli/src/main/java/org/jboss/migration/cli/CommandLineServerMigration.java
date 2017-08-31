@@ -15,12 +15,12 @@
  */
 package org.jboss.migration.cli;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.ParseException;
+import org.jboss.cli.commonscli.CommandLine;
+import org.jboss.cli.commonscli.CommandLineParser;
+import org.jboss.cli.commonscli.DefaultParser;
+import org.jboss.cli.commonscli.HelpFormatter;
+import org.jboss.cli.commonscli.MissingOptionException;
+import org.jboss.cli.commonscli.ParseException;
 import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
