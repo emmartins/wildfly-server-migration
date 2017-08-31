@@ -43,6 +43,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PATH;
+import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.ERROR;
 import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.NO;
 import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.YES;
 
@@ -122,11 +123,19 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                     // confirm deployments migration if environment does not skip it, and migration is interactive
                                     if (context.isInteractive()) {
                                         final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
-                                        new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if the scanner's deployments found are compatible with the target server, skip scanner's deployments migration?","yes/no?", migrateUserConfirmation).execute();
+                                        final UserConfirmation skipDeploymentScannerConfirmation = new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if the scanner's deployments found are compatible with the target server, skip scanner's deployments migration?","yes/no?", migrateUserConfirmation);
+                                        skipDeploymentScannerConfirmation.execute();
+                                        while (migrateUserConfirmation.getResult() == ERROR) {
+                                            skipDeploymentScannerConfirmation.execute();
+                                        }
                                         migrateDeployments = migrateUserConfirmation.getResult() == NO;
                                         if (migrateDeployments && deployments.size() > 1) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate all scanner's deployments found?", "yes/no?", userConfirmation).execute();
+                                            final UserConfirmation migrateAllDeploymentScannersConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate all scanner's deployments found?", "yes/no?", userConfirmation);
+                                            migrateAllDeploymentScannersConfirmation.execute();
+                                            while (userConfirmation.getResult() == ERROR)  {
+                                                migrateAllDeploymentScannersConfirmation.execute();
+                                            }
                                             confirmEachDeployment = userConfirmation.getResult() == NO;
                                         }
                                     }
@@ -135,7 +144,11 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                         final boolean migrateDeployment;
                                         if (confirmEachDeployment) {
                                             final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            new UserConfirmation(context.getConsoleWrapper(), "Migrate scanner's deployment '" + deployment + "'?", "yes/no?", userConfirmation).execute();
+                                            final UserConfirmation individualDeploymentConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate scanner's deployment '" + deployment + "'?", "yes/no?", userConfirmation);
+                                            individualDeploymentConfirmation.execute();
+                                            while (userConfirmation.getResult() == ERROR) {
+                                                individualDeploymentConfirmation.execute();
+                                            }
                                             migrateDeployment = userConfirmation.getResult() == YES;
                                         } else {
                                             migrateDeployment = migrateDeployments;
