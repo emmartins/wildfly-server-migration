@@ -49,7 +49,7 @@ Run the Server Migration Tool (Standalone Build)
         Migrate the source's standalone server?
         yes/no?
 
-    Type `y` or `yes` to continue with the migration.    
+    Type `y` or `yes` to continue with the migration.
 4. You are presented with information and prompts similar to the following.
 
         [org.jboss.migration.core.task.ServerMigrationTask#3] (main) Standalone server migration starting...
@@ -64,14 +64,14 @@ Run the Server Migration Tool (Standalone Build)
         Migrate all configurations?
         yes/no?
 
-    Type `y` or `yes` to continue with the migration of all of the standalone server configuration files. Type `n` or `no` to choose the select the files individually.    
+    Type `y` or `yes` to continue with the migration of all of the standalone server configuration files. Type `n` or `no` to choose the select the files individually.
 5. You are presented with a long list of tasks that were completed for the standalone server migration, and the following prompt.
 
         INFO  [org.jboss.migration.core.task.ServerMigrationTask#3] (main) Standalone server migration done.
         
         Migrate the source's managed domain?
         yes/no? 
-    Type `y` or `yes` to continue with the migration of the managed domain configuration files.    
+    Type `y` or `yes` to continue with the migration of the managed domain configuration files.
 6. You are presented with the list of available domain configuration files.
 
         INFO  [org.jboss.migration.core.task.ServerMigrationTask#323] (main) Domain migration starting...
@@ -93,7 +93,7 @@ Run the Server Migration Tool (Standalone Build)
         Migrate all configurations?
         yes/no? 
 
-    Type `y` or `yes` to continue with the migration of all of the displayed configuration files. Type `n` or `no` to choose the select the files individually.    
+    Type `y` or `yes` to continue with the migration of all of the displayed configuration files. Type `n` or `no` to choose the select the files individually.
 8. The messages are followed by a `Task Summary` report that summarizes the result of the migration of each task.
 
         ---------------------------------------------------------------------------------------------------
