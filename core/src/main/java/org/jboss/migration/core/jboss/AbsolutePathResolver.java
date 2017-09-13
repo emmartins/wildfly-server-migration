@@ -16,63 +16,22 @@
 
 package org.jboss.migration.core.jboss;
 
-import org.jboss.dmr.ModelNode;
-
 import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.jboss.as.domain.management.ModelDescriptionConstants.PATH;
-import static org.jboss.as.domain.management.ModelDescriptionConstants.RELATIVE_TO;
 
 /**
  * @author emmartins
  */
 public interface AbsolutePathResolver {
 
-    Path resolveNamedPath(String path);
+    Path resolveNamedPath(String string);
+
+    Path resolvePath(String path, String relativeTo);
+
+    default Path resolvePath(String path) {
+        return resolvePath(path, null);
+    }
 
     default Path resolvePath(ResolvablePath resolvablePath) {
         return resolvePath(resolvablePath.getPath(), resolvablePath.getRelativeTo());
-    }
-
-    default Path resolvePath(ModelNode modelNode) {
-        if (!modelNode.hasDefined(PATH)) {
-            return null;
-        } else {
-            final Path path = Paths.get(modelNode.get(PATH).asString());
-            if (!modelNode.hasDefined(RELATIVE_TO)) {
-                return path;
-            } else {
-                return resolvePath(path, modelNode.get(RELATIVE_TO).asString());
-            }
-        }
-    }
-
-    default Path resolvePath(String string) {
-        final Path namedPath = resolveNamedPath(string);
-        if (namedPath != null && namedPath.isAbsolute()) {
-            return namedPath;
-        } else {
-            final Path path = Paths.get(string);
-            if (path.isAbsolute()) {
-                return path;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    default Path resolvePath(Path path, String relativeTo) {
-        if (path.isAbsolute()) {
-            return path;
-        } else {
-            final Path relativeToPath = resolvePath(relativeTo);
-            return relativeToPath != null ? relativeToPath.resolve(path) : null;
-        }
-    }
-
-    default Path resolvePath(String path, String relativeTo) {
-        return resolvePath(Paths.get(path), relativeTo);
-
     }
 }
