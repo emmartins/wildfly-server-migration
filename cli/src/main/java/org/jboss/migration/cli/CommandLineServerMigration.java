@@ -84,7 +84,9 @@ public class CommandLineServerMigration {
             boolean interactive = !cmdLine.hasOption(CommandLineConstants.INTERACTIVE.getArgument()) || Boolean.parseBoolean(cmdLine.getOptionValue(CommandLineConstants.INTERACTIVE.getArgument()));
 
             if (!cmdLine.getArgList().isEmpty()) {
-                System.out.printf("Argument(s), %s, will be discarded.\n", cmdLine.getArgList());
+                System.err.printf("Incorrect argument(s), %s. Exiting...\n", cmdLine.getArgList());
+                help();
+                System.exit(1);
             }
 
             final String baseDir = SystemEnvironment.INSTANCE.getPropertyAsString(EnvironmentProperties.BASE_DIR);
