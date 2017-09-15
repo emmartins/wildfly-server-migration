@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 
 /**
- * Finds global modules referenced by EE subsystem configs.
+ * Finds modules referenced by Security Realms plugin configs.
  * @author emmartins
  */
 public class SecurityRealmsPluginModulesFinder implements ConfigurationModulesMigrationTaskFactory.ModulesFinder {
