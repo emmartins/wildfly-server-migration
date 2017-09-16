@@ -39,7 +39,10 @@ public class JMSBridgesModulesFinder implements ConfigurationModulesMigrationTas
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ SubsystemNames.MESSAGING_ACTIVEMQ)) {
             return;
         }
-        moduleMigrator.migrateModule(reader.getAttributeValue(null, "module"), "Required by JMS Bridge "+reader.getAttributeValue(null, "name"), context);
+        final String moduleId = reader.getAttributeValue(null, "module");
+        if (moduleId != null) {
+            moduleMigrator.migrateModule(moduleId, "Required by JMS Bridge " + reader.getAttributeValue(null, "name"), context);
+        }
     }
 
     /*

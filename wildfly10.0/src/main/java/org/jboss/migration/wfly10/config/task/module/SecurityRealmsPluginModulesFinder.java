@@ -38,6 +38,9 @@ public class SecurityRealmsPluginModulesFinder implements ConfigurationModulesMi
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:")) {
             return;
         }
-        moduleMigrator.migrateModule(reader.getAttributeValue(null, "module"), "Requird by Security Realm plugin", context);
+        final String moduleId = reader.getAttributeValue(null, "module");
+        if (moduleId != null) {
+            moduleMigrator.migrateModule(moduleId, "Required by Security Realm plugin", context);
+        }
     }
 }
