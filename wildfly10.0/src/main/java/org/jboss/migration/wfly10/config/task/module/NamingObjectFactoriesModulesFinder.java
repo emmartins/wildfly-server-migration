@@ -39,6 +39,9 @@ public class NamingObjectFactoriesModulesFinder implements ConfigurationModulesM
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ SubsystemNames.NAMING)) {
             return;
         }
-        moduleMigrator.migrateModule(reader.getAttributeValue(null, "module"), "Required by Naming's object factory "+reader.getAttributeValue(null, "name"), context);
+        final String moduleId = reader.getAttributeValue(null, "module");
+        if (moduleId != null) {
+            moduleMigrator.migrateModule(moduleId, "Required by Naming's object factory " + reader.getAttributeValue(null, "name"), context);
+        }
     }
 }

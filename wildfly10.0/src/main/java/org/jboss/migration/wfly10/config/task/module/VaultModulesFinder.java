@@ -38,6 +38,9 @@ public class VaultModulesFinder implements ConfigurationModulesMigrationTaskFact
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:")) {
             return;
         }
-        moduleMigrator.migrateModule(reader.getAttributeValue(null, "module"), "Requird by Vault", context);
+        final String moduleId = reader.getAttributeValue(null, "module");
+        if (moduleId != null) {
+            moduleMigrator.migrateModule(moduleId, "Required by Vault", context);
+        }
     }
 }
