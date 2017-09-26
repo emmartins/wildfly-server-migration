@@ -15,8 +15,8 @@
  */
 package org.jboss.migration.cli;
 
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
+import org.jboss.cli.commonscli.Option;
+import org.jboss.cli.commonscli.Options;
 
 /**
  * @author Ingo Weiss
