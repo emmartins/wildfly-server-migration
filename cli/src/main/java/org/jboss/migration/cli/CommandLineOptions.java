@@ -31,8 +31,8 @@ public class CommandLineOptions {
                 .desc(CommandLineConstants.ENVIRONMENT.getDescription()).hasArg(true).build();
         options.addOption(opt);
 
-        opt = Option.builder("i").longOpt(CommandLineConstants.INTERACTIVE.getArgument()).argName("true/false")
-                .desc(CommandLineConstants.INTERACTIVE.getDescription()).hasArg(true).build();
+        opt = Option.builder("n").longOpt(CommandLineConstants.NON_INTERACTIVE.getArgument())
+                .desc(CommandLineConstants.NON_INTERACTIVE.getDescription()).hasArg(false).build();
         options.addOption(opt);
 
         opt = Option.builder("s").longOpt(CommandLineConstants.SOURCE.getArgument()).argName("source")

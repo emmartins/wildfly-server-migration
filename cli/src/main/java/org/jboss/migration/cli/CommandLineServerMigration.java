@@ -81,7 +81,7 @@ public class CommandLineServerMigration {
             Path source = resolvePath(cmdLine.getOptionValue(CommandLineConstants.SOURCE.getArgument()));
             Path target = resolvePath(cmdLine.getOptionValue(CommandLineConstants.TARGET.getArgument()));
             Path environment = cmdLine.hasOption(CommandLineConstants.ENVIRONMENT.getArgument()) ? resolvePath(cmdLine.getOptionValue(CommandLineConstants.ENVIRONMENT.getArgument())) : null;
-            boolean interactive = !cmdLine.hasOption(CommandLineConstants.INTERACTIVE.getArgument()) || Boolean.parseBoolean(cmdLine.getOptionValue(CommandLineConstants.INTERACTIVE.getArgument()));
+            boolean interactive = !cmdLine.hasOption(CommandLineConstants.NON_INTERACTIVE.getArgument());
 
             if (!cmdLine.getArgList().isEmpty()) {
                 System.err.printf("Incorrect argument(s), %s. Exiting...\n", cmdLine.getArgList());

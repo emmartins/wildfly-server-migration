@@ -37,11 +37,11 @@ public interface CommandLineMigrationLogger extends BasicLogger {
     String argEnvironment();
 
     /**
-     * Instructions for the {@link org.jboss.migration.cli.CommandLineConstants#INTERACTIVE} command line arguments.
+     * Instructions for the {@link org.jboss.migration.cli.CommandLineConstants#NON_INTERACTIVE} command line arguments.
      *
      * @return the message.
      */
-    @Message(id = Message.NONE, value = "Indicates if the migration tool should interact (or not) with the user. Value should either be true or false.")
+    @Message(id = Message.NONE, value = "Indicates if the migration tool should not interact with the user.")
     String argInteractive();
 
     /**
