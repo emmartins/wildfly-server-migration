@@ -1,0 +1,24 @@
+= Migrate Referenced Paths
+
+A migrated configuration may reference paths, i.e. files and directories, which may need to be migrated to the target server.
+
+A referenced path is migrated only if it's not an absolute path, and such migration consists in copying the resource to such path, but relative to the migrated configuration, in the target server.
+
+The tools automatically migrates the following paths references:
+
+* `Vault` keystore and encrypted file's directory.
+
+The console logs a message noting each path migration, for example:
+
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#25] Resource with path /{server-source-baseDir}/vault/vault.keystore migrated.
+----
+
+If you prefer, you can configure the environment properties to customize the migration of referenced paths.
+
+|===
+| Property Name |Property Description
+
+| `paths.migrate-paths-requested-by-configuration.vault.skip` | If set to `true`, the tool skips the migration of `Vault` referenced paths.
+|===

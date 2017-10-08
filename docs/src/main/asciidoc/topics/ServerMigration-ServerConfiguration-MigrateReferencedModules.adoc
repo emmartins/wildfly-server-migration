@@ -1,0 +1,71 @@
+= Migrate Referenced Modules
+
+A migrated configuration may reference and depend on a module that is not installed on the target server.
+The tool automatically migrates the referenced modules, and their dependent modules as well.
+
+A module is migrated when it is referenced by:
+
+// conditional list depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Host"]
+* A `security-realm` configuration, as plug-in(s) module
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+* A `security-realm` configuration, as plug-in(s) module
+* A `datasource` subsystem configuration, as datasource driver(s) module
+* An `ee` subsystem configuration, as a global module
+* A `naming` subsystem configuration, as an Object Factory module
+* A `messaging` subsystem configuration, as JMS Bridge module
+* A `vault` configuration
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+* A `security-realm` configuration, as plug-in(s) module
+* A `datasource` subsystem configuration, as datasource driver(s) module
+* An `ee` subsystem configuration, as a global module
+* A `naming` subsystem configuration, as an Object Factory module
+* A `messaging` subsystem configuration, as JMS Bridge module
+* A `vault` configuration
+endif::[]
+
+* A `security-realm` configuration, as plug-in(s) module
+* A `datasource` subsystem configuration, as datasource driver(s) module
+* An `ee` subsystem configuration, as a global module
+* A `naming` subsystem configuration, as an Object Factory module
+* A `messaging` subsystem configuration, as JMS Bridge module
+* A `vault` configuration
+
+The console logs a message noting the module ID for any module that is migrated, for example:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Host"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#18] (main) Module cmtool.security-realms:main migrated.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#18] (main) Module cmtool.security-realms:main migrated.
+INFO  [ServerMigrationTask#19] (main) Module cmtool.datasources:main migrated.
+INFO  [ServerMigrationTask#20] (main) Module cmtool.ee1:main migrated.
+INFO  [ServerMigrationTask#21] (main) Module cmtool.ee2:main migrated.
+INFO  [ServerMigrationTask#22] (main) Module cmtool.naming:main migrated.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#18] (main) Module cmtool.security-realms:main migrated.
+INFO  [ServerMigrationTask#19] (main) Module cmtool.datasources:main migrated.
+INFO  [ServerMigrationTask#20] (main) Module cmtool.ee1:main migrated.
+INFO  [ServerMigrationTask#21] (main) Module cmtool.ee2:main migrated.
+INFO  [ServerMigrationTask#22] (main) Module cmtool.naming:main migrated.
+----
+endif::[]
+
+
+TIP: It is possible to *exclude* the migration of specific modules by specifying the id(s) in the environment property named `modules.excludes`.

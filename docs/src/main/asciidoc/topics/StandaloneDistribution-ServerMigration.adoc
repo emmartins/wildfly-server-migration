@@ -1,0 +1,24 @@
+= Migrating from {server-source-productName} to {server-target-productName}
+
+== Overview
+
+This document describes how to use the JBoss Server Migration Tool to migrate from {server-source-productName} to {server-target-productName}.
+
+As a reminder, the following is the basic command to run the standalone tool.
+
+[source,options="nowrap",subs="attributes"]
+----
+$ ./jboss-server-migration.sh --source ../{server-source-baseDir} --target ../{server-target-baseDir}
+
+----------------------------------------------------------
+----  JBoss Server Migration Tool  -----------------------
+----------------------------------------------------------
+
+Retrieving servers...
+INFO  [org.jboss.migration.core.logger] (main) SOURCE server name: {server-source-name}, version: {server-source-version}.
+INFO  [org.jboss.migration.core.logger] (main) TARGET server name: {server-target-name}, version: {server-target-version}.
+
+Server migration starting...
+----
+
+//The server migration consists of executing a series of tasks, which are detailed by the sections that follow.

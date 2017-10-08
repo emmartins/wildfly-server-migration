@@ -1,0 +1,45 @@
+= Add Socket Binding Port Expressions
+
+The {server-target-productName} default configurations use value expressions for the `port` attribute of the following socket bindings:
+
+* `ajp`
+* `http`
+* `https`
+
+The tool automatically adds the value expressions to the migrated {server-source-productName} configurations.
+
+The following message(s) in the console indicates this configuration update:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#465] Adding socket binding's port expressions...
+INFO  [ServerMigrationTask#466] Socket binding /socket-binding-group=standard-sockets/socket-binding=ajp port value expression set as ${jboss.ajp.port:8009}.
+INFO  [ServerMigrationTask#467] Socket binding /socket-binding-group=standard-sockets/socket-binding=http port value expression set as ${jboss.http.port:8080}.
+INFO  [ServerMigrationTask#468] Socket binding /socket-binding-group=standard-sockets/socket-binding=https port value expression set as ${jboss.https.port:8443}.
+INFO  [ServerMigrationTask#465] Socket binding's port expressions added.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#642] Adding socket binding's port expressions...
+INFO  [ServerMigrationTask#643] Socket binding /socket-binding-group=full-sockets/socket-binding=ajp port value expression set as ${jboss.ajp.port:8009}.
+INFO  [ServerMigrationTask#644] Socket binding /socket-binding-group=ha-sockets/socket-binding=ajp port value expression set as ${jboss.ajp.port:8009}.
+INFO  [ServerMigrationTask#645] Socket binding /socket-binding-group=standard-sockets/socket-binding=ajp port value expression set as ${jboss.ajp.port:8009}.
+INFO  [ServerMigrationTask#646] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=ajp port value expression set as ${jboss.ajp.port:8009}.
+INFO  [ServerMigrationTask#647] Socket binding /socket-binding-group=ha-sockets/socket-binding=http port value expression set as ${jboss.http.port:8080}.
+INFO  [ServerMigrationTask#648] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=http port value expression set as ${jboss.http.port:8080}.
+INFO  [ServerMigrationTask#649] Socket binding /socket-binding-group=full-sockets/socket-binding=http port value expression set as ${jboss.http.port:8080}.
+INFO  [ServerMigrationTask#650] Socket binding /socket-binding-group=standard-sockets/socket-binding=http port value expression set as ${jboss.http.port:8080}.
+INFO  [ServerMigrationTask#651] Socket binding /socket-binding-group=ha-sockets/socket-binding=https port value expression set as ${jboss.https.port:8443}.
+INFO  [ServerMigrationTask#652] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=https port value expression set as ${jboss.https.port:8443}.
+INFO  [ServerMigrationTask#653] Socket binding /socket-binding-group=full-sockets/socket-binding=https port value expression set as ${jboss.https.port:8443}.
+INFO  [ServerMigrationTask#654] Socket binding /socket-binding-group=standard-sockets/socket-binding=https port value expression set as ${jboss.https.port:8443}.
+INFO  [ServerMigrationTask#642] Socket binding's port expressions added.
+----
+endif::[]
+
+NOTE: The Migration Environment may be configured to skip this conifguration update, by setting environment property named `socket-bindings.add-port-expressions.skip` as `true`.

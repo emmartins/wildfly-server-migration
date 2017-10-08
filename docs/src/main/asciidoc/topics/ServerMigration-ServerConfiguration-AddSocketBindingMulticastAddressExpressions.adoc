@@ -1,0 +1,23 @@
+= Add Socket Binding Multicast Address Expressions
+
+The {server-target-productName} default configurations uses value expressions in the `multicast-address` attribute of `modcluster` socket bindings, and the migration tool automatically adds such value expressions to migrated configurations.
+
+The following message(s) in the console indicates the configuration update:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#167] Socket binding /socket-binding-group=standard-sockets/socket-binding=modcluster multicast address value expression set as ${jboss.modcluster.multicast.adress:224.0.1.105}.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#656] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=modcluster multicast address value expression set as ${jboss.modcluster.multicast.adress:224.0.1.105}.
+INFO  [ServerMigrationTask#657] Socket binding /socket-binding-group=ha-sockets/socket-binding=modcluster multicast address value expression set as ${jboss.modcluster.multicast.adress:224.0.1.105}.
+----
+endif::[]
+
+NOTE: The Migration Environment may be configured to skip this specific task, by setting environment property named `socket-bindings.multicast-address.add-expressions.skip` as `true`.

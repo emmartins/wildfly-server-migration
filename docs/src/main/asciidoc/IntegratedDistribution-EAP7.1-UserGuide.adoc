@@ -1,0 +1,21 @@
+// setup of vars used by this and/or included docs
+:server-target-productName: JBoss EAP 7.1
+:server-target-name: JBoss EAP
+:server-target-version: 7.1.0.GA
+
+:includesDir: topics
+
+// toc setup
+:toc:
+:numbered:
+
+// include abstract
+include::{includesDir}/IntegratedDistribution-UserGuide.adoc[]
+
+// list the supported migrations with links to their user guides
+
+* <<IntegratedDistribution-EAP6.4toEAP7.1-ServerMigration.adoc#, JBoss EAP 6.4 to JBoss EAP 7.1>>
+* <<IntegratedDistribution-EAP7.0toEAP7.1-ServerMigration.adoc#, JBoss EAP 7.0 to JBoss EAP 7.1>>
+* <<IntegratedDistribution-WFLY8.2toEAP7.1-ServerMigration.adoc#, WildFly 8.2 to JBoss EAP 7.1>>
+* <<IntegratedDistribution-WFLY9.0toEAP7.1-ServerMigration.adoc#, WildFly 9.0 to JBoss EAP 7.1>>
+* <<IntegratedDistribution-WFLY10.0toEAP7.1-ServerMigration.adoc#, WildFly 10.0 to JBoss EAP 7.1>>
