@@ -1,0 +1,359 @@
+:toc:
+:toclevels: 3
+:numbered:
+
+= JBoss Server Migration Tool User Guide
+
+== Overview
+
+Migrating an existing application server configuration from one release to another is a complex task. It requires a complete understanding of the current server configuration. It also required extensive knowledge of what has changed in the target release. The individuals performing the migration generally must copy and edit several configuration files, and then make the updates needed to keep the same behavior in the new release. If it is not done correctly, the new server does not work as expected, often because some functionality is not supported by the new server. The JBoss Server Migration Tool is a Java application that automatically migrates JBoss EAP and WildFly server configurations with minimal or no interaction required.
+
+== Installation
+
+=== Minimal Requirements
+
+The _JBoss Server Migration Tool_ is a Java standalone application. It requires Java version 8 or later.
+
+It is recommended that you start the tool using the provided *.sh* (Linux, Mac OS) and *.bat* (Windows) scripts.
+
+=== Binary Distribution
+
+Download the _JBoss Server Migration Tool_ ZIP archive from https://github.com/wildfly/wildfly-server-migration/releases +
+Simply unzip the archive into a directory of your choice. No further setup is needed.
+
+=== Source Code
+
+The _JBoss Server Migration Tool_ source code is open source. The source repository is located in GitHub at https://github.com/wildfly/wildfly-server-migration
+
+Apache Maven 3.x or later is required to build the application from source code.
+
+To build the tool, open a terminal, navigate to the root directory of the project, and type the following Maven command:
+
+[source,options="nowrap"]
+----
+$ mvn clean install
+----
+
+This creates a ZIP archive in the `build/target` directory containing the tool. As with the downloaded binary distribution, unzip the ZIP archive into the directory of your choice.
+
+== Executing the JBoss Server Migration Tool
+
+=== Running the JBoss Server Migration Tool
+
+To run the _JBoss Server Migration Tool_, open a terminal, navigate to the root directory where you downloaded or built the tool, and run the the provided script. This is the `jboss-server-migration.sh` file for Linux or the `jboss-server-migration.bat` file for Windows.
+
+The following is the basic command to run tool.
+
+[source,options="nowrap"]
+----
+$ jboss-server-migration.sh --source <server-from-path> --target <server-to-path>
+----
+
+The following arguments are required when you execute the script:
+
+* --source <server-from-path>
+* --target <server-to-path>
+
+Replace `<server-from-path>` with the path to the server you are migrating from.
+
+Replace `<server-to-path>` with the path to the server you are migrating to.
+
+These paths should be absolute paths or relative to the current directory.
+
+For example, if the source server base directory relative path is `../jboss-eap-6.4` and the target server base directory relative path is `../jboss-eap-7.0`, execute the following command to migrate the server configuration.
+
+[source,options="nowrap"]
+----
+$ jboss-server-migration.sh --source ../jboss-eap-6.4 --target ../jboss-eap-7.0
+----
+
+NOTE: If no arguments are provided, the tool prints usage instructions and provides a list of supported arguments.
+
+Upon execution, the tool scans the specified source and target server base directories to identify each server. It then delegates the migration process to the target server.
+
+[source,options="nowrap"]
+----
+----------------------------------------------------------
+
+---- JBoss Server Migration Tool -----------------------
+
+----------------------------------------------------------
+
+Retrieving servers...
+
+15:11:33,844 INFO [org.wildfly.migration.core.logger] (main) SOURCE server name: EAP, version: 6.4.0.Final.
+
+15:11:33,859 INFO [org.wildfly.migration.core.logger] (main) TARGET server name: EAP, version: 7.0.0.Final.
+----
+
+This is a fully automated process. The tool execution will fail if a server is not recognized or if the target server does not support migration from the specified source server.
+
+=== Running in Interactive Mode
+
+The _JBoss Server Migration Tool_ can be run in either `interactive` mode, meaning the user may be prompted for input, or `non-interactive` mode, meaning the input values are preconfigured and available to the tool without user input.
+
+You can explicitly set the mode by providing one of the following arguments:
+
+* -i <true or false>
+* --interactive <true or false>
+
+Please note that this mode defaults to *true*, thus the tool is executed in `interactive` mode when this argument is not specified.
+
+To use predefined behaviors and run in `non-interactive` mode, you must specify `false` for this argument.
+
+
+[source,options="nowrap"]
+----
+$ jboss-server-migration.sh --source ../jboss-eap-6.4 --target ../jboss-eap-7.0 --interactive false
+----
+
+NOTE: `Non-interactive` mode predefined behavior is specific to each supported server migration and is described in more detail in the related sections of this document.
+
+== Configuring the JBoss Server Migration Tool
+
+
+The JBoss Server Migration Tool is configured using a combination of properties defined within the tool, user properties passed on the command line, and system environment variables.
+
+
+Note that the environment properties required for each supported server migration may differ. Refer to the specific server migration user guide for the list of valid properties for that migration.
+
+=== Tool Configuration Properties
+
+You can configure the JBoss Migration Server Tool using the `environment.properties` file located in the `config/` directory. Valid properties for this standard Java properties file can be found in the guide for each specific server migration.
+
+
+=== User Configuration Properties
+
+User configuration properties are defined in a standard Java properties file and are passed on the command line using the following argument.
+
+* --environment <path-to-properties-file>
+
+Replace `<path-to-properties-file>` with the path to the properties file. This path should be an absolute path or a path relative to the current directory.
+
+The following example demonstrates how to pass user configuration properties on the command line.
+ 
+[source,options="nowrap"]
+----
+$ jboss-server-migration.sh --source ../jboss-eap-6.4 --target ../jboss-eap-7.0 --environment ~/Migration-files/my-configuration.properties
+----
+
+Properties defined in files passed on the command line using the `\---environment` argument override the ones specified in the server configuration `config/` directory.
+
+=== System Configuration Properties
+
+System configuration properties may also be used to set migration's environment properties on the command line, using the following syntax.
+
+[source,options="nowrap"]
+----
+-Djboss.server.migration.PROPERTY_NAME=PROPERTY_VALUE
+----
+
+The System property _name_ should be `jboss.server.migration` concatenated with the environment property name, the following example demonstrates how to specify `migration-report.xml` as the name of the XML report file when starting the JBoss Server Migration Tool.
+
+[source,options="nowrap"]
+----
+$ jboss-server-migration.sh --source ../jboss-eap-6.4 --target ../jboss-eap-7.0 -Djboss.server.migration.report.xml.fileName=migration-report.xml
+----
+
+System property names override both user configuration properties and tool configuration properties.
+
+=== Logging Configuration
+
+The JBoss Server Migration Tool uses the JBoss Logging framework to log the migration progress. Results are written to the Java console and also to a file named `migration.log`, which is located in the current user directory. This log file is created if it does not exist and its content is overwritten on each subsequent execution of the tool.
+
+The logging configuration is provided by the `config/logging.properties` file. You can modify the configuration file or specify an alternative logging configuration file by specifying the following system property on the command line.
+
+[source,options="nowrap"]
+----
+-Dlogging.configuration=file:<absolute-path-to-alternative-logging-configuration-file>
+----
+
+== Migration Reports
+
+The tool generates multiples reports, of different formats, after the server migration completes. Such reports may be used to analyse in detail how the target server was setup.
+
+=== Migration Tasks
+
+The data collected from executing the server migration logic is structured as a tree of Migration Tasks. Each server migration implementation has a _root task_, which executes its subtasks, and so on.
+
+Each Migration Task has a _name_, made of a name string and optional attributes. In most cases the name string defines the task subject or type, while attributes are used to distinguish between siblings, e.g. a task with name string _config-file_ handles migration of a single server config file, and an attribute _source_ is then used to identify which of the config files the task handles, e.g. its file name. The textual format of a task name is string_name(attribute1_name=attribute1_value, attribute2_name=attribute2_value, ...), such representation for the previous example could be config-file(source=standalone.xml).
+
+Since a Migration Task may be executed multiple times, under different parent tasks, each execution has a _path_ in the task execution tree, made of the names of the parent tasks, since root, and the task's own name, e.g. server>standalone>config-file(source=standalone.xml) is a path representation using '>' as each task name's separator.
+
+Each Migration Task execution obvioulsy has a _result_, which _status_ may be:
+
+* Success, the task executed successfully as expected
+* Skipped, the task skipped the execution, in most cases due to not be needed
+* Fail, the task execution failed due to a specific reason
+Beyond the _status_, some tasks may also attach _attributes_ to its execution result, data which may be relevant, for instance to understand why its execution failed or was skipped.
+
+=== Summary Report
+
+The Summary Report is generated and printed in the migration console/logs, as it's name suggests it provides only a summary of the server migration execution, more specifically it lists the name and status of tasks which executed with success or failed status result. An example of such report:
+
+[source,options="nowrap"]
+----
+08:04:57,434 INFO [org.jboss.migration.core.logger] (main)
+----------------------------------------------------------------------------------------------------------------------
+Task Summary
+----------------------------------------------------------------------------------------------------------------------
+
+server ...................................................................................................... SUCCESS
+standalone ................................................................................................. SUCCESS
+config-files .............................................................................................. SUCCESS
+config-file(source=/Users/emmartins/wildfly/dist/jboss-eap-6.4/standalone/configuration/standalone.xml) .. SUCCESS
+subsystems-xml-config ................................................................................... SUCCESS
+remove-extension(module=org.jboss.as.threads) .......................................................... SUCCESS
+remove-subsystem(namespace=urn:jboss:domain:threads:1.1) ............................................... SUCCESS
+subsystems-management-resources ......................................................................... SUCCESS
+migrate-subsystem(name=web) ............................................................................ SUCCESS
+update-subsystem(name=infinispan) ...................................................................... SUCCESS
+update-subsystem(name=ee) .............................................................................. SUCCESS
+update-subsystem(name=ejb3) ............................................................................ SUCCESS
+update-subsystem(name=remoting) ........................................................................ SUCCESS
+add-subsystem(name=batch-jberet) ....................................................................... SUCCESS
+add-subsystem(name=bean-validation) .................................................................... SUCCESS
+add-subsystem(name=singleton) .......................................................................... SUCCESS
+add-subsystem(name=request-controller) ................................................................. SUCCESS
+add-subsystem(name=security-manager) ................................................................... SUCCESS
+update-subsystem(name=undertow) ........................................................................ SUCCESS
+update-subsystem(name=messaging-activemq) .............................................................. SUCCESS
+security-realms ......................................................................................... SUCCESS
+security-realm(name=ApplicationRealm) .................................................................. SUCCESS
+security-realm(name=ManagementRealm) ................................................................... SUCCESS
+management-interfaces ................................................................................... SUCCESS
+enable-http-upgrade-support ............................................................................ SUCCESS
+socket-bindings ......................................................................................... SUCCESS
+update-management-https ................................................................................ SUCCESS
+
+----------------------------------------------------------------------------------------------------------------------
+Migration Result: SUCCESS
+----------------------------------------------------------------------------------------------------------------------
+----
+
+The ident of each task name line defines the task/subtask relationship, in the example above _migrate-subsystem(name=web)_ is a subtask of _subsystems-management-resources_.
+
+==== Summary Report Environment Properties
+
+|| Property Name || Description || Value Type || Default Value ||
+| report.summary.maxTaskPathSizeToDisplaySubtasks | Subtasks will be visible if the task has a path size smaller or equal | Int | 5 |
+
+=== HTML Report
+
+The HTML Report provides a high level and interactive interface to the migration data, it may be found in the _output_ directory, by default its filename is _migration-report.html_
+
+!report_full.png|border=1!
+
+The report has three sections: Summary, Environment and Tasks.
+
+The Summary section provides the migration's start time, information about the source and target servers, and the migration's result.
+
+!report-summary.png|border=1!
+
+The Environment section lists all used environment properties.
+
+!report-env.png|border=1!
+
+Last but not least, the Tasks section provides statistics and a map of the executed Migration Tasks:
+
+!report-tasks-init.png|border=1!
+
+Each task is listed by it's name, which is coloured according to the task status result: green if Success, red if Failed, gray if Skipped.
+
+The Migration Tasks map is interactive, it provides three controls, as highlighted below:
+
+!report-tasks-controls.png|border=1!
+
+The _minus_, highlighted with a red circle, hides the task's subtasks:
+
+!report-tasks-hidesubtasks.png|border=1!
+
+The _plus_, highlighted with a green circle, show's the task's subtasks:
+
+!report-tasks-showsubtasks.png|border=1!
+
+Clicking a task name, as the one highlighted with a orange rectangle, shows/hides the task details:
+
+!report-tasks-details.png|border=1!
+
+==== HTML Report Environment Properties
+
+|| Property Name || Description || Value Type || Default Value ||
+| report.html.fileName | The name of file to write the HTML report. If not set the report will not be generated. | String | migration-report.html |
+| report.html.maxTaskPathSizeToDisplaySubtasks | Subtasks will be visible if the task has a path size smaller or equal | Int | 4 |
+| report.html.templateFileName | The HTML report template file name. | String | migration-report-template.html |
+
+=== XML Report
+
+The XML Report is a low level report that provides all migration data gathered by the tool, in a format which may be worked out by 3rd party tools. An example of such report:
+
+[source,xml]
+--
+<?xml version="1.0" ?>
+<server-migration-report xmlns="urn:jboss:server-migration:1.0" start-time="Mon, 11 Jul 2016 06:39:29 UTC">
+<servers>
+<source name="EAP" version="6.4.0.GA" base-dir="/Users/emmartins/wildfly/dist/jboss-eap-6.4"/>
+<target name="JBoss EAP" version="7.0.0.GA" base-dir="/Users/emmartins/wildfly/dist/jboss-eap-7.0"/>
+</servers>
+<environment>
+<property name="baseDir" value="/Users/emmartins/wildfly/git/wildfly-server-migration/jboss-server-migration"/>
+<property name="extensions.remove" value=""/>
+<property name="report.xml.fileName" value="migration-report.xml"/>
+<property name="socket-bindings.update-management-https.port" value="${jboss.management.https.port:9993}"/>
+<property name="subsystem.ee.setup-ee-concurrency-utilities.addDefaultContextService" value="true"/>
+<property name="subsystem.ee.setup-ee-concurrency-utilities.addDefaultManagedExecutorService" value="true"/>
+<property name="subsystem.ee.setup-ee-concurrency-utilities.addDefaultManagedScheduledExecutorService" value="true"/>
+<property name="subsystem.ee.setup-ee-concurrency-utilities.addDefaultManagedThreadFactory" value="true"/>
+<!-- ... -->
+</environment>
+<task number="1" name="server">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#1"/>
+<result status="SUCCESS"/>
+<subtasks>
+<task number="2" name="standalone">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#2"/>
+<result status="SUCCESS"/>
+<subtasks>
+<task number="3" name="config-files">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#3"/>
+<result status="SUCCESS"/>
+<subtasks>
+<task number="4" name="config-file(source=/Users/emmartins/wildfly/dist/jboss-eap-6.4/standalone/configuration/standalone-full.xml)">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#4"/>
+<result status="SUCCESS"/>
+<subtasks>
+<task number="5" name="subsystems-xml-config">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#5"/>
+<result status="SUCCESS"/>
+<subtasks>
+<task number="6" name="remove-extension(module=org.jboss.as.cmp)">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#6"/>
+<result status="SUCCESS"/>
+</task>
+<!-- ... -->
+</subtasks>
+</task>
+</subtasks>
+</task>
+<task number="58" name="config-file(source=/Users/emmartins/wildfly/dist/jboss-eap-6.4/standalone/configuration/standalone.xml)">
+<logger logger="org.jboss.migration.core.ServerMigrationTask#58"/>
+<result status="SUCCESS"/>
+<subtasks>
+<!-- ... -->
+</subtasks>
+</task>
+</subtasks>
+</task>
+</subtasks>
+</task>
+</subtasks>
+</task>
+</server-migration-report>
+--
+
+The XML Report may be found in the _output_ directory, by default its filename is _migration-report.xml_
+
+==== XML Report Environment Properties
+
+|| Property Name || Description || Value Type || Default Value ||
+| report.xml.fileName | The name of file to write the XML report. If not set the report will not be generated. | String | migration-report.xml |
