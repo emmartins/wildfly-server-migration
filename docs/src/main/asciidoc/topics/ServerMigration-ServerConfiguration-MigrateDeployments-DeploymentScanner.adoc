@@ -1,0 +1,57 @@
+= Migrate Deployment Scanner Deployments
+
+Deployment scanners monitor a directory for new files and manage their deployment automatically or through special deployment marker files,
+and the migration tool, when migrating the server configuration, first searches for any configured deployment scanners, and then for each scanner found, searches its monitored directories for deployments marked as `deployed`.
+
+A list with the names of deployments found are printed to the console, for instance:
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#68] Found deployment scanner 'default' watching directory '/{server-source-baseDir}/standalone/deployments', searching for deployments in it...
+INFO  [ServerMigrationTask#68] Scanner's deployments found: [cmtool-helloworld5.war, cmtool-helloworld6.war]
+----
+
+If you run the migration tool in `interactive` mode, you then see the following prompt:
+[source,options="nowrap"]
+----
+This tool is not able to assert if the scanner's deployments found are compatible with the target server, skip scanner's deployments migration?
+yes/no?
+----
+
+* If you reply *yes*, or *y*, all deployments are *not* migrated.
+* If you reply *no*, or *n*, you receive an additional prompt asking if all deployments should be the migrated:
++
+[source,options="nowrap"]
+----
+Migrate all scanner's deployments found?
+yes/no?
+----
+
+** If you reply *yes*, or *y*, all deployments are migrated.
++
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#69] Resource with path /{server-source-baseDir}/standalone/deployments/cmtool-helloworld5.war migrated.
+INFO  [ServerMigrationTask#70] Resource with path /{server-source-baseDir}/standalone/deployments/cmtool-helloworld6.war migrated.
+----
+
+** If you reply *no*, or *n*, you receive a prompt asking to confirm the migration for each deployment:
++
+[source,options="nowrap"]
+----
+Migrate scanner's deployment 'cmtool-helloworld5.war'?
+yes/no?
+----
+*** If you reply *no*, or *n*, the deployment is not migrated.
+*** If you reply *yes*, or *y*, the deployment is migrated.
+
++
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#69] Resource with path /{server-source-baseDir}/standalone/deployments/cmtool-helloworld5.war migrated.
+----
+
+If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool will migrate or not migrate `all` deployments found, depending on the environment configuration.
+Persistent deployments are migrated only if *none* of the following environment properties is set as `true`:
+
+* deployments.migrate-deployments.skip
+* deployments.migrate-deployment-scanner-deployments.skip

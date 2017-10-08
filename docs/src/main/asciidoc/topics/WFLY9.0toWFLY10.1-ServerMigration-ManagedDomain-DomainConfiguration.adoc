@@ -1,0 +1,14 @@
+:toc: macro
+:toc-title:
+
+// include abstract
+include::ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
+
+toc::[]
+
+// include each task
+:leveloffset: +1
+
+// TODO
+
+:leveloffset: -1

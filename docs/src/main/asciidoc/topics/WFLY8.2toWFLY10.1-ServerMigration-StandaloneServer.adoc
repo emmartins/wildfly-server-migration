@@ -1,0 +1,12 @@
+:toc:
+
+// include abstract
+include::ServerMigration-StandaloneServer.adoc[]
+
+// include standalone configuration
+:leveloffset: +1
+
+include::WFLY8.2toWFLY10.1-ServerMigration-StandaloneServer-StandaloneServerConfiguration.adoc[]
+
+:leveloffset: -1
+
