@@ -1,0 +1,14 @@
+:toc:
+
+// include abstract
+include::ServerMigration-ManagedDomain.adoc[]
+
+// include configuration
+:leveloffset: +1
+
+include::WFLY9.0toWFLY10.1-ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
+
+include::WFLY9.0toWFLY10.1-ServerMigration-ManagedDomain-HostConfiguration.adoc[]
+
+:leveloffset: -1
+

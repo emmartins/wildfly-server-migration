@@ -1,0 +1,13 @@
+= Update the Domain Configuration's Unsecure Interface
+
+The tool updates the `unsecure` interface configuration to match {server-target-productName} default configurations.
+
+By default, the tool automatically updates the `unsecure` interface configuration.
+If you prefer, you can set the `interface.unsecure.update.skip` environment property to `true` to skip the automatic update of the `unsecure` interface.
+
+Upon successful update of the `unsecure` interface configuration, you should see the following messages in the console:
+
+[source,options="nowrap"]
+----
+INFO [ServerMigrationTask#432] Interface unsecure inet address value set as ${jboss.bind.address.unsecure:127.0.0.1}.
+----

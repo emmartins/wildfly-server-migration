@@ -1,0 +1,38 @@
+= Add the {subsystem-add-subsystemName} Subsystem
+
+[subs="attributes,normal"]
+{subsystem-add-subsystemDescription}
+
+Its default configuration is automatically added to the migrated configuration file, unless the environment property named `subsystem.{subsystem-add-subsystemName}.add.skip` is set to `true`.
+
+The subsystem and related extension are added without any interaction required by the user.
+Upon successful addition of the *{subsystem-add-subsystemName}* subsystem configuration, you should see the following messages in the console:
+
+// conditional console's list depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Host"]
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#49] Adding subsystem {subsystem-add-subsystemName} configuration(s)...
+INFO  [ServerMigrationTask#50] Extension {subsystem-add-extensionName} added.
+INFO  [ServerMigrationTask#51] Subsystem config /host=master/subsystem={subsystem-add-subsystemName} added.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#49] Adding subsystem {subsystem-add-subsystemName} configuration(s)...
+INFO  [ServerMigrationTask#50] Extension {subsystem-add-extensionName} added.
+INFO  [ServerMigrationTask#51] Subsystem config /profile=default/subsystem={subsystem-add-subsystemName} added.
+INFO  [ServerMigrationTask#51] Subsystem config /profile=full/subsystem={subsystem-add-subsystemName} added.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#49] Adding subsystem {subsystem-add-subsystemName} configuration(s)...
+INFO  [ServerMigrationTask#50] Extension {subsystem-add-extensionName} added.
+INFO  [ServerMigrationTask#51] Subsystem config /subsystem={subsystem-add-subsystemName} added.
+----
+endif::[]

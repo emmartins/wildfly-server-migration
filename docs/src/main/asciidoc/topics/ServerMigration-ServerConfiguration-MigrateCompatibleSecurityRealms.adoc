@@ -1,0 +1,38 @@
+= Migrate Compatible Security Realms
+
+Because the {server-target-productName} security realms configuration is fully compatible with the {server-source-productName} security realms configuration, they require no update by the JBoss Server Migration Tool.
+However, if the properties files are not referenced using an absolute path, the tool copies them to the path expected by the migrated configuration file.
+
+This process is fully automated and requires no interaction by the user.
+To skip the security realms migration, set the `security-realms.migrate-properties.skip` environment property to `true`.
+
+Upon successful migration of the security realms configuration, you should see the following messages in the console:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Host"]
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#140]  Migrating security realms...
+INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/domain/configuration/mgmt-users.properties migrated.
+INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/domain/configuration/mgmt-groups.properties migrated.
+INFO  [ServerMigrationTask#141]  Security realm /host=master/core-service=management/security-realm=ManagementRealm migrated.
+INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/domain/configuration/application-users.properties migrated.
+INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/domain/configuration/application-roles.properties migrated.
+INFO  [ServerMigrationTask#142]  Security realm /host=master/core-service=management/security-realm=ApplicationRealm migrated.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap",subs="attributes"]
+----
+INFO  [ServerMigrationTask#140]  Migrating security realms...
+INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/standalone/configuration/mgmt-users.properties migrated.
+INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/standalone/configuration/mgmt-groups.properties migrated.
+INFO  [ServerMigrationTask#141]  Security realm /core-service=management/security-realm=ManagementRealm migrated.
+INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/standalone/configuration/application-users.properties migrated.
+INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/standalone/configuration/application-roles.properties migrated.
+INFO  [ServerMigrationTask#142]  Security realm /core-service=management/security-realm=ApplicationRealm migrated.
+----
+endif::[]
+
+

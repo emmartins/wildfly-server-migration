@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: core-management
+:subsystem-add-extensionName: org.wildfly.extension.core-management
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides WildFly Core management-related resources, which previously were configured on its kernel, for instance the server configuration's changes history feature.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]
