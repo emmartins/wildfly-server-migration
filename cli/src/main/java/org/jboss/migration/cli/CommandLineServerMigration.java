@@ -147,6 +147,7 @@ public class CommandLineServerMigration {
     }
 
     private static void help() {
+        System.out.println(CommandLineMigrationLogger.ROOT_LOGGER.helpHeader());
         HelpFormatter help = new HelpFormatter();
         help.setWidth(1024);
         help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"), cmdOptions.getOptions(),true);

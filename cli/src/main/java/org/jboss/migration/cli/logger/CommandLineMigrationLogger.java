@@ -65,4 +65,7 @@ public interface CommandLineMigrationLogger extends BasicLogger {
 
     @Message(id = Message.NONE, value = "Get help with usage of this command")
     String argHelp();
+
+    @Message(id = Message.NONE, value = "The JBoss Server Migration Tool simplifies the task of migrating JBoss application servers, requiring minimal or no user interaction at all.")
+    String helpHeader();
 }
