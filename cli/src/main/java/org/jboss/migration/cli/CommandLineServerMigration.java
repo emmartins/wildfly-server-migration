@@ -68,6 +68,7 @@ public class CommandLineServerMigration {
 
             if (cmdLine.hasOption(CommandLineConstants.HELP.getArgument())) {
                 help();
+                return;
             }
 
             if (!cmdLine.hasOption(CommandLineConstants.SOURCE.getArgument())) {
@@ -141,8 +142,10 @@ public class CommandLineServerMigration {
         } catch (ParseException pex) {
             System.err.println(pex.getLocalizedMessage());
             help();
+            System.exit(1);
         } catch (Throwable t) {
-            abort(t);
+            t.printStackTrace(STDERR);
+            System.exit(1);
         }
     }
 
@@ -151,7 +154,6 @@ public class CommandLineServerMigration {
         HelpFormatter help = new HelpFormatter();
         help.setWidth(1024);
         help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"), cmdOptions.getOptions(),true);
-        abort(null);
     }
 
     private static Properties loadProperties(Path propertiesFilePath) throws IOException {
@@ -160,16 +162,6 @@ public class CommandLineServerMigration {
             properties.load(inputStream);
         }
         return properties;
-    }
-
-    private static void abort(Throwable t) {
-        try {
-            if (t != null) {
-                t.printStackTrace(STDERR);
-            }
-        } finally {
-            System.exit(1);
-        }
     }
 
     private static Path resolvePath(String s) throws IllegalArgumentException {
