@@ -63,6 +63,7 @@
          -->
         <version.commons-cli>1.3.1</version.commons-cli>
         <version.org.wildfly.core>3.0.3.Final</version.org.wildfly.core>
+        <version.org.asciidoctor.asciidoctor-maven-plugin>1.5.6</version.org.asciidoctor.asciidoctor-maven-plugin>
 
         <!-- Surefire args -->
         <surefire.jpda.args/>
@@ -74,12 +75,14 @@
         <version.junit>4.12</version.junit>
         <version.org.wildfly.build-tools>1.1.7.Final</version.org.wildfly.build-tools>
         <version.org.wildfly.checkstyle-config>1.0.5.Final</version.org.wildfly.checkstyle-config>
+
     </properties>
 
     <modules>
         <module>build</module>
         <module>cli</module>
         <module>core</module>
+        <module>docs</module>
         <module>eap6.4</module>
         <module>eap6.4-to-eap7.0</module>
         <module>eap6.4-to-eap7.1</module>
@@ -201,6 +204,11 @@
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
                     <version>${version.org.wildfly.build-tools}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>${version.org.asciidoctor.asciidoctor-maven-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -370,7 +378,13 @@
             </dependency>
 
             <!-- External Dependencies -->
-
+<!--
+            <dependency>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctorj</artifactId>
+                <version>${version.asciidoctorj}</version>
+            </dependency>
+-->
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-core-parent</artifactId>
@@ -385,9 +399,9 @@
     <repositories>
         <!-- keep this repository the first -->
         <repository>
-            <id>jboss-eap-7.0-product-repository</id>
+            <id>jboss-eap-7.1-product-repository</id>
             <name>JBoss EAP Product Repository</name>
-            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.0-rhel-7-maven-build/latest/maven/</url>
+            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.1-rhel-7-maven-build/latest/maven/</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -430,9 +444,9 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>jboss-eap-7.0-product-repository</id>
+            <id>jboss-eap-7.1-product-repository</id>
             <name>JBoss EAP Product Repository</name>
-            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.0-rhel-7-maven-build/latest/maven/</url>
+            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.1-rhel-7-maven-build/latest/maven/</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -469,6 +483,5 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
 
 </project>

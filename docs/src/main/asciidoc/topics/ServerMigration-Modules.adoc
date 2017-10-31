@@ -1,0 +1,31 @@
+= Modules Migration
+
+The JBoss Server Migration Tool is capable of migrating any module installed in the source server, as long as the module is not already installed on the target server.
+
+The migration of source server's module can be done explicitly, i.e. by user demand, or implicitly, because a migrated module or server configuration depends on it.
+
+You can specify which modules should be migrated or not, by using the `modules.includes` and `modules.excludes` environment properties:
+
+    * A module whose ID is referenced by the `modules.excludes` environment property is _never_ migrated.
+    * A module whose ID is referenced by the `modules.includes` environment property is _always_ migrated, unless it referenced by the `modules.excludes` environment property.
+
+IMPORTANT: The syntax for a module ID is _name:slot_; The _slot_ is optional, and if it is not specified, defaults to _main_.
+
+As an example, to migrate modules `com.example.moduleA` and `com.example.moduleB`, and do not migrate module `com.example.moduleC`:
+
+* You can configure the properties in the tool's `config/environment.properties` file:
++
+[source,options="nowrap"]
+----
+modules.includes=com.example.moduleA,com.example.moduleB
+modules.excludes=com.example.moduleC
+----
+* You can include the above properties in your own custom properties file, and then pass the file on the command line using the `--environment` argument.
+* You can pass the information on the command line using a system property. The environment property names must be prefixed with `jboss.server.migration.`:
++
+[source,options="nowrap"]
+----
+-Djboss.server.migration.modules.includes="com.example.moduleA,com.example.moduleB" -Djboss.server.migration.modules.excludes="com.example.moduleC"
+----
+
+WARNING: The JBoss Server Migration Tool does not verify that the source server's module is compatible with the target server, and the migration of an incompatible module may cause the target server to malfunction, or not work at all.

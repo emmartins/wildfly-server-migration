@@ -1,0 +1,22 @@
+= Remove Permgen Attributes From JVM Configurations
+
+The usage of `Permgen` attributes in JVM configurations is deprecated in {server-target-productName} and the JBoss Migration Tool removes these from all JVM configurations.
+
+Upon successful removal of the `Permgen` attributes, you should see the following messages in the console:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Host"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#900] Permgen attributes removed from JVM /host=master/jvm=default
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#677] Permgen attributes removed from JVM /server-group=main-server-group/jvm=default
+INFO  [ServerMigrationTask#678] Permgen attributes removed from JVM /server-group=other-server-group/jvm=default
+----
+
+If you prefer, you can set the `jvms.remove-permgen-attributes.skip` environment property value to `true` to skip the automatic removal.

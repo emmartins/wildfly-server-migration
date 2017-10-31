@@ -1,0 +1,55 @@
+:toc: macro
+:toc-title:
+
+// include abstract
+include::ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
+
+toc::[]
+
+// include doc for each domain task in EAP6_4ToEAP7_0ServerMigrationProvider.java
+
+:leveloffset: +1
+
+include::ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Migrate-jacorb.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Migrate-web.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Migrate-messaging.adoc[]
+
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-infinispan.adoc[]
+
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-ee.adoc[]
+
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-ejb3.adoc[]
+
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-remoting.adoc[]
+
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-undertow.adoc[]
+
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-messaging-activemq.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-batch-jberet.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-request-controller.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-security-manager.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-singleton.adoc[]
+
+include::ServerMigration-ServerConfiguration-UpdateUnsecureInterface.adoc[]
+
+include::ServerMigration-ServerConfiguration-SetupPrivateInterface.adoc[]
+
+include::ServerMigration-ServerConfiguration-AddSocketBindingPortExpressions.adoc[]
+
+include::ServerMigration-ServerConfiguration-JVM-RemovePermgenAttributes.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
+
+:leveloffset: -1
