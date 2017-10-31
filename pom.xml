@@ -244,7 +244,13 @@
                 <artifactId>jboss-server-migration-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap6.4</artifactId>
@@ -378,13 +384,7 @@
             </dependency>
 
             <!-- External Dependencies -->
-<!--
-            <dependency>
-                <groupId>org.asciidoctor</groupId>
-                <artifactId>asciidoctorj</artifactId>
-                <version>${version.asciidoctorj}</version>
-            </dependency>
--->
+
             <dependency>
                 <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-core-parent</artifactId>
@@ -403,21 +403,6 @@
     </dependencyManagement>
 
     <repositories>
-        <!-- keep this repository the first -->
-        <repository>
-            <id>jboss-eap-7.1-product-repository</id>
-            <name>JBoss EAP Product Repository</name>
-            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.1-rhel-7-maven-build/latest/maven/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
@@ -449,20 +434,6 @@
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>jboss-eap-7.1-product-repository</id>
-            <name>JBoss EAP Product Repository</name>
-            <url>http://download.eng.bos.redhat.com/brewroot/repos/jb-eap-7.1-rhel-7-maven-build/latest/maven/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </pluginRepository>
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
