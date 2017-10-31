@@ -1,0 +1,38 @@
+= Set Up Private Interface
+
+The {server-target-productName} default configuration uses a new `private` interface on all `jgroups` socket bindings.
+The JBoss Server Migration Tool automatically adds the new interface to migrated configurations with `jgroups` socket bindings, and updates these to use it.
+
+Upon successful configuration of the private interface, you should see the following messages in the console:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#160] Interface private added.
+INFO  [ServerMigrationTask#161] Socket binding /socket-binding-group=standard-sockets/socket-binding=jgroups-mping interface set to private
+INFO  [ServerMigrationTask#161] Socket binding /socket-binding-group=standard-sockets/socket-binding=jgroups-tcp interface set to private
+INFO  [ServerMigrationTask#161] Socket binding /socket-binding-group=standard-sockets/socket-binding=jgroups-tcp-fd interface set to private
+INFO  [ServerMigrationTask#161] Socket binding /socket-binding-group=standard-sockets/socket-binding=jgroups-udp interface set to private
+INFO  [ServerMigrationTask#161] Socket binding /socket-binding-group=standard-sockets/socket-binding=jgroups-udp-fd interface set to private
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#637] Interface private added.
+INFO  [ServerMigrationTask#640] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=jgroups-mping interface set to private
+INFO  [ServerMigrationTask#640] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=jgroups-tcp interface set to private
+INFO  [ServerMigrationTask#640] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=jgroups-tcp-fd interface set to private
+INFO  [ServerMigrationTask#640] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=jgroups-udp interface set to private
+INFO  [ServerMigrationTask#640] Socket binding /socket-binding-group=full-ha-sockets/socket-binding=jgroups-udp-fd interface set to private
+INFO  [ServerMigrationTask#641] Socket binding /socket-binding-group=ha-sockets/socket-binding=jgroups-mping interface set to private
+INFO  [ServerMigrationTask#641] Socket binding /socket-binding-group=ha-sockets/socket-binding=jgroups-tcp interface set to private
+INFO  [ServerMigrationTask#641] Socket binding /socket-binding-group=ha-sockets/socket-binding=jgroups-tcp-fd interface set to private
+INFO  [ServerMigrationTask#641] Socket binding /socket-binding-group=ha-sockets/socket-binding=jgroups-udp interface set to private
+INFO  [ServerMigrationTask#641] Socket binding /socket-binding-group=ha-sockets/socket-binding=jgroups-udp-fd interface set to private
+----
+endif::[]
+
+If you prefer to skip the configuration of the private interface, set the environment property named `interface.private.setup.skip` to `true`.

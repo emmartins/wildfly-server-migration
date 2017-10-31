@@ -1,0 +1,27 @@
+= Setup HTTP Upgrade Management
+
+{server-target-productName} management clients use the new HTTP Upgrade mechanism, and the JBoss Migration Tool makes all of configuration changes needed for clients to work properly with the migrated configuration.
+
+The configuration changes are fully automated, and upon successful completion of the configuration, you should see the following messages in the console:
+
+// conditional console depending of config type
+ifeval::["{server-migration-serverConfigurationType}" == "Host"]
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#896] HTTP upgrade management setup starting...
+INFO  [ServerMigrationTask#897] Management interface 'http-interface' http upgrade enabled.
+INFO  [ServerMigrationTask#896] HTTP upgrade management setup completed.
+----
+endif::[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+[source,options="nowrap"]
+----
+[ServerMigrationTask#75] HTTP upgrade management setup starting...
+[ServerMigrationTask#76] Management interface 'http-interface' http upgrade enabled.
+[ServerMigrationTask#77] Socket binding 'management-https' port set to ${jboss.management.https.port:9993}.
+[ServerMigrationTask#75] HTTP upgrade management setup completed.
+----
+endif::[]
+
+If you prefer to skip the configuration of HTTP Upgrade management, set the environment property named `management.setup-http-upgrade.skip` to `true`.

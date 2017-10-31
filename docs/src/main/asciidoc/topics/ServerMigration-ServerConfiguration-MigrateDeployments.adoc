@@ -1,0 +1,27 @@
+= Migrate Deployments
+
+The JBoss Server Migration Tool, when migrating a configuration, may also migrate:
+
+* Deployments it references, also known as persistent deployments.
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+* Deployments found in directories monitored by its deployment scanners.
+endif::[]
+* Deployment Overlays it references.
+
+WARNING: The migration of a deployment or deployment overlay merely consists of *installing* related file resources on the target server, and possibly updating the migrated configuration.
+The tool will *not* assert if these resources are compatible with the target server, which means that a migrated deployment might *not* work as expected, or might not work at all.
+Red Hat recommends that you use *Red Hat Application Migration Toolkit* to analyze a deployment with respect to compatibility among different JBoss servers.
+
+NOTE: If you run the migration tool in `non-interactive` mode, by default the JBoss Server Migration Tool will not migrate any deployments and overlays. To migrate deployments the environment property `deployments.migrate-deployments.skip` should be set as `false`.
+
+:leveloffset: +1
+
+include::ServerMigration-ServerConfiguration-MigrateDeployments-Persistent.adoc[]
+
+ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
+include::ServerMigration-ServerConfiguration-MigrateDeployments-DeploymentScanner.adoc[]
+endif::[]
+
+include::ServerMigration-ServerConfiguration-MigrateDeployments-Overlays.adoc[]
+
+:leveloffset: -1

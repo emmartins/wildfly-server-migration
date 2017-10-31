@@ -1,0 +1,46 @@
+= Migrate Persistent Deployments
+
+When migrating a configuration, the tool searches for references to deployments persisted in the source server, and prints the names of the deployments found in the console, e.g.:
+
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#67] Persistent deployments found: [cmtool-helloworld3.war, cmtool-helloworld4.war, cmtool-helloworld2.war, cmtool-helloworld1.war]
+----
+
+If you run the migration tool in `interactive` mode, you then see the following prompt:
+[source,options="nowrap"]
+----
+This tool is not able to assert if persistent deployments found are compatible with the target server, skip persistent deployments migration?
+yes/no?
+----
+
+* If you reply *yes*, or *y*, the all deployment references are removed from the migrated configuration, i.e. the deployments will not be migration.
+* If you reply *no*, or *n*, you receive an additional prompt asking if all deployments should be the migrated:
++
+[source,options="nowrap"]
+----
+Migrate all persistent deployments found?
+yes/no?
+----
+
+** If you reply *yes*, or *y*, all deployments are migrated.
+** If you reply *no*, or *n*, you receive a prompt asking to confirm the migration for each referenced deployment:
++
+[source,options="nowrap"]
+----
+Migrate persistent deployment 'cmtool-helloworld3.war'?
+yes/no?
+----
+*** If you reply *yes*, or *y*, the deployment is migrated.
+*** If you reply *no*, or *n*, the deployment reference is removed from the migrated configuration, i.e. the deployment is not migrated.
++
+[source,options="nowrap"]
+----
+INFO  [ServerMigrationTask#68] Removed persistent deployment from configuration /deployment=cmtool-helloworld3.war
+----
+
+If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool will migrate or not migrate `all` persistent deployments, depending on the environment configuration.
+Persistent deployments are migrated only if *none* of the following environment properties is set as `true`:
+
+* deployments.migrate-deployments.skip
+* deployments.migrate-persistent-deployments.skip
