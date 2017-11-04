@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JBoss Server Migration Report</title>
+    <style>
+        body {
+            background-color: white;
+            margin: 20px;
+        }
+
+        h1 {
+            padding: 10px;
+            color: #000;
+        }
+
+        h2 {
+            padding: 5px;
+            background-color: #ddd;
+        }
+
+        h3 {
+            padding: 5px;
+            text-decoration: underline;
+        }
+
+        div.section {
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-bottom: 15px;
+        }
+
+        table.properties {
+            border-collapse: collapse;
+        }
+
+        table.properties tr:nth-child(even) {
+            background-color: white;
+        }
+
+        table.properties tr:nth-child(odd) {
+            background-color: WhiteSmoke;
+        }
+
+        td.property-name {
+        }
+
+        td.property-value {
+        }
+
+        span.task-result-SUCCESS {
+            color: green;
+        }
+
+        span.task-result-SKIPPED {
+            color: grey;
+        }
+
+        span.task-result-FAIL {
+            color: tomato;
+        }
+
+        /* task map style */
+
+        table.task-map-odd, table.task-map-even {
+            width: 100%;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        table.task-map-odd {
+            background-color: WhiteSmoke;
+        }
+
+        table.task-map-even {
+            background-color: white;
+        }
+
+        td.task-map-header {
+        }
+
+        table.task-header {
+            width: 100%;
+        }
+
+        td.task-header-name {
+            width: 100%;
+        }
+
+        td.task-header-toggles {
+        }
+
+        a.task-display-toggle {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        td.task-display-toggle {
+            color: grey;
+        }
+
+        /* task details style */
+
+        td.task-map-details {
+        }
+
+        table.task-details {
+            width: 100%;
+        }
+
+        td.task-details-property-name {
+            vertical-align: top;
+            font-size: small;
+            font-weight: bold;
+            padding: 2px;
+        }
+
+        td.task-details-property-value {
+            padding: 2px;
+            font-size: small;
+        }
+
+        /* task substasks style */
+
+        td.task-map-subtasks {
+        }
+
+        table.task-subtasks {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<script>
+    function toggleDisplay(id) {
+        var x = document.getElementById(id);
+        if (x != null) {
+            if (x.style.display === 'none') {
+                x.style.display = 'block';
+            } else {
+                x.style.display = 'none';
+            }
+
+        }
+    }
+    function toggleDisplayTaskDetails(id) {
+        toggleDisplay(id+'-details');
+    }
+
+    function showTaskDetails(id) {
+        var x = document.getElementById(id+'-details');
+        if (x != null) {
+            x.style.display = 'block';
+        }
+    }
+
+    function showSubtasks(id) {
+        var subtasks = document.getElementById(id+'-subtasks');
+        if (subtasks != null) {
+            var hideToggle = document.getElementById(id+'-subtasks-hide');
+            var showToggle = document.getElementById(id+'-subtasks-show');
+            subtasks.style.display = 'block';
+            hideToggle.style.display = 'block';
+            showToggle.style.display = 'none';
+        }
+    }
+    function hideSubtasks(id) {
+        var subtasks = document.getElementById(id+'-subtasks');
+        if (subtasks != null) {
+            var hideToggle = document.getElementById(id+'-subtasks-hide');
+            var showToggle = document.getElementById(id+'-subtasks-show');
+            subtasks.style.display = 'none';
+            hideToggle.style.display = 'none';
+            showToggle.style.display = 'block';
+        }
+    }
+</script>
+
+<h1>JBoss Server Migration Report</h1>
+
+<div id="summary" class="section">
+    <h2>Summary</h2>
+    <table class="properties">
+        $SUMMARY
+    </table>
+</div>
+
+<br/>
+
+<div id="environment" class="section">
+    <h2>Environment</h2>
+    <table class="properties">
+        $ENVIRONMENT
+    </table>
+</div>
+
+<br/>
+
+<div id="tasks" class="section">
+    <h2>Tasks</h2>
+    <div id="task-summary">
+        <table class="properties">
+            $TASK_SUMMARY
+        </table>
+    </div>
+    <br/>
+    <div id="task-map">
+        $TASK_MAP
+    </div>
+</div>
+
+</body>
+</html>
