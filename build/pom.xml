@@ -94,11 +94,6 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly8.2-to-wildfly10.1</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly8.2-to-wildfly11.0</artifactId>
         </dependency>
 
@@ -119,11 +114,6 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly9.0-to-wildfly10.1</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly9.0-to-wildfly11.0</artifactId>
         </dependency>
 
@@ -135,11 +125,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly10.0-to-eap7.1</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly10.0-to-wildfly10.1</artifactId>
         </dependency>
 
         <dependency>
