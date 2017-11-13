@@ -7,5 +7,5 @@ Upon successful removal of the `unsecure` interface configuration, you should se
 
 [source,options="nowrap"]
 ----
-INFO [ServerMigrationTask#480] (main) Interface unsecure removed.
+INFO [ServerMigrationTask#480] Interface unsecure removed.
 ----
