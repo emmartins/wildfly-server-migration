@@ -10,5 +10,5 @@ Upon successful migration of the *remoting* subsystem configuration, you should 
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#33] (main) Http connector http-remoting-connector added to Remoting subsystem configuration.
+INFO  [ServerMigrationTask#33] Http connector http-remoting-connector added to Remoting subsystem configuration.
 ----

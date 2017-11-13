@@ -15,8 +15,8 @@ $ ./jboss-server-migration.sh --source ../{server-source-baseDir} --target ../{s
 ----------------------------------------------------------
 
 Retrieving servers...
-INFO  [org.jboss.migration.core.logger] (main) SOURCE server name: {server-source-name}, version: {server-source-version}.
-INFO  [org.jboss.migration.core.logger] (main) TARGET server name: {server-target-name}, version: {server-target-version}.
+INFO  [logger] SOURCE server name: {server-source-name}, version: {server-source-version}.
+INFO  [logger] TARGET server name: {server-target-name}, version: {server-target-version}.
 
 Server migration starting...
 ----
