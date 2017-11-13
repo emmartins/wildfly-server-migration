@@ -10,7 +10,7 @@ toc::[]
 
 :leveloffset: +1
 
-include::ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
+include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
