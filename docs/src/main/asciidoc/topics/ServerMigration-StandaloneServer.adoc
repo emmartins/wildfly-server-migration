@@ -20,25 +20,25 @@ If you choose to proceed, the tool starts by migrating the source standalone ser
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#5] (main) Migrating standalone content found: [22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content, 23/b62a37ba8a4830622bfcdb960280577cc6796e/content, 40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content, 88/96c992d1b9866945a5015b72f8d254d3d5c132/content, ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content, fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content]
-INFO  [ServerMigrationTask#6] (main) Resource with path /{server-source-baseDir}/standalone/data/content/22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content migrated.
-INFO  [ServerMigrationTask#7] (main) Resource with path /{server-source-baseDir}/standalone/data/content/23/b62a37ba8a4830622bfcdb960280577cc6796e/content migrated.
-INFO  [ServerMigrationTask#8] (main) Resource with path /{server-source-baseDir}/standalone/data/content/40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content migrated.
-INFO  [ServerMigrationTask#9] (main) Resource with path /{server-source-baseDir}/standalone/data/content/88/96c992d1b9866945a5015b72f8d254d3d5c132/content migrated.
-INFO  [ServerMigrationTask#10] (main) Resource with path /{server-source-baseDir}/standalone/data/content/ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content migrated.
-INFO  [ServerMigrationTask#11] (main) Resource with path /{server-source-baseDir}/standalone/data/content/fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content migrated.
+INFO  [ServerMigrationTask#5] Migrating standalone content found: [22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content, 23/b62a37ba8a4830622bfcdb960280577cc6796e/content, 40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content, 88/96c992d1b9866945a5015b72f8d254d3d5c132/content, ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content, fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content]
+INFO  [ServerMigrationTask#6] Resource with path /{server-source-baseDir}/standalone/data/content/22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content migrated.
+INFO  [ServerMigrationTask#7] Resource with path /{server-source-baseDir}/standalone/data/content/23/b62a37ba8a4830622bfcdb960280577cc6796e/content migrated.
+INFO  [ServerMigrationTask#8] Resource with path /{server-source-baseDir}/standalone/data/content/40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content migrated.
+INFO  [ServerMigrationTask#9] Resource with path /{server-source-baseDir}/standalone/data/content/88/96c992d1b9866945a5015b72f8d254d3d5c132/content migrated.
+INFO  [ServerMigrationTask#10] Resource with path /{server-source-baseDir}/standalone/data/content/ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content migrated.
+INFO  [ServerMigrationTask#11] Resource with path /{server-source-baseDir}/standalone/data/content/fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content migrated.
 ----
 
 Next, the tool scans the source server for standalone server configurations files and prints the results in the console.
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#3] (main) Retrieving source's standalone configurations...
-INFO  [ServerMigrationTask#3] (main) /{server-source-baseDir}/standalone/configuration/standalone-full-ha.xml
-INFO  [ServerMigrationTask#3] (main) /{server-source-baseDir}/standalone/configuration/standalone-full.xml
-INFO  [ServerMigrationTask#3] (main) /{server-source-baseDir}/standalone/configuration/standalone-ha.xml
-INFO  [ServerMigrationTask#3] (main) /{server-source-baseDir}/standalone/configuration/standalone-osgi.xml
-INFO  [ServerMigrationTask#3] (main) /{server-source-baseDir}/standalone/configuration/standalone.xml
+INFO  [ServerMigrationTask#3] Retrieving source's standalone configurations...
+INFO  [ServerMigrationTask#3] /{server-source-baseDir}/standalone/configuration/standalone-full-ha.xml
+INFO  [ServerMigrationTask#3] /{server-source-baseDir}/standalone/configuration/standalone-full.xml
+INFO  [ServerMigrationTask#3] /{server-source-baseDir}/standalone/configuration/standalone-ha.xml
+INFO  [ServerMigrationTask#3] /{server-source-baseDir}/standalone/configuration/standalone-osgi.xml
+INFO  [ServerMigrationTask#3] /{server-source-baseDir}/standalone/configuration/standalone.xml
 ----
 
 If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool migrates all listed configuration files.

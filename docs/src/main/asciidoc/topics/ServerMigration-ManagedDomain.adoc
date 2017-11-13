@@ -19,20 +19,20 @@ If you choose to proceed, the tool begins migrating the domain content of the so
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#397] (main) Migrating domain content found: [22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content, 23/b62a37ba8a4830622bfcdb960280577cc6796e/content, 40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content, 88/96c992d1b9866945a5015b72f8d254d3d5c132/content, ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content, fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content]
-INFO  [ServerMigrationTask#398] (main) Resource with path /{server-source-baseDir}/domain/data/content/22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content migrated.
-INFO  [ServerMigrationTask#399] (main) Resource with path /{server-source-baseDir}/domain/data/content/23/b62a37ba8a4830622bfcdb960280577cc6796e/content migrated.
-INFO  [ServerMigrationTask#400] (main) Resource with path /{server-source-baseDir}/domain/data/content/40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content migrated.
-INFO  [ServerMigrationTask#401] (main) Resource with path /{server-source-baseDir}/domain/data/content/88/96c992d1b9866945a5015b72f8d254d3d5c132/content migrated.
-INFO  [ServerMigrationTask#402] (main) Resource with path /{server-source-baseDir}/domain/data/content/ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content migrated.
-INFO  [ServerMigrationTask#403] (main) Resource with path /{server-source-baseDir}/domain/data/content/fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content migrated.
+INFO  [ServerMigrationTask#397]  Migrating domain content found: [22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content, 23/b62a37ba8a4830622bfcdb960280577cc6796e/content, 40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content, 88/96c992d1b9866945a5015b72f8d254d3d5c132/content, ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content, fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content]
+INFO  [ServerMigrationTask#398]  Resource with path /{server-source-baseDir}/domain/data/content/22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content migrated.
+INFO  [ServerMigrationTask#399]  Resource with path /{server-source-baseDir}/domain/data/content/23/b62a37ba8a4830622bfcdb960280577cc6796e/content migrated.
+INFO  [ServerMigrationTask#400]  Resource with path /{server-source-baseDir}/domain/data/content/40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content migrated.
+INFO  [ServerMigrationTask#401]  Resource with path /{server-source-baseDir}/domain/data/content/88/96c992d1b9866945a5015b72f8d254d3d5c132/content migrated.
+INFO  [ServerMigrationTask#402]  Resource with path /{server-source-baseDir}/domain/data/content/ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content migrated.
+INFO  [ServerMigrationTask#403]  Resource with path /{server-source-baseDir}/domain/data/content/fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content migrated.
 ----
 
 Next, the migration tool scans the source server for domain configuration files and prints the results in the console.
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#312] (main) Retrieving source's domain configurations...
-INFO  [ServerMigrationTask#312] (main) /{server-source-baseDir}/domain/configuration/domain.xml
+INFO  [ServerMigrationTask#312]  Retrieving source's domain configurations...
+INFO  [ServerMigrationTask#312]  /{server-source-baseDir}/domain/configuration/domain.xml
 ----
 
 If you run the migration tool `non-interactive` mode, the JBoss Server Migration Tool migrates all listed domain configuration files.
@@ -57,10 +57,10 @@ Next, the migration tool scans the source server for host configurations files a
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#457] (main) Retrieving source's host configurations...
-INFO  [ServerMigrationTask#457] (main) /{server-source-baseDir}/domain/configuration/host-master.xml
-INFO  [ServerMigrationTask#457] (main) /{server-source-baseDir}/domain/configuration/host-slave.xml
-INFO  [ServerMigrationTask#457] (main) /{server-source-baseDir}/domain/configuration/host.xml
+INFO  [ServerMigrationTask#457] Retrieving source's host configurations...
+INFO  [ServerMigrationTask#457] /{server-source-baseDir}/domain/configuration/host-master.xml
+INFO  [ServerMigrationTask#457] /{server-source-baseDir}/domain/configuration/host-slave.xml
+INFO  [ServerMigrationTask#457] /{server-source-baseDir}/domain/configuration/host.xml
 ----
 
 If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool migrates all listed host configuration files.

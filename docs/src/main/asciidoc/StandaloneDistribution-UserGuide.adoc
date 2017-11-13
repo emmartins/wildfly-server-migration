@@ -81,9 +81,9 @@ Upon execution, the tool scans the specified source and target server base direc
 
 Retrieving servers...
 
-15:11:33,844 INFO [org.wildfly.migration.core.logger] (main) SOURCE server name: EAP, version: 6.4.0.GA.
+15:11:33,844 INFO [logger] SOURCE server name: EAP, version: 6.4.0.GA.
 
-15:11:33,859 INFO [org.wildfly.migration.core.logger] (main) TARGET server name: EAP, version: 7.0.0.GA.
+15:11:33,859 INFO [logger] TARGET server name: EAP, version: 7.0.0.GA.
 ----
 
 This is a fully automated process. The tool execution will fail if a server is not recognized or if the target server does not support migration from the specified source server.
@@ -189,7 +189,7 @@ The Summary Report is generated and printed in the migration console/logs, as it
 
 [source,options="nowrap"]
 ----
-08:04:57,434 INFO [org.jboss.migration.core.logger] (main)
+08:04:57,434 INFO [logger]
 ----------------------------------------------------------------------------------------------------------------------
 Task Summary
 ----------------------------------------------------------------------------------------------------------------------
