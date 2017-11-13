@@ -11,19 +11,19 @@ The outcome of the legacy *{subsystem-migrate-legacySubsystemName}* subsystem mi
 
 // sets value of console's "subsystem config migrated" line depending if config is domain or standalone
 ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
-:subsystem-migrate-console-body: INFO  [ServerMigrationTask#335] (main) Subsystem config /profile=default/subsystem={subsystem-migrate-legacySubsystemName} migrated.
+:subsystem-migrate-console-body: INFO  [ServerMigrationTask#335] Subsystem config /profile=default/subsystem={subsystem-migrate-legacySubsystemName} migrated.
 endif::[]
 
 ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
-:subsystem-migrate-console-body:  INFO  [ServerMigrationTask#335] (main) Subsystem config /subsystem={subsystem-migrate-legacySubsystemName} migrated.
+:subsystem-migrate-console-body:  INFO  [ServerMigrationTask#335] Subsystem config /subsystem={subsystem-migrate-legacySubsystemName} migrated.
 endif::[]
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#331] (main) Migrating subsystem {subsystem-migrate-legacySubsystemName} configurations...
+INFO  [ServerMigrationTask#331] Migrating subsystem {subsystem-migrate-legacySubsystemName} configurations...
 {subsystem-migrate-console-body}
-INFO  [ServerMigrationTask#336] (main) Extension {subsystem-migrate-legacyExtensionName} removed.
-INFO  [ServerMigrationTask#331] (main) Subsystem {subsystem-migrate-legacySubsystemName} configurations migrated.
+INFO  [ServerMigrationTask#336] Extension {subsystem-migrate-legacyExtensionName} removed.
+INFO  [ServerMigrationTask#331] Subsystem {subsystem-migrate-legacySubsystemName} configurations migrated.
 ----
 
 Any issues encountered during the migration are written to the log files and displayed in the migration console.

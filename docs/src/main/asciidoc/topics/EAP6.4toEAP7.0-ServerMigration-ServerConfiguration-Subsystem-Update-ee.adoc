@@ -46,11 +46,11 @@ The following is an example of the interaction that occurs when migrating a conf
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#22] (main) Default datasource not found.
+INFO  [ServerMigrationTask#22] Default datasource not found.
 0. ExampleDS
 1. Unconfigured data source, I want to enter the JNDI name...
 Please select Java EE's Default Datasource: (0): 0
-INFO  [ServerMigrationTask#22] (main) Java EE Default Datasource configured with JNDI name java:jboss/datasources/ExampleDS.
+INFO  [ServerMigrationTask#22] Java EE Default Datasource configured with JNDI name java:jboss/datasources/ExampleDS.
 
 Save this Java EE Default Datasource JNDI name and use it when migrating other config files?
 yes/no? y
