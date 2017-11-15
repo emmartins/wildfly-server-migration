@@ -1,0 +1,23 @@
+= Running in Non-Interactive Mode
+
+The _JBoss Server Migration Tool_ can be run in either `interactive` mode, meaning the user may be prompted for input, or `non-interactive` mode, meaning the input values are preconfigured and available to the tool without user input.
+
+To run the tool in `non-interactive` mode, provide the argument `--non-interactive`, or it's shorter version `-n`, when starting the tool.
+
+// conditional console depending of dist type
+ifeval::["{tool-distributionType}" == "standalone"]
+[source,options="nowrap",subs="attributes"]
+----
+$ ./jboss-server-migration.sh --source ../jboss-server-old --target ../jboss-server-new --non-interactive
+----
+endif::[]
+
+ifeval::["{tool-distributionType}" == "integrated"]
+[source,options="nowrap",subs="attributes"]
+----
+$ ./jboss-server-migration.sh --source ../jboss-server-old --non-interactive
+----
+endif::[]
+
+
+NOTE: `Non-interactive` mode predefined behavior is specific to each supported server migration and is described in more detail in the related sections of this document.
