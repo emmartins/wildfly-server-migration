@@ -1,4 +1,5 @@
 // setup of vars used by this and/or included docs
+:tool-distributionType: integrated
 :server-source-productName: JBoss EAP 6.4
 :server-source-name: EAP
 :server-source-version: 6.4.0.GA
@@ -93,24 +94,11 @@ Server migration starting...
 
 This is a fully automated process. The tool execution will fail if a server is not recognized or if the target server does not support migration from the specified source server.
 
-=== Running in Interactive Mode
+:leveloffset: +2
 
-The _JBoss Server Migration Tool_ can be run in either `interactive` mode, meaning the user may be prompted for input, or `non-interactive` mode, meaning the input values are preconfigured and available to the tool without user input.
+include::Tool-RunningInInteractiveMode.adoc[]
 
-You can explicitly set the mode by providing the following argument:
-
-* --interactive <true or false>
-
-Please note that this mode defaults to *true*, thus the tool is executed in `interactive` mode when this argument is not specified.
-
-To use predefined behaviors and run in `non-interactive` mode, you must specify `false` for this argument.
-
-[source,options="nowrap",subs="attributes"]
-----
-$ ./jboss-server-migration.sh --source ../jboss-server-old --interactive false
-----
-
-NOTE: `Non-interactive` mode predefined behavior is specific to each supported server migration and is described in more detail in the related sections of this document.
+:leveloffset: -2
 
 == Configuring the JBoss Server Migration Tool
 
