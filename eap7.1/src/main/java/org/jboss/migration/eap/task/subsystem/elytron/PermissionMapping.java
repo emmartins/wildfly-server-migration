@@ -27,10 +27,16 @@ import java.util.List;
 public class PermissionMapping {
     private List<String> principals;
     private List<Permission> permissions;
+    private Boolean matchAll;
 
     public PermissionMapping() {
         this.principals = new ArrayList<>();
         this.permissions = new ArrayList<>();
+    }
+
+    public PermissionMapping matchAll(boolean matchAll) {
+        this.matchAll = matchAll;
+        return this;
     }
 
     public PermissionMapping addPrincipal(String principal) {
@@ -45,6 +51,9 @@ public class PermissionMapping {
 
     public ModelNode toModelNode() {
         final ModelNode modelNode = new ModelNode();
+        if (matchAll != null) {
+            modelNode.get("match-all").set(matchAll);
+        }
         if (principals != null && !principals.isEmpty()) {
             final ModelNode principalsNode = modelNode.get("principals").setEmptyList();
             for (String principal : principals) {
