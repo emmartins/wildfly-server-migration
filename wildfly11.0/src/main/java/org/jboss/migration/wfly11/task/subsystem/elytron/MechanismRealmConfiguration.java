@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap.task.subsystem.elytron;
+package org.jboss.migration.wfly11.task.subsystem.elytron;
 
-import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.dmr.ModelNode;
 
 /**
  * @author emmartins
  */
-public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
-    public AddElytronSubsystem() {
-        super(ExtensionNames.ELYTRON, new AddElytronSubsystemConfig<>());
+public class MechanismRealmConfiguration {
+
+    private final String realmName;
+
+    public MechanismRealmConfiguration(String realmName) {
+        this.realmName = realmName;
+    }
+
+    public ModelNode toModelNode() {
+        final ModelNode modelNode = new ModelNode();
+        modelNode.get("realm-name").set(realmName);
+        return modelNode;
     }
 }

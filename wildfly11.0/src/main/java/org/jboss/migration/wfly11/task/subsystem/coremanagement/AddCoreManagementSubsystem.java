@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap.task.subsystem.elytron;
+package org.jboss.migration.wfly11.task.subsystem.coremanagement;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * @author emmartins
  */
-public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
-    public AddElytronSubsystem() {
-        super(ExtensionNames.ELYTRON, new AddElytronSubsystemConfig<>());
+public class AddCoreManagementSubsystem<S> extends AddSubsystemResources<S> {
+    public AddCoreManagementSubsystem() {
+        super(ExtensionNames.CORE_MANAGEMENT, SubsystemNames.CORE_MANAGEMENT);
     }
 }

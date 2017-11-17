@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap.task.subsystem.elytron;
+package org.jboss.migration.wfly11.task.subsystem.elytron;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;

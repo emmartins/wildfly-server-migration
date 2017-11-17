@@ -33,7 +33,7 @@
     <dependencies>   
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-eap7.1</artifactId>
+            <artifactId>jboss-server-migration-wildfly10.1</artifactId>
         </dependency>
     </dependencies>   
 
