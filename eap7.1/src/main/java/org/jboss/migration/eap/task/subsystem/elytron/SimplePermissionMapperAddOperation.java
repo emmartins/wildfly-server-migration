@@ -29,12 +29,18 @@ import java.util.List;
 public class SimplePermissionMapperAddOperation {
     private final PathAddress subsystemPathAddress;
     private final String simplePermissionMapper;
+    private String mappingMode;
     private List<PermissionMapping> permissionMappings;
 
     public SimplePermissionMapperAddOperation(PathAddress subsystemPathAddress, String simplePermissionMapper) {
         this.subsystemPathAddress = subsystemPathAddress;
         this.simplePermissionMapper = simplePermissionMapper;
         this.permissionMappings = new ArrayList<>();
+    }
+
+    public SimplePermissionMapperAddOperation mappingMode(String mappingMode) {
+        this.mappingMode = mappingMode;
+        return this;
     }
 
     public SimplePermissionMapperAddOperation addPermissionMapping(PermissionMapping permissionMapping) {
@@ -56,6 +62,9 @@ public class SimplePermissionMapperAddOperation {
              */
         final PathAddress pathAddress = subsystemPathAddress.append("simple-permission-mapper", simplePermissionMapper);
         final ModelNode operation = Util.createAddOperation(pathAddress);
+        if (mappingMode != null) {
+            operation.get("mapping-mode").set(mappingMode);
+        }
         if (permissionMappings != null && !permissionMappings.isEmpty()) {
             final ModelNode permissionMappingsNode = operation.get("permission-mappings").setEmptyList();
             for (PermissionMapping permissionMapping : permissionMappings) {
