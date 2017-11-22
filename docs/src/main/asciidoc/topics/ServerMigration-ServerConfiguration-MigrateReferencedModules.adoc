@@ -28,13 +28,6 @@ ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
 * A `vault` configuration
 endif::[]
 
-* A `security-realm` configuration, as plug-in(s) module
-* A `datasource` subsystem configuration, as datasource driver(s) module
-* An `ee` subsystem configuration, as a global module
-* A `naming` subsystem configuration, as an Object Factory module
-* A `messaging` subsystem configuration, as JMS Bridge module
-* A `vault` configuration
-
 The console logs a message noting the module ID for any module that is migrated, for example:
 
 // conditional console depending of config type
