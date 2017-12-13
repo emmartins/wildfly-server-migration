@@ -19,12 +19,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Singleton subsystem, if missing from the server config.
@@ -33,7 +33,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 public class AddSingletonSubsystemResource<S> extends AddSubsystemResourceSubtaskBuilder<S> {
 
     protected AddSingletonSubsystemResource() {
-        super(SubsystemNames.SINGLETON);
+        super(JBossSubsystemNames.SINGLETON);
     }
 
     private static final String DEFAULT_ATTR_NAME = "default";

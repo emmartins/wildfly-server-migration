@@ -17,7 +17,7 @@ package org.jboss.migration.wfly8.to.wfly11;
 
 import org.jboss.migration.wfly11.task.subsystem.undertow.AddHttpInvoker;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
@@ -29,7 +29,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpL
  */
 public class WildFly8ToWildFly11_0UpdateUndertowSubsystem<S> extends UpdateSubsystemResources<S> {
     public WildFly8ToWildFly11_0UpdateUndertowSubsystem() {
-        super(SubsystemNames.UNDERTOW,
+        super(JBossSubsystemNames.UNDERTOW,
                 new SetDefaultHttpListenerRedirectSocket<>(),
                 new AddHttpsListener<>(),
                 new EnableHttp2<>(),

@@ -17,13 +17,13 @@
 package org.jboss.migration.wfly10.config.task.subsystem.securitymanager;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class AddSecurityManagerSubsystem<S> extends AddSubsystemResources<S> {
     public AddSecurityManagerSubsystem() {
-        super(ExtensionNames.SECURITY_MANAGER, new AddSecurityManagerSubsystemResource<>());
+        super(JBossExtensionNames.SECURITY_MANAGER, new AddSecurityManagerSubsystemResource<>());
     }
 }

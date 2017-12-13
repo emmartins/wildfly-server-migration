@@ -26,8 +26,8 @@ import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 
 /**
  * A task which adds the jmx subsystem to host configs.
@@ -36,7 +36,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 public class AddJmxSubsystemToHosts<S> extends AddSubsystemResources<S> {
 
     public AddJmxSubsystemToHosts() {
-        super(ExtensionNames.JMX, new AddJMXSubsystemConfig<>());
+        super(JBossExtensionNames.JMX, new AddJMXSubsystemConfig<>());
     }
 
     public static class AddJMXSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
@@ -48,7 +48,7 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemResources<S> {
         private static final String JMX = "jmx";
 
         protected AddJMXSubsystemConfig() {
-            super(SubsystemNames.JMX);
+            super(JBossSubsystemNames.JMX);
         }
 
         @Override

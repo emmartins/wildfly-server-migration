@@ -25,9 +25,10 @@ import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSu
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly9.WildFlyServer9;
@@ -43,7 +44,8 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
         final ServerUpdate.Builders<WildFlyServer9> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedSubsystems<>())
+                        .subtask(new RemoveUnsupportedExtensions<>())
+                        .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new WildFly9ToEAP7_0UpdateUndertowSubsystem<>())
@@ -55,7 +57,8 @@ public class WildFly9ToEAP7_0ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedSubsystems<>())
+                                .subtask(new RemoveUnsupportedExtensions<>())
+                                .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new WildFly9ToEAP7_0UpdateUndertowSubsystem<>())

@@ -17,9 +17,12 @@ package org.jboss.migration.wfly11;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossExtensions;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigrations10;
+import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_0;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -29,9 +32,23 @@ import java.util.ServiceLoader;
  */
 public class WildFlyFullServer11_0 extends WildFlyServer10 {
 
+    public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
+            .extensions(WildFlyFullServer10_0.EXTENSIONS)
+            .extension(JBossExtensions.CORE_MANAGEMENT)
+            .extension(JBossExtensions.ELYTRON)
+            .build();
+
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(WildFlyFullServerMigrationProvider11_0.class));
 
     public WildFlyFullServer11_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, SERVER_MIGRATIONS);
+        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS, SERVER_MIGRATIONS);
+    }
+
+    protected WildFlyFullServer11_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, WildFlyServerMigrations10 serverMigrations) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS, serverMigrations);
+    }
+
+    protected WildFlyFullServer11_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, Extensions extensions, WildFlyServerMigrations10 serverMigrations) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment, extensions, serverMigrations);
     }
 }

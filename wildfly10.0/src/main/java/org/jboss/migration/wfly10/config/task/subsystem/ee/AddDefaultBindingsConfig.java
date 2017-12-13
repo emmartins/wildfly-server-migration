@@ -23,12 +23,12 @@ import org.jboss.migration.core.console.UserChoiceWithOtherOption;
 import org.jboss.migration.core.console.UserConfirmation;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +84,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
         final PathAddress pathAddress = subsystemPathAddress.append(pathElement("service", "default-bindings"));
         final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
         // add ee concurrency utils defaults if configured
-        ModelNode eeSubsystemConfig = subsystemResource.getParentResource().getSubsystemResourceConfiguration(SubsystemNames.EE);
+        ModelNode eeSubsystemConfig = subsystemResource.getParentResource().getSubsystemResourceConfiguration(JBossSubsystemNames.EE);
         if (eeSubsystemConfig != null) {
             if (eeSubsystemConfig.hasDefined("context-service", "default", "jndi-name")) {
                 final String jndiName = eeSubsystemConfig.get("context-service", "default", "jndi-name").asString();
@@ -116,7 +116,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
 
     private void setupDefaultJMSConnectionFactory(String defaultJmsConnectionFactoryJndiName, String defaultJmsConnectionFactoryName, final ModelNode addOp, SubsystemResource.Parent subsystemResources, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) {
         // if the subsystem config defines expected default resource then use it
-        final SubsystemResource resource = subsystemResources.getSubsystemResource(SubsystemNames.MESSAGING_ACTIVEMQ);
+        final SubsystemResource resource = subsystemResources.getSubsystemResource(JBossSubsystemNames.MESSAGING_ACTIVEMQ);
         if (resource == null) {
             return;
         }
@@ -224,7 +224,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
 
     private void setupDefaultDatasource(String defaultDataSourceJndiName, final String defaultDataSourceName, final ModelNode addOp, SubsystemResource.Parent subsystemResources, final TaskContext context, final TaskEnvironment taskEnvironment, final ServerMigrationTaskResult.Builder taskResultBuilder) {
         // if the subsystem config defines expected default resource then use it
-        final SubsystemResource resource = subsystemResources.getSubsystemResource(SubsystemNames.DATASOURCES);
+        final SubsystemResource resource = subsystemResources.getSubsystemResource(JBossSubsystemNames.DATASOURCES);
         if (resource == null) {
             return;
         }

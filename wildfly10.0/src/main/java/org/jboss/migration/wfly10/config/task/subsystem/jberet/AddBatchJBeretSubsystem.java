@@ -17,13 +17,13 @@
 package org.jboss.migration.wfly10.config.task.subsystem.jberet;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class AddBatchJBeretSubsystem<S> extends AddSubsystemResources<S> {
     public AddBatchJBeretSubsystem() {
-        super(ExtensionNames.BATCH_JBERET, new AddBatchJBeretSubsystemResource<>());
+        super(JBossExtensionNames.BATCH_JBERET, new AddBatchJBeretSubsystemResource<>());
     }
 }

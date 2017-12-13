@@ -19,11 +19,11 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Batch JBeret subsystem, if missing from the server config.
@@ -32,7 +32,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 public class AddBatchJBeretSubsystemResource<S> extends AddSubsystemResourceSubtaskBuilder<S> {
 
     protected AddBatchJBeretSubsystemResource() {
-        super(SubsystemNames.BATCH_JBERET);
+        super(JBossSubsystemNames.BATCH_JBERET);
     }
 
     private static final String DEFAULT_JOB_REPOSITORY_ATTR_NAME = "default-job-repository";

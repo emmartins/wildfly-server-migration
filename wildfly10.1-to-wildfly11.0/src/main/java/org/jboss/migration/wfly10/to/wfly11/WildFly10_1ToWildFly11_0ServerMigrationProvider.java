@@ -16,19 +16,20 @@
 
 package org.jboss.migration.wfly10.to.wfly11;
 
-import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
 import org.jboss.migration.wfly11.WildFlyFullServerMigrationProvider11_0;
+import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
+import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
+import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 
 /**
  * Server migration to WFLY 11.0, from WFLY 10.1.
@@ -41,7 +42,8 @@ public class WildFly10_1ToWildFly11_0ServerMigrationProvider implements WildFlyF
         final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedSubsystems<>())
+                        .subtask(new RemoveUnsupportedExtensions<>())
+                        .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new WildFly10_1ToWildFly11_0UpdateUndertowSubsystem<>())
@@ -51,7 +53,8 @@ public class WildFly10_1ToWildFly11_0ServerMigrationProvider implements WildFlyF
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedSubsystems<>())
+                                .subtask(new RemoveUnsupportedExtensions<>())
+                                .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new WildFly10_1ToWildFly11_0UpdateUndertowSubsystem<>())

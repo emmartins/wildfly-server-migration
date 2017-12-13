@@ -18,11 +18,11 @@ package org.jboss.migration.wfly10.config.task.subsystem.securitymanager;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 /**
  * A task which adds the default Security Manager subsystem, if missing from the server config.
@@ -31,7 +31,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 public class AddSecurityManagerSubsystemResource<S> extends AddSubsystemResourceSubtaskBuilder<S> {
 
     protected AddSecurityManagerSubsystemResource() {
-        super(SubsystemNames.SECURITY_MANAGER);
+        super(JBossSubsystemNames.SECURITY_MANAGER);
     }
 
     private static final String DEPLOYMENT_PERMISSIONS = "deployment-permissions";

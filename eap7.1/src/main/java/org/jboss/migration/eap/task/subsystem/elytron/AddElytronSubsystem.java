@@ -17,13 +17,13 @@
 package org.jboss.migration.eap.task.subsystem.elytron;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class AddElytronSubsystem<S> extends AddSubsystemResources<S> {
     public AddElytronSubsystem() {
-        super(ExtensionNames.ELYTRON, new AddElytronSubsystemConfig<>());
+        super(JBossExtensionNames.ELYTRON, new AddElytronSubsystemConfig<>());
     }
 }

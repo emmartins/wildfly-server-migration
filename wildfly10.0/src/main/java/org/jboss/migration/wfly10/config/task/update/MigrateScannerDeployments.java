@@ -34,7 +34,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,7 +63,7 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
         runBuilder(params -> context -> {
             final JBossServerConfiguration sourceConfiguration = params.getSource();
             final ManageableServerConfiguration targetConfiguration = params.getServerConfiguration();
-            for (SubsystemResource subsystemResource : targetConfiguration.findResources(SubsystemResource.class, SubsystemNames.DEPLOYMENT_SCANNER)) {
+            for (SubsystemResource subsystemResource : targetConfiguration.findResources(SubsystemResource.class, JBossSubsystemNames.DEPLOYMENT_SCANNER)) {
                 context.getLogger().debugf("Deployment-scanner found, analysing its configuration %s...", subsystemResource.getResourceAbsoluteName());
                 ModelNode subsystemConfig = subsystemResource.getResourceConfiguration();
                 if (subsystemConfig != null && subsystemConfig.hasDefined(SCANNER)) {

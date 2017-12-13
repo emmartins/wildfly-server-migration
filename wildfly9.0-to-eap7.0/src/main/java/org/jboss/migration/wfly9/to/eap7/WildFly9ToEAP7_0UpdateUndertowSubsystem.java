@@ -17,7 +17,7 @@
 package org.jboss.migration.wfly9.to.eap7;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
 
@@ -26,7 +26,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostR
  */
 public class WildFly9ToEAP7_0UpdateUndertowSubsystem<S> extends UpdateSubsystemResources<S> {
     public WildFly9ToEAP7_0UpdateUndertowSubsystem() {
-        super(SubsystemNames.UNDERTOW,
+        super(JBossSubsystemNames.UNDERTOW,
                 new SetDefaultHostResponseHeaderServer<>(),
                 new SetDefaultHostResponseHeaderXPoweredBy<>());
     }
