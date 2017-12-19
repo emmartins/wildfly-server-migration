@@ -31,12 +31,12 @@ public abstract class WildFlyServer10 extends JBossServer<WildFlyServer10> {
 
     protected final WildFlyServerMigrations10 serverMigrations;
 
-    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        this(migrationName, productInfo, baseDir, migrationEnvironment, null);
+    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, JBossServer.Extensions extensions) {
+        this(migrationName, productInfo, baseDir, migrationEnvironment, extensions, null);
     }
 
-    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment,  WildFlyServerMigrations10 serverMigrations) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment);
+    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, JBossServer.Extensions extensions, WildFlyServerMigrations10 serverMigrations) {
+        super(migrationName, productInfo, baseDir, migrationEnvironment, extensions);
         this.serverMigrations = serverMigrations;
     }
 

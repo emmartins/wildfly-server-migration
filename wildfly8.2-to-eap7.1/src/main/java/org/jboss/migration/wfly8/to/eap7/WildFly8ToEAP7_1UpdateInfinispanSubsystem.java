@@ -17,7 +17,7 @@
 package org.jboss.migration.wfly8.to.eap7;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
@@ -27,7 +27,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCach
  */
 public class WildFly8ToEAP7_1UpdateInfinispanSubsystem<S> extends UpdateSubsystemResources<S> {
     public WildFly8ToEAP7_1UpdateInfinispanSubsystem() {
-        super(SubsystemNames.INFINISPAN,
+        super(JBossSubsystemNames.INFINISPAN,
                 new AddServerCache<>(),
                 new FixHibernateCacheModuleName<>(),
                 new UpdateWebCache<>());

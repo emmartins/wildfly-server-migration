@@ -19,12 +19,12 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -75,7 +75,7 @@ public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemResourceSub
         final String undertowHttpListenerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_HTTP_LISTENER_NAME, DEFAULT_UNDERTOW_HTTP_LISTENER_NAME);
         final String undertowServerName = taskEnvironment.getPropertyAsString(EnvironmentProperties.UNDERTOW_SERVER_NAME, DEFAULT_UNDERTOW_SERVER_NAME);
         // ensure undertow's default http listener is configured
-        final SubsystemResource undertow = subsystemResource.getParentResource().getSubsystemResource(SubsystemNames.UNDERTOW);
+        final SubsystemResource undertow = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.UNDERTOW);
         if (undertow == null) {
             return ServerMigrationTaskResult.SKIPPED;
         }

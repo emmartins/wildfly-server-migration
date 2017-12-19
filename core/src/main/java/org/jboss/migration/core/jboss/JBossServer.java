@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An abstract JBoss {@link org.jboss.migration.core.Server} impl, which is usable only as migration source.
@@ -81,7 +82,9 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
 
     private final Modules modules;
 
-    public JBossServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
+    private final Extensions extensions;
+
+    public JBossServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, Extensions extensions) {
         super(migrationName, productInfo, baseDir, migrationEnvironment);
         // build server paths from env
         Path domainBaseDir = Paths.get(migrationEnvironment.getPropertyAsString(getFullEnvironmentPropertyName(EnvironmentProperties.PROPERTY_DOMAIN_BASE_DIR), "domain"));
@@ -147,6 +150,8 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         this.pathResolver.put("jboss.domain.temp.dir", domainBaseDir.resolve("tmp"));
 
         this.modules = new Modules(baseDir);
+
+        this.extensions = extensions;
     }
 
     protected String getFullEnvironmentPropertyName(String propertyName) {
@@ -284,6 +289,10 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         return modules;
     }
 
+    public Extensions getExtensions() {
+        return extensions;
+    }
+
     public class ValueExpressionResolver extends org.jboss.dmr.ValueExpressionResolver {
         @Override
         protected String resolvePart(String name) {
@@ -394,6 +403,63 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
                 return systemLayersBaseModuleDir;
             }
             return modulesDir.resolve(modulePath);
+        }
+    }
+
+    public static class Extensions {
+
+        private final Map<String, Extension> extensionMap;
+
+        protected Extensions(Builder builder) {
+            this.extensionMap = Collections.unmodifiableMap(builder.extensionMap);
+        }
+
+        public Collection<Extension> getExtensions() {
+            return extensionMap.values();
+        }
+
+        public Set<String> getExtensionModuleNames() {
+            return extensionMap.keySet();
+        }
+
+        public Extension getExtension(String moduleName) {
+            return extensionMap.get(moduleName);
+        }
+
+        public abstract static class Builder<T extends Builder<T>> {
+
+            private final Map<String, Extension> extensionMap = new HashMap<>();
+
+            protected abstract T getThis();
+
+            public T extension(Extension extension) {
+                this.extensionMap.put(extension.getModule(), extension);
+                return getThis();
+            }
+
+            public T extension(Extension.Builder extensionBuilder) {
+                return extension(extensionBuilder.build());
+            }
+
+            public T extensions(Extensions extensions) {
+                this.extensionMap.putAll(extensions.extensionMap);
+                return getThis();
+            }
+
+            public Extensions build() {
+                return new Extensions(this);
+            }
+        }
+
+        private static class DefaultBuilder extends Builder {
+            @Override
+            protected DefaultBuilder getThis() {
+                return this;
+            }
+        }
+
+        public static Builder builder() {
+            return new DefaultBuilder();
         }
     }
 }

@@ -16,8 +16,8 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.ee.AddConcurrencyUtilitiesDefaultConfig;
 import org.jboss.migration.wfly10.config.task.subsystem.ee.AddDefaultBindingsConfig;
 
@@ -26,7 +26,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.ee.AddDefaultBindingsCon
  */
 public class EAP6_4ToEAP7_0UpdateEESubsystem<S> extends UpdateSubsystemResources<S> {
     public EAP6_4ToEAP7_0UpdateEESubsystem() {
-        super(SubsystemNames.EE,
+        super(JBossSubsystemNames.EE,
                 new AddConcurrencyUtilitiesDefaultConfig<>(),
                 new AddDefaultBindingsConfig<>());
     }

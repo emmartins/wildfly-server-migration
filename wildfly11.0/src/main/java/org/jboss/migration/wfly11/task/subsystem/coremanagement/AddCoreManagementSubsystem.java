@@ -17,14 +17,14 @@
 package org.jboss.migration.wfly11.task.subsystem.coremanagement;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 
 /**
  * @author emmartins
  */
 public class AddCoreManagementSubsystem<S> extends AddSubsystemResources<S> {
     public AddCoreManagementSubsystem() {
-        super(ExtensionNames.CORE_MANAGEMENT, SubsystemNames.CORE_MANAGEMENT);
+        super(JBossExtensionNames.CORE_MANAGEMENT, JBossSubsystemNames.CORE_MANAGEMENT);
     }
 }

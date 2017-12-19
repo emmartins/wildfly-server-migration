@@ -31,8 +31,8 @@ import org.jboss.migration.wfly10.config.task.management.profile.AddProfileTaskB
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 
 import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
@@ -44,9 +44,9 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
     public AddLoadBalancerProfile() {
         super("load-balancer");
         subtasks.subtask(new AddLoadBalancerSocketBindingsGroup<>());
-        addSubsystemSubtasks(new AddSubsystemResources<>(ExtensionNames.IO, new AddIOSubsystemConfig<>()),
-                new AddSubsystemResources<>(ExtensionNames.UNDERTOW, new AddUndertowSubsystemConfig<>()),
-                new AddSubsystemResources<>(ExtensionNames.LOGGING, new AddLoggingSubsystemConfig<>()));
+        addSubsystemSubtasks(new AddSubsystemResources<>(JBossExtensionNames.IO, new AddIOSubsystemConfig<>()),
+                new AddSubsystemResources<>(JBossExtensionNames.UNDERTOW, new AddUndertowSubsystemConfig<>()),
+                new AddSubsystemResources<>(JBossExtensionNames.LOGGING, new AddLoggingSubsystemConfig<>()));
     }
 
     public static class AddLoadBalancerSocketBindingsGroup<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
@@ -96,7 +96,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
 
     public static class AddIOSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
         protected AddIOSubsystemConfig() {
-            super(SubsystemNames.IO);
+            super(JBossSubsystemNames.IO);
             skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         }
 
@@ -117,7 +117,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
 
     public static class AddUndertowSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
         protected AddUndertowSubsystemConfig() {
-            super(SubsystemNames.UNDERTOW);
+            super(JBossSubsystemNames.UNDERTOW);
             skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         }
 
@@ -180,7 +180,7 @@ public class AddLoadBalancerProfile<S> extends AddProfileTaskBuilder<S> {
 
     public static class AddLoggingSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
         protected AddLoggingSubsystemConfig() {
-            super(SubsystemNames.LOGGING);
+            super(JBossSubsystemNames.LOGGING);
             skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
         }
 

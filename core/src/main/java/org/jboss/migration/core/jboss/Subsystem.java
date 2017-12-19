@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10.config.task.subsystem;
+package org.jboss.migration.core.jboss;
 
 /**
  * @author emmartins
@@ -24,10 +24,10 @@ public class Subsystem {
     private final String namespaceWithoutVersion;
     private final Extension extension;
 
-    public Subsystem(String name, String namespaceWithoutVersion, Extension extension) {
-        this.name = name;
-        this.namespaceWithoutVersion = namespaceWithoutVersion;
-        this.extension = extension;
+    public Subsystem(Builder builder) {
+        this.name = builder.name;
+        this.namespaceWithoutVersion = builder.namespaceWithoutVersion == null ?("urn:jboss:domain:"+name) : builder.namespaceWithoutVersion;
+        this.extension = builder.extension;
     }
 
     public Extension getExtension() {
@@ -60,4 +60,42 @@ public class Subsystem {
         return name;
     }
 
+    public abstract static class Builder<T extends Builder<T>> {
+
+        private String name;
+        private String namespaceWithoutVersion;
+        private Extension extension;
+
+        protected abstract T getThis();
+
+        public T extension(Extension extension) {
+            this.extension = extension;
+            return getThis();
+        }
+
+        public T name(String name) {
+            this.name = name;
+            return getThis();
+        }
+
+        public T namespaceWithoutVersion(String namespaceWithoutVersion) {
+            this.namespaceWithoutVersion = namespaceWithoutVersion;
+            return getThis();
+        }
+
+        public Subsystem build() {
+            return new Subsystem(this);
+        }
+    }
+
+    private static class DefaultBuilder extends Builder<DefaultBuilder> {
+        @Override
+        protected DefaultBuilder getThis() {
+            return this;
+        }
+    }
+
+    public static Builder builder() {
+        return new DefaultBuilder();
+    }
 }

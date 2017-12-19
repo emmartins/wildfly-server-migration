@@ -16,6 +16,8 @@
 package org.jboss.migration.wfly8.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
@@ -34,7 +36,6 @@ import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -53,7 +54,8 @@ public class WildFly8ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
         final ServerUpdate.Builders<WildFlyServer8> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedSubsystems<>())
+                        .subtask(new RemoveUnsupportedExtensions<>())
+                        .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new WildFly8ToEAP7_1UpdateInfinispanSubsystem<>())
@@ -73,7 +75,8 @@ public class WildFly8ToEAP7_1ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedSubsystems<>())
+                                .subtask(new RemoveUnsupportedExtensions<>())
+                                .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new WildFly8ToEAP7_1UpdateInfinispanSubsystem<>())

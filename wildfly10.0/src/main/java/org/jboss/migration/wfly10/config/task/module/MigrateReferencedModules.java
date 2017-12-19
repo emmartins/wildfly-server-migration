@@ -24,6 +24,7 @@ import org.jboss.migration.core.jboss.JBossServer;
 public class MigrateReferencedModules<S extends JBossServer<S>> extends ConfigurationModulesMigrationTaskFactory<S> {
     public MigrateReferencedModules() {
         super(new ConfigurationModulesMigrationTaskFactory.Builder<S>()
+                .modulesFinder(new ExtensionModulesFinder())
                 .modulesFinder(new DatasourcesJdbcDriversModulesFinder())
                 .modulesFinder(new DefaultJsfImplModulesFinder())
                 .modulesFinder(new EEGlobalModulesFinder())

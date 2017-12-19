@@ -16,15 +16,15 @@
 
 package org.jboss.migration.wfly10.config.task.subsystem.jacorb;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.MigrateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class MigrateJacorbSubsystem<S> extends MigrateSubsystemResources<S> {
     public MigrateJacorbSubsystem() {
-        super(ExtensionNames.JACORB, SubsystemNames.JACORB);
+        super(JBossExtensionNames.JACORB, JBossSubsystemNames.JACORB);
     }
 }

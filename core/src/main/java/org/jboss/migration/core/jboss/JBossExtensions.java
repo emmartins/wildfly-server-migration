@@ -1,0 +1,254 @@
+/*
+ * Copyright 2017 Red Hat, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.jboss.migration.core.jboss;
+
+/**
+ * Prebuilt extensions supported by multiple jboss servers.
+ * @author emmartins
+ */
+public interface JBossExtensions {
+
+    Extension BATCH = Extension.builder()
+            .module(JBossExtensionNames.BATCH)
+            .subsystem(JBossSubsystemNames.BATCH)
+            .build();
+
+    Extension BATCH_JBERET = Extension.builder()
+            .module(JBossExtensionNames.BATCH_JBERET)
+            .subsystem(JBossSubsystemNames.BATCH_JBERET)
+            .build();
+
+    Extension BEAN_VALIDATION = Extension.builder()
+            .module(JBossExtensionNames.BEAN_VALIDATION)
+            .subsystem(JBossSubsystemNames.BEAN_VALIDATION)
+            .build();
+
+    Extension CMP = Extension.builder()
+            .module(JBossExtensionNames.CMP)
+            .subsystem(JBossSubsystemNames.CMP)
+            .build();
+
+    Extension CONFIGADMIN = Extension.builder()
+            .module(JBossExtensionNames.CONFIGADMIN)
+            .subsystem(JBossSubsystemNames.CONFIGADMIN)
+            .build();
+
+    Extension CONNECTOR = Extension.builder()
+            .module(JBossExtensionNames.CONNECTOR)
+            .subsystem(JBossSubsystemNames.DATASOURCES)
+            .subsystem(JBossSubsystemNames.JCA)
+            .subsystem(JBossSubsystemNames.RESOURCE_ADAPTERS)
+            .build();
+
+    Extension CORE_MANAGEMENT = Extension.builder()
+            .module(JBossExtensionNames.CORE_MANAGEMENT)
+            .subsystem(JBossSubsystemNames.CORE_MANAGEMENT)
+            .build();
+
+    Extension DEPLOYMENT_SCANNER = Extension.builder()
+            .module(JBossExtensionNames.DEPLOYMENT_SCANNER)
+            .subsystem(JBossSubsystemNames.DEPLOYMENT_SCANNER)
+            .build();
+
+    Extension EE = Extension.builder()
+            .module(JBossExtensionNames.EE)
+            .subsystem(JBossSubsystemNames.EE)
+            .build();
+
+    Extension EJB3 = Extension.builder()
+            .module(JBossExtensionNames.EJB3)
+            .subsystem(JBossSubsystemNames.EJB3)
+            .build();
+
+    Extension ELYTRON = Extension.builder()
+            .module(JBossExtensionNames.ELYTRON)
+            .subsystem(JBossSubsystemNames.ELYTRON)
+            .build();
+
+    Extension IIOP_OPENJDK = Extension.builder()
+            .module(JBossExtensionNames.IIOP_OPENJDK)
+            .subsystem(JBossSubsystemNames.IIOP_OPENJDK)
+            .build();
+
+    Extension INFINISPAN = Extension.builder()
+            .module(JBossExtensionNames.INFINISPAN)
+            .subsystem(JBossSubsystemNames.INFINISPAN)
+            .build();
+
+    Extension IO = Extension.builder()
+            .module(JBossExtensionNames.IO)
+            .subsystem(JBossSubsystemNames.IO)
+            .build();
+
+    Extension JACORB = Extension.builder()
+            .module(JBossExtensionNames.JACORB)
+            .subsystem(JBossSubsystemNames.JACORB)
+            .build();
+
+    Extension JAXR = Extension.builder()
+            .module(JBossExtensionNames.JAXR)
+            .subsystem(JBossSubsystemNames.JAXR)
+            .build();
+
+    Extension JAXRS = Extension.builder()
+            .module(JBossExtensionNames.JAXRS)
+            .subsystem(JBossSubsystemNames.JAXRS)
+            .build();
+
+    Extension JDR = Extension.builder()
+            .module(JBossExtensionNames.JDR)
+            .subsystem(JBossSubsystemNames.JDR)
+            .build();
+
+    Extension JGROUPS = Extension.builder()
+            .module(JBossExtensionNames.JGROUPS)
+            .subsystem(JBossSubsystemNames.JGROUPS)
+            .build();
+
+    Extension JMX = Extension.builder()
+            .module(JBossExtensionNames.JMX)
+            .subsystem(JBossSubsystemNames.JMX)
+            .build();
+
+    Extension JPA = Extension.builder()
+            .module(JBossExtensionNames.JPA)
+            .subsystem(JBossSubsystemNames.JPA)
+            .build();
+
+    Extension JSF = Extension.builder()
+            .module(JBossExtensionNames.JSF)
+            .subsystem(JBossSubsystemNames.JSF)
+            .build();
+
+    Extension JSR77 =Extension.builder()
+            .module(JBossExtensionNames.JSR77)
+            .subsystem(JBossSubsystemNames.JSR77)
+            .build();
+
+    Extension LOGGING = Extension.builder()
+            .module(JBossExtensionNames.LOGGING)
+            .subsystem(JBossSubsystemNames.LOGGING)
+            .build();
+
+    Extension MAIL = Extension.builder()
+            .module(JBossExtensionNames.MAIL)
+            .subsystem(JBossSubsystemNames.MAIL)
+            .build();
+
+    Extension MESSAGING = Extension.builder()
+            .module(JBossExtensionNames.MESSAGING)
+            .subsystem(JBossSubsystemNames.MESSAGING)
+            .build();
+
+    Extension MESSAGING_ACTIVEMQ = Extension.builder()
+            .module(JBossExtensionNames.MESSAGING_ACTIVEMQ)
+            .subsystem(JBossSubsystemNames.MESSAGING_ACTIVEMQ)
+            .build();
+
+    Extension MODCLUSTER = Extension.builder()
+            .module(JBossExtensionNames.MODCLUSTER)
+            .subsystem(JBossSubsystemNames.MODCLUSTER)
+            .build();
+
+    Extension NAMING = Extension.builder()
+            .module(JBossExtensionNames.NAMING)
+            .subsystem(JBossSubsystemNames.NAMING)
+            .build();
+
+    Extension OSGI = Extension.builder()
+            .module(JBossExtensionNames.OSGI)
+            .subsystem(JBossSubsystemNames.OSGI)
+            .build();
+
+    Extension POJO = Extension.builder()
+            .module(JBossExtensionNames.POJO)
+            .subsystem(JBossSubsystemNames.POJO)
+            .build();
+
+    Extension REQUEST_CONTROLLER = Extension.builder()
+            .module(JBossExtensionNames.REQUEST_CONTROLLER)
+            .subsystem(JBossSubsystemNames.REQUEST_CONTROLLER)
+            .build();
+
+    Extension REMOTING = Extension.builder()
+            .module(JBossExtensionNames.REMOTING)
+            .subsystem(JBossSubsystemNames.REMOTING)
+            .build();
+
+    Extension SAR = Extension.builder()
+            .module(JBossExtensionNames.SAR)
+            .subsystem(JBossSubsystemNames.SAR)
+            .build();
+
+    Extension SECURITY = Extension.builder()
+            .module(JBossExtensionNames.SECURITY)
+            .subsystem(JBossSubsystemNames.SECURITY)
+            .build();
+
+    Extension SECURITY_MANAGER = Extension.builder()
+            .module(JBossExtensionNames.SECURITY_MANAGER)
+            .subsystem(JBossSubsystemNames.SECURITY_MANAGER)
+            .build();
+
+    Extension SINGLETON = Extension.builder()
+            .module(JBossExtensionNames.SINGLETON)
+            .subsystem(JBossSubsystemNames.SINGLETON)
+            .build();
+
+    Extension TRANSACTIONS = Extension.builder()
+            .module(JBossExtensionNames.TRANSACTIONS)
+            .subsystem(JBossSubsystemNames.TRANSACTIONS)
+            .build();
+
+    Extension THREADS = Extension.builder()
+            .module(JBossExtensionNames.THREADS)
+            .subsystem(JBossSubsystemNames.THREADS)
+            .build();
+
+    Extension UNDERTOW = Extension.builder()
+            .module(JBossExtensionNames.UNDERTOW)
+            .subsystem(JBossSubsystemNames.UNDERTOW)
+            .build();
+
+    Extension WEB = Extension.builder()
+            .module(JBossExtensionNames.WEB)
+            .subsystem(JBossSubsystemNames.WEB)
+            .build();
+
+    Extension WEBSERVICES = Extension.builder()
+            .module(JBossExtensionNames.WEBSERVICES)
+            .subsystem(JBossSubsystemNames.WEBSERVICES)
+            .build();
+
+    Extension WELD = Extension.builder()
+            .module(JBossExtensionNames.WELD)
+            .subsystem(JBossSubsystemNames.WELD)
+            .build();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

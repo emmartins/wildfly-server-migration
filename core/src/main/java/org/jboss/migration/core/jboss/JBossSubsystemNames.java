@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10.config.task.subsystem;
+package org.jboss.migration.core.jboss;
 
 /**
  * The names of supported subsystems.
  * @author emmartins
  */
-public interface SubsystemNames {
+public interface JBossSubsystemNames {
 
+    String BATCH = "batch";
     String BATCH_JBERET = "batch-jberet";
     String BEAN_VALIDATION = "bean-validation";
+    String CMP = "core-management";
+    String CONFIGADMIN = "configadmin";
     String CORE_MANAGEMENT = "core-management";
     String DATASOURCES = "datasources";
     String DEPLOYMENT_SCANNER = "deployment-scanner";
@@ -33,6 +36,7 @@ public interface SubsystemNames {
     String INFINISPAN = "infinispan";
     String IO = "io";
     String JACORB = "jacorb";
+    String JAXR = "jaxr";
     String JAXRS = "jaxrs";
     String JCA = "jca";
     String JDR = "jdr";
@@ -47,6 +51,7 @@ public interface SubsystemNames {
     String MESSAGING_ACTIVEMQ = "messaging-activemq";
     String MODCLUSTER = "modcluster";
     String NAMING = "naming";
+    String OSGI = "osgi";
     String POJO = "pojo";
     String REMOTING = "remoting";
     String REQUEST_CONTROLLER = "request-controller";
@@ -55,6 +60,7 @@ public interface SubsystemNames {
     String SECURITY = "security";
     String SECURITY_MANAGER = "security-manager";
     String SINGLETON = "singleton";
+    String THREADS = "threads";
     String TRANSACTIONS = "transactions";
     String UNDERTOW = "undertow";
     String WEB = "web";

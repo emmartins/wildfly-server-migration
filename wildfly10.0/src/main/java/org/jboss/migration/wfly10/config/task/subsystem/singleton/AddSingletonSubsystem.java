@@ -17,13 +17,13 @@
 package org.jboss.migration.wfly10.config.task.subsystem.singleton;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class AddSingletonSubsystem<S> extends AddSubsystemResources<S> {
     public AddSingletonSubsystem() {
-        super(ExtensionNames.SINGLETON, new AddSingletonSubsystemResource<>());
+        super(JBossExtensionNames.SINGLETON, new AddSingletonSubsystemResource<>());
     }
 }

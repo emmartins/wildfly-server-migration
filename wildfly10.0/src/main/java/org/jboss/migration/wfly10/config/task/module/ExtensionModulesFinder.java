@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc.
+ * Copyright 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
-import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
 
@@ -24,24 +23,24 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 
 /**
- * Finds modules referenced by Datasources subsystem configs, as source of JDBC driver.
+ * Finds modules referenced by Extensions.
  * @author emmartins
  */
-public class DatasourcesJdbcDriversModulesFinder implements ConfigurationModulesMigrationTaskFactory.ModulesFinder {
+public class ExtensionModulesFinder implements ConfigurationModulesMigrationTaskFactory.ModulesFinder {
     @Override
     public String getElementLocalName() {
-        return "driver";
+        return "extension";
     }
 
     @Override
     public void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
         final String namespaceURI = reader.getNamespaceURI();
-        if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ JBossSubsystemNames.DATASOURCES)) {
+        if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:")) {
             return;
         }
         final String moduleId = reader.getAttributeValue(null, "module");
         if (moduleId != null) {
-            moduleMigrator.migrateModule(moduleId, "Referenced as the source of a datasource JDBC driver", context);
+            moduleMigrator.migrateModule(moduleId, "Required by Extension", context);
         }
     }
 }

@@ -16,15 +16,15 @@
 
 package org.jboss.migration.wfly10.config.task.subsystem.messaging;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.MigrateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class MigrateMessagingSubsystem<S> extends MigrateSubsystemResources<S> {
     public MigrateMessagingSubsystem() {
-        super(ExtensionNames.MESSAGING, SubsystemNames.MESSAGING);
+        super(JBossExtensionNames.MESSAGING, JBossSubsystemNames.MESSAGING);
     }
 }

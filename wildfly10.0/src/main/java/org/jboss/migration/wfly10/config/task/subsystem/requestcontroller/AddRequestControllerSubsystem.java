@@ -16,15 +16,15 @@
 
 package org.jboss.migration.wfly10.config.task.subsystem.requestcontroller;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.ExtensionNames;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 
 /**
  * @author emmartins
  */
 public class AddRequestControllerSubsystem<S> extends AddSubsystemResources<S> {
     public AddRequestControllerSubsystem() {
-        super(ExtensionNames.REQUEST_CONTROLLER, SubsystemNames.REQUEST_CONTROLLER);
+        super(JBossExtensionNames.REQUEST_CONTROLLER, JBossSubsystemNames.REQUEST_CONTROLLER);
     }
 }

@@ -25,7 +25,7 @@ import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
@@ -36,7 +36,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REM
 public class RemoveConsoleHandlerFromLoggingSubsystem<S> extends UpdateSubsystemResources<S> {
 
     public RemoveConsoleHandlerFromLoggingSubsystem() {
-        super(SubsystemNames.LOGGING,
+        super(JBossSubsystemNames.LOGGING,
                 new SubtaskBuilder<>());
     }
 

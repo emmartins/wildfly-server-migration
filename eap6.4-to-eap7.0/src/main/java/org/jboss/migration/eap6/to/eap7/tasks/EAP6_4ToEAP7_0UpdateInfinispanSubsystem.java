@@ -16,8 +16,8 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddEjbCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
@@ -27,7 +27,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateC
  */
 public class EAP6_4ToEAP7_0UpdateInfinispanSubsystem<S> extends UpdateSubsystemResources<S> {
     public EAP6_4ToEAP7_0UpdateInfinispanSubsystem() {
-        super(SubsystemNames.INFINISPAN,
+        super(JBossSubsystemNames.INFINISPAN,
                 new AddServerCache<>(),
                 new AddEjbCache<>(),
                 new FixHibernateCacheModuleName<>());

@@ -27,7 +27,7 @@ import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguratio
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 
 import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
@@ -37,7 +37,7 @@ import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefau
 public class AddElytronSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {
 
     protected AddElytronSubsystemConfig() {
-        super(SubsystemNames.ELYTRON);
+        super(JBossSubsystemNames.ELYTRON);
         skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
     }
 

@@ -16,10 +16,10 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.jboss.ModuleIdentifier;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class EEGlobalModulesFinder implements ConfigurationModulesMigrationTaskF
     @Override
     public void processElement(XMLStreamReader reader, ModulesMigrationTask.ModuleMigrator moduleMigrator, TaskContext context) throws IOException {
         final String namespaceURI = reader.getNamespaceURI();
-        if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ SubsystemNames.EE)) {
+        if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ JBossSubsystemNames.EE)) {
             return;
         }
         final String name = reader.getAttributeValue(null, "name");

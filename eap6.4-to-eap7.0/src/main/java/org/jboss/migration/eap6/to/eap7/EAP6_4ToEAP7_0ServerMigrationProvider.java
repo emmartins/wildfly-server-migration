@@ -39,9 +39,10 @@ import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
-import org.jboss.migration.wfly10.config.task.update.RemoveAllUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 
@@ -56,7 +57,8 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
         final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
-                        .subtask(new RemoveAllUnsupportedSubsystems<>())
+                        .subtask(new RemoveUnsupportedExtensions<>())
+                        .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new MigrateJacorbSubsystem<>())
@@ -79,7 +81,8 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
-                                .subtask(new RemoveAllUnsupportedSubsystems<>())
+                                .subtask(new RemoveUnsupportedExtensions<>())
+                                .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new MigrateJacorbSubsystem<>())

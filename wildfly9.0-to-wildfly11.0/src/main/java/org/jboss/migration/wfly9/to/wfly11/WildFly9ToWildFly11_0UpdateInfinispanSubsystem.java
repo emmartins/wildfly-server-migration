@@ -16,7 +16,7 @@
 package org.jboss.migration.wfly9.to.wfly11;
 
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
 
 /**
@@ -24,7 +24,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCach
  */
 public class WildFly9ToWildFly11_0UpdateInfinispanSubsystem<S> extends UpdateSubsystemResources<S> {
     public WildFly9ToWildFly11_0UpdateInfinispanSubsystem() {
-        super(SubsystemNames.INFINISPAN,
+        super(JBossSubsystemNames.INFINISPAN,
                 new UpdateWebCache<>());
     }
 }

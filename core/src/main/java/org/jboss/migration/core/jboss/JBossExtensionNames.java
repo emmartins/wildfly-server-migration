@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.migration.wfly10.config.task.subsystem;
+package org.jboss.migration.core.jboss;
 
 /**
- * The names of WildFly 10 extensions.
+ * Names of JBoss Server's extensions.
  * @author emmartins
  */
-public interface ExtensionNames {
-
+public interface JBossExtensionNames {
+    String BATCH = "org.wildfly.extension.batch";
     String BATCH_JBERET = "org.wildfly.extension.batch.jberet";
     String BEAN_VALIDATION = "org.wildfly.extension.bean-validation";
+    String CMP = "org.jboss.as.cmp";
+    String CONFIGADMIN = "org.jboss.as.configadmin";
     String CONNECTOR = "org.jboss.as.connector";
     String CORE_MANAGEMENT = "org.wildfly.extension.core-management";
     String DEPLOYMENT_SCANNER = "org.jboss.as.deployment-scanner";
@@ -33,6 +35,7 @@ public interface ExtensionNames {
     String INFINISPAN = "org.jboss.as.clustering.infinispan";
     String IO = "org.wildfly.extension.io";
     String JACORB = "org.jboss.as.jacorb";
+    String JAXR = "org.jboss.as.jaxr";
     String JAXRS = "org.jboss.as.jaxrs";
     String JDR = "org.jboss.as.jdr";
     String JGROUPS = "org.jboss.as.clustering.jgroups";
@@ -46,6 +49,7 @@ public interface ExtensionNames {
     String MESSAGING_ACTIVEMQ = "org.wildfly.extension.messaging-activemq";
     String MODCLUSTER = "org.jboss.as.modcluster";
     String NAMING = "org.jboss.as.naming";
+    String OSGI = "org.jboss.as.osgi";
     String POJO = "org.jboss.as.pojo";
     String REMOTING = "org.jboss.as.remoting";
     String REQUEST_CONTROLLER = "org.wildfly.extension.request-controller";
@@ -53,10 +57,10 @@ public interface ExtensionNames {
     String SECURITY = "org.jboss.as.security";
     String SECURITY_MANAGER = "org.wildfly.extension.security.manager";
     String SINGLETON = "org.wildfly.extension.clustering.singleton";
+    String THREADS = "org.jboss.as.threads";
     String TRANSACTIONS = "org.jboss.as.transactions";
     String UNDERTOW = "org.wildfly.extension.undertow";
     String WEB = "org.jboss.as.web";
     String WEBSERVICES = "org.jboss.as.webservices";
     String WELD = "org.jboss.as.weld";
-
 }
