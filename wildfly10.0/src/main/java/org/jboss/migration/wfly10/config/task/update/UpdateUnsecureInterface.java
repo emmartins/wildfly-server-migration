@@ -43,9 +43,13 @@ public class UpdateUnsecureInterface<S> extends ManageableServerConfigurationCom
     public UpdateUnsecureInterface() {
         name(TASK_NAME);
         skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Unsecure interface update task starting..."));
+        beforeRun(context -> context.getLogger().debugf("Updating interface %s...", INTERFACE_NAME));
         subtasks(InterfaceResource.class, INTERFACE_NAME, ManageableResourceCompositeSubtasks.of(new SetUnsecureInterfaceInetAddress<>()));
-        afterRun(context -> context.getLogger().debugf("Unsecure interface update task done."));
+        afterRun(context -> {
+            if (context.hasSucessfulSubtasks()) {
+                context.getLogger().infof("Interface %s updated.", INTERFACE_NAME);
+            }
+        });
     }
 
 
@@ -73,7 +77,7 @@ public class UpdateUnsecureInterface<S> extends ManageableServerConfigurationCom
                 writeAttrOp.get(NAME).set(INET_ADDRESS);
                 writeAttrOp.get(VALUE).set(valueExpression);
                 resource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Interface %s inet address value set as %s.", INTERFACE_NAME, valueExpression.getExpressionString());
+                context.getLogger().debugf("Interface %s inet address value set as %s.", INTERFACE_NAME, valueExpression.getExpressionString());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

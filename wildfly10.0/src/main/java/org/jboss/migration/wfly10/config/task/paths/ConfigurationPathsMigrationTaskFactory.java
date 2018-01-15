@@ -39,9 +39,15 @@ public class ConfigurationPathsMigrationTaskFactory<S extends JBossServer<S>> im
     public ServerMigrationTask getTask(final JBossServerConfiguration<S> sourceConfiguration, final JBossServerConfiguration targetConfiguration) {
         return new SimpleComponentTask.Builder()
                 .name(new ServerMigrationTaskName.Builder("paths.migrate-paths-requested-by-configuration").addAttribute("path", targetConfiguration.getPath().toString()).build())
-                .beforeRun(context -> context.getLogger().debugf("Migrating paths requested by configuration..."))
+                .beforeRun(context -> context.getLogger().debugf("Migrating referenced paths..."))
                 .runnable(runnableBuilder.build(sourceConfiguration, targetConfiguration))
-                .afterRun(context -> context.getLogger().debugf("Migration of paths requested by configuration complete."))
+                .afterRun(context -> {
+                    if (context.hasSucessfulSubtasks()) {
+                        context.getLogger().infof("Referenced paths migrated.");
+                    } else {
+                        context.getLogger().debugf("No referenced paths found to migrate.");
+                    }
+                })
                 .build();
     }
 }

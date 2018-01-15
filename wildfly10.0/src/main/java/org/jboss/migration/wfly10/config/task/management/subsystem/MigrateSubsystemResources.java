@@ -37,15 +37,13 @@ public class MigrateSubsystemResources<S> extends ManageableResourcesCompositeTa
         final ServerMigrationTaskName taskName = new ServerMigrationTaskName.Builder("subsystem."+subtask.getSubsystem()+".migrate").build();
         name(taskName);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Migrating subsystem %s configuration(s)...", subtask.getSubsystem()));
+        beforeRun(context -> context.getLogger().debugf("Migrating subsystem %s...", subtask.getSubsystem()));
         subtasks(new ManageableResourcesCompositeSubtasks.Builder<S, ManageableResource>()
                 .subtask(SubsystemResource.class, subtask.getSubsystem(), subtask.nameBuilder(parameters -> new ServerMigrationTaskName.Builder(taskName.getName()+".migrate-config").addAttribute("name", parameters.getResource().getResourceAbsoluteName()).build()))
                 .subtask(new RemoveExtensionTaskBuilder<S>(extensionModule).name(new ServerMigrationTaskName.Builder(taskName.getName()+".remove-extension").addAttribute("module", extensionModule).build())));
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
-                context.getLogger().infof("Subsystem %s configuration(s) migrated.", subtask.getSubsystem());
-            } else {
-                context.getLogger().infof("No subsystem %s configuration(s) migrated.", subtask.getSubsystem());
+                context.getLogger().infof("Subsystem %s migrated.", subtask.getSubsystem());
             }
         });
     }

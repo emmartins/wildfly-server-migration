@@ -69,7 +69,7 @@ public class AddHttpConnectorIfMissing<S> extends UpdateSubsystemResourceSubtask
             httpRemotingConnectorAddOp.get(CONNECTOR_REF).set(connectorRefName);
             httpRemotingConnectorAddOp.get(SECURITY_REALM).set(securityRealmName);
             serverConfiguration.executeManagementOperation(httpRemotingConnectorAddOp);
-            taskContext.getLogger().infof("Http connector %s added to Remoting subsystem configuration.", httpConnectorName);
+            taskContext.getLogger().debugf("Http connector %s added to Remoting subsystem configuration.", httpConnectorName);
             return ServerMigrationTaskResult.SUCCESS;
         } else {
             return ServerMigrationTaskResult.SKIPPED;

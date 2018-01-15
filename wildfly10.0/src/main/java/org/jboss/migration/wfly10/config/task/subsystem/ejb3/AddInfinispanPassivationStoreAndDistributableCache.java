@@ -83,7 +83,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
                 final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(FILE_PASSIVATION_STORE, FILE_PASSIVATION_STORE_NAME));
                 final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
                 configurationManagement.executeManagementOperation(filePassivationStoreRemoveperation);
-                context.getLogger().infof("Legacy file passivation store removed from EJB3 subsystem configuration.");
+                context.getLogger().debugf("Legacy file passivation store removed from EJB3 subsystem configuration.");
                 legacyFilePassivationStoreRemoved = true;
             }
             // remove cluster-passivation-store infinispan
@@ -91,7 +91,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
                 final PathAddress filePassivationStorePathAddress =  subsystemPathAddress.append(pathElement(CLUSTER_PASSIVATION_STORE, PASSIVATION_STORE_NAME));
                 final ModelNode filePassivationStoreRemoveperation = Util.createRemoveOperation(filePassivationStorePathAddress);
                 configurationManagement.executeManagementOperation(filePassivationStoreRemoveperation);
-                context.getLogger().infof("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
+                context.getLogger().debugf("Legacy 'clustered' passivation store removed from EJB3 subsystem configuration.");
                 legacyClusteredPassivationStoreRemoved = true;
             }
             // add default wfly 10 / eap 7 infinispan passivation store
@@ -101,7 +101,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
             passivationStoreAddOperation.get(MAX_SIZE_ATTR_NAME).set(MAX_SIZE_ATTR_VALUE);
             configurationManagement.executeManagementOperation(passivationStoreAddOperation);
             configUpdated = true;
-            context.getLogger().infof("Infinispan passivation store added to EJB3 subsystem configuration.");
+            context.getLogger().debugf("Infinispan passivation store added to EJB3 subsystem configuration.");
             infinispanPassivationStoreAdded = true;
         }
         if (!config.hasDefined(CACHE, CACHE_NAME_DISTRIBUTABLE)) {
@@ -110,7 +110,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
                 final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_PASSIVATING));
                 final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
                 configurationManagement.executeManagementOperation(cacheRemoveOperation);
-                context.getLogger().infof("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
+                context.getLogger().debugf("Legacy 'passivating' cache removed from EJB3 subsystem configuration.");
                 legacyPassivatingCacheRemoved = true;
             }
             // remove legacy clustered cache
@@ -118,7 +118,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
                 final PathAddress cachePathAddress =  subsystemPathAddress.append(pathElement(CACHE, CACHE_NAME_CLUSTERED));
                 final ModelNode cacheRemoveOperation = Util.createRemoveOperation(cachePathAddress);
                 configurationManagement.executeManagementOperation(cacheRemoveOperation);
-                context.getLogger().infof("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
+                context.getLogger().debugf("Legacy 'clustered' cache removed from EJB3 subsystem configuration.");
                 legacyClusteredCacheRemoved = true;
             }
             // add wfly 10 / eap 7 default distributable cache
@@ -130,7 +130,7 @@ public class AddInfinispanPassivationStoreAndDistributableCache<S> extends Updat
             }
             configurationManagement.executeManagementOperation(cacheAddOperation);
             configUpdated = true;
-            context.getLogger().infof("Distributable cache added to EJB3 subsystem configuration.");
+            context.getLogger().debugf("Distributable cache added to EJB3 subsystem configuration.");
             distributableCacheAdded = true;
         }
         if (configUpdated) {

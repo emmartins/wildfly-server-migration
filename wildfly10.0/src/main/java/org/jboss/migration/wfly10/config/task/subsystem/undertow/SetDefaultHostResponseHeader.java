@@ -111,7 +111,7 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubt
             final ModelNode op = Util.createAddOperation(filterRefPathAddress);
             subsystemResource.getServerConfiguration().executeManagementOperation(op);
         }
-        context.getLogger().infof("Response header '%s' set as '%s: %s' in Undertow's config %s", filterName, headerName, headerValue, configPathAddress.toCLIStyleString());
+        context.getLogger().debugf("Response header '%s' set as '%s: %s' in Undertow's config %s", filterName, headerName, headerValue, configPathAddress.toCLIStyleString());
         return new ServerMigrationTaskResult.Builder()
                 .success()
                 .addAttribute(HEADER_NAME, headerName)

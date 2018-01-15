@@ -63,7 +63,6 @@ public class ModulesMigrationTask implements ServerMigrationTask {
         if (taskEnvironment.isSkippedByEnvironment()) {
             return ServerMigrationTaskResult.SKIPPED;
         }
-        context.getLogger().debugf("Migrating modules requested by %s...", requestedBy);
         final ModuleMigrator moduleMigrator = new ModuleMigrator(source, target, context.getMigrationEnvironment());
         migrateModules(moduleMigrator, context);
         if (context.hasSucessfulSubtasks()) {
@@ -75,7 +74,14 @@ public class ModulesMigrationTask implements ServerMigrationTask {
     }
 
     protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
+        context.getConsoleWrapper().println();
+        context.getLogger().infof("--- Migrating modules requested by environment...");
+        context.getConsoleWrapper().println();
         final List<String> includedModules = context.getMigrationEnvironment().getPropertyAsList(ENVIRONMENT_PROPERTY_INCLUDES, Collections.emptyList());
+        if (includedModules.isEmpty()) {
+            context.getLogger().infof("No modules to migrate.", requestedBy);
+            return;
+        }
         for (String module : includedModules) {
             moduleMigrator.migrateModule(module, "requested by environment", context);
         }

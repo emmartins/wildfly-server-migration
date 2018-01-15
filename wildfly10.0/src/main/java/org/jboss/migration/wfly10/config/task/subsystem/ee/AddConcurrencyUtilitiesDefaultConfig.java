@@ -70,7 +70,7 @@ public class AddConcurrencyUtilitiesDefaultConfig<S> extends UpdateSubsystemReso
         defaultContextServiceAddOp.get("jndi-name").set(DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
         defaultContextServiceAddOp.get("use-transaction-setup-provider").set(true);
         configurationManagement.executeManagementOperation(defaultContextServiceAddOp);
-        context.getLogger().infof("Default ContextService added to EE subsystem configuration.");
+        context.getLogger().debugf("Default ContextService added to EE subsystem configuration.");
         taskResultBuilder.addAttribute(TASK_RESULT_ATTR_CONTEXT_SERVICE, DEFAULT_CONTEXT_SERVICE_JNDI_NAME);
 
         // add default managed thread factory
@@ -87,7 +87,7 @@ public class AddConcurrencyUtilitiesDefaultConfig<S> extends UpdateSubsystemReso
         defaultManagedThreadFactoryAddOp.get("context-service").set("default");
         defaultManagedThreadFactoryAddOp.get("priority").set(5);
         configurationManagement.executeManagementOperation(defaultManagedThreadFactoryAddOp);
-        context.getLogger().infof("Default ManagedThreadFactory added to EE subsystem configuration.");
+        context.getLogger().debugf("Default ManagedThreadFactory added to EE subsystem configuration.");
         taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_THREAD_FACTORY, DEFAULT_MANAGED_THREAD_FACTORY_JNDI_NAME);
 
         // add default managed executor service
@@ -114,7 +114,7 @@ public class AddConcurrencyUtilitiesDefaultConfig<S> extends UpdateSubsystemReso
         defaultManagedExecutorServiceAddOp.get("long-running-tasks").set(false);
         defaultManagedExecutorServiceAddOp.get("reject-policy").set("ABORT");
         configurationManagement.executeManagementOperation(defaultManagedExecutorServiceAddOp);
-        context.getLogger().infof("Default ManagedExecutorService added to EE subsystem configuration.");
+        context.getLogger().debugf("Default ManagedExecutorService added to EE subsystem configuration.");
         taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_EXECUTOR_SERVICE, DEFAULT_MANAGED_EXECUTOR_SERVICE_JNDI_NAME);
 
         // add default managed scheduled executor service
@@ -139,7 +139,7 @@ public class AddConcurrencyUtilitiesDefaultConfig<S> extends UpdateSubsystemReso
         defaultManagedScheduledExecutorServiceAddOp.get("long-running-tasks").set(false);
         defaultManagedScheduledExecutorServiceAddOp.get("reject-policy").set("ABORT");
         configurationManagement.executeManagementOperation(defaultManagedScheduledExecutorServiceAddOp);
-        context.getLogger().infof("Default ManagedScheduledExecutorService added to EE subsystem configuration.");
+        context.getLogger().debugf("Default ManagedScheduledExecutorService added to EE subsystem configuration.");
         taskResultBuilder.addAttribute(TASK_RESULT_ATTR_MANAGED_SCHEDULED_EXECUTOR_SERVICE, DEFAULT_MANAGED_SCHEDULED_EXECUTOR_SERVICE_JNDI_NAME);
 
         return taskResultBuilder.success().build();

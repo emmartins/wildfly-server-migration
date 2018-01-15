@@ -78,8 +78,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
                 final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Migrating %s configuration %s", getConfigType(), source);
+                context.getLogger().infof("Migrating %s configuration %s...", getConfigType(), source);
                 // create xml config
                 final JBossServerConfiguration targetConfiguration = xmlConfigurationProvider.getXMLConfiguration(source, targetConfigurationType, target, context);
                 // execute xml config subtasks
@@ -93,7 +92,7 @@ public class ServerConfigurationMigration<S, T extends ManageableServerConfigura
                 if (manageableConfigurationProvider != null) {
                     final T configurationManagement = manageableConfigurationProvider.getManageableConfiguration(targetConfiguration, target);
                     //context.getConsoleWrapper().printf("%n%n");
-                    context.getLogger().debugf("Starting target configuration %s", targetConfiguration.getPath().getFileName());
+                    context.getLogger().debugf("Starting target configuration %s...", targetConfiguration.getPath().getFileName());
                     configurationManagement.start();
                     try {
                         final ModelNode op = Util.createEmptyOperation(READ_RESOURCE_OPERATION, null);

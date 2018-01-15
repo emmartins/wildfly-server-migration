@@ -62,7 +62,7 @@ public class FixHibernateCacheModuleName<S> extends UpdateSubsystemResourceSubta
         final String newModuleName = taskEnvironment.getPropertyAsString(EnvironmentProperties.NEW_MODULE_NAME, DEFAULT_NEW_MODULE_NAME);
         // do migration
         if (!config.hasDefined(CACHE_CONTAINER)) {
-            context.getLogger().infof("No Cache container");
+            context.getLogger().debugf("No Cache container");
             return ServerMigrationTaskResult.SKIPPED;
         }
         boolean configUpdated = false;
@@ -76,7 +76,7 @@ public class FixHibernateCacheModuleName<S> extends UpdateSubsystemResourceSubta
                     op.get(VALUE).set(newModuleName);
                     configurationManagement.executeManagementOperation(op);
                     configUpdated = true;
-                    context.getLogger().infof("Infinispan subsystem's cache %s 'module' attribute updated to %s.", cacheName, newModuleName);
+                    context.getLogger().debugf("Infinispan subsystem's cache %s 'module' attribute updated to %s.", cacheName, newModuleName);
                 }
             }
         }

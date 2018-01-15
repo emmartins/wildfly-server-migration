@@ -67,9 +67,9 @@ public class MigrateSubsystemResourceSubtaskBuilder<S> extends ManageableResourc
             }
             processWarnings(migrateWarnings, subsystemResource, taskContext);
             if (migrateWarnings.isEmpty()) {
-                taskContext.getLogger().infof("Subsystem config %s migrated.", configName);
+                taskContext.getLogger().debugf("Subsystem config %s migrated.", configName);
             } else {
-                taskContext.getLogger().infof("Subsystem config %s migrated with warnings: %s", configName, migrateWarnings);
+                taskContext.getLogger().debugf("Subsystem config %s migrated with warnings: %s", configName, migrateWarnings);
                 resultBuilder.addAttribute("migration-warnings", migrateWarnings);
             }
             // FIXME tmp workaround for legacy subsystems which do not remove itself

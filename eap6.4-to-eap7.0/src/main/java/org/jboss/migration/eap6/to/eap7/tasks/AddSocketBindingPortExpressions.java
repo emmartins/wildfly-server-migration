@@ -46,7 +46,7 @@ public class AddSocketBindingPortExpressions<S> extends ManageableServerConfigur
     public AddSocketBindingPortExpressions() {
         name("socket-bindings.add-port-expressions");
         skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Adding socket binding's port expressions..."));
+        beforeRun(context -> context.getLogger().debugf("Adding socket binding's port expressions..."));
         final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
         for (String socketBinding : SOCKET_BINDINGS) {
             subtasks.subtask(SocketBindingResource.class, socketBinding, new AddSocketBindingPortExpression<>(socketBinding));
@@ -56,7 +56,7 @@ public class AddSocketBindingPortExpressions<S> extends ManageableServerConfigur
             if (context.hasSucessfulSubtasks()) {
                 context.getLogger().infof("Socket binding's port expressions added.");
             } else {
-                context.getLogger().infof("No socket binding's port expressions added.");
+                context.getLogger().debugf("No socket binding's port expressions added.");
             }
         });
     }
@@ -92,7 +92,7 @@ public class AddSocketBindingPortExpressions<S> extends ManageableServerConfigur
                 writeAttrOp.get(NAME).set(PORT);
                 writeAttrOp.get(VALUE).set(valueExpression);
                 socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Socket binding %s port value expression set as %s.", pathAddress.toCLIStyleString(), valueExpression.getExpressionString());
+                context.getLogger().debugf("Socket binding %s port value expression set as %s.", pathAddress.toCLIStyleString(), valueExpression.getExpressionString());
                 return ServerMigrationTaskResult.SUCCESS;
             });
         }

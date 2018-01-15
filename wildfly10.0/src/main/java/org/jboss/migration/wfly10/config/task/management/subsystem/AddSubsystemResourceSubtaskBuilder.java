@@ -45,7 +45,7 @@ public class AddSubsystemResourceSubtaskBuilder<S> extends ManageableResourceLea
             final String configName = parent.getSubsystemResourceAbsoluteName(subsystem);
             taskContext.getLogger().debugf("Adding subsystem config %s...", configName);
             addConfiguration(params, taskContext);
-            taskContext.getLogger().infof("Subsystem config %s added.", configName);
+            taskContext.getLogger().debugf("Subsystem config %s added.", configName);
             return ServerMigrationTaskResult.SUCCESS;
         });
     }

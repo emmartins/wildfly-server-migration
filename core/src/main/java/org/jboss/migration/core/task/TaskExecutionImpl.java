@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TaskExecutionImpl implements TaskExecution {
 
-    private static final AtomicLong taskCounter = new AtomicLong(0);
+    private final AtomicLong taskCounter = new AtomicLong(0);
 
     private final ServerMigrationTask task;
     private final TaskExecutionImpl parent;
@@ -39,7 +39,7 @@ public class TaskExecutionImpl implements TaskExecution {
     private final AtomicLong startTime = new AtomicLong(0L);
     private ServerMigrationTaskResult result;
     private final Logger logger;
-    private final long taskNumber;
+    private final String taskNumber;
     private final ServerMigrationTaskPath taskPath;
 
     public TaskExecutionImpl(ServerMigrationTask task, TaskExecutionImpl parent) {
@@ -55,8 +55,8 @@ public class TaskExecutionImpl implements TaskExecution {
         this.parent = parent;
         this.serverMigrationContext = serverMigrationContext;
         this.children = new ArrayList<>();
-        taskNumber = taskCounter.incrementAndGet();
-        this.logger = Logger.getLogger(ServerMigrationTask.class.getName()+'#'+String.valueOf(taskNumber));
+        taskNumber = parent == null ? "1" : parent.getTaskNumber() +":" + parent.taskCounter.incrementAndGet();
+        this.logger = Logger.getLogger(ServerMigrationTask.class.getName()+'#'+taskNumber);
         this.taskPath = new ServerMigrationTaskPath(task.getName(), parent != null ? parent.getTaskPath() : null);
     }
 
@@ -72,7 +72,7 @@ public class TaskExecutionImpl implements TaskExecution {
      * Retrieves the task number.
      * @return the task number
      */
-    public long getTaskNumber() {
+    public String getTaskNumber() {
         return taskNumber;
     }
 
@@ -164,7 +164,7 @@ public class TaskExecutionImpl implements TaskExecution {
         if (!startTime.compareAndSet(0L, System.currentTimeMillis())) {
             throw new IllegalStateException("Task "+ taskPath +" already started");
         }
-        logger.debugf("Task %s execution starting...", taskPath);
+        logger.tracef("Task %s execution starting...", taskPath);
         try {
             result = task.run(new TaskContextImpl(this));
         } catch (ServerMigrationFailureException e) {
@@ -175,7 +175,7 @@ public class TaskExecutionImpl implements TaskExecution {
             result = ServerMigrationTaskResult.fail(e);
             throw e;
         } finally {
-            logger.debugf("Task %s execution completed with result status... %s", taskPath, result);
+            logger.tracef("Task %s execution completed with result status... %s", taskPath, result);
         }
     }
 }

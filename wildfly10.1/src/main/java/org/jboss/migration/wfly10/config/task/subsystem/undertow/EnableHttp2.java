@@ -67,7 +67,7 @@ public class EnableHttp2<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
                     op.get(NAME).set(ENABLE_HTTP2);
                     op.get(VALUE).set(true);
                     subsystemResource.getServerConfiguration().executeManagementOperation(op);
-                    context.getLogger().infof("HTTP2 enabled for Undertow's HTTP Listener %s.", listenerPathAddress.toCLIStyleString());
+                    context.getLogger().debugf("HTTP2 enabled for Undertow's HTTP Listener %s.", listenerPathAddress.toCLIStyleString());
                     updatedHttpListeners.add(listenerName);
                 }
             }
@@ -82,7 +82,7 @@ public class EnableHttp2<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
                     op.get(NAME).set(ENABLE_HTTP2);
                     op.get(VALUE).set(true);
                     subsystemResource.getServerConfiguration().executeManagementOperation(op);
-                    context.getLogger().infof("HTTP2 enabled for Undertow's HTTPS Listener %s.", listenerPathAddress.toCLIStyleString());
+                    context.getLogger().debugf("HTTP2 enabled for Undertow's HTTPS Listener %s.", listenerPathAddress.toCLIStyleString());
                     updatedHttpsListeners.add(listenerName);
                 }
             }

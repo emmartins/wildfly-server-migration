@@ -55,7 +55,7 @@ public class SetDefaultHttpListenerRedirectSocket<S> extends UpdateSubsystemReso
             final PathAddress pathAddress = subsystemResource.getResourcePathAddress().append(SERVER, SERVER_NAME).append(HTTP_LISTENER, httpListenerName);
             final ModelNode op = Util.getWriteAttributeOperation(pathAddress, REDIRECT_SOCKET_ATTR_NAME, REDIRECT_SOCKET_ATTR_VALUE);
             subsystemResource.getServerConfiguration().executeManagementOperation(op);
-            context.getLogger().infof("Undertow's default HTTP listener '%s' redirect-socket set as 'https'.", httpListenerName);
+            context.getLogger().debugf("Undertow's default HTTP listener '%s' redirect-socket set as 'https'.", httpListenerName);
             return ServerMigrationTaskResult.SUCCESS;
         } else {
             return ServerMigrationTaskResult.SKIPPED;

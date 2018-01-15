@@ -38,10 +38,10 @@ public class AddExtensionTaskBuilder<S> extends ManageableServerConfigurationLea
                 final ModelNode op = Util.createAddOperation(extensionResourceParent.getExtensionResourcePathAddress(extensionModule));
                 op.get(MODULE).set(extensionModule);
                 extensionResourceParent.getServerConfiguration().executeManagementOperation(op);
-                context.getLogger().infof("Extension %s added.",extensionModule);
+                context.getLogger().debugf("Extension %s added.",extensionModule);
                 return ServerMigrationTaskResult.SUCCESS;
             } else {
-                context.getLogger().infof("Extension %s already exists in config.", extensionModule);
+                context.getLogger().debugf("Extension %s already exists in config.", extensionModule);
                 return ServerMigrationTaskResult.SKIPPED;
             }
         });

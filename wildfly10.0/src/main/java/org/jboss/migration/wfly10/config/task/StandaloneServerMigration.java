@@ -54,13 +54,14 @@ public class StandaloneServerMigration<S extends Server> implements ServerMigrat
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
                 final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Standalone server migration starting...");
+                consoleWrapper.println();
+                context.getLogger().infof("--- Migrating standalone server...");
                 beforeConfigurationsMigration(source, target, context);
+                consoleWrapper.println();
                 context.execute(configFilesMigration.getServerMigrationTask(source, target, JBossServerConfiguration.Type.STANDALONE));
                 afterConfigurationsMigration(source, target, context);
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Standalone server migration done.");
+                //consoleWrapper.println();
+                //context.getLogger().infof("- Standalone server migration done.");
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };

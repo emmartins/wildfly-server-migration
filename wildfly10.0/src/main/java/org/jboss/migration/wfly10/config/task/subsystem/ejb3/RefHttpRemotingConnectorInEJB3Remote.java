@@ -52,7 +52,7 @@ public class RefHttpRemotingConnectorInEJB3Remote<S> extends UpdateSubsystemReso
         op.get(NAME).set("connector-ref");
         op.get(VALUE).set("http-remoting-connector");
         configurationManagement.executeManagementOperation(op);
-        context.getLogger().infof("EJB3 subsystem's remote service configured to use HTTP Remoting connector.");
+        context.getLogger().debugf("EJB3 subsystem's remote service configured to use HTTP Remoting connector.");
         return ServerMigrationTaskResult.SUCCESS;
     }
 }

@@ -125,7 +125,7 @@ public class UpdateWebCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
             compositeOperationBuilder.addStep(cacheFileStoreAddOperation);
         }
         subsystemResource.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
-        context.getLogger().infof("Cache '%s' added to cache container '%s'.", CACHE_NAME, CACHE_CONTAINER_NAME);
+        context.getLogger().debugf("Cache '%s' added to cache container '%s'.", CACHE_NAME, CACHE_CONTAINER_NAME);
         return ServerMigrationTaskResult.SUCCESS;
     }
 }

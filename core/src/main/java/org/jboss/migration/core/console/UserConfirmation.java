@@ -60,11 +60,11 @@ public class UserConfirmation {
     }
 
     public void execute() {
-        theConsole.printf("%n");
+        theConsole.println();
         if (messageLines != null) {
             for (String message : messageLines) {
                 theConsole.printf(message);
-                theConsole.printf(ConsoleWrapper.NEW_LINE);
+                theConsole.println();
             }
         }
 

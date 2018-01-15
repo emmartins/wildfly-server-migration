@@ -78,6 +78,7 @@ public class VaultPathsMigration implements XmlConfigurationMigration.Component 
                 .skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet())
                 .runnable(context -> {
                     if (keystoreURL != null) {
+                        context.getLogger().debugf("Migrating referenced path 'vault KEYSTORE_URL'...", keystoreURL);
                         context.execute(new MigrateResolvablePathTaskBuilder()
                                 .name(context.getTaskName().getName()+".KEYSTORE_URL")
                                 .path(ResolvablePath.fromPathExpression(keystoreURL))
@@ -86,6 +87,7 @@ public class VaultPathsMigration implements XmlConfigurationMigration.Component 
                                 .build());
                     }
                     if (encFileDir != null) {
+                        context.getLogger().debugf("Migrating referenced path 'vault ENC_FILE_DIR'...", encFileDir);
                         context.execute(new MigrateResolvablePathTaskBuilder()
                                 .name(context.getTaskName().getName()+".ENC_FILE_DIR")
                                 .path(ResolvablePath.fromPathExpression(encFileDir))
