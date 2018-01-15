@@ -30,9 +30,8 @@ public class RemoveExtensionTaskBuilder<S> extends ManageableServerConfiguration
         runBuilder(params -> context -> {
             final ManageableServerConfiguration extensionResourceParent = params.getServerConfiguration();
             if (extensionResourceParent.getExtensionResourceNames().contains(extensionModule)) {
-                context.getLogger().debugf("Removing Extension %s...", extensionModule);
                 extensionResourceParent.removeExtensionResource(extensionModule);
-                context.getLogger().infof("Extension %s removed.",extensionModule);
+                context.getLogger().debugf("Extension %s removed.",extensionModule);
                 return ServerMigrationTaskResult.SUCCESS;
             } else {
                 context.getLogger().debugf("Skipped extension %s removal, doesn't exists in config.", extensionModule);

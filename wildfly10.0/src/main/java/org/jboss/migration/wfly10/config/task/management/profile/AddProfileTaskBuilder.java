@@ -46,13 +46,13 @@ public class AddProfileTaskBuilder<S> extends ManageableServerConfigurationCompo
         skipPolicyBuilders(skipIfDefaultTaskSkipPropertyIsSet(),
                 buildParameters -> context -> {
                     if (!buildParameters.getServerConfiguration().findResources(ProfileResource.class, profileName).isEmpty()) {
-                        context.getLogger().infof("Profile %s already exists.", profileName);
+                        context.getLogger().debugf("Profile %s already exists.", profileName);
                         return true;
                     } else {
                         return false;
                     }
                 });
-        beforeRun(context -> context.getLogger().infof("Adding profile %s...", profileName));
+        beforeRun(context -> context.getLogger().debugf("Adding profile %s...", profileName));
         this.subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(ProfileResource.Parent.class, new CreateProfileTask<>(profileName));
         subtasks(subtasks);
@@ -62,6 +62,7 @@ public class AddProfileTaskBuilder<S> extends ManageableServerConfigurationCompo
     protected void addSubsystemSubtasks(AddSubsystemResources<S>... addSubsystemSubtasks) {
         final ManageableResourceCompositeSubtasks.Builder<S, SubsystemResource.Parent> compositeSubtasks = new ManageableResourceCompositeSubtasks.Builder<>();
         for (AddSubsystemResources<S> subtask : addSubsystemSubtasks) {
+            subtask.afterRun(null);
             compositeSubtasks.subtask(subtask);
         }
         this.subtasks.subtask(ProfileResource.class, profileName, compositeSubtasks);
@@ -80,7 +81,7 @@ public class AddProfileTaskBuilder<S> extends ManageableServerConfigurationCompo
                 final PathAddress pathAddress = resource.getProfileResourcePathAddress(profileName);
                 final ModelNode op = Util.createAddOperation(pathAddress);
                 resource.getServerConfiguration().executeManagementOperation(op);
-                context.getLogger().infof("Profile %s created.", profileName);
+                context.getLogger().debugf("Profile %s created.", profileName);
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

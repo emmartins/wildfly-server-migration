@@ -56,18 +56,18 @@ public class DomainMigration<S extends Server> implements ServerMigration.Subtas
             @Override
             public ServerMigrationTaskResult run(TaskContext context) {
                 final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Domain migration starting...");
+                consoleWrapper.println();
+                context.getLogger().infof("--- Migrating managed domain...");
                 beforeConfigurationsMigration(source, target, context);
                 if (domainConfigurationsMigration != null) {
+                    consoleWrapper.println();
                     context.execute(domainConfigurationsMigration.getServerMigrationTask(source, target, JBossServerConfiguration.Type.DOMAIN));
                 }
                 if (hostConfigurationsMigration != null) {
+                    consoleWrapper.println();
                     context.execute(hostConfigurationsMigration.getServerMigrationTask(source, target, JBossServerConfiguration.Type.HOST));
                 }
                 afterConfigurationsMigration(source, target, context);
-                consoleWrapper.printf("%n");
-                context.getLogger().infof("Domain migration done.");
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
             }
         };

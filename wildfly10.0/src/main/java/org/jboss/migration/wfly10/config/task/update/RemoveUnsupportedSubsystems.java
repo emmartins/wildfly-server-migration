@@ -104,7 +104,7 @@ public class RemoveUnsupportedSubsystems<S extends JBossServer<S>> implements Se
                                 .addAttribute(SUBTASK_NAME_ATTRIBUTE_NAMESPACE, namespaceURI)
                                 .build())
                         .runnable(subtaskContext -> {
-                            subtaskContext.getLogger().debugf("Subsystem with namespace %s removed.", namespaceURI);
+                            subtaskContext.getLogger().debugf("Subsystem with namespace '%s' removed.", namespaceURI);
                             removed.add(namespaceURI);
                             return ServerMigrationTaskResult.SUCCESS;
                         })
@@ -117,7 +117,7 @@ public class RemoveUnsupportedSubsystems<S extends JBossServer<S>> implements Se
         };
         XMLFiles.filter(targetConfigurationPath.getPath(), extensionsFilter);
         if (!removed.isEmpty()) {
-            context.getLogger().infof("Removed the following unsupported subsystems: %s", removed);
+            context.getLogger().infof("Unsupported subsystems removed: %s", removed);
         }
     }
 }

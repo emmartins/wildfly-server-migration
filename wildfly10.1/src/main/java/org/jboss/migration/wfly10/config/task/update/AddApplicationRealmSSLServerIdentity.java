@@ -42,9 +42,9 @@ public class AddApplicationRealmSSLServerIdentity<S> extends ManageableServerCon
     public AddApplicationRealmSSLServerIdentity() {
         name("security-realm."+RESOURCE_NAME+".add-"+SERVER_IDENTITY_NAME+"-"+SERVER_IDENTITY);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().debugf("Security Realm '%s' SSL Server Identity configuration starting...", RESOURCE_NAME));
+        beforeRun(context -> context.getLogger().debugf("Configuring security realm %s SSL server identity...", RESOURCE_NAME));
         runBuilder(SecurityRealmResource.class, RESOURCE_NAME, new RunnableBuilder<>());
-        afterRun(context -> context.getLogger().debugf("Security Realm '%s' SSL Server Identity configuration complete.", RESOURCE_NAME));
+        afterRun(context -> context.getLogger().infof("Security realm %s SSL server identity configured.", RESOURCE_NAME));
     }
 
     protected static class RunnableBuilder<S> implements ManageableResourceTaskRunnableBuilder<S, SecurityRealmResource> {
@@ -93,7 +93,7 @@ public class AddApplicationRealmSSLServerIdentity<S> extends ManageableServerCon
                 addOperation.get(KEY_PASSWORD).set("password");
                 addOperation.get(GENERATE_SELF_SIGNED_CERTIFICATE_HOST).set("localhost");
                 serverConfiguration.executeManagementOperation(addOperation);
-                context.getLogger().infof("SSL server identity added to security realm %s.", RESOURCE_NAME);
+                context.getLogger().debugf("SSL server identity added to security realm %s.", RESOURCE_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             };
         }

@@ -61,11 +61,15 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
                     }
                     return true;
                 });
-        beforeRun(context -> context.getLogger().debugf("Private interface setup starting..."));
+        beforeRun(context -> context.getLogger().debugf("Adding interface %s...", INTERFACE_NAME));
         subtasks(new ManageableServerConfigurationCompositeSubtasks.Builder<S>()
                 .subtask(new AddInterface<>())
                 .subtask(SocketBindingGroupResource.class, new UpdateSocketBindings<>()));
-        afterRun(context -> context.getLogger().debugf("Private interface setup done."));
+        afterRun(context -> {
+            if (context.hasSucessfulSubtasks()) {
+                context.getLogger().infof("Interface %s added.", INTERFACE_NAME);
+            }
+        });
     }
 
     protected static class AddInterface<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
@@ -75,13 +79,13 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
             runBuilder(params -> context -> {
                 final ManageableServerConfiguration serverConfiguration = params.getServerConfiguration();
                 if (serverConfiguration.getInterfaceResourceNames().contains(INTERFACE_NAME)) {
-                    context.getLogger().debugf("Skipping task to add private interface, the configuration already has it.");
+                    context.getLogger().debugf("Skipping task to add interface private, the configuration already has it.");
                     return ServerMigrationTaskResult.SKIPPED;
                 }
                 final ModelNode addInterfaceOp = Util.createAddOperation(serverConfiguration.getInterfaceResourcePathAddress(INTERFACE_NAME));
                 addInterfaceOp.get(INET_ADDRESS).set(new ValueExpression("${jboss.bind.address.private:127.0.0.1}"));
                 serverConfiguration.executeManagementOperation(addInterfaceOp);
-                context.getLogger().infof("Interface %s added.", INTERFACE_NAME);
+                context.getLogger().debugf("Interface %s added.", INTERFACE_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             });
         }
@@ -104,7 +108,7 @@ public class AddPrivateInterface<S> extends ManageableServerConfigurationComposi
                                 writeAttrOp.get(NAME).set(INTERFACE);
                                 writeAttrOp.get(VALUE).set(INTERFACE_NAME);
                                 socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                                context.getLogger().infof("Socket binding %s interface set to %s", socketBindingResource.getResourceAbsoluteName(), INTERFACE_NAME);
+                                context.getLogger().debugf("Socket binding %s interface set to %s", socketBindingResource.getResourceAbsoluteName(), INTERFACE_NAME);
                                 updated.add(socketBinding);
                             }
                         }

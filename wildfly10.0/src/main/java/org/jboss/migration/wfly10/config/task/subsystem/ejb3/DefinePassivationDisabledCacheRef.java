@@ -55,7 +55,7 @@ public class DefinePassivationDisabledCacheRef<S> extends UpdateSubsystemResourc
         op.get(NAME).set(DEFAULT_SFSB_PASSIVATION_DISABLED_CACHE_ATTR_NAME);
         op.get(VALUE).set(defaultSFSBCache);
         configurationManagement.executeManagementOperation(op);
-        context.getLogger().infof("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
+        context.getLogger().debugf("EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to %s.", defaultSFSBCache);
         return ServerMigrationTaskResult.SUCCESS;
     }
 }

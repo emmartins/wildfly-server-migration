@@ -77,6 +77,7 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
 
         @Override
         protected void migrateModules(ModuleMigrator moduleMigrator, TaskContext context) {
+            context.getLogger().debugf("Migrating modules referenced by the configuration...");
             try (InputStream in = new BufferedInputStream(new FileInputStream(targetConfigurationPath.getPath().toFile()))) {
                 XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(in);
                 reader.require(START_DOCUMENT, null, null);
@@ -87,6 +88,9 @@ public class ConfigurationModulesMigrationTaskFactory<S extends JBossServer<S>> 
                 }
             } catch (Exception e) {
                 throw new ServerMigrationFailureException(e);
+            }
+            if (!context.hasSucessfulSubtasks()) {
+                context.getLogger().debugf("No referenced modules to migrate.");
             }
         }
 

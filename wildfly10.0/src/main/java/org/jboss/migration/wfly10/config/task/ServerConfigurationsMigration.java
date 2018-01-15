@@ -30,6 +30,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.jboss.migration.core.logger.ServerMigrationLogger.ROOT_LOGGER;
 
@@ -64,12 +65,12 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
     protected static class Task<S, T extends ManageableServerConfiguration> implements ServerMigrationTask {
 
         private final ServerMigrationTaskName name;
-        private final Collection<S> sourceConfigs;
+        private final List<S> sourceConfigs;
         private final JBossServerConfiguration.Type targetConfigurationType;
         private final WildFlyServer10 target;
         private final ServerConfigurationMigration<S, T> configFileMigration;
 
-        protected Task(ServerMigrationTaskName name, Collection<S> sourceConfigs, WildFlyServer10 target, JBossServerConfiguration.Type targetConfigurationType, ServerConfigurationMigration<S, T> configFileMigration) {
+        protected Task(ServerMigrationTaskName name, List<S> sourceConfigs, WildFlyServer10 target, JBossServerConfiguration.Type targetConfigurationType, ServerConfigurationMigration<S, T> configFileMigration) {
             this.name = name;
             this.sourceConfigs = sourceConfigs;
             this.targetConfigurationType = targetConfigurationType;
@@ -85,14 +86,11 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
         @Override
         public ServerMigrationTaskResult run(final TaskContext taskContext) {
             final ConsoleWrapper consoleWrapper = taskContext.getConsoleWrapper();
-            consoleWrapper.printf("%n");
-            taskContext.getLogger().infof("Retrieving source's %s configurations...", configFileMigration.getConfigType());
+            taskContext.getLogger().debugf("Migrating source's %s configurations...", configFileMigration.getConfigType());
             if (!sourceConfigs.isEmpty()) {
-                for (S sourceConfig : sourceConfigs) {
-                    taskContext.getLogger().infof("%s", sourceConfig);
-                }
+                taskContext.getLogger().infof("Source's %s configurations found: %s", configFileMigration.getConfigType(), sourceConfigs);
             } else {
-                taskContext.getLogger().infof("No source's %s configurations found.", configFileMigration.getConfigType());
+                taskContext.getLogger().debugf("No source's %s configurations found.", configFileMigration.getConfigType());
                 return ServerMigrationTaskResult.SKIPPED;
             }
 
@@ -119,7 +117,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
 
         protected void migrateAllConfigs(Collection<S> sourceConfigs, final JBossServerConfiguration.Type targetConfigurationType, WildFlyServer10 target, final TaskContext taskContext) {
             for (S sourceConfig : sourceConfigs) {
-                taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigurationType, target));
+                migrateConfig(sourceConfig, targetConfigurationType, target, taskContext);
             }
         }
 
@@ -136,7 +134,7 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
                 }
                 @Override
                 public void onYes() {
-                    taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigurationType, target));
+                    migrateConfig(sourceConfig, targetConfigurationType, target, taskContext);
                 }
                 @Override
                 public void onError() {
@@ -147,6 +145,11 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
             final ConsoleWrapper consoleWrapper = taskContext.getConsoleWrapper();
             new UserConfirmation(consoleWrapper, "Migrate configuration "+sourceConfig+" ?", ROOT_LOGGER.yesNo(), resultHandler).execute();
         }
+
+        protected void migrateConfig(final S sourceConfig, final JBossServerConfiguration.Type targetConfigurationType, final WildFlyServer10 target, final TaskContext taskContext) {
+            taskContext.getConsoleWrapper().println();
+            taskContext.execute(configFileMigration.getServerMigrationTask(sourceConfig, targetConfigurationType, target));
+        }
     }
 
     /**
@@ -155,6 +158,6 @@ public class ServerConfigurationsMigration<S extends Server, C, T extends Manage
      * @param <C> the source configuration type
      */
     public interface SourceConfigurations<S extends Server, C> {
-        Collection<C> getConfigurations(S source, WildFlyServer10 target);
+        List<C> getConfigurations(S source, WildFlyServer10 target);
     }
 }

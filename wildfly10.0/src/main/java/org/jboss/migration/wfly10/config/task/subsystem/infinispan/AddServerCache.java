@@ -56,7 +56,7 @@ public class AddServerCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
     @Override
     protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
         if (!config.hasDefined(CACHE_CONTAINER)) {
-            context.getLogger().infof("No Cache container");
+            context.getLogger().debugf("No Cache container");
             return ServerMigrationTaskResult.SKIPPED;
         }
         if (config.hasDefined(CACHE_CONTAINER, CACHE_NAME)) {
@@ -87,7 +87,7 @@ public class AddServerCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
         localCacheTransactionAddOperation.get(MODE_ATTR_NAME).set(MODE_ATTR_VALUE);
         compositeOperationBuilder.addStep(localCacheTransactionAddOperation);
         configurationManagement.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-        context.getLogger().infof("Server cache added to Infinispan subsystem configuration.");
+        context.getLogger().debugf("Server cache added to Infinispan subsystem configuration.");
         return ServerMigrationTaskResult.SUCCESS;
     }
 }

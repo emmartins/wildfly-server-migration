@@ -81,7 +81,7 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                     final boolean migrateDeployment;
                     if (confirmEachDeployment) {
                         final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
+                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment "+deploymentResource.getResourceName()+"?","yes/no?", userConfirmation).execute();
                         migrateDeployment = userConfirmation.getResult() == YES;
                     } else {
                         migrateDeployment = migrateDeployments;
@@ -91,6 +91,8 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                     if (!migrateDeployment) {
                         final ManageableServerConfigurationLeafTask.Builder<JBossServerConfiguration<S>> subtaskBuilder = new RemoveDeploymentSubtask<>(deploymentResource);
                         context.execute(subtaskBuilder.build(params));
+                    } else {
+                        context.getLogger().infof("Persistent deployment %s migrated.", deploymentResource.getResourceName());
                     }
                 }
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
@@ -129,11 +131,11 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                     // the deployment may be referenced in server groups, remove these first
                     for (DeploymentResource serverGroupDeploymentResource : selectResources(ServerGroupResource.class).andThen(selectResources(DeploymentResource.class, resource.getResourceName())).fromResources(params.getServerConfiguration())) {
                         serverGroupDeploymentResource.removeResource();
-                        context.getLogger().infof("Removed persistent deployment from server group %s", resource.getResourceAbsoluteName());
+                        context.getLogger().debugf("Persistent deployment (from server group) '%s' removed.", resource.getResourceAbsoluteName());
                     }
                 }
                 resource.removeResource();
-                context.getLogger().infof("Removed persistent deployment from configuration %s", resource.getResourceAbsoluteName());
+                context.getLogger().debugf("Persistent deployment %s removed.", resource.getResourceName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

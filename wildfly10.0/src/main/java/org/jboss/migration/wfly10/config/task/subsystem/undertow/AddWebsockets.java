@@ -48,7 +48,7 @@ public class AddWebsockets<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
             final PathAddress pathAddress = subsystemResource.getResourcePathAddress().append(SERVLET_CONTAINER, SERVLET_CONTAINER_NAME).append(SETTING, SETTING_NAME);
             final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
             subsystemResource.getServerConfiguration().executeManagementOperation(addOp);
-            context.getLogger().infof("Undertow's default Servlet Container configured to support Websockets.");
+            context.getLogger().debugf("Undertow's default Servlet Container configured to support Websockets.");
             return ServerMigrationTaskResult.SUCCESS;
         } else {
             return ServerMigrationTaskResult.SKIPPED;

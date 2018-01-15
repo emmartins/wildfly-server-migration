@@ -17,8 +17,8 @@
 package org.jboss.migration.wfly10.config.task.update;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
-import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.CopyPath;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.component.SimpleComponentTask;
@@ -38,10 +38,11 @@ public class MigrateContentDir<S extends JBossServer<S>> extends SimpleComponent
     protected MigrateContentDir(String contentsName, Path sourceContentDir, Path targetContentDir) {
         name("contents."+contentsName+".migrate-content-dir");
         skipPolicies(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet(), context -> !Files.isDirectory(sourceContentDir));
-        beforeRun(context -> context.getLogger().debugf(" Searching for %s content at '%s'...", contentsName, sourceContentDir));
         runnable(context -> {
+            context.getLogger().debugf("Migrating source's %s content...", contentsName);
             final List<Path> contents;
             try {
+                context.getLogger().debugf("Retrieving %s content from '%s'...", contentsName, sourceContentDir);
                 contents = Files.find(sourceContentDir, 3, (path, basicFileAttributes) -> Files.isRegularFile(path) && path.getFileName().toString().equals("content"))
                         .map(path -> sourceContentDir.relativize(path))
                         //.filter(path -> path.getNameCount() == 3)
@@ -51,16 +52,17 @@ public class MigrateContentDir<S extends JBossServer<S>> extends SimpleComponent
                 throw new ServerMigrationFailureException("Failed to read content from "+sourceContentDir, e);
             }
             if (contents.isEmpty()) {
-                context.getLogger().debugf("No %s content found to migrate.", contentsName, sourceContentDir);
+                context.getLogger().infof("No source's %s content found to migrate.", contentsName);
                 return ServerMigrationTaskResult.SKIPPED;
             } else {
-                context.getLogger().infof("Migrating %s content found: %s", contentsName, contents);
+                context.getLogger().debugf("Source's %s content found: %s", contentsName, contents);
                 // execute subtasks
                 for (Path content : contents) {
                     final ServerMigrationTaskName subtaskName = new ServerMigrationTaskName.Builder("contents."+contentsName+".migrate-content").addAttribute("path", content.toString()).build();
-                    context.execute(subtaskName, subtaskContext -> new CopyPath(sourceContentDir.resolve(content), targetContentDir.resolve(content)).run(subtaskContext));
+                    context.execute(subtaskName, new CopyPath(sourceContentDir.resolve(content), targetContentDir.resolve(content)));
                 }
-                return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+                context.getLogger().infof("Source's %s content migrated.", contentsName);
+                return ServerMigrationTaskResult.SUCCESS;
             }
         });
     }

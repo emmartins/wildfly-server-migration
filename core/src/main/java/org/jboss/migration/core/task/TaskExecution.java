@@ -31,6 +31,6 @@ public interface TaskExecution {
     List<TaskExecution> getSubtasks();
     long getStartTime();
     ServerMigrationTaskName getTaskName();
-    long getTaskNumber();
+    String getTaskNumber();
     ServerMigrationTaskPath getTaskPath();
 }

@@ -110,7 +110,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
         setupDefaultDatasource(defaultDataSourceJndiName, defaultDataSourceName, addOp, subsystemResource.getParentResource(), context, taskEnvironment, taskResultBuilder);
         setupDefaultJMSConnectionFactory(defaultJmsConnectionFactoryJndiName, defaultJmsConnectionFactoryName, addOp, subsystemResource.getParentResource(), context, taskEnvironment, taskResultBuilder);
         configurationManagement.executeManagementOperation(addOp);
-        context.getLogger().infof("Java EE Default Bindings configured.");
+        context.getLogger().debugf("Java EE Default Bindings configured.");
         return taskResultBuilder.success().build();
     }
 
@@ -145,13 +145,13 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
         if (defaultJmsConnectionFactoryJndiName != null) {
             addOp.get("jms-connection-factory").set(defaultJmsConnectionFactoryJndiName);
             taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, defaultJmsConnectionFactoryJndiName);
-            context.getLogger().infof("Java EE Default JMS Connection Builder configured with JNDI name %s.", defaultJmsConnectionFactoryJndiName);
+            context.getLogger().debugf("Java EE Default JMS Connection Factory configured with JNDI name %s.", defaultJmsConnectionFactoryJndiName);
         } else {
             if (context.isInteractive()) {
-                context.getLogger().infof("Default JMS Connection Builder not found");
+                context.getLogger().infof("Default JMS Connection Factory not found");
             } else {
                 // not interactive, skip it
-                context.getLogger().infof("Default JMS Connection Builder not found, skipping its configuration due to non interactive mode");
+                context.getLogger().infof("Default JMS Connection Factory not found, skipping its configuration due to non interactive mode");
                 return;
             }
             // retrieve the names of configured factories
@@ -197,7 +197,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
                 private void processJmsConnectionFactoryJndiName(final String jmsConnectionFactoryJndiName) {
                     addOp.get("jms-connection-factory").set(jmsConnectionFactoryJndiName);
                     taskResultBuilder.addAttribute(TASK_RESULT_ATTR_JMS_CONNECTION_FACTORY, jmsConnectionFactoryJndiName);
-                    context.getLogger().infof("Java EE Default JMS Connection Builder configured with JNDI name %s.", jmsConnectionFactoryJndiName);
+                    context.getLogger().infof("Java EE Default JMS Connection Factory configured with JNDI name %s.", jmsConnectionFactoryJndiName);
                     final UserConfirmation.ResultHandler resultHandler = new org.jboss.migration.core.console.UserConfirmation.ResultHandler() {
                         @Override
                         public void onNo() {
@@ -215,10 +215,10 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
                     };
                     final ConsoleWrapper consoleWrapper = context.getConsoleWrapper();
                     consoleWrapper.printf("%n");
-                    new UserConfirmation(consoleWrapper, "Save this Java EE Default JMS Connection Builder JNDI name and use it when migrating other config files?", ROOT_LOGGER.yesNo(), resultHandler).execute();
+                    new UserConfirmation(consoleWrapper, "Save this Java EE Default JMS Connection Factory JNDI name and use it when migrating other config files?", ROOT_LOGGER.yesNo(), resultHandler).execute();
                 }
             };
-            new UserChoiceWithOtherOption(context.getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Builder, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Builder: ", resultHandler).execute();
+            new UserChoiceWithOtherOption(context.getConsoleWrapper(), factoryNames, "Unconfigured JMS Connection Factory, I want to enter the JNDI name...", "Please select Java EE's Default JMS Connection Factory: ", resultHandler).execute();
         }
     }
 
@@ -243,7 +243,7 @@ public class AddDefaultBindingsConfig<S> extends UpdateSubsystemResourceSubtaskB
         if (defaultDataSourceJndiName != null) {
             addOp.get("datasource").set(defaultDataSourceJndiName);
             taskResultBuilder.addAttribute(TASK_RESULT_ATTR_DATA_SOURCE, defaultDataSourceJndiName);
-            context.getLogger().infof("Java EE Default Datasource configured with JNDI name %s.", defaultDataSourceJndiName);
+            context.getLogger().debugf("Java EE Default Datasource configured with JNDI name %s.", defaultDataSourceJndiName);
         } else {
             if (context.isInteractive()) {
                 context.getLogger().infof("Default datasource not found.");

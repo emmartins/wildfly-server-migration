@@ -22,7 +22,7 @@ import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationsMigration;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author emmartins
@@ -35,7 +35,7 @@ class HostConfigurationsUpdate<S extends JBossServer<S>> extends HostConfigurati
 
     private static class SourceHostConfigurations<S extends JBossServer<S>> implements SourceConfigurations<S, JBossServerConfiguration<S>> {
         @Override
-        public Collection<JBossServerConfiguration<S>> getConfigurations(S source, WildFlyServer10 target) {
+        public List<JBossServerConfiguration<S>> getConfigurations(S source, WildFlyServer10 target) {
             return source.getDomainHostConfigs();
         }
     }

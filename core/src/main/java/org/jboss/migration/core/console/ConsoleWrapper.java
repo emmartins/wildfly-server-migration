@@ -49,6 +49,13 @@ public interface ConsoleWrapper {
     void printf(String format, Object... args) throws IllegalFormatException;
 
     /**
+     * A convenience method to write a new line.
+     */
+    default void println() {
+        printf(NEW_LINE);
+    }
+
+    /**
      * Provides a formatted prompt, then reads a single line of text from the
      * console.
      *

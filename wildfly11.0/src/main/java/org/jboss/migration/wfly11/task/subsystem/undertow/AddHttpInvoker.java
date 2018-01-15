@@ -58,7 +58,7 @@ public class AddHttpInvoker<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
             ]
          */
         if (!config.hasDefined(SERVER, SERVER_NAME, HOST, HOST_NAME)) {
-            context.getLogger().infof("Undertow's host %s not defined, skipping task to configure the host's http-invoker.");
+            context.getLogger().debugf("Undertow's host %s not defined, skipping task to configure the host's http-invoker.");
             return ServerMigrationTaskResult.SKIPPED;
         }
         if (!config.hasDefined(SERVER, SERVER_NAME, HOST, HOST_NAME, SETTING, HTTP_INVOKER)) {
@@ -66,10 +66,10 @@ public class AddHttpInvoker<S> extends UpdateSubsystemResourceSubtaskBuilder<S> 
             final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
             addOp.get(SECURITY_REALM).set(SECURITY_REALM_NAME);
             subsystemResource.getServerConfiguration().executeManagementOperation(addOp);
-            context.getLogger().infof("Undertow's default host http-invoker configured.");
+            context.getLogger().debugf("Undertow's default host http-invoker configured.");
             return ServerMigrationTaskResult.SUCCESS;
         } else {
-            context.getLogger().infof("Undertow's host %s http-invoker is defined, skipping task to configure it.");
+            context.getLogger().debugf("Undertow's host %s http-invoker is defined, skipping task to configure it.");
             return ServerMigrationTaskResult.SKIPPED;
         }
     }

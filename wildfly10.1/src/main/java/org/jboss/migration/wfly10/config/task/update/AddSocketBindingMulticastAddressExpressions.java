@@ -52,7 +52,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableSe
         subtasks(subtasks);
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
-                context.getLogger().debugf("Socket binding's multicast address expressions added.");
+                context.getLogger().infof("Socket binding's multicast address expressions added.");
             } else {
                 context.getLogger().debugf("No socket binding's multicast address expressions added.");
             }
@@ -91,7 +91,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableSe
                 writeAttrOp.get(NAME).set(MULTICAST_ADDRESS);
                 writeAttrOp.get(VALUE).set(valueExpression);
                 socketBindingResource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Socket binding %s multicast address value expression set as %s.", absoluteResourceName, valueExpression.getExpressionString());
+                context.getLogger().debugf("Socket binding %s multicast address value expression set as %s.", absoluteResourceName, valueExpression.getExpressionString());
                 return ServerMigrationTaskResult.SUCCESS;
             });
         }

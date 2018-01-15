@@ -43,9 +43,9 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
     public SetupHttpUpgradeManagement() {
         name(TASK_NAME);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("HTTP upgrade management setup starting..."));
+        beforeRun(context -> context.getLogger().debugf("Configuring HTTP Upgrade Management..."));
         subtasks(ManageableServerConfigurationCompositeSubtasks.of(new SetManagementInterfacesHttpUpgradeEnabled<>(), new UpdateManagementHttpsSocketBindingPort<>()));
-        afterRun(context -> context.getLogger().infof("HTTP upgrade management setup completed."));
+        afterRun(context -> context.getLogger().infof("HTTP Upgrade Management configured."));
     }
 
     public static class SetManagementInterfacesHttpUpgradeEnabled<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
@@ -70,7 +70,7 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
                 writeAttrOp.get(NAME).set(HTTP_UPGRADE_ENABLED);
                 writeAttrOp.get(VALUE).set(true);
                 resource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Management interface '%s' http upgrade enabled.", MANAGEMENT_INTERFACE_NAME);
+                context.getLogger().debugf("Management interface '%s' http upgrade enabled.", MANAGEMENT_INTERFACE_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(ManagementInterfaceResource.class, MANAGEMENT_INTERFACE_NAME, runnableBuilder);
@@ -104,7 +104,7 @@ public class SetupHttpUpgradeManagement<S> extends ManageableServerConfiguration
                 writeAttrOp.get(NAME).set(SOCKET_BINDING_PORT_ATTR);
                 writeAttrOp.get(VALUE).set(envPropertyPort);
                 resource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().infof("Socket binding '%s' port set to "+envPropertyPort+".", SOCKET_BINDING_NAME);
+                context.getLogger().debugf("Socket binding '%s' port set to "+envPropertyPort+".", SOCKET_BINDING_NAME);
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(SocketBindingResource.class, SOCKET_BINDING_NAME, runnableBuilder);

@@ -158,7 +158,7 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         return EnvironmentProperties.PROPERTIES_PREFIX + getMigrationName() + "." + propertyName;
     }
 
-    protected Collection<JBossServerConfiguration<S>> getConfigs(final JBossServerConfiguration.Type configurationType, final String xmlDocumentElementName, final String envPropertyName) {
+    protected List<JBossServerConfiguration<S>> getConfigs(final JBossServerConfiguration.Type configurationType, final String xmlDocumentElementName, final String envPropertyName) {
         final List<JBossServerConfiguration<S>> configs = new ArrayList<>();
         final String fullEnvPropertyName = getFullEnvironmentPropertyName(envPropertyName);
         final List<String> envConfigs = getMigrationEnvironment().getPropertyAsList(fullEnvPropertyName);
@@ -193,15 +193,15 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         return Collections.unmodifiableList(configs);
     }
 
-    public Collection<JBossServerConfiguration<S>> getStandaloneConfigs() {
+    public List<JBossServerConfiguration<S>> getStandaloneConfigs() {
         return getConfigs(JBossServerConfiguration.Type.STANDALONE, "server", EnvironmentProperties.PROPERTY_STANDALONE_CONFIG_FILES);
     }
 
-    public Collection<JBossServerConfiguration<S>> getDomainDomainConfigs() {
+    public List<JBossServerConfiguration<S>> getDomainDomainConfigs() {
         return getConfigs(JBossServerConfiguration.Type.DOMAIN, "domain", EnvironmentProperties.PROPERTY_DOMAIN_DOMAIN_CONFIG_FILES);
     }
 
-    public Collection<JBossServerConfiguration<S>> getDomainHostConfigs() {
+    public List<JBossServerConfiguration<S>> getDomainHostConfigs() {
         return getConfigs(JBossServerConfiguration.Type.HOST, "host", EnvironmentProperties.PROPERTY_DOMAIN_HOST_CONFIG_FILES);
     }
 

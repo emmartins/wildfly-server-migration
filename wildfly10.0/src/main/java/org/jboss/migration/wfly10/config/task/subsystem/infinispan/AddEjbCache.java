@@ -104,7 +104,7 @@ public class AddEjbCache<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
         addLocalCachePassivation(compositeOperationBuilder, cachePathAddress);
         addLocalCachePersistent(compositeOperationBuilder, cachePathAddress);
         configurationManagement.executeManagementOperation(compositeOperationBuilder.build().getOperation());
-        context.getLogger().infof("Ejb cache added to Infinispan subsystem configuration.");
+        context.getLogger().debugf("Ejb cache added to Infinispan subsystem configuration.");
         return ServerMigrationTaskResult.SUCCESS;
     }
 

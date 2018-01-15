@@ -28,7 +28,7 @@ import org.jboss.migration.wfly10.config.task.management.configuration.Manageabl
 public class MigrateDeployments<S extends JBossServer<S>> extends ManageableServerConfigurationCompositeTask.Builder<JBossServerConfiguration<S>> {
     public MigrateDeployments() {
         name("deployments.migrate-deployments");
-        beforeRun(context -> context.getLogger().debugf("Processing source configuration's deployments..."));
+        beforeRun(context -> context.getLogger().debugf("Retrieving source configuration's deployments..."));
         subtasks(new ManageableServerConfigurationCompositeSubtasks.Builder<JBossServerConfiguration<S>>()
                 .subtask(new MigratePersistentDeployments<>())
                 .subtask(new MigrateScannerDeployments<>())

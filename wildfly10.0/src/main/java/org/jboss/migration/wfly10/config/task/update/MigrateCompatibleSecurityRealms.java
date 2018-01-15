@@ -43,9 +43,13 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
     public MigrateCompatibleSecurityRealms() {
         name("security-realms.migrate-properties");
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().infof("Migrating security realms..."));
+        beforeRun(context -> context.getLogger().debugf("Migrating security realms..."));
         subtasks(SecurityRealmResource.class, ManageableResourceCompositeSubtasks.of(new Subtask<>()));
-        afterRun(context -> context.getLogger().debugf("Security realms migration done."));
+        afterRun(context -> {
+            if (context.hasSucessfulSubtasks()) {
+                context.getLogger().infof("Security realms migrated.");
+            }
+        });
 
     }
 
@@ -55,7 +59,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
             final ManageableResourceTaskRunnableBuilder<JBossServerConfiguration<S>, SecurityRealmResource> runnableBuilder = params -> context -> {
                 final SecurityRealmResource securityRealmResource = params.getResource();
                 final String securityRealmConfigName = securityRealmResource.getResourceAbsoluteName();
-                context.getLogger().debugf("Security realm %s migration starting...", securityRealmConfigName);
+                context.getLogger().debugf("Migrating security realm '%s'...", securityRealmConfigName);
                 final ModelNode securityRealmConfig = securityRealmResource.getResourceConfiguration();
                 if (securityRealmConfig.hasDefined(AUTHENTICATION, PROPERTIES)) {
                     copyPropertiesFile(AUTHENTICATION, securityRealmConfig, params.getSource(), securityRealmResource, context);
@@ -63,7 +67,7 @@ public class MigrateCompatibleSecurityRealms<S extends JBossServer<S>> extends M
                 if (securityRealmConfig.hasDefined(AUTHORIZATION, PROPERTIES)) {
                     copyPropertiesFile(AUTHORIZATION, securityRealmConfig, params.getSource(), securityRealmResource, context);
                 }
-                context.getLogger().infof("Security realm %s migrated.", securityRealmConfigName);
+                context.getLogger().debugf("Security realm '%s' migrated.", securityRealmConfigName);
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

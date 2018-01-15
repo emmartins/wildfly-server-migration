@@ -69,7 +69,7 @@ public class AddHttpsListener<S> extends UpdateSubsystemResourceSubtaskBuilder<S
         op.get(SOCKET_BINDING).set("https");
         op.get(SECURITY_REALM).set("ApplicationRealm");
         subsystemResource.getServerConfiguration().executeManagementOperation(op);
-        context.getLogger().infof("Default HTTPS listener added to server '%s', in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
+        context.getLogger().debugf("Default HTTPS listener added to server '%s', in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
         return ServerMigrationTaskResult.SUCCESS;
     }
 }

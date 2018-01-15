@@ -37,11 +37,11 @@ public class CopyPath implements TaskRunnable {
 
     @Override
     public ServerMigrationTaskResult run(TaskContext context) {
-        context.getLogger().debugf("Source's path: %s", sourcePath);
-        context.getLogger().debugf("Target's path: %s", targetPath);
+        context.getLogger().tracef("Source's path: %s", sourcePath);
+        context.getLogger().tracef("Target's path: %s", targetPath);
         if (!sourcePath.equals(targetPath)) {
             context.getMigrationFiles().copy(sourcePath, targetPath);
-            context.getLogger().infof("Resource with path %s migrated.", sourcePath, targetPath);
+            afterCopy(context);
             return new ServerMigrationTaskResult.Builder()
                     .success()
                     .addAttribute("sourcePath", sourcePath)
@@ -54,5 +54,9 @@ public class CopyPath implements TaskRunnable {
                     .addAttribute("targetPath", targetPath)
                     .build();
         }
+    }
+
+    protected void afterCopy(TaskContext context) {
+        context.getLogger().debugf("Resource %s migrated.", sourcePath);
     }
 }

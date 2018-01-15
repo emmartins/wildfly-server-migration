@@ -51,10 +51,10 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
             // only deployment overlay resources which are direct children of the server config, so it doesn't end up handling here domain server groups' deployment overlays
             final List<DeploymentOverlayResource> overlays = params.getServerConfiguration().getChildResources(DeploymentOverlayResource.RESOURCE_TYPE);
             if (overlays.isEmpty()) {
-                context.getLogger().debugf("No deployment overlays found.");
+                context.getLogger().debugf("No deployment overlays found to migrate.");
                 return ServerMigrationTaskResult.SKIPPED;
             } else {
-                context.getLogger().infof("Deployment overlays found: %s", overlays.stream().map(overlay -> overlay.getResourceName()).collect(toList()));
+                context.getLogger().debugf("Deployment overlays found: %s", overlays.stream().map(overlay -> overlay.getResourceName()).collect(toList()));
                 // migrate only overlays linked to migrated deployments
                 final DeploymentOverlayLinkMatcher matcher = new DeploymentOverlayLinkMatcher();
                 for (DeploymentOverlayResource overlay : overlays) {
@@ -63,7 +63,7 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
                     final List<DeploymentResource> deployments = params.getServerConfiguration().getChildResources(DeploymentResource.RESOURCE_TYPE);
                     for (DeploymentResource deployment : deployments) {
                         if (matcher.matches(deployment.getResourceName(), deploymentLinks)) {
-                            context.getLogger().infof("Migrating deployment overlay '%s', it's linked to deployment %s", overlay.getResourceName(), deployment.getResourceName());
+                            context.getLogger().debugf("Migrating deployment overlay %s, linked to deployment %s.", overlay.getResourceName(), deployment.getResourceName());
                             migrateResource = true;
                             break;
                         }
@@ -73,6 +73,8 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
                     if (!migrateResource) {
                         final ManageableServerConfigurationLeafTask.Builder<JBossServerConfiguration<S>> subtaskBuilder = new RemoveResourceSubtask<>(overlay);
                         context.execute(subtaskBuilder.build(params));
+                    } else {
+                        context.getLogger().infof("Deployment overlay %s migrated.", overlay.getResourceName());
                     }
                 }
                 return context.hasSucessfulSubtasks() ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
@@ -116,11 +118,11 @@ public class MigrateDeploymentOverlays<S extends JBossServer<S>> extends Managea
                     // the resource may be referenced in server groups, remove these first
                     for (DeploymentOverlayResource serverGroupDeploymentResource : selectResources(ServerGroupResource.class).andThen(selectResources(DeploymentOverlayResource.class, resource.getResourceName())).fromResources(params.getServerConfiguration())) {
                         serverGroupDeploymentResource.removeResource();
-                        context.getLogger().infof("Removed deployment overlay from server group %s", resource.getResourceAbsoluteName());
+                        context.getLogger().debugf("Deployment overlay from server group %s removed.", resource.getResourceAbsoluteName());
                     }
                 }
                 resource.removeResource();
-                context.getLogger().infof("Removed deployment overlay from configuration %s", resource.getResourceAbsoluteName());
+                context.getLogger().debugf("Deployment overlay %s removed.", resource.getResourceName());
                 return ServerMigrationTaskResult.SUCCESS;
             };
             runBuilder(runnableBuilder);

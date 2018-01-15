@@ -94,7 +94,7 @@ public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemResourceSub
                     addOp.get(HTTP_LISTENER).set(undertowHttpListenerName);
                     configurationManagement.executeManagementOperation(addOp);
                     configUpdated = true;
-                    context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", httpAcceptorName);
+                    context.getLogger().debugf("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", httpAcceptorName);
                 }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_ACCEPTOR, HTTP_ACCEPTOR_THROUGHPUT_NAME)) {
@@ -102,7 +102,7 @@ public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemResourceSub
                     final ModelNode addOp = Util.createEmptyOperation(ADD, pathAddress);
                     addOp.get(HTTP_LISTENER).set(HTTP_LISTENER_NAME);
                     configurationManagement.executeManagementOperation(addOp);
-                    context.getLogger().infof("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_THROUGHPUT_NAME);
+                    context.getLogger().debugf("HTTP Acceptor named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_ACCEPTOR_THROUGHPUT_NAME);
                 }
                 */
                 if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, httpConnectorName)) {
@@ -112,7 +112,7 @@ public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemResourceSub
                     addOp.get(ENDPOINT).set(httpAcceptorName);
                     configurationManagement.executeManagementOperation(addOp);
                     configUpdated = true;
-                    context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", httpConnectorName);
+                    context.getLogger().debugf("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", httpConnectorName);
                 }
                 /*
                 if (!config.hasDefined(SERVER, serverName, HTTP_CONNECTOR, HTTP_CONNECTOR_THROUGHPUT_NAME)) {
@@ -121,7 +121,7 @@ public class AddHttpAcceptorsAndConnectors<S> extends UpdateSubsystemResourceSub
                     addOp.get(SOCKET_BINDING).set(SOCKET_BINDING_NAME);
                     addOp.get(ENDPOINT).set(HTTP_ACCEPTOR_NAME);
                     configurationManagement.executeManagementOperation(addOp);
-                    context.getLogger().infof("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_THROUGHPUT_NAME);
+                    context.getLogger().debugf("HTTP Connector named %s added to Messaging ActiveMQ subsystem configuration.", HTTP_CONNECTOR_THROUGHPUT_NAME);
                 }
                 */
             }

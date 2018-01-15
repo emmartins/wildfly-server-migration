@@ -61,9 +61,9 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
     public ServerMigrationTask getTask(final S source, final HostResource.Parent hostsManagement) {
         return new ManageableResourceCompositeTask.Builder<S, HostResource.Parent>()
                 .name(HOSTS)
-                .beforeRun(context -> context.getLogger().infof("Hosts migration starting..."))
+                .beforeRun(context -> context.getLogger().debugf("Hosts migration starting..."))
                 .subtasks(new ManageableResourceCompositeSubtasks.Builder<S, HostResource.Parent>().subtask(HostResource.class, getSubtask()))
-                .afterRun(context -> context.getLogger().infof("Hosts migration done."))
+                .afterRun(context -> context.getLogger().debugf("Hosts migration done."))
                 .build(new ManageableResourceBuildParametersImpl<>(source, hostsManagement));
     }
 
@@ -71,10 +71,9 @@ public class HostMigration<S> implements HostsManagementTaskFactory<S> {
         return new ManageableResourceLeafTask.Builder<S, HostResource>()
                 .nameBuilder(parameters -> new ServerMigrationTaskName.Builder(HOST).addAttribute(MIGRATION_REPORT_TASK_ATTR_NAME, parameters.getResource().getResourceName()).build())
                 .beforeRunBuilder(parameters -> context -> {
-                    context.getConsoleWrapper().printf("%n%n");
-                    context.getLogger().infof("Migrating host %s in host configuration %s ...", parameters.getResource().getResourceName(), parameters.getSource());
+                    context.getLogger().infof("Migrating host %s...", parameters.getResource().getResourceName());
                 })
-                .afterRunBuilder(parameters -> context -> context.getLogger().infof("Migration of host %s in host configuration %s done.", parameters.getResource().getResourceName(), parameters.getSource()))
+                .afterRunBuilder(parameters -> context -> context.getLogger().debugf("Migration of host %s in host configuration %s done.", parameters.getResource().getResourceName(), parameters.getSource()))
                 .runBuilder(params -> context -> {
                     final HostConfiguration hostConfiguration = hostConfigurationProvider.getHostConfiguration(params.getResource().getResourceName(), (HostControllerConfiguration) params.getResource().getServerConfiguration());
                     hostConfiguration.start();

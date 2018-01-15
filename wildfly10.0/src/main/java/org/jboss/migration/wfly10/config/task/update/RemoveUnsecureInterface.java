@@ -32,17 +32,16 @@ public class RemoveUnsecureInterface<S> extends ManageableServerConfigurationLea
     public RemoveUnsecureInterface() {
         name("interface.unsecure.remove");
         skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
-        beforeRun(context -> context.getLogger().debugf("Unsecure interface removal task starting..."));
+        beforeRun(context -> context.getLogger().debugf("Removing interface unsecure..."));
         runBuilder(params -> context -> {
             InterfaceResource resource = params.getServerConfiguration().getInterfaceResource("unsecure");
             if (resource == null) {
-                context.getLogger().debugf("Unsecure interface not found, skipping task.");
+                context.getLogger().debugf("Interface unsecure not found, skipping task.");
                 return ServerMigrationTaskResult.SKIPPED;
             }
             resource.removeResource();
-            context.getLogger().infof("Interface %s removed.", resource.getResourceAbsoluteName());
+            context.getLogger().infof("Interface unsecure removed.");
             return ServerMigrationTaskResult.SUCCESS;
         });
-        afterRun(context -> context.getLogger().debugf("Unsecure interface removal task done."));
     }
 }

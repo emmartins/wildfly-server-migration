@@ -99,7 +99,7 @@ public class RemoveUnsupportedExtensions<S extends JBossServer<S>> implements Se
                                     .addAttribute(SUBTASK_NAME_ATTRIBUTE_MODULE, moduleName)
                                     .build())
                             .runnable(subtaskContext -> {
-                                subtaskContext.getLogger().debugf("Extension with module %s removed.", moduleName);
+                                subtaskContext.getLogger().debugf("Extension with module '%s' removed.", moduleName);
                                 removed.add(moduleName);
                                 return ServerMigrationTaskResult.SUCCESS;
                             })
@@ -113,7 +113,7 @@ public class RemoveUnsupportedExtensions<S extends JBossServer<S>> implements Se
         };
         XMLFiles.filter(targetConfigurationPath.getPath(), extensionsFilter);
         if (!removed.isEmpty()) {
-            context.getLogger().infof("Removed the following unsupported extensions: %s", removed);
+            context.getLogger().infof("Unsupported extensions removed: %s", removed);
         }
     }
 }

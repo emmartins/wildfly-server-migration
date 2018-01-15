@@ -32,6 +32,7 @@ public class StandaloneServerUpdate<S extends JBossServer<S>> extends Standalone
 
     @Override
     protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
+        context.getConsoleWrapper().println();
         context.execute(new MigrateContentDir<>("standalone", source.getStandaloneContentDir(), target.getStandaloneContentDir()).build());
         super.beforeConfigurationsMigration(source, target, context);
     }
