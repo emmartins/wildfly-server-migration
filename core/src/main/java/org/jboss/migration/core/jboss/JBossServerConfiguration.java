@@ -47,6 +47,10 @@ public class JBossServerConfiguration<S extends JBossServer<S>> extends ServerPa
         return getServer().getConfigurationDir(configurationType);
     }
 
+    public Path getPathRelativeToConfigurationDir() {
+        return getConfigurationDir().relativize(getPath());
+    }
+
     public Path getDataDir() {
         return getServer().getDataDir(configurationType);
     }
@@ -63,5 +67,10 @@ public class JBossServerConfiguration<S extends JBossServer<S>> extends ServerPa
     @Override
     public Path resolvePath(String path, String relativeTo) {
         return getServer().resolvePath(path, relativeTo);
+    }
+
+    @Override
+    public String toString() {
+        return getPathRelativeToConfigurationDir().toString();
     }
 }
