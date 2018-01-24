@@ -71,6 +71,12 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
             cmds.add("--host-config="+ hostConfig);
         }
         cmds.add("--admin-only");
+        if (!getServer().getEnvironment().isDefaultDomainBaseDir()) {
+            cmds.add("-Djboss.domain.base.dir="+getServer().getDomainDir());
+        }
+        if (!getServer().getEnvironment().isDefaultDomainConfigDir()) {
+            cmds.add("-Djboss.domain.config.dir="+getServer().getDomainConfigurationDir());
+        }
         final String[] systemPackages = {"org.jboss.logmanager"};
         hostController = EmbeddedProcessFactory.createHostController(getServer().getBaseDir().toString(), null, systemPackages, cmds.toArray(new String[cmds.size()]));
         try {
@@ -93,14 +99,14 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     public static class DomainConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
         public HostControllerConfiguration getManageableConfiguration(JBossServerConfiguration configurationPath, WildFlyServer10 server) {
-            return new EmbeddedHostControllerConfiguration(configurationPath.getPath().getFileName().toString(), null, configurationPath, server);
+            return new EmbeddedHostControllerConfiguration(configurationPath.getPathRelativeToConfigurationDir().toString(), null, configurationPath, server);
         }
     }
 
     public static class HostConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
         @Override
         public HostControllerConfiguration getManageableConfiguration(JBossServerConfiguration configurationPath, WildFlyServer10 server) {
-            return new EmbeddedHostControllerConfiguration(null, configurationPath.getPath().getFileName().toString(), configurationPath, server);
+            return new EmbeddedHostControllerConfiguration(null, configurationPath.getPathRelativeToConfigurationDir().toString(), configurationPath, server);
         }
     }
 }
