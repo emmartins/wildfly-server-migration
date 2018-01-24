@@ -62,7 +62,7 @@ public class MigrationFiles {
             throw ServerMigrationLogger.ROOT_LOGGER.sourceFileDoesNotExists(source);
         }
         final Path existentCopySource = copiedFiles.get(target);
-        if (existentCopySource != null) {
+        if (existentCopySource != null && existentCopySource.equals(source)) {
             ServerMigrationLogger.ROOT_LOGGER.debugf("Skipping previously copied file %s", source);
         } else {
             try {
@@ -159,6 +159,7 @@ public class MigrationFiles {
         private synchronized FileVisitResult copy(Path sourcePath) throws ServerMigrationFailureException {
             final Path targetPath = getTargetPath(sourcePath);
             final Path previousSourcePath = copiedFiles.put(targetPath, sourcePath);
+            /*
             if (previousSourcePath != null) {
                 if (previousSourcePath.equals(sourcePath)) {
                     return CONTINUE;
@@ -166,8 +167,10 @@ public class MigrationFiles {
                     throw new ServerMigrationFailureException("Target "+targetPath+" previously copied and sources mismatch: new = "+sourcePath+", previous = "+previousSourcePath);
                 }
             }
+            */
             try {
-                if (Files.exists(targetPath)) {
+                if (previousSourcePath == null && Files.exists(targetPath)) {
+                    // backup if needed
                     if (!Files.isDirectory(targetPath)) {
                         // backup file to be replaced
                         final Path backupPath = targetPath.resolveSibling(targetPath.getFileName().toString()+".beforeMigration");

@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ConfigFilesDiscoveryTest {
-    private static final String STANDALONE_CONFIGS_PROP = JBossServer.EnvironmentProperties.PROPERTIES_PREFIX + TestJBossServer.MIGRATION_NAME + ".standalone.configFiles";
+    private static final String STANDALONE_CONFIGS_PROP = JBossServer.Environment.getFullEnvironmentPropertyName(TestJBossServer.MIGRATION_NAME, JBossServer.Environment.PROPERTY_STANDALONE_CONFIG_FILES);
 
     @Rule
     public final TemporaryFolder tmp = new TemporaryFolder();

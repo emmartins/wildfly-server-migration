@@ -19,10 +19,12 @@ package org.jboss.migration.wfly10.config.task.update;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfiguration;
 import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.core.task.component.SimpleComponentTask;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.config.task.DomainConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.DomainMigration;
 import org.jboss.migration.wfly10.config.task.HostConfigurationMigration;
+import org.jboss.migration.wfly10.config.task.InitializeTargetDir;
 
 /**
  * @author emmartins
@@ -35,10 +37,18 @@ public class DomainUpdate<S extends JBossServer<S>> extends DomainMigration<S> {
 
     @Override
     protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
-        // FIXME first let's migrate all domain's contents, to go around current limitation where content missing for deployment overlays fails to boot target server...
-        context.getConsoleWrapper().println();
-        context.execute(new MigrateContentDir<>("domain", source.getDomainContentDir(), target.getDomainContentDir()).build());
         super.beforeConfigurationsMigration(source, target, context);
+        context.getConsoleWrapper().println();
+        context.execute(new SimpleComponentTask.Builder().name("domain.initialize-target-dirs")
+                .subtasks(new InitializeTargetDir<>("domain.base.dir", target.getDomainDir(), target.getDefaultDomainDir()),
+                        new InitializeTargetDir<>("domain.config.dir", target.getDomainConfigurationDir(), target.getDefaultDomainConfigurationDir()))
+                .afterRun(context1 -> {
+                    if (context1.hasSucessfulSubtasks()) {
+                        context1.getLogger().info("Target's domain dirs initialized.");
+                    }
+                })
+                .build());
+        context.execute(new MigrateContentDir<>("domain", source.getDomainContentDir(), target.getDomainContentDir()).build());
     }
 
     public static class Builder<S extends JBossServer<S>> extends DomainMigration.Builder<S> {
