@@ -35,10 +35,13 @@ public class DomainUpdate<S extends JBossServer<S>> extends DomainMigration<S> {
 
     @Override
     protected void beforeConfigurationsMigration(S source, WildFlyServer10 target, TaskContext context) {
-        // FIXME first let's migrate all domain's contents, to go around current limitation where content missing for deployment overlays fails to boot target server...
-        context.getConsoleWrapper().println();
-        context.execute(new MigrateContentDir<>("domain", source.getDomainContentDir(), target.getDomainContentDir()).build());
         super.beforeConfigurationsMigration(source, target, context);
+        context.getConsoleWrapper().println();
+        context.execute(new InitializeTargetDirs("domain")
+                .targetDir("domain.base.dir", target.getDomainDir(), target.getDefaultDomainDir())
+                .targetDir("domain.config.dir", target.getDomainConfigurationDir(), target.getDefaultDomainConfigurationDir())
+                .build());
+        context.execute(new MigrateContentDir<>("domain", source.getDomainContentDir(), target.getDomainContentDir()).build());
     }
 
     public static class Builder<S extends JBossServer<S>> extends DomainMigration.Builder<S> {
