@@ -22,8 +22,6 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.migration.core.ProductInfo;
 
-import java.nio.file.Path;
-
 import static org.jboss.logging.Logger.Level.INFO;
 
 /**
@@ -170,20 +168,4 @@ public interface ServerMigrationLogger extends BasicLogger {
     @LogMessage(level = INFO)
     @Message(id = Message.NONE, value = "%s server %s.")
     void serverProductInfo(String name, ProductInfo productInfo);
-
-    /**
-     * Creates an exception indicating that a file copy's source does not exists.
-     *
-     * @return a {@link IllegalArgumentException} for the error.
-     */
-    @Message(id = 7, value = "Copy's source file %s does not exists.")
-    IllegalArgumentException sourceFileDoesNotExists(Path sourcePath);
-
-    /**
-     * Creates an exception indicating that the target file was previously copied, and source file was different.
-     *
-     * @return a {@link IllegalStateException} for the error.
-     */
-    @Message(id = 8, value = "Target file %s previously copied from different source.")
-    IllegalStateException targetPreviouslyCopiedFromDifferentSource(Path targetPath);
 }

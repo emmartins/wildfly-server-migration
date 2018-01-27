@@ -116,7 +116,7 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
                 xmlDocumentElementName = "server";
                 break;
             case DOMAIN:
-                envConfigs = environment.getEnvironmentDomainConfigFiles();
+                envConfigs = environment.getDomainConfigFiles();
                 xmlDocumentElementName = "domain";
                 break;
             case HOST:
@@ -632,7 +632,7 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         }
 
         public List<String> getStandaloneConfigFiles() {
-            return standaloneConfigFiles;
+            return getEnvironmentStandaloneConfigFiles();
         }
 
         public boolean isDefaultDomainBaseDir() {
