@@ -28,6 +28,7 @@ public interface JBossExtensionNames {
     String CONNECTOR = "org.jboss.as.connector";
     String CORE_MANAGEMENT = "org.wildfly.extension.core-management";
     String DEPLOYMENT_SCANNER = "org.jboss.as.deployment-scanner";
+    String DISCOVERY = "org.wildfly.extension.discovery";
     String EE = "org.jboss.as.ee";
     String EJB3 = "org.jboss.as.ejb3";
     String ELYTRON = "org.wildfly.extension.elytron";

@@ -35,20 +35,18 @@ public class WildFlyFullServer11_0 extends WildFlyServer10 {
     public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
             .extensions(WildFlyFullServer10_0.EXTENSIONS)
             .extension(JBossExtensions.CORE_MANAGEMENT)
+            .extension(JBossExtensions.DISCOVERY)
             .extension(JBossExtensions.ELYTRON)
             .build();
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(WildFlyFullServerMigrationProvider11_0.class));
 
     public WildFlyFullServer11_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS, SERVER_MIGRATIONS);
+        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS);
     }
 
-    protected WildFlyFullServer11_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, WildFlyServerMigrations10 serverMigrations) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS, serverMigrations);
-    }
-
-    protected WildFlyFullServer11_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, Extensions extensions, WildFlyServerMigrations10 serverMigrations) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, extensions, serverMigrations);
+    @Override
+    protected WildFlyServerMigrations10 getMigrations() {
+        return SERVER_MIGRATIONS;
     }
 }

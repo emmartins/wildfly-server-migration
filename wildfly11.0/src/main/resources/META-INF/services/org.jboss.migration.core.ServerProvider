@@ -1,1 +1,2 @@
 org.jboss.migration.wfly11.WildFlyFullServerProvider11_0
+org.jboss.migration.wfly12.WildFlyFullServerProvider12_0
