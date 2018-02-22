@@ -29,15 +29,8 @@ import java.nio.file.Path;
  */
 public abstract class WildFlyServer10 extends JBossServer<WildFlyServer10> {
 
-    protected final WildFlyServerMigrations10 serverMigrations;
-
     public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, JBossServer.Extensions extensions) {
-        this(migrationName, productInfo, baseDir, migrationEnvironment, extensions, null);
-    }
-
-    public WildFlyServer10(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, JBossServer.Extensions extensions, WildFlyServerMigrations10 serverMigrations) {
         super(migrationName, productInfo, baseDir, migrationEnvironment, extensions);
-        this.serverMigrations = serverMigrations;
     }
 
     @Override
@@ -50,7 +43,12 @@ public abstract class WildFlyServer10 extends JBossServer<WildFlyServer10> {
         }
     }
 
+    protected WildFlyServerMigrations10 getMigrations() {
+        return null;
+    }
+
     protected WildFlyServerMigration10 getMigration(Server source) {
+        final WildFlyServerMigrations10 serverMigrations = getMigrations();
         return serverMigrations != null ? serverMigrations.getMigrationFrom(source) : null;
     }
 }

@@ -29,6 +29,7 @@ public interface JBossSubsystemNames {
     String CORE_MANAGEMENT = "core-management";
     String DATASOURCES = "datasources";
     String DEPLOYMENT_SCANNER = "deployment-scanner";
+    String DISCOVERY = "discovery";
     String EE = "ee";
     String EJB3 = "ejb3";
     String ELYTRON = "elytron";

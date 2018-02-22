@@ -63,6 +63,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.DEPLOYMENT_SCANNER)
             .build();
 
+    Extension DISCOVERY = Extension.builder()
+            .module(JBossExtensionNames.DISCOVERY)
+            .subsystem(JBossSubsystemNames.DISCOVERY)
+            .build();
+
     Extension EE = Extension.builder()
             .module(JBossExtensionNames.EE)
             .subsystem(JBossSubsystemNames.EE)
@@ -75,7 +80,7 @@ public interface JBossExtensions {
 
     Extension ELYTRON = Extension.builder()
             .module(JBossExtensionNames.ELYTRON)
-            .subsystem(JBossSubsystemNames.ELYTRON)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.ELYTRON).namespaceWithoutVersion("urn:wildfly:elytron"))
             .build();
 
     Extension IIOP_OPENJDK = Extension.builder()

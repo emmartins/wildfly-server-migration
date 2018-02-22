@@ -99,6 +99,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly8.2-to-wildfly12.0</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly9.0</artifactId>
         </dependency>
 
@@ -119,6 +124,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly9.0-to-wildfly12.0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly10.0</artifactId>
         </dependency>
 
@@ -130,6 +140,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly10.0-to-wildfly11.0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.0-to-wildfly12.0</artifactId>
         </dependency>
 
         <dependency>
@@ -146,12 +161,27 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly10.1-to-wildfly11.0</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.1-to-wildfly12.0</artifactId>
+        </dependency>
         
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly11.0</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly11.0-to-wildfly12.0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly12.0</artifactId>
+        </dependency>
+        
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>

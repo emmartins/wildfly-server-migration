@@ -20,7 +20,6 @@ import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.jboss.JBossExtensions;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.wfly10.WildFlyServer10;
-import org.jboss.migration.wfly10.WildFlyServerMigrations10;
 
 import java.nio.file.Path;
 
@@ -68,14 +67,6 @@ public class WildFlyFullServer10_0 extends WildFlyServer10 {
             .build();
 
     public WildFlyFullServer10_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS, null);
-    }
-
-    protected WildFlyFullServer10_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, WildFlyServerMigrations10 serverMigrations) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS, serverMigrations);
-    }
-
-    protected WildFlyFullServer10_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment, Extensions extensions, WildFlyServerMigrations10 serverMigrations) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment, extensions, serverMigrations);
+        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS);
     }
 }
