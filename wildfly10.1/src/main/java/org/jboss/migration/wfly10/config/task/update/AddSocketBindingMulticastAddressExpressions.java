@@ -62,7 +62,7 @@ public class AddSocketBindingMulticastAddressExpressions<S> extends ManageableSe
     public static class AddSocketBindingMulticastAddressExpression<S> extends ManageableResourceLeafTask.Builder<S, SocketBindingResource> {
 
         protected AddSocketBindingMulticastAddressExpression(String resourceName) {
-            this(resourceName, "jboss."+resourceName+".multicast.adress");
+            this(resourceName, "jboss."+resourceName+".multicast.address");
         }
 
         protected AddSocketBindingMulticastAddressExpression(String resourceName, String propertyName) {
