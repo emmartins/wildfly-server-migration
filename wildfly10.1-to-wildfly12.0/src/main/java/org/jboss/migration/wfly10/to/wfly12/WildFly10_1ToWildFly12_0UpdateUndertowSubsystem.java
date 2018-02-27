@@ -16,11 +16,10 @@
 
 package org.jboss.migration.wfly10.to.wfly12;
 
-import org.jboss.migration.wfly11.task.subsystem.undertow.AddHttpInvoker;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.UpdateDefaultHostResponseHeaderServer;
+import org.jboss.migration.wfly11.task.subsystem.undertow.AddHttpInvoker;
 
 /**
  * @author emmartins
@@ -28,8 +27,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostR
 public class WildFly10_1ToWildFly12_0UpdateUndertowSubsystem<S> extends UpdateSubsystemResources<S> {
     public WildFly10_1ToWildFly12_0UpdateUndertowSubsystem() {
         super(JBossSubsystemNames.UNDERTOW,
-                new SetDefaultHostResponseHeaderServer<>(),
-                new SetDefaultHostResponseHeaderXPoweredBy<>(),
+                new UpdateDefaultHostResponseHeaderServer<>(),
                 new AddHttpInvoker<>());
     }
 }
