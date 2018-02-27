@@ -21,8 +21,6 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsyst
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
 
 /**
  * @author emmartins
@@ -32,8 +30,6 @@ public class EAP7_0ToEAP7_1UpdateUndertowSubsystem<S> extends UpdateSubsystemRes
         super(SubsystemNames.UNDERTOW,
                 new AddHttpsListener<>(),
                 new EnableHttp2<>(),
-                new SetDefaultHostResponseHeaderServer<>(),
-                new SetDefaultHostResponseHeaderXPoweredBy<>(),
                 new AddHttpInvoker<>());
     }
 }
