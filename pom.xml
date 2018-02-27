@@ -61,7 +61,7 @@
             versions, add the artifactId or other qualifier to the property name.
             For example: <version.org.jboss.as.console>
          -->
-        <version.org.wildfly.core>4.0.0.Beta1</version.org.wildfly.core>
+        <version.org.wildfly.core>4.0.0.CR1</version.org.wildfly.core>
         <version.org.asciidoctor.asciidoctor-maven-plugin>1.5.6</version.org.asciidoctor.asciidoctor-maven-plugin>
 
         <!-- Surefire args -->
@@ -85,29 +85,39 @@
         <module>eap6.4</module>
         <module>eap6.4-to-eap7.0</module>
         <module>eap6.4-to-eap7.1</module>
+        <module>eap6.4-to-eap7.2</module>
         <module>eap7.0</module>
         <module>eap7.0-to-eap7.1</module>
+        <module>eap7.0-to-eap7.2</module>
         <module>eap7.1</module>
         <module>eap7.1-feature-pack</module>
+        <module>eap7.1-to-eap7.2</module>        
+        <module>eap7.2</module>
+        <module>eap7.2-feature-pack</module>
         <module>wildfly8.2</module>
         <module>wildfly8.2-to-eap7.0</module>
         <module>wildfly8.2-to-eap7.1</module>
+        <module>wildfly8.2-to-eap7.2</module>
         <module>wildfly8.2-to-wildfly11.0</module>
         <module>wildfly8.2-to-wildfly12.0</module>        
         <module>wildfly9.0</module>
         <module>wildfly9.0-to-eap7.0</module>
         <module>wildfly9.0-to-eap7.1</module>
+        <module>wildfly9.0-to-eap7.2</module>
         <module>wildfly9.0-to-wildfly11.0</module>
         <module>wildfly9.0-to-wildfly12.0</module>
         <module>wildfly10.0</module>
         <module>wildfly10.0-to-eap7.1</module>
+        <module>wildfly10.0-to-eap7.2</module>
         <module>wildfly10.0-to-wildfly11.0</module>
         <module>wildfly10.0-to-wildfly12.0</module>
         <module>wildfly10.1</module>
         <module>wildfly10.1-to-eap7.1</module>
+        <module>wildfly10.1-to-eap7.2</module>
         <module>wildfly10.1-to-wildfly11.0</module>
         <module>wildfly10.1-to-wildfly12.0</module>
         <module>wildfly11.0</module>
+        <module>wildfly11.0-to-eap7.2</module>
         <module>wildfly11.0-to-wildfly12.0</module>
         <module>wildfly12.0</module>
     </modules>
@@ -276,6 +286,12 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap6.4-to-eap7.2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap7.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -283,6 +299,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap7.0-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.0-to-eap7.2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             
@@ -295,6 +317,24 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap7.1-feature-pack</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.1-to-eap7.2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.2-feature-pack</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -313,6 +353,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly8.2-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly8.2-to-eap7.2</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -348,6 +394,12 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly9.0-to-eap7.2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly9.0-to-wildfly11.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -367,6 +419,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly10.0-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly10.0-to-eap7.2</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -393,6 +451,12 @@
                 <artifactId>jboss-server-migration-wildfly10.1-to-eap7.1</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly10.1-to-eap7.2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -409,6 +473,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly11.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly11.0-to-eap7.2</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
