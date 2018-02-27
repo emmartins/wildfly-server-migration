@@ -33,7 +33,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SER
  * A task which adds a response header filter to Undertow's default host config.
  * @author emmartins
  */
-public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
+public abstract class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
     public static final String TASK_NAME = "add-response-header";
 
@@ -49,22 +49,14 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubt
 
     protected final String filterName;
     protected final String headerName;
-    protected final String headerValue;
 
     public SetDefaultHostResponseHeader(String filterName, String headerName) {
-        this(filterName, headerName, null);
-    }
-
-    public SetDefaultHostResponseHeader(String filterName, String headerName, String headerValue) {
         subtaskName(TASK_NAME+"."+filterName);
         this.filterName = filterName;
         this.headerName = headerName;
-        this.headerValue = headerValue;
     }
 
-    protected String getHeaderValue(ModelNode config, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
-        return headerValue;
-    }
+    protected abstract String getHeaderValue(boolean defined, ModelNode config, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment);
 
     @Override
     protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
@@ -82,16 +74,16 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubt
             context.getLogger().debugf("Skipping task, host '%s' not found in Undertow's config %s", defaultHostPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
             return ServerMigrationTaskResult.SKIPPED;
         }
-        final ModelNode defaultHost = server.get(HOST, HOST_NAME);
-        // add/update the response header
-        final String headerValue = getHeaderValue(config, subsystemResource, context, taskEnvironment);
+        final boolean headerDefined = config.hasDefined(CONFIGURATION, FILTER, RESPONSE_HEADER, filterName);
+        final String headerValue = getHeaderValue(headerDefined, config, subsystemResource, context, taskEnvironment);
         if (headerValue == null) {
-            context.getLogger().debugf("Skipping task, null header-value");
+            context.getLogger().debugf("Skipping task, no header-value to set");
             return ServerMigrationTaskResult.SKIPPED;
         }
+        // add/update the response header
         final PathAddress responseHeaderPathAddress = configPathAddress.append(CONFIGURATION, FILTER).append(RESPONSE_HEADER, filterName);
-        if (!config.hasDefined(CONFIGURATION, FILTER, RESPONSE_HEADER, filterName)) {
-            // response header not defined, add it
+        if (!headerDefined) {
+            // add
             if (!config.hasDefined(CONFIGURATION, FILTER)) {
                 final ModelNode op = Util.createAddOperation(configPathAddress.append(CONFIGURATION, FILTER));
                 subsystemResource.getServerConfiguration().executeManagementOperation(op);
@@ -100,15 +92,14 @@ public class SetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubt
             op.get(HEADER_NAME).set(headerName);
             op.get(HEADER_VALUE).set(headerValue);
             subsystemResource.getServerConfiguration().executeManagementOperation(op);
+            // add filter-ref to default host, if missing
+            if (!server.get(HOST, HOST_NAME).hasDefined(FILTER_REF, filterName)) {
+                final PathAddress filterRefPathAddress = defaultHostPathAddress.append(FILTER_REF, filterName);
+                subsystemResource.getServerConfiguration().executeManagementOperation(Util.createAddOperation(filterRefPathAddress));
+            }
         } else {
-            // response header exists, update its header-value attr
+            // update
             final ModelNode op = Util.getWriteAttributeOperation(responseHeaderPathAddress, HEADER_VALUE, headerValue);
-            subsystemResource.getServerConfiguration().executeManagementOperation(op);
-        }
-        // add filter-ref to default host, if missing
-        if (!defaultHost.hasDefined(FILTER_REF, filterName)) {
-            final PathAddress filterRefPathAddress = defaultHostPathAddress.append(FILTER_REF, filterName);
-            final ModelNode op = Util.createAddOperation(filterRefPathAddress);
             subsystemResource.getServerConfiguration().executeManagementOperation(op);
         }
         context.getLogger().debugf("Response header '%s' set as '%s: %s' in Undertow's config %s", filterName, headerName, headerValue, configPathAddress.toCLIStyleString());
