@@ -18,8 +18,8 @@ package org.jboss.migration.wfly8.to.wfly12;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
-import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
+import org.jboss.migration.wfly12.task.subsystem.infinispan.WildFly12_0FixHibernateCacheModuleName;
 
 /**
  * @author emmartins
@@ -28,7 +28,7 @@ public class WildFly8ToWildFly12_0UpdateInfinispanSubsystem<S> extends UpdateSub
     public WildFly8ToWildFly12_0UpdateInfinispanSubsystem() {
         super(JBossSubsystemNames.INFINISPAN,
                 new AddServerCache<>(),
-                new FixHibernateCacheModuleName<>(),
+                new WildFly12_0FixHibernateCacheModuleName<>(),
                 new UpdateWebCache<>());
     }
 }

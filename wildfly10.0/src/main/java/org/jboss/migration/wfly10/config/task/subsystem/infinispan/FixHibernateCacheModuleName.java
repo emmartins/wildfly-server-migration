@@ -19,14 +19,14 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.migration.core.jboss.ModuleIdentifier;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
 import static org.jboss.as.controller.PathElement.pathElement;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -38,48 +38,49 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 public class FixHibernateCacheModuleName<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
 
     public interface EnvironmentProperties {
-        String LEGACY_MODULE_NAMES = "deprecatedModuleNames";
         String NEW_MODULE_NAME = "moduleName";
     }
 
     public static final String TASK_NAME = "fix-hibernate-cache-module-name";
 
-    public FixHibernateCacheModuleName() {
+    private final String defaultNewModuleName;
+
+    public FixHibernateCacheModuleName(String defaultNewModuleName) {
         subtaskName(TASK_NAME);
+        this.defaultNewModuleName = Objects.requireNonNull(defaultNewModuleName);
     }
 
     private static final String CACHE_CONTAINER = "cache-container";
+    private static final String HIBERNATE = "hibernate";
     private static final String MODULE_ATTR_NAME = "module";
-    private static final String DEFAULT_NEW_MODULE_NAME = "org.hibernate.infinispan";
-    private static final List<String> DEFAULT_LEGACY_MODULE_NAMES = Arrays.asList("org.jboss.as.jpa.hibernate:4", "org.hibernate");
+
 
     @Override
     protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
         final PathAddress subsystemPathAddress = subsystemResource.getResourcePathAddress();
         final ManageableServerConfiguration configurationManagement = subsystemResource.getServerConfiguration();
-        // read env properties
-        final List<String> legacyModuleNames = taskEnvironment.getPropertyAsList(EnvironmentProperties.LEGACY_MODULE_NAMES, DEFAULT_LEGACY_MODULE_NAMES);
-        final String newModuleName = taskEnvironment.getPropertyAsString(EnvironmentProperties.NEW_MODULE_NAME, DEFAULT_NEW_MODULE_NAME);
         // do migration
-        if (!config.hasDefined(CACHE_CONTAINER)) {
-            context.getLogger().debugf("No Cache container");
+        if (!config.hasDefined(CACHE_CONTAINER, HIBERNATE)) {
+            context.getLogger().debugf("Hibernate cache container not defined.");
             return ServerMigrationTaskResult.SKIPPED;
         }
-        boolean configUpdated = false;
-        for (String cacheName : config.get(CACHE_CONTAINER).keys()) {
-            final ModelNode cache = config.get(CACHE_CONTAINER, cacheName);
-            if (cache.hasDefined(MODULE_ATTR_NAME)) {
-                if (legacyModuleNames.contains(cache.get(MODULE_ATTR_NAME).asString())) {
-                    // /subsystem=infinispan/cache-container=cacheName:write-attribute(name=MODULE_ATTR_NAME,value=MODULE_ATTR_NEW_VALUE)
-                    final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, subsystemPathAddress.append(pathElement(CACHE_CONTAINER, cacheName)));
-                    op.get(NAME).set(MODULE_ATTR_NAME);
-                    op.get(VALUE).set(newModuleName);
-                    configurationManagement.executeManagementOperation(op);
-                    configUpdated = true;
-                    context.getLogger().debugf("Infinispan subsystem's cache %s 'module' attribute updated to %s.", cacheName, newModuleName);
-                }
-            }
+        final ModelNode cache = config.get(CACHE_CONTAINER, HIBERNATE);
+        if (!cache.hasDefined(MODULE_ATTR_NAME)) {
+            context.getLogger().debugf("Hibernate cache container module not defined.");
+            return ServerMigrationTaskResult.SKIPPED;
         }
-        return configUpdated ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
+        // read env properties
+        final String newModuleName = taskEnvironment.getPropertyAsString(EnvironmentProperties.NEW_MODULE_NAME, defaultNewModuleName);
+        final String moduleName = cache.get(MODULE_ATTR_NAME).asString();
+        if (ModuleIdentifier.fromString(moduleName).equals(ModuleIdentifier.fromString(newModuleName))) {
+            context.getLogger().debugf("Hibernate cache container module already defined with correct module name.");
+            return ServerMigrationTaskResult.SKIPPED;
+        }
+        // /subsystem=infinispan/cache-container=cacheName:write-attribute(name=MODULE_ATTR_NAME,value=MODULE_ATTR_NEW_VALUE)
+        final ModelNode op = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, subsystemPathAddress.append(pathElement(CACHE_CONTAINER, HIBERNATE)));
+        op.get(NAME).set(MODULE_ATTR_NAME);
+        op.get(VALUE).set(newModuleName);
+        configurationManagement.executeManagementOperation(op);
+        return ServerMigrationTaskResult.SUCCESS;
     }
 }
