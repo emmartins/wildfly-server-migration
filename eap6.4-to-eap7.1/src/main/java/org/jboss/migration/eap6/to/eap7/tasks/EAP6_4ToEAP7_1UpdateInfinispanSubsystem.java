@@ -20,8 +20,8 @@ import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddEjbCache;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.AddServerCache;
-import org.jboss.migration.wfly10.config.task.subsystem.infinispan.FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.subsystem.infinispan.UpdateWebCache;
+import org.jboss.migration.wfly10.config.task.subsystem.infinispan.WildFly10_0FixHibernateCacheModuleName;
 
 /**
  * @author emmartins
@@ -31,7 +31,7 @@ public class EAP6_4ToEAP7_1UpdateInfinispanSubsystem<S> extends UpdateSubsystemR
         super(JBossSubsystemNames.INFINISPAN,
                 new AddServerCache<>(),
                 new AddEjbCache<>(),
-                new FixHibernateCacheModuleName<>(),
+                new WildFly10_0FixHibernateCacheModuleName<>(),
                 new UpdateWebCache<>());
     }
 }
