@@ -15,27 +15,74 @@
  */
 package org.jboss.migration.cli;
 
-import org.jboss.cli.commonscli.Options;
+import org.jboss.migration.cli.commonscli.Option;
+import org.jboss.migration.cli.commonscli.Options;
 
-import java.util.stream.Stream;
-
-import static org.jboss.migration.cli.CommandLineOption.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ingo Weiss
+ * @author emmartins
  */
-public interface CommandLineOptions {
+public class CommandLineOptions {
 
-    Options NON_DEPRECATED = new Options()
-            .addOption(ENVIRONMENT)
-            .addOption(HELP)
-            .addOption(NON_INTERACTIVE)
-            .addOption(SOURCE)
-            .addOption(TARGET);
+    private final Options nonDeprecatedOptions;
+    private final Options deprecatedOptions;
+    private final Options allOptions;
 
-    Options DEPRECATED = new Options()
-            .addOption(INTERACTIVE);
+    protected CommandLineOptions(Builder builder) {
+        this.allOptions = new Options();
+        this.nonDeprecatedOptions = new Options();
+        for (Option option : builder.nonDeprecatedOptions) {
+            nonDeprecatedOptions.addOption(option);
+            allOptions.addOption(option);
+        }
+        this.deprecatedOptions = new Options();
+        for (Option option : builder.deprecatedOptions) {
+            deprecatedOptions.addOption(option);
+            allOptions.addOption(option);
+        }
+    }
 
-    Options ALL = Stream.concat(NON_DEPRECATED.getOptions().stream(), DEPRECATED.getOptions().stream())
-            .collect(Options::new, Options::addOption, (options1, options2) -> options2.getOptions().stream().forEach(option -> options1.addOption(option)));
+    public Options getAllOptions() {
+        return allOptions;
+    }
+
+    public Options getDeprecatedOptions() {
+        return deprecatedOptions;
+    }
+
+    public Options getNonDeprecatedOptions() {
+        return nonDeprecatedOptions;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    protected static class Builder {
+
+        private final List<Option> nonDeprecatedOptions;
+        private final List<Option> deprecatedOptions;
+
+        protected Builder() {
+            this.nonDeprecatedOptions = new ArrayList<>();
+            this.deprecatedOptions = new ArrayList<>();
+        }
+
+        public Builder deprecatedOption(Option option) {
+            deprecatedOptions.add(option);
+            return this;
+        }
+
+        public Builder nonDeprecatedOption(Option option) {
+            nonDeprecatedOptions.add(option);
+            return this;
+        }
+
+        public CommandLineOptions build() {
+            return new CommandLineOptions(this);
+        }
+    }
 }

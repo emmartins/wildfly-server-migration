@@ -15,11 +15,11 @@
  */
 package org.jboss.migration.cli;
 
-import org.jboss.cli.commonscli.CommandLine;
-import org.jboss.cli.commonscli.DefaultParser;
-import org.jboss.cli.commonscli.HelpFormatter;
-import org.jboss.cli.commonscli.MissingOptionException;
-import org.jboss.cli.commonscli.ParseException;
+import org.jboss.migration.cli.commonscli.CommandLine;
+import org.jboss.migration.cli.commonscli.DefaultParser;
+import org.jboss.migration.cli.commonscli.HelpFormatter;
+import org.jboss.migration.cli.commonscli.MissingOptionException;
+import org.jboss.migration.cli.commonscli.ParseException;
 import org.jboss.migration.cli.logger.CommandLineMigrationLogger;
 import org.jboss.migration.core.MigrationData;
 import org.jboss.migration.core.ServerMigration;
@@ -38,6 +38,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import static org.jboss.migration.cli.CommandLineOption.*;
+
 /**
  * The command line tool to migrate a WildFly server.
  *
@@ -47,6 +49,15 @@ public class CommandLineServerMigration {
     // Capture System.out and System.err before they are redirected by STDIO
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
+
+    private static final CommandLineOptions COMMAND_LINE_OPTIONS = CommandLineOptions.builder()
+            .nonDeprecatedOption(ENVIRONMENT)
+            .nonDeprecatedOption(HELP)
+            .nonDeprecatedOption(NON_INTERACTIVE)
+            .nonDeprecatedOption(SOURCE)
+            .nonDeprecatedOption(TARGET)
+            .deprecatedOption(INTERACTIVE)
+            .build();
 
     private CommandLineServerMigration() {
     }
@@ -60,7 +71,7 @@ public class CommandLineServerMigration {
 
         CommandLine cmdLine;
         try {
-            cmdLine = new DefaultParser().parse(CommandLineOptions.ALL, args);
+            cmdLine = new DefaultParser().parse(COMMAND_LINE_OPTIONS.getAllOptions(), args);
 
             if (cmdLine.hasOption(CommandLineConstants.HELP.getArgument())) {
                 help();
@@ -156,7 +167,7 @@ public class CommandLineServerMigration {
         System.out.println(CommandLineMigrationLogger.ROOT_LOGGER.helpHeader());
         HelpFormatter help = new HelpFormatter();
         help.setWidth(1024);
-        help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"), CommandLineOptions.NON_DEPRECATED,true);
+        help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"), COMMAND_LINE_OPTIONS.getNonDeprecatedOptions(),true);
     }
 
     private static Properties loadProperties(Path propertiesFilePath) throws IOException {
