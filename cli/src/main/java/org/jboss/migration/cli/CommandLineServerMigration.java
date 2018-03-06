@@ -16,6 +16,7 @@
 package org.jboss.migration.cli;
 
 import org.jboss.migration.cli.commonscli.CommandLine;
+import org.jboss.migration.cli.commonscli.DefaultParser;
 import org.jboss.migration.cli.commonscli.HelpFormatter;
 import org.jboss.migration.cli.commonscli.MissingOptionException;
 import org.jboss.migration.cli.commonscli.ParseException;
@@ -70,7 +71,7 @@ public class CommandLineServerMigration {
 
         CommandLine cmdLine;
         try {
-            cmdLine = new CommandLineParser(false).parse(COMMAND_LINE_OPTIONS.getAllOptions(), args);
+            cmdLine = new DefaultParser().parse(COMMAND_LINE_OPTIONS.getAllOptions(), args);
 
             if (cmdLine.hasOption(CommandLineConstants.HELP.getArgument())) {
                 help();
