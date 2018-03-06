@@ -16,7 +16,6 @@
 package org.jboss.migration.cli;
 
 import org.jboss.cli.commonscli.CommandLine;
-import org.jboss.cli.commonscli.CommandLineParser;
 import org.jboss.cli.commonscli.DefaultParser;
 import org.jboss.cli.commonscli.HelpFormatter;
 import org.jboss.cli.commonscli.MissingOptionException;
@@ -48,8 +47,6 @@ public class CommandLineServerMigration {
     // Capture System.out and System.err before they are redirected by STDIO
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
-    private static final CommandLineParser cmdLineParser = new DefaultParser();
-    private static final CommandLineOptions cmdOptions = new CommandLineOptions();
 
     private CommandLineServerMigration() {
     }
@@ -62,9 +59,8 @@ public class CommandLineServerMigration {
     public static void main(String[] args) {
 
         CommandLine cmdLine;
-
         try {
-            cmdLine = cmdLineParser.parse(cmdOptions.getOptions(), args);
+            cmdLine = new DefaultParser().parse(CommandLineOptions.ALL, args);
 
             if (cmdLine.hasOption(CommandLineConstants.HELP.getArgument())) {
                 help();
@@ -74,15 +70,22 @@ public class CommandLineServerMigration {
             if (!cmdLine.hasOption(CommandLineConstants.SOURCE.getArgument())) {
                 throw new MissingOptionException("Missing required option: " + CommandLineConstants.SOURCE.getArgument());
             }
+            final Path source = resolvePath(cmdLine.getOptionValue(CommandLineConstants.SOURCE.getArgument()));
 
             if (!cmdLine.hasOption(CommandLineConstants.TARGET.getArgument())) {
                 throw new MissingOptionException("Missing required option: " + CommandLineConstants.TARGET.getArgument());
             }
+            final Path target = resolvePath(cmdLine.getOptionValue(CommandLineConstants.TARGET.getArgument()));
 
-            Path source = resolvePath(cmdLine.getOptionValue(CommandLineConstants.SOURCE.getArgument()));
-            Path target = resolvePath(cmdLine.getOptionValue(CommandLineConstants.TARGET.getArgument()));
-            Path environment = cmdLine.hasOption(CommandLineConstants.ENVIRONMENT.getArgument()) ? resolvePath(cmdLine.getOptionValue(CommandLineConstants.ENVIRONMENT.getArgument())) : null;
-            boolean interactive = !cmdLine.hasOption(CommandLineConstants.NON_INTERACTIVE.getArgument());
+            final Path environment = cmdLine.hasOption(CommandLineConstants.ENVIRONMENT.getArgument()) ? resolvePath(cmdLine.getOptionValue(CommandLineConstants.ENVIRONMENT.getArgument())) : null;
+
+            final boolean interactive;
+            if (cmdLine.hasOption(CommandLineConstants.NON_INTERACTIVE.getArgument())) {
+                interactive = false;
+            } else {
+                // non-interactive arg not found, look for deprecated interactive arg
+                interactive = !cmdLine.hasOption(CommandLineConstants.INTERACTIVE.getArgument()) || Boolean.parseBoolean(cmdLine.getOptionValue(CommandLineConstants.INTERACTIVE.getArgument()));
+            }
 
             if (!cmdLine.getArgList().isEmpty()) {
                 System.err.printf("Incorrect argument(s), %s. Exiting...\n", cmdLine.getArgList());
@@ -153,7 +156,7 @@ public class CommandLineServerMigration {
         System.out.println(CommandLineMigrationLogger.ROOT_LOGGER.helpHeader());
         HelpFormatter help = new HelpFormatter();
         help.setWidth(1024);
-        help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"), cmdOptions.getOptions(),true);
+        help.printHelp(CommandLineMigrationLogger.ROOT_LOGGER.argUsage("jboss-server-migration"), CommandLineOptions.NON_DEPRECATED,true);
     }
 
     private static Properties loadProperties(Path propertiesFilePath) throws IOException {

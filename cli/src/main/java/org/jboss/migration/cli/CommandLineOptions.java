@@ -15,40 +15,27 @@
  */
 package org.jboss.migration.cli;
 
-import org.jboss.cli.commonscli.Option;
 import org.jboss.cli.commonscli.Options;
+
+import java.util.stream.Stream;
+
+import static org.jboss.migration.cli.CommandLineOption.*;
 
 /**
  * @author Ingo Weiss
  */
-public class CommandLineOptions {
-    private final Options options;
+public interface CommandLineOptions {
 
-    public CommandLineOptions() {
-        options = new Options();
+    Options NON_DEPRECATED = new Options()
+            .addOption(ENVIRONMENT)
+            .addOption(HELP)
+            .addOption(NON_INTERACTIVE)
+            .addOption(SOURCE)
+            .addOption(TARGET);
 
-        Option opt = Option.builder("e").longOpt(CommandLineConstants.ENVIRONMENT.getArgument()).argName("environment file")
-                .desc(CommandLineConstants.ENVIRONMENT.getDescription()).hasArg(true).build();
-        options.addOption(opt);
+    Options DEPRECATED = new Options()
+            .addOption(INTERACTIVE);
 
-        opt = Option.builder("n").longOpt(CommandLineConstants.NON_INTERACTIVE.getArgument())
-                .desc(CommandLineConstants.NON_INTERACTIVE.getDescription()).hasArg(false).build();
-        options.addOption(opt);
-
-        opt = Option.builder("s").longOpt(CommandLineConstants.SOURCE.getArgument()).argName("source")
-                .desc(CommandLineConstants.SOURCE.getDescription()).hasArg(true).build();
-        options.addOption(opt);
-
-        opt = Option.builder("t").longOpt(CommandLineConstants.TARGET.getArgument()).argName("target")
-                .desc(CommandLineConstants.TARGET.getDescription()).hasArg(true).build();
-        options.addOption(opt);
-
-        opt = Option.builder("h").longOpt(CommandLineConstants.HELP.getArgument()).argName("help")
-                .desc(CommandLineConstants.HELP.getDescription()).hasArg(false).build();
-        options.addOption(opt);
-    }
-
-    public Options getOptions() {
-        return options;
-    }
+    Options ALL = Stream.concat(NON_DEPRECATED.getOptions().stream(), DEPRECATED.getOptions().stream())
+            .collect(Options::new, Options::addOption, (options1, options2) -> options2.getOptions().stream().forEach(option -> options1.addOption(option)));
 }
