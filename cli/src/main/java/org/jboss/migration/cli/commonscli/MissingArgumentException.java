@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.jboss.cli.commonscli;
+package org.jboss.migration.cli.commonscli;
 
 /**
  * Thrown when an option requiring an argument is not provided with an argument.

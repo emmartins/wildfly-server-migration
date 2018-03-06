@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.jboss.cli.commonscli;
+package org.jboss.migration.cli.commonscli;
 
 /**
  * Thrown when more than one option in an option group has been provided.

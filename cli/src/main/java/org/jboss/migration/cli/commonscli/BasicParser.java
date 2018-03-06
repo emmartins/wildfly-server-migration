@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.jboss.cli.commonscli;
+package org.jboss.migration.cli.commonscli;
 
 /**
  * The class BasicParser provides a very simple implementation of the {@link Parser#flatten(Options,String[],boolean) flatten}

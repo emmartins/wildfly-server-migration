@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.jboss.cli.commonscli;
+package org.jboss.migration.cli.commonscli;
 
 /**
  * Base for Exceptions thrown during parsing of a command-line.

@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.cli;
 
-import org.jboss.cli.commonscli.Option;
+import org.jboss.migration.cli.commonscli.Option;
 
 /**
  * @author emartins
@@ -53,6 +53,7 @@ public interface CommandLineOption {
             .argName("source")
             .desc(CommandLineConstants.SOURCE.getDescription())
             .hasArg(true)
+            .numberOfArgs(1)
             .build();
 
     Option TARGET = Option.builder("t")
@@ -60,5 +61,6 @@ public interface CommandLineOption {
             .argName("target")
             .desc(CommandLineConstants.TARGET.getDescription())
             .hasArg(true)
+            .numberOfArgs(1)
             .build();
 }

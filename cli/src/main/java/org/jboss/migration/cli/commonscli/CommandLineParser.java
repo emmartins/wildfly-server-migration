@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.jboss.cli.commonscli;
+package org.jboss.migration.cli.commonscli;
 
 /**
  * A class that implements the <code>CommandLineParser</code> interface can parse a String array according to the

@@ -20,4 +20,4 @@
  *
  * @version $Id$
  */
-package org.jboss.cli.commonscli;
+package org.jboss.migration.cli.commonscli;
