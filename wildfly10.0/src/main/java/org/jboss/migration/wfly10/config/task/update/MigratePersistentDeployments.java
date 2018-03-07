@@ -40,6 +40,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.ERROR;
 import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.NO;
 import static org.jboss.migration.core.console.BasicResultHandlers.UserConfirmation.Result.YES;
 import static org.jboss.migration.wfly10.config.management.ManageableResourceSelectors.selectResources;
@@ -67,22 +68,31 @@ public class MigratePersistentDeployments<S extends JBossServer<S>> extends Mana
                 boolean confirmEachDeployment = false;
                 // confirm deployments migration if environment does not skip it, and migration is interactive
                 if (context.isInteractive()) {
-                    final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
-                    new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if persistent deployments found are compatible with the target server, skip persistent deployments migration?","yes/no?", migrateUserConfirmation).execute();
-                    migrateDeployments = migrateUserConfirmation.getResult() == NO;
+                    final BasicResultHandlers.UserConfirmation skipDeploymentsUserConfirmationResultHandler = new BasicResultHandlers.UserConfirmation();
+                    final UserConfirmation skipDeploymentsUserConfirmation = new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if persistent deployments found are compatible with the target server, skip persistent deployments migration?","yes/no?", skipDeploymentsUserConfirmationResultHandler);
+                    do {
+                        skipDeploymentsUserConfirmation.execute();
+                    } while (skipDeploymentsUserConfirmationResultHandler.getResult() == ERROR);
+                    migrateDeployments = skipDeploymentsUserConfirmationResultHandler.getResult() == NO;
                     if (migrateDeployments && deploymentResources.size() > 1) {
-                        final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate all persistent deployments found?", "yes/no?", userConfirmation).execute();
-                        confirmEachDeployment = userConfirmation.getResult() == NO;
+                        final BasicResultHandlers.UserConfirmation migrateAllDeploymentsUserConfirmationResultHandler = new BasicResultHandlers.UserConfirmation();
+                        final UserConfirmation migrateAllDeploymentsUserConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate all persistent deployments found?", "yes/no?", migrateAllDeploymentsUserConfirmationResultHandler);
+                        do {
+                            migrateAllDeploymentsUserConfirmation.execute();
+                        } while (migrateAllDeploymentsUserConfirmationResultHandler.getResult() == ERROR);
+                        confirmEachDeployment = migrateAllDeploymentsUserConfirmationResultHandler.getResult() == NO;
                     }
                 }
                 // execute subtasks
                 for (DeploymentResource deploymentResource : deploymentResources) {
                     final boolean migrateDeployment;
                     if (confirmEachDeployment) {
-                        final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                        new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment '"+deploymentResource.getResourceName()+"'?","yes/no?", userConfirmation).execute();
-                        migrateDeployment = userConfirmation.getResult() == YES;
+                        final BasicResultHandlers.UserConfirmation migrateDeploymentUserConfirmationResultHandler = new BasicResultHandlers.UserConfirmation();
+                        final UserConfirmation migrateDeploymentUserConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate persistent deployment "+deploymentResource.getResourceName()+"?","yes/no?", migrateDeploymentUserConfirmationResultHandler);
+                        do {
+                            migrateDeploymentUserConfirmation.execute();
+                        } while (migrateDeploymentUserConfirmationResultHandler.getResult() == ERROR);
+                        migrateDeployment = migrateDeploymentUserConfirmationResultHandler.getResult() == YES;
                     } else {
                         migrateDeployment = migrateDeployments;
                     }
