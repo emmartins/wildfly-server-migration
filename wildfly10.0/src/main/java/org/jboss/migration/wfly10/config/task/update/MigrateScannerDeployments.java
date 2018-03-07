@@ -31,6 +31,7 @@ import org.jboss.migration.core.jboss.CopyPath;
 import org.jboss.migration.core.jboss.ResolvablePath;
 import org.jboss.migration.core.task.ServerMigrationTaskName;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
+import org.jboss.migration.core.task.component.CompositeTaskRunnable;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
@@ -148,7 +149,14 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                                     .addAttribute("source", sourcePath.toString())
                                                     .addAttribute("target", targetPath.toString())
                                                     .build();
-                                            context.execute(subtaskName, subtaskContext -> new CopyPath(sourcePath, targetPath).run(subtaskContext));
+                                            context.execute(subtaskName, subtaskContext ->
+                                                    new CompositeTaskRunnable.Builder()
+                                                            .runnables(
+                                                                    new CopyPath(sourcePath, targetPath),
+                                                                    new CopyPath(sourcePath.resolveSibling(sourcePath.getFileName()+".deployed"), targetPath.resolveSibling(targetPath.getFileName()+".deployed")))
+                                                            .build()
+                                                            .run(subtaskContext)
+                                            );
                                         }
                                     }
                                 }
