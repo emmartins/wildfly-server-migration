@@ -124,34 +124,31 @@ public class MigrateScannerDeployments<S extends JBossServer<S>> extends Managea
                                     boolean confirmEachDeployment = false;
                                     // confirm deployments migration if environment does not skip it, and migration is interactive
                                     if (context.isInteractive()) {
-                                        final BasicResultHandlers.UserConfirmation migrateUserConfirmation = new BasicResultHandlers.UserConfirmation();
-                                        final UserConfirmation skipDeploymentScannerConfirmation = new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if the non-persistent deployments found are compatible with the target server, skip scanner's deployments migration?","yes/no?", migrateUserConfirmation);
-                                        skipDeploymentScannerConfirmation.execute();
-                                        while (migrateUserConfirmation.getResult() == ERROR) {
-                                            skipDeploymentScannerConfirmation.execute();
-                                        }
-                                        migrateDeployments = migrateUserConfirmation.getResult() == NO;
+                                        final BasicResultHandlers.UserConfirmation skipDeploymentsUserConfirmationResultHandler = new BasicResultHandlers.UserConfirmation();
+                                        final UserConfirmation skipDeploymentsUserConfirmation = new UserConfirmation(context.getConsoleWrapper(), "This tool is not able to assert if the non-persistent deployments found are compatible with the target server, skip scanner's deployments migration?","yes/no?", skipDeploymentsUserConfirmationResultHandler);
+                                        do {
+                                            skipDeploymentsUserConfirmation.execute();
+                                        } while (skipDeploymentsUserConfirmationResultHandler.getResult() == ERROR);
+                                        migrateDeployments = skipDeploymentsUserConfirmationResultHandler.getResult() == NO;
                                         if (migrateDeployments && deployments.size() > 1) {
-                                            final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            final UserConfirmation migrateAllDeploymentScannersConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate all non-persistent deployments found?", "yes/no?", userConfirmation);
-                                            migrateAllDeploymentScannersConfirmation.execute();
-                                            while (userConfirmation.getResult() == ERROR)  {
-                                                migrateAllDeploymentScannersConfirmation.execute();
-                                            }
-                                            confirmEachDeployment = userConfirmation.getResult() == NO;
+                                            final BasicResultHandlers.UserConfirmation migrateAllDeploymentsUserConfirmationResultHandler = new BasicResultHandlers.UserConfirmation();
+                                            final UserConfirmation migrateAllDeploymentsUserConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate all non-persistent deployments found?", "yes/no?", migrateAllDeploymentsUserConfirmationResultHandler);
+                                            do {
+                                                migrateAllDeploymentsUserConfirmation.execute();
+                                            } while (migrateAllDeploymentsUserConfirmationResultHandler.getResult() == ERROR);
+                                            confirmEachDeployment = migrateAllDeploymentsUserConfirmationResultHandler.getResult() == NO;
                                         }
                                     }
                                     // execute subtasks
                                     for (Path deployment : deployments) {
                                         final boolean migrateDeployment;
                                         if (confirmEachDeployment) {
-                                            final BasicResultHandlers.UserConfirmation userConfirmation = new BasicResultHandlers.UserConfirmation();
-                                            final UserConfirmation individualDeploymentConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate non-persistent deployment " + deployment + "?", "yes/no?", userConfirmation);
-                                            individualDeploymentConfirmation.execute();
-                                            while (userConfirmation.getResult() == ERROR) {
-                                                individualDeploymentConfirmation.execute();
-                                            }
-                                            migrateDeployment = userConfirmation.getResult() == YES;
+                                            final BasicResultHandlers.UserConfirmation migrateDeploymentUserConfirmationResultHandler = new BasicResultHandlers.UserConfirmation();
+                                            final UserConfirmation migrateDeploymentUserConfirmation = new UserConfirmation(context.getConsoleWrapper(), "Migrate non-persistent deployment " + deployment + "?", "yes/no?", migrateDeploymentUserConfirmationResultHandler);
+                                            do {
+                                                migrateDeploymentUserConfirmation.execute();
+                                            } while (migrateDeploymentUserConfirmationResultHandler.getResult() == ERROR);
+                                            migrateDeployment = migrateDeploymentUserConfirmationResultHandler.getResult() == YES;
                                         } else {
                                             migrateDeployment = migrateDeployments;
                                         }
