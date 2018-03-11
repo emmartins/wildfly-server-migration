@@ -62,6 +62,8 @@ rm -Rf $SOURCE_DIST_CMTOOL_MODULES_SYSTEM_DIR
 rm -Rf $SOURCE_DIST_CMTOOL_MODULES_CUSTOM_DIR
 rm -Rf $TARGET_DIST_CMTOOL_MODULES_SYSTEM_DIR
 rm -Rf $TARGET_DIST_CMTOOL_MODULES_CUSTOM_DIR
+rm -Rf $SOURCE_DIST_VAULT_DIR
+rm -Rf $TARGET_DIST_VAULT_DIR
 
 for file in "$TEST_BEFORE_DIR"/content/*
 do
@@ -90,6 +92,11 @@ cp -Rf "$TEST_BEFORE_DIR"/content/ $SOURCE_DIST_STANDALONE_CONTENT_DIR/
 cp -Rf "$TEST_BEFORE_DIR"/content/ $SOURCE_DIST_DOMAIN_CONTENT_DIR/
 cp -Rf "$TEST_BEFORE_DIR"/standalone-deployments/ $SOURCE_DIST_STANDALONE_DEPLOYMENTS_DIR/
 
+echo "### setting up vault in source server"
+mkdir $SOURCE_DIST_VAULT_DIR
+keytool -genseckey -alias vault -storetype jceks -keyalg AES -keysize 128 -storepass vault22 -keypass vault22 -validity 730 -keystore $SOURCE_DIST_VAULT_DIR/vault.keystore
+$SOURCE_DIST_DIR/bin/vault.sh --keystore $SOURCE_DIST_VAULT_DIR/vault.keystore --keystore-password vault22 --alias vault --vault-block vb --attribute password --sec-attr 0penS3sam3 --enc-dir $SOURCE_DIST_VAULT_DIR --iteration 120 --salt 1234abcd
+
 echo "### Setting up cmtool-standalone.xml and cmtool-domain.xml"
 cp $SOURCE_DIST_STANDALONE_CONFIG_DIR/standalone.xml $SOURCE_DIST_STANDALONE_CONFIG_DIR/cmtool-standalone.xml
 sed -f $TEST_BEFORE_DIR/cmtool-standalone.xml.patch -i '' $SOURCE_DIST_STANDALONE_CONFIG_DIR/cmtool-standalone.xml
@@ -97,4 +104,4 @@ cp $SOURCE_DIST_DOMAIN_CONFIG_DIR/domain.xml $SOURCE_DIST_DOMAIN_CONFIG_DIR/cmto
 sed -f $TEST_BEFORE_DIR/cmtool-domain.xml.patch -i '' $SOURCE_DIST_DOMAIN_CONFIG_DIR/cmtool-domain.xml
 
 echo "### Executing the migration..."
-$TOOL_DIR/jboss-server-migration.sh --source $SOURCE_DIST_DIR --target $TARGET_DIST_DIR -Djboss.server.migration.deployments.migrate-deployments.skip="false" -Djboss.server.migration.modules.includes="cmtool.module1" -Djboss.server.migration.modules.excludes="cmtool.module2,cmtool.module3"
+$TOOL_DIR/jboss-server-migration.sh -s $SOURCE_DIST_DIR --target $TARGET_DIST_DIR -Djboss.server.migration.deployments.migrate-deployments.skip="false" -Djboss.server.migration.modules.includes="cmtool.module1" -Djboss.server.migration.modules.excludes="cmtool.module2,cmtool.module3"
