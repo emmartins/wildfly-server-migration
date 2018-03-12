@@ -17,6 +17,7 @@ ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
 * A `naming` subsystem configuration, as an Object Factory module
 * A `messaging` subsystem configuration, as JMS Bridge module
 * A `vault` configuration
+* An extension not installed in the target server
 endif::[]
 
 ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
@@ -26,6 +27,7 @@ ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
 * A `naming` subsystem configuration, as an Object Factory module
 * A `messaging` subsystem configuration, as JMS Bridge module
 * A `vault` configuration
+* An extension not installed in the target server
 endif::[]
 
 The console logs a message noting the module ID for any module that is migrated, for example:
@@ -34,29 +36,29 @@ The console logs a message noting the module ID for any module that is migrated,
 ifeval::["{server-migration-serverConfigurationType}" == "Host"]
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#18] Module cmtool.security-realms:main migrated.
+INFO  Module cmtool.security-realms:main migrated.
 ----
 endif::[]
 
 ifeval::["{server-migration-serverConfigurationType}" == "Domain"]
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#18] Module cmtool.security-realms:main migrated.
-INFO  [ServerMigrationTask#19] Module cmtool.datasources:main migrated.
-INFO  [ServerMigrationTask#20] Module cmtool.ee1:main migrated.
-INFO  [ServerMigrationTask#21] Module cmtool.ee2:main migrated.
-INFO  [ServerMigrationTask#22] Module cmtool.naming:main migrated.
+INFO  Module cmtool.security-realms:main migrated.
+INFO  Module cmtool.datasources:main migrated.
+INFO  Module cmtool.ee1:main migrated.
+INFO  Module cmtool.ee2:main migrated.
+INFO  Module cmtool.naming:main migrated.
 ----
 endif::[]
 
 ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#18] Module cmtool.security-realms:main migrated.
-INFO  [ServerMigrationTask#19] Module cmtool.datasources:main migrated.
-INFO  [ServerMigrationTask#20] Module cmtool.ee1:main migrated.
-INFO  [ServerMigrationTask#21] Module cmtool.ee2:main migrated.
-INFO  [ServerMigrationTask#22] Module cmtool.naming:main migrated.
+INFO  Module cmtool.security-realms:main migrated.
+INFO  Module cmtool.datasources:main migrated.
+INFO  Module cmtool.ee1:main migrated.
+INFO  Module cmtool.ee2:main migrated.
+INFO  Module cmtool.naming:main migrated.
 ----
 endif::[]
 

@@ -7,10 +7,9 @@ In addition to migrating the *messaging* subsystem to {server-target-productName
 By default, the tool automatically updates any *messaging-activemq* subsystem configuration.
 If you prefer, you can set the `subsystem.messaging-activemq.update.skip` environment property to `true` to skip automatic update of *messaging-activemq* subsystem configurations.
 
-Upon successful migration of a *messaging-activemq* subsystem configuration, you should see the following messages in the console:
+Upon successful migration of a *messaging-activemq* subsystem configuration, you should see the following message in the console:
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#123] HTTP Acceptor named http-acceptor added to Messaging ActiveMQ subsystem configuration.
-INFO  [ServerMigrationTask#123] HTTP Connector named http-connector added to Messaging ActiveMQ subsystem configuration.
+ INFO  Subsystem messaging-activemq updated.
 ----

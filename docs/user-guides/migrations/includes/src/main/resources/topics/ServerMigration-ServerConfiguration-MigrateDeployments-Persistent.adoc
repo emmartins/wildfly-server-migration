@@ -4,7 +4,7 @@ When migrating a configuration, the tool searches for references to deployments 
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#67] Persistent deployments found: [cmtool-helloworld3.war, cmtool-helloworld4.war, cmtool-helloworld2.war, cmtool-helloworld1.war]
+INFO  Persistent deployments found: [cmtool-helloworld3.war, cmtool-helloworld4.war, cmtool-helloworld2.war, cmtool-helloworld1.war]
 ----
 
 If you run the migration tool in `interactive` mode, you then see the following prompt:
@@ -36,7 +36,7 @@ yes/no?
 +
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#68] Removed persistent deployment from configuration /deployment=cmtool-helloworld3.war
+INFO  Persistent deployment cmtool-helloworld3.war migrated.
 ----
 
 If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool will migrate or not migrate `all` persistent deployments, depending on the environment configuration.

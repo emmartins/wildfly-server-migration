@@ -14,9 +14,9 @@ If you prefer, you can configure the environment properties to customize the pro
 | `subsystem.infinispan.update.update-infinispan-web-cache.skip` | If set to `true`, the tool does not adds `concurrent` cache to the `web` cache container.
 |===
 
-Upon successful migration of a *infinispan* subsystem configuration, you should see messages in the console such as:
+Upon successful migration of a *infinispan* subsystem configuration, you should see the following message in the console:
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#47] Cache 'concurrent' added to cache container 'web'.
+ INFO  Subsystem infinispan updated.
 ----

@@ -1,1 +1,0 @@
-include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-remoting.adoc[]

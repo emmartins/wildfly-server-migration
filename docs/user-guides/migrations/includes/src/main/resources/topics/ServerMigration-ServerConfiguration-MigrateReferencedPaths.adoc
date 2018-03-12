@@ -8,11 +8,11 @@ The tools automatically migrates the following paths references:
 
 * `Vault` keystore and encrypted file's directory.
 
-The console logs a message noting each path migration, for example:
+The console logs a message noting the migrations of paths:
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#25] Resource with path /{server-source-baseDir}/vault/vault.keystore migrated.
+ INFO  Referenced paths migrated.
 ----
 
 If you prefer, you can configure the environment properties to customize the migration of referenced paths.

@@ -15,24 +15,19 @@ yes/no?
 * If you reply with *yes* or *y*, the domain migration proceeds.
 * If you reply with *no* or *n*, the domain migration is skipped.
 
-If you choose to proceed, the tool begins migrating the domain content of the source server. A cyphered repository used to store data, such as deployments and deployment overlays, that are referenced by the source server's domain and host configurations. Because the source and target servers use a similar content repository, the migration of this data merely consists of finding and copying the content between the servers. The migration tool prints the results in the console.
+If you choose to proceed, the tool begins migrating the domain content of the source server. A cyphered repository used to store data, such as deployments and deployment overlays, that are referenced by the source server's domain and host configurations. Because the source and target servers use a similar content repository, the migration of this data merely consists of finding and copying the content between the servers.
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#397]  Migrating domain content found: [22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content, 23/b62a37ba8a4830622bfcdb960280577cc6796e/content, 40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content, 88/96c992d1b9866945a5015b72f8d254d3d5c132/content, ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content, fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content]
-INFO  [ServerMigrationTask#398]  Resource with path /{server-source-baseDir}/domain/data/content/22/caa450a9ba3b84eaf5a15b6da418b92ce6c98e/content migrated.
-INFO  [ServerMigrationTask#399]  Resource with path /{server-source-baseDir}/domain/data/content/23/b62a37ba8a4830622bfcdb960280577cc6796e/content migrated.
-INFO  [ServerMigrationTask#400]  Resource with path /{server-source-baseDir}/domain/data/content/40/8bcb8a4480739d370ebf70fbcabb33c1508c50/content migrated.
-INFO  [ServerMigrationTask#401]  Resource with path /{server-source-baseDir}/domain/data/content/88/96c992d1b9866945a5015b72f8d254d3d5c132/content migrated.
-INFO  [ServerMigrationTask#402]  Resource with path /{server-source-baseDir}/domain/data/content/ea/69fbffdf08b320c09ad1acc7d31deba5a7787b/content migrated.
-INFO  [ServerMigrationTask#403]  Resource with path /{server-source-baseDir}/domain/data/content/fc/8ec517e0b169fb27b61ff90f04de5dd8ca8d52/content migrated.
+ INFO  --- Migrating managed domain...
+
+ INFO  Source's domain content migrated.
 ----
 
 Next, the migration tool scans the source server for domain configuration files and prints the results in the console.
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#312]  Retrieving source's domain configurations...
-INFO  [ServerMigrationTask#312]  /{server-source-baseDir}/domain/configuration/domain.xml
+ INFO  Source's domain configurations found: [cmtool-domain.xml, domain.xml]
 ----
 
 If you run the migration tool `non-interactive` mode, the JBoss Server Migration Tool migrates all listed domain configuration files.
@@ -49,7 +44,7 @@ yes/no?
 +
 [source,options="nowrap",subs="attributes"]
 ----
-Migrate configuration /{server-source-baseDir}/domain/configuration/domain.xml ?
+Migrate configuration cmtool-domain.xml ?
 yes/no? y
 ----
 
@@ -57,10 +52,7 @@ Next, the migration tool scans the source server for host configurations files a
 
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#457] Retrieving source's host configurations...
-INFO  [ServerMigrationTask#457] /{server-source-baseDir}/domain/configuration/host-master.xml
-INFO  [ServerMigrationTask#457] /{server-source-baseDir}/domain/configuration/host-slave.xml
-INFO  [ServerMigrationTask#457] /{server-source-baseDir}/domain/configuration/host.xml
+ INFO  Source's host configurations found: [host-master.xml, host-slave.xml, host.xml]
 ----
 
 If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool migrates all listed host configuration files.
@@ -78,7 +70,7 @@ yes/no?
 +
 [source,options="nowrap",subs="attributes"]
 ----
-Migrate configuration /{server-source-baseDir}/domain/configuration/host.xml ?
+Migrate configuration host-master.xml ?
 yes/no? y
 ----
 
@@ -90,12 +82,11 @@ Managed domain migration can be customized by configuring the following environm
 | Property Name |Property Description
 
 | `domain.skip` | If set to `true`, the tool skips the entire domain migration.
-| `server.source.domain.domainDir` | Defines an alternative path for the source domain server directory, which defaults to the source domain server's base directory.
-| `server.source.domain.configDir` | Defines an alternative path for the source domain server `configuration/` directory, which defaults to the source server's domain `configuration/` directory.
-| `server.source.domain.domainConfigFiles` | Specifies a comma delimited list of the file names of the source server domain configurations that are to be migrated.
-| `server.source.domain.hostConfigFiles` | Specifies a comma delimited list of the file names of the source server host configurations that are to be migrated.
-| `server.target.domain.domainDir` | Defines an alternative path for the target domain server directory, which defaults to the target domain server’s base directory.
-| `server.target.domain.configDir` | Defines an alternative path for the target domain server `configuration/` directory, which defaults to the target server's domain `configuration/` directory.
+| `server.source.domain.domainDir` |Defines an alternative path for the source server's domain directory. Please note that a non absolute path is considered relative to the source server's base directory, and if not defined this property defaults to "domain".
+| `server.source.domain.configDir` |Defines an alternative path for the source server's domain configuration directory. Please note that a non absolute path is considered relative to the source server's domain directory, and if not defined this property defaults to "configuration".
+| `server.source.domain.hostConfigFiles` |Specifies a comma delimited list of the file names of the source server host configurations that are to be migrated.
+| `server.target.domain.domainDir` |Defines an alternative path for the target server's domain directory. Please note that a non absolute path is considered relative to the target server's base directory, and if not defined this property defaults to "domain".
+| `server.target.domain.configDir` |Defines an alternative path for the target server's domain configuration directory. Please note that a non absolute path is considered relative to the target server's domain directory, and if not defined this property defaults to "configuration".
 |===
 
 The environment configuration may be done in one of the following ways:

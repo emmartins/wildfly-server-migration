@@ -6,14 +6,13 @@ and the migration tool, when migrating the server configuration, first searches 
 A list with the names of deployments found are printed to the console, for instance:
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#68] Found deployment scanner 'default' watching directory '/{server-source-baseDir}/standalone/deployments', searching for deployments in it...
-INFO  [ServerMigrationTask#68] Scanner's deployments found: [cmtool-helloworld5.war, cmtool-helloworld6.war]
+INFO  Non-persistent deployments found in /{server-source-baseDir}/standalone/deployments: [cmtool-helloworld5.war, cmtool-helloworld6.war]
 ----
 
 If you run the migration tool in `interactive` mode, you then see the following prompt:
 [source,options="nowrap"]
 ----
-This tool is not able to assert if the scanner's deployments found are compatible with the target server, skip scanner's deployments migration?
+This tool is not able to assert if the non-persistent deployments found are compatible with the target server, skip scanner's deployments migration?
 yes/no?
 ----
 
@@ -22,7 +21,7 @@ yes/no?
 +
 [source,options="nowrap"]
 ----
-Migrate all scanner's deployments found?
+Migrate all non-persistent deployments found?
 yes/no?
 ----
 
@@ -30,15 +29,15 @@ yes/no?
 +
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#69] Resource with path /{server-source-baseDir}/standalone/deployments/cmtool-helloworld5.war migrated.
-INFO  [ServerMigrationTask#70] Resource with path /{server-source-baseDir}/standalone/deployments/cmtool-helloworld6.war migrated.
+INFO  Non-persistent deployment cmtool-helloworld5.war migrated.
+INFO  Non-persistent deployment cmtool-helloworld6.war migrated.
 ----
 
 ** If you reply *no*, or *n*, you receive a prompt asking to confirm the migration for each deployment:
 +
 [source,options="nowrap"]
 ----
-Migrate scanner's deployment 'cmtool-helloworld5.war'?
+Migrate non-persistent deployment cmtool-helloworld5.war?
 yes/no?
 ----
 *** If you reply *no*, or *n*, the deployment is not migrated.
@@ -47,7 +46,7 @@ yes/no?
 +
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#69] Resource with path /{server-source-baseDir}/standalone/deployments/cmtool-helloworld5.war migrated.
+INFO  Non-persistent deployment cmtool-helloworld5.war migrated.
 ----
 
 If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool will migrate or not migrate `all` deployments found, depending on the environment configuration.

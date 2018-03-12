@@ -8,31 +8,8 @@ To skip the security realms migration, set the `security-realms.migrate-properti
 
 Upon successful migration of the security realms configuration, you should see the following messages in the console:
 
-// conditional console depending of config type
-ifeval::["{server-migration-serverConfigurationType}" == "Host"]
 [source,options="nowrap",subs="attributes"]
 ----
-INFO  [ServerMigrationTask#140]  Migrating security realms...
-INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/domain/configuration/mgmt-users.properties migrated.
-INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/domain/configuration/mgmt-groups.properties migrated.
-INFO  [ServerMigrationTask#141]  Security realm /host=master/core-service=management/security-realm=ManagementRealm migrated.
-INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/domain/configuration/application-users.properties migrated.
-INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/domain/configuration/application-roles.properties migrated.
-INFO  [ServerMigrationTask#142]  Security realm /host=master/core-service=management/security-realm=ApplicationRealm migrated.
+INFO  Security realms migrated.
 ----
-endif::[]
-
-ifeval::["{server-migration-serverConfigurationType}" == "Standalone"]
-[source,options="nowrap",subs="attributes"]
-----
-INFO  [ServerMigrationTask#140]  Migrating security realms...
-INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/standalone/configuration/mgmt-users.properties migrated.
-INFO  [ServerMigrationTask#141]  Resource with path /{server-source-baseDir}/standalone/configuration/mgmt-groups.properties migrated.
-INFO  [ServerMigrationTask#141]  Security realm /core-service=management/security-realm=ManagementRealm migrated.
-INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/standalone/configuration/application-users.properties migrated.
-INFO  [ServerMigrationTask#142]  Resource with path /{server-source-baseDir}/standalone/configuration/application-roles.properties migrated.
-INFO  [ServerMigrationTask#142]  Security realm /core-service=management/security-realm=ApplicationRealm migrated.
-----
-endif::[]
-
 
