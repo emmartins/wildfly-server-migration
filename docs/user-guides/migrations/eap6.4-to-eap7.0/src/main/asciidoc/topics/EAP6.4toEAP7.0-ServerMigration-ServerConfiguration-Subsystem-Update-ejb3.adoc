@@ -18,13 +18,8 @@ If you prefer, you can configure the environment properties to customize the pro
 | `subsystem.ejb3.update.setup-default-sfsb-passivation-disabled-cache.skip` | If set to `true`, the tool does not update the `default-sfsb-passivation-disabled-cache` configuration.
 |===
 
-Upon successful migration of the *ejb3* subsystem configuration, you should see the following messages in the console:
+Upon successful migration of the *ejb3* subsystem configuration, you should see the following message in the console:
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#52] EJB3 subsystem's remote service configured to use HTTP Remoting connector.
-INFO  [ServerMigrationTask#53] EJB3 subsystem's 'default-sfsb-passivation-disabled-cache' attribute set to simple.
-INFO  [ServerMigrationTask#54] Legacy file passivation store removed from EJB3 subsystem configuration.
-INFO  [ServerMigrationTask#54] Infinispan passivation store added to EJB3 subsystem configuration.
-INFO  [ServerMigrationTask#54] Legacy 'passivating' cache removed from EJB3 subsystem configuration.
-INFO  [ServerMigrationTask#54] Distributable cache added to EJB3 subsystem configuration.
+ INFO  Subsystem ejb3 updated.
 ----

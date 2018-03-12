@@ -9,5 +9,5 @@ Upon successful update of the `unsecure` interface configuration, you should see
 
 [source,options="nowrap"]
 ----
-INFO [ServerMigrationTask#432] Interface unsecure inet address value set as ${jboss.bind.address.unsecure:127.0.0.1}.
+ INFO  Interface unsecure updated.
 ----

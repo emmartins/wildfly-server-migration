@@ -7,9 +7,9 @@ The JBoss Server Migration Tool makes the following updates to the *infinispan* 
 By default, the tool automatically updates any *infinispan* subsystem configuration to include these changes.
 If you prefer, you can set the `subsystem.infinispan.update.skip` environment property to `true` to skip automatic update of *infinispan* subsystem configurations.
 
-Upon successful migration of a *infinispan* subsystem configuration, you should see messages in the console such as:
+Upon successful migration of a *infinispan* subsystem configuration, you should see the following message in the console:
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#47] Cache 'concurrent' added to cache container 'web'.
+ INFO  Subsystem infinispan updated.
 ----

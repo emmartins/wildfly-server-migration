@@ -20,6 +20,6 @@ The console logs the configuration namespaces, and extension modules, of unsuppo
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#5] Unsupported extensions removed: [org.jboss.as.jaxr, org.jboss.as.threads, org.jboss.as.cmp]
-INFO  [ServerMigrationTask#5] Unsupported subsystems removed: [urn:jboss:domain:jaxr:1.1, urn:jboss:domain:cmp:1.1, urn:jboss:domain:threads:1.1]
+INFO  Unsupported extensions removed: [org.jboss.as.jaxr, org.jboss.as.threads, org.jboss.as.cmp]
+INFO  Unsupported subsystems removed: [urn:jboss:domain:jaxr:1.1, urn:jboss:domain:cmp:1.1, urn:jboss:domain:threads:1.1]
 ----

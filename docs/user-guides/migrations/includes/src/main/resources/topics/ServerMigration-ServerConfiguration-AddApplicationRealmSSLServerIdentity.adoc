@@ -6,7 +6,7 @@ The following message(s) printed on the migration console and log(s), indicates 
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#171] SSL server identity added to security realm ApplicationRealm.
+INFO  Security realm ApplicationRealm SSL server identity configured.
 ----
 
 NOTE: The Migration Environment may be configured to skip this configuration update, by setting environment property named `security-realm.ApplicationRealm.add-ssl-server-identity.skip` as `true`.

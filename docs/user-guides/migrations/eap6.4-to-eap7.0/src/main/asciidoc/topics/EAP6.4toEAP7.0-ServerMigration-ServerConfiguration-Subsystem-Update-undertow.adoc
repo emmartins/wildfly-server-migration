@@ -20,12 +20,9 @@ If you prefer, you can configure the environment properties to customize the pro
 | `subsystem.undertow.update.add-response-header.x-powered-by-header.skip` | If set to `true`, the tool does not set the default `X-Powered-By` response header.
 |===
 
-Upon successful migration of a *undertow* subsystem configuration, you should see messages in the console such as:
+Upon successful migration of a *undertow* subsystem configuration, you should see the following message in the console:
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#33] Undertow's default HTTP listener 'http' redirect-socket set as 'https'.
-INFO  [ServerMigrationTask#34] Undertow's default Servlet Container configured to support Websockets.
-INFO  [ServerMigrationTask#35] Response header 'server-header' set as 'Server: JBoss-EAP/7' in Undertow's config /subsystem=undertow
-INFO  [ServerMigrationTask#36] Response header 'x-powered-by-header' set as 'X-Powered-By: Undertow/1' in Undertow's config /subsystem=undertow
+ INFO  Subsystem undertow updated.
 ----

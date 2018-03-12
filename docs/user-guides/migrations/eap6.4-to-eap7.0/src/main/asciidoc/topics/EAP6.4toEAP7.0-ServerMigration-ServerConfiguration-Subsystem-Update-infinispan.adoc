@@ -18,11 +18,9 @@ If you prefer, you can configure the environment properties to customize the pro
 | `subsystem.infinispan.update.fix-hibernate-cache-module-name.skip` | If set to `true`, the tool does not fix the module name in the `hibernate` cache configuration.
 |===
 
-Upon successful migration of a *infinispan* subsystem configuration, you should see messages in the console such as:
+Upon successful migration of a *infinispan* subsystem configuration, you should see the following message in the console:
 
 [source,options="nowrap"]
 ----
-INFO  [ServerMigrationTask#44] Server cache added to Infinispan subsystem configuration.
-INFO  [ServerMigrationTask#45] Ejb cache added to Infinispan subsystem configuration.
-INFO  [ServerMigrationTask#46] Infinispan subsystem's cache hibernate 'module' attribute updated to org.hibernate.infinispan.
+ INFO  Subsystem infinispan updated.
 ----
