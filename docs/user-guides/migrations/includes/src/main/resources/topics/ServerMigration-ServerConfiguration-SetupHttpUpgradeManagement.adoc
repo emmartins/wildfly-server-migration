@@ -1,0 +1,12 @@
+= Setup HTTP Upgrade Management
+
+{server-target-productName} management clients use the new HTTP Upgrade mechanism, and the JBoss Migration Tool makes all of configuration changes needed for clients to work properly with the migrated configuration.
+
+The configuration changes are fully automated, and upon successful completion of the configuration, you should see the following messages in the console:
+
+[source,options="nowrap"]
+----
+ INFO  HTTP Upgrade Management configured.
+----
+
+If you prefer to skip the configuration of HTTP Upgrade management, set the environment property named `management.setup-http-upgrade.skip` to `true`.

@@ -1,0 +1,12 @@
+= Remove Permgen Attributes From JVM Configurations
+
+The usage of `Permgen` attributes in JVM configurations is deprecated in {server-target-productName} and the JBoss Migration Tool removes these from all JVM configurations.
+
+Upon successful removal of the `Permgen` attributes, you should see the following messages in the console:
+
+[source,options="nowrap"]
+----
+INFO  JVM's permgen attributes removed.
+----
+
+If you prefer, you can set the `jvms.remove-permgen-attributes.skip` environment property value to `true` to skip the automatic removal.

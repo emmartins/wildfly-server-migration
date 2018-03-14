@@ -1,0 +1,12 @@
+= Add default SSL Server Identity to ApplicationRealm
+
+{server-target-productName} default configurations include a SSL Server Identity for the default Security Realm named `ApplicationRealm`, and the migration tool automatically updates migrated configurations to match such change.
+
+The following message(s) printed on the migration console and log(s), indicates this configuration update:
+
+[source,options="nowrap"]
+----
+INFO  Security realm ApplicationRealm SSL server identity configured.
+----
+
+NOTE: The Migration Environment may be configured to skip this configuration update, by setting environment property named `security-realm.ApplicationRealm.add-ssl-server-identity.skip` as `true`.

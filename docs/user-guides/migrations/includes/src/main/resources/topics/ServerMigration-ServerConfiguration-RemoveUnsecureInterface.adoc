@@ -1,0 +1,11 @@
+= Remove the Unsecure Interface
+
+The tool removes the `unsecure` interface configuration from migrated configurations, to match the {server-target-productName} default configurations.
+However, you can configure the tool to skip the removal of the `unsecure` interface by setting the `interface.unsecure.remove.skip` environment property value to `true`.
+
+Upon successful removal of the `unsecure` interface configuration, you should see the following message in the console:
+
+[source,options="nowrap"]
+----
+ INFO  Interface unsecure removed.
+----

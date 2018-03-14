@@ -81,7 +81,28 @@
         <module>build</module>
         <module>cli</module>
         <module>core</module>
-        <module>docs</module>
+        <module>docs/user-guides/migrations/includes</module>
+        <module>docs/user-guides/migrations/eap6.4-to-eap7.0</module>
+        <module>docs/user-guides/migrations/eap6.4-to-eap7.1</module>
+        <module>docs/user-guides/migrations/eap7.0-to-eap7.1</module>
+        <module>docs/user-guides/migrations/wildfly8.2-to-eap7.0</module>
+        <module>docs/user-guides/migrations/wildfly8.2-to-eap7.1</module>
+        <module>docs/user-guides/migrations/wildfly8.2-to-wildfly11.0</module>
+        <module>docs/user-guides/migrations/wildfly8.2-to-wildfly12.0</module>
+        <module>docs/user-guides/migrations/wildfly9.0-to-eap7.0</module>
+        <module>docs/user-guides/migrations/wildfly9.0-to-eap7.1</module>
+        <module>docs/user-guides/migrations/wildfly9.0-to-wildfly11.0</module>
+        <module>docs/user-guides/migrations/wildfly9.0-to-wildfly12.0</module>        
+        <module>docs/user-guides/migrations/wildfly10.0-to-eap7.1</module>
+        <module>docs/user-guides/migrations/wildfly10.0-to-wildfly11.0</module>
+        <module>docs/user-guides/migrations/wildfly10.0-to-wildfly12.0</module>        
+        <module>docs/user-guides/migrations/wildfly10.1-to-eap7.1</module>
+        <module>docs/user-guides/migrations/wildfly10.1-to-wildfly11.0</module>
+        <module>docs/user-guides/migrations/wildfly10.1-to-wildfly12.0</module>
+        <module>docs/user-guides/migrations/wildfly11.0-to-wildfly12.0</module>
+        <module>docs/user-guides/tool/includes</module>
+        <module>docs/user-guides/tool/integrated-eap7.1</module>
+        <module>docs/user-guides/tool/standalone</module>
         <module>eap6.4</module>
         <module>eap6.4-to-eap7.0</module>
         <module>eap6.4-to-eap7.1</module>
@@ -224,6 +245,30 @@
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <version>${version.org.asciidoctor.asciidoctor-maven-plugin}</version>
+                    <configuration>
+                        <sourceDirectory>${project.build.directory}/asciidoc</sourceDirectory>
+                        <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        <relativeBaseDir/>
+                        <sourceHighlighter>coderay</sourceHighlighter>
+                        <backend>html5</backend>
+                        <attributes>
+                            <allow-uri-read>true</allow-uri-read>
+                            <version>${project.version}</version>
+                            <revnumber>${project.version}</revnumber>
+                            <revdate>${maven.build.timestamp}</revdate>
+                            <organization>${project.organization.name}</organization>
+                        </attributes>
+                        <resources>
+                            <resource>
+                                <directory>${project.build.directory}/asciidoc/images</directory>
+                                <targetPath>images</targetPath>
+                            </resource>
+                            <resource>
+                                <directory>${project.build.directory}/asciidoc/downloads</directory>
+                                <targetPath>downloads</targetPath>
+                            </resource>
+                        </resources>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -263,6 +308,138 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-docs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-includes</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-eap6.4-to-eap7.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-eap6.4-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-eap7.0-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly11.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly12.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly11.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly12.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly11.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly12.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly11.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly12.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly11.0-to-wildfly12.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-tool-includes</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-tool-integrated-eap7.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-docs-userguide-tool-standalone</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

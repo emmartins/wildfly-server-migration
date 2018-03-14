@@ -1,0 +1,13 @@
+= Set Up Private Interface
+
+The {server-target-productName} default configuration uses a new `private` interface on all `jgroups` socket bindings.
+The JBoss Server Migration Tool automatically adds the new interface to migrated configurations with `jgroups` socket bindings, and updates these to use it.
+
+Upon successful configuration of the private interface, you should see the following messages in the console:
+
+[source,options="nowrap"]
+----
+ INFO  Interface private added.
+----
+
+If you prefer to skip the configuration of the private interface, set the environment property named `interface.private.setup.skip` to `true`.

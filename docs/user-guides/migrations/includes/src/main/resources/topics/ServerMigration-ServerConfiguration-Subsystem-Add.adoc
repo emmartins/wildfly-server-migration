@@ -1,0 +1,14 @@
+= Add the {subsystem-add-subsystemName} Subsystem
+
+[subs="attributes,normal"]
+{subsystem-add-subsystemDescription}
+
+Its default configuration is automatically added to the migrated configuration file, unless the environment property named `subsystem.{subsystem-add-subsystemName}.add.skip` is set to `true`.
+
+The subsystem and related extension are added without any interaction required by the user.
+Upon successful addition of the *{subsystem-add-subsystemName}* subsystem configuration, you should see the following messages in the console:
+
+[source,options="nowrap",subs="attributes"]
+----
+ INFO  Subsystem {subsystem-add-subsystemName} added.
+----

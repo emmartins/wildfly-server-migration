@@ -1,0 +1,88 @@
+:toc:
+= Standalone Server Migration
+
+== Standalone Configuration Processing Overview
+
+When tasked to migrate standalone server configurations, the JBoss Server Migration Tool migrates the configuration files and related content from the source server to the target server. This migration task is optional.
+
+If you run the migration tool in `interactive` mode, which is the default, you are are prompted to confirm its execution.
+
+[source,options="nowrap"]
+----
+Migrate the source's standalone server?
+yes/no?
+----
+
+* If you reply with *yes* or *y*, the standalone server migration proceeds.
+* If you reply with *no* or *n*, the standalone server migration is skipped.
+
+If you choose to proceed, the tool starts by migrating the source standalone server's content. Because both the source and target servers use a similar cyphered content repository to store data that is referenced by standalone server configurations, such as deployments and deployment overlays, migration of this data merely consists of finding and copying the content from the source server to the target server.
+
+[source,options="nowrap",subs="attributes"]
+----
+ INFO  --- Migrating standalone server...
+
+ INFO  Source's standalone content migrated.
+----
+
+Next, the tool scans the source server for standalone server configurations files and prints the results in the console.
+
+[source,options="nowrap",subs="attributes"]
+----
+ INFO  Source's standalone configurations found: [standalone-full-ha.xml, standalone-full.xml, standalone-ha.xml, standalone.xml]
+----
+
+If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool migrates all listed configuration files.
+
+If you run the migration tool in `interactive` mode, which is the default, you are presented with the following prompt.
+
+[source,options="nowrap"]
+----
+Migrate all configurations?
+yes/no?
+----
+
+* If you reply *yes*, all listed configuration files are migrated.
+* If you reply *no*, you receive a prompt asking to confirm the migration, for each listed configuration file:
++
+[source,options="nowrap",subs="attributes"]
+----
+Migrate configuration standalone-full-ha.xml ?
+yes/no? y
+----
+
+== Customizing the Migration of the Standalone Configuration
+
+The standalone server migration can be customized by configuring the following environment properties:
+|===
+| Property Name |Property Description
+
+|`standalone.skip` |If set to `true`, the tool skips the entire standalone server migration.
+|`server.source.standalone.serverDir` |Defines an alternative path for the source's standalone server directory. Please note that a non absolute path is considered relative to the source server's base directory, and if not defined this property defaults to "standalone".
+|`server.source.standalone.configDir` |Defines an alternative path for the source's standalone server configuration directory. Please note that a non absolute path is considered relative to the source's standalone server directory, and if not defined this property defaults to "configuration".
+|`server.source.standalone.configFiles` |Specifies the file names of the source standalone server configurations to be migrated.
+|`server.target.standalone.serverDir` |Defines an alternative path for the target's standalone server directory. Please note that a non absolute path is considered relative to the target server's base directory, and if not defined this property defaults to "standalone".
+|`server.target.standalone.configDir` |Defines an alternative path for the target's standalone server configuration directory. Please note that a non absolute path is considered relative to the target's standalone server directory, and if not defined this property defaults to "configuration".
+|===
+
+The environment configuration can be customized in one of the following ways:
+
+* You can configure the properties in the tool's `config/environment.properties` file:
++
+[source,options="nowrap"]
+----
+standalone.skip=false
+server.source.standalone.serverDir=standalone
+server.source.standalone.configDir=configuration
+server.source.standalone.configFiles=standalone.xml,standalone-full.xml
+server.target.standalone.serverDir=standalone
+server.target.standalone.configDir=configuration
+----
+* You can include the above properties in your own custom properties file, and then pass the file on the command line using the `--environment` argument.
+* You can pass the information on the command line using a system property. The environment property names must be prefixed with `jboss.server.migration.`, for example:
++
+[source,options="nowrap"]
+----
+-Djboss.server.migration.server.source.standalone.serverDir="standalone"
+----
+

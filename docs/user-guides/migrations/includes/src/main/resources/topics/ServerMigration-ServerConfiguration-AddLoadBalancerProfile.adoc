@@ -1,0 +1,10 @@
+= Add Load Balancer Profile
+
+{server-target-productName} includes a new default profile, specially tailored for hosts servings as load balancers, and the migration tool automatically configures such profile in all migrated domain configurations.
+
+[source,options="nowrap"]
+----
+INFO  Profile load-balancer added.
+----
+
+NOTE: The Migration Environment may be configured to skip this configuration update, by setting environment property named `profile.load-balancer.add.skip` as `true`.

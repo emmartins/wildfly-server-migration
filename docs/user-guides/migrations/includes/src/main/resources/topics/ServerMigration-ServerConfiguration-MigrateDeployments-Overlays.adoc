@@ -1,0 +1,13 @@
+= Migrate Deployment Overlays
+
+The migration of deployment overlays is a fully automated process.
+The migration tool searches for deployment overlays referenced in the standalone server configuration.
+It then migrates those that are linked to deployments that were migrated.
+
+The migration tool prints a message to the console for each deployment overlay that is migrated.
+
+[source,options="nowrap"]
+----
+INFO  Deployment overlay overlay1 migrated.
+INFO  Deployment overlay overlay2 migrated.
+----

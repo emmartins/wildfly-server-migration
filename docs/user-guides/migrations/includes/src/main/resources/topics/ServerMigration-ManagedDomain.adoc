@@ -1,0 +1,106 @@
+= Managed Domain Migration
+
+== Managed Domain Processing Overview
+
+When tasked to migrate managed domains, the JBoss Server Migration Tool migrates the domain and host configuration files and their related domain content from the source server to the target server. This migration task is optional.
+
+If you run the migration tool in `interactive` mode, which is the default, you are prompted to confirm its execution.
+
+[source,options="nowrap"]
+----
+Migrate the source's managed domain?
+yes/no?
+----
+
+* If you reply with *yes* or *y*, the domain migration proceeds.
+* If you reply with *no* or *n*, the domain migration is skipped.
+
+If you choose to proceed, the tool begins migrating the domain content of the source server. A cyphered repository used to store data, such as deployments and deployment overlays, that are referenced by the source server's domain and host configurations. Because the source and target servers use a similar content repository, the migration of this data merely consists of finding and copying the content between the servers.
+
+[source,options="nowrap",subs="attributes"]
+----
+ INFO  --- Migrating managed domain...
+
+ INFO  Source's domain content migrated.
+----
+
+Next, the migration tool scans the source server for domain configuration files and prints the results in the console.
+[source,options="nowrap",subs="attributes"]
+----
+ INFO  Source's domain configurations found: [cmtool-domain.xml, domain.xml]
+----
+
+If you run the migration tool `non-interactive` mode, the JBoss Server Migration Tool migrates all listed domain configuration files.
+
+If you run the migration tool in `interactive` mode, which is the default, you are presented with the following prompt.
+
+[source,options="nowrap"]
+----
+Migrate all configurations?
+yes/no?
+----
+* If you reply with *yes*, all listed configuration files are migrated.
+* If you reply with *no*, you are prompted to confirm the migration for each listed configuration file:
++
+[source,options="nowrap",subs="attributes"]
+----
+Migrate configuration cmtool-domain.xml ?
+yes/no? y
+----
+
+Next, the migration tool scans the source server for host configurations files and prints the results in the console.
+
+[source,options="nowrap",subs="attributes"]
+----
+ INFO  Source's host configurations found: [host-master.xml, host-slave.xml, host.xml]
+----
+
+If you run the migration tool in `non-interactive` mode, the JBoss Server Migration Tool migrates all listed host configuration files.
+
+If you run the migration tool in `interactive` mode, which is the default, you are presented with the following prompt.
+
+[source,options="nowrap"]
+----
+Migrate all configurations?
+yes/no?
+----
+
+* If you reply with *yes*, all listed configuration files are migrated.
+* If you reply with *no*, you are prompted to confirm the migration for each listed configuration file:
++
+[source,options="nowrap",subs="attributes"]
+----
+Migrate configuration host-master.xml ?
+yes/no? y
+----
+
+== Customizing the Migration of the Managed Domain Configuration
+
+Managed domain migration can be customized by configuring the following environment properties:
+
+|===
+| Property Name |Property Description
+
+| `domain.skip` | If set to `true`, the tool skips the entire domain migration.
+| `server.source.domain.domainDir` |Defines an alternative path for the source server's domain directory. Please note that a non absolute path is considered relative to the source server's base directory, and if not defined this property defaults to "domain".
+| `server.source.domain.configDir` |Defines an alternative path for the source server's domain configuration directory. Please note that a non absolute path is considered relative to the source server's domain directory, and if not defined this property defaults to "configuration".
+| `server.source.domain.hostConfigFiles` |Specifies a comma delimited list of the file names of the source server host configurations that are to be migrated.
+| `server.target.domain.domainDir` |Defines an alternative path for the target server's domain directory. Please note that a non absolute path is considered relative to the target server's base directory, and if not defined this property defaults to "domain".
+| `server.target.domain.configDir` |Defines an alternative path for the target server's domain configuration directory. Please note that a non absolute path is considered relative to the target server's domain directory, and if not defined this property defaults to "configuration".
+|===
+
+The environment configuration may be done in one of the following ways:
+
+* You can configure the tool's `config/environment.properties` properties file:
+[source,options="nowrap"]
+----
+domain.skip=false
+server.source.domain.domainDir=domain
+server.source.domain.configDir=configuration
+server.source.domain.domainConfigFiles=domain.xml
+server.source.domain.hostConfigFiles=host-master.xml, host.xml
+server.target.domain.domainDir=domain
+server.target.domain.configDir=configuration
+----
+* You can configure the properties in your own custom properties file and pass the file on the command line using the `--environment` argument.
+* You can pass the information on the command line using system properties. In this case, all environment property names should be prefixed with `jboss.server.migration.`.

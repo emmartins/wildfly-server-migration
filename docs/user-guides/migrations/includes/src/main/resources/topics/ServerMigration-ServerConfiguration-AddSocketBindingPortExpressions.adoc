@@ -1,0 +1,18 @@
+= Add Socket Binding Port Expressions
+
+The {server-target-productName} default configurations use value expressions for the `port` attribute of the following socket bindings:
+
+* `ajp`
+* `http`
+* `https`
+
+The tool automatically adds the value expressions to the migrated {server-source-productName} configurations.
+
+The following message(s) in the console indicates this configuration update:
+
+[source,options="nowrap"]
+----
+INFO  Socket binding's port expressions added.
+----
+
+NOTE: The Migration Environment may be configured to skip this conifguration update, by setting environment property named `socket-bindings.add-port-expressions.skip` as `true`.
