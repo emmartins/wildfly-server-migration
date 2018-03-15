@@ -636,35 +636,35 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
         }
 
         public boolean isDefaultDomainBaseDir() {
-            return getEnvironmentDomainBaseDir() != null && !getEnvironmentDomainBaseDir().equals(getDefaultDomainBaseDir());
+            return getEnvironmentDomainBaseDir() == null || getEnvironmentDomainBaseDir().equals(getDefaultDomainBaseDir());
         }
 
         public boolean isDefaultDomainConfigDir() {
-            return getEnvironmentDomainConfigDir() != null && !getEnvironmentDomainConfigDir().equals(getDefaultDomainConfigDir());
+            return getEnvironmentDomainConfigDir() == null || getEnvironmentDomainConfigDir().equals(getDefaultDomainConfigDir());
         }
 
         public boolean isDefaultDomainDataDir() {
-            return getEnvironmentDomainDataDir() != null && !getEnvironmentDomainDataDir().equals(getDefaultDomainDataDir());
+            return getEnvironmentDomainDataDir() == null || getEnvironmentDomainDataDir().equals(getDefaultDomainDataDir());
         }
 
         public boolean isDefaultDomainContentDir() {
-            return getEnvironmentDomainContentDir() != null && !getEnvironmentDomainContentDir().equals(getDefaultDomainContentDir());
+            return getEnvironmentDomainContentDir() == null || getEnvironmentDomainContentDir().equals(getDefaultDomainContentDir());
         }
 
         public boolean isDefaultStandaloneServerDir() {
-            return getEnvironmentStandaloneServerDir() != null && !getEnvironmentStandaloneServerDir().equals(getDefaultStandaloneServerDir());
+            return getEnvironmentStandaloneServerDir() == null || getEnvironmentStandaloneServerDir().equals(getDefaultStandaloneServerDir());
         }
 
         public boolean isDefaultStandaloneConfigDir() {
-            return getEnvironmentStandaloneConfigDir() != null && !getEnvironmentStandaloneConfigDir().equals(getDefaultStandaloneConfigDir());
+            return getEnvironmentStandaloneConfigDir() == null || getEnvironmentStandaloneConfigDir().equals(getDefaultStandaloneConfigDir());
         }
 
         public boolean isDefaultStandaloneDataDir() {
-            return getEnvironmentStandaloneDataDir() != null && !getEnvironmentStandaloneDataDir().equals(getDefaultStandaloneDataDir());
+            return getEnvironmentStandaloneDataDir() == null || getEnvironmentStandaloneDataDir().equals(getDefaultStandaloneDataDir());
         }
 
         public boolean isDefaultStandaloneContentDir() {
-            return getEnvironmentStandaloneContentDir() != null && !getEnvironmentStandaloneContentDir().equals(getDefaultStandaloneContentDir());
+            return getEnvironmentStandaloneContentDir() == null || getEnvironmentStandaloneContentDir().equals(getDefaultStandaloneContentDir());
         }
 
         public static String getFullEnvironmentPropertyName(String serverMigrationName, String propertyName) {
