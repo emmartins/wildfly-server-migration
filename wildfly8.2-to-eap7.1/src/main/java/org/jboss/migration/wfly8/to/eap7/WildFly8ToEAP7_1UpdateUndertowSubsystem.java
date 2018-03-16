@@ -21,9 +21,8 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsyst
 import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpListenerRedirectSocket;
+import org.jboss.migration.wfly10.config.task.subsystem.undertow.UpdateDefaultHostResponseHeaderServer;
 
 /**
  * @author emmartins
@@ -34,8 +33,7 @@ public class WildFly8ToEAP7_1UpdateUndertowSubsystem<S> extends UpdateSubsystemR
                 new SetDefaultHttpListenerRedirectSocket<>(),
                 new AddHttpsListener<>(),
                 new EnableHttp2<>(),
-                new SetDefaultHostResponseHeaderServer<>(),
-                new SetDefaultHostResponseHeaderXPoweredBy<>(),
+                new UpdateDefaultHostResponseHeaderServer<>(),
                 new AddHttpInvoker<>());
     }
 }

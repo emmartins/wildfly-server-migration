@@ -24,14 +24,12 @@ import org.jboss.migration.wfly10.config.management.SubsystemResource;
 /**
  * @author emmartins
  */
-public class SetDefaultHostResponseHeaderXPoweredBy<S> extends SetDefaultHostResponseHeader<S> {
-
-    public SetDefaultHostResponseHeaderXPoweredBy() {
-        super("x-powered-by-header", "X-Powered-By");
-    }
-
+public class UpdateDefaultHostResponseHeaderServer<S> extends SetDefaultHostResponseHeaderServer<S> {
     @Override
     protected String getHeaderValue(boolean defined, ModelNode config, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
-        return "Undertow/1";
+        if (!defined) {
+            return null;
+        }
+        return super.getHeaderValue(defined, config, subsystemResource, context, taskEnvironment);
     }
 }

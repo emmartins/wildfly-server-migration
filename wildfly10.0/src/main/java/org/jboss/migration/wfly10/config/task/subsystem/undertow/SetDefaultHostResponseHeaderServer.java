@@ -26,37 +26,31 @@ import org.jboss.migration.wfly10.config.management.SubsystemResource;
  * @author emmartins
  */
 public class SetDefaultHostResponseHeaderServer<S> extends SetDefaultHostResponseHeader<S> {
+
     public SetDefaultHostResponseHeaderServer() {
         super("server-header", "Server");
     }
-    public SetDefaultHostResponseHeaderServer(String headerValue) {
-        super("server-header", "Server", headerValue);
-    }
 
     @Override
-    protected String getHeaderValue(ModelNode config, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
-        if (headerValue != null) {
-            return headerValue;
+    protected String getHeaderValue(boolean defined, ModelNode config, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
+        // compute from product info
+        final ProductInfo productInfo = subsystemResource.getServerConfiguration().getServer().getProductInfo();
+        // TODO this should come instead, from the "subsystem" in extensions, exposed by target server
+        final String serverName;
+        if (productInfo.getName().contains("WildFly")) {
+            serverName = "WildFly";
+        } else if (productInfo.getName().contains("EAP")) {
+            serverName = "JBoss-EAP";
         } else {
-            // compute from product info
-            final ProductInfo productInfo = subsystemResource.getServerConfiguration().getServer().getProductInfo();
-            // TODO this should come instead, from the "subsystem" in extensions, exposed by target server
-            final String serverName;
-            if (productInfo.getName().contains("WildFly")) {
-                serverName = "WildFly";
-            } else if (productInfo.getName().contains("EAP")) {
-                serverName = "JBoss-EAP";
-            } else {
-                serverName = productInfo.getName();
-            }
-            final int dot = productInfo.getVersion().indexOf('.');
-            final String serverVersion;
-            if (dot < 1) {
-                serverVersion = productInfo.getVersion();
-            } else {
-                serverVersion = productInfo.getVersion().substring(0, dot);
-            }
-            return serverName + '/' + serverVersion;
+            serverName = productInfo.getName();
         }
+        final int dot = productInfo.getVersion().indexOf('.');
+        final String serverVersion;
+        if (dot < 1) {
+            serverVersion = productInfo.getVersion();
+        } else {
+            serverVersion = productInfo.getVersion().substring(0, dot);
+        }
+        return serverName + '/' + serverVersion;
     }
 }
