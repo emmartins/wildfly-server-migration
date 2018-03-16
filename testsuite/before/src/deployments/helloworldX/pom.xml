@@ -42,9 +42,9 @@
 
         <!-- JBoss dependency versions -->
 
-        <version.wildfly.maven.plugin>1.0.4.Final-SNAPSHOT</version.wildfly.maven.plugin>
+        <version.wildfly.maven.plugin>1.0.4.Final</version.wildfly.maven.plugin>
 
-        <version.jboss.spec.javaee.7.0>1.0.4.Final-SNAPSHOT</version.jboss.spec.javaee.7.0>
+        <version.jboss.spec.javaee.7.0>1.0.4.Final</version.jboss.spec.javaee.7.0>
 
         <!-- other plug-in versions -->
         <version.war.plugin>3.0.0</version.war.plugin>
