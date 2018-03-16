@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.jboss.migration</groupId>
         <artifactId>jboss-server-migration-parent</artifactId>
-        <version>1.1.0.Alpha-SNAPSHOT</version>
+        <version>1.1.0.CR1</version>
     </parent>
 
     <artifactId>jboss-server-migration-wildfly10.0-to-wildfly12.0</artifactId>
