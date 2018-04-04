@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly10.config.task.subsystem.web;
 
+import org.jboss.migration.wfly10.config.task.management.subsystem.MigrateSubsystemResourceSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.subsystem.MigrateSubsystemResources;
 import org.jboss.migration.core.jboss.JBossExtensionNames;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
@@ -24,7 +25,18 @@ import org.jboss.migration.core.jboss.JBossSubsystemNames;
  * @author emmartins
  */
 public class MigrateWebSubsystem<S> extends MigrateSubsystemResources<S> {
+
     public MigrateWebSubsystem() {
-        super(JBossExtensionNames.WEB, JBossSubsystemNames.WEB);
+        this(new MigrateWebSubsystemSubtaskBuilder<>());
+    }
+
+    protected MigrateWebSubsystem(MigrateWebSubsystemSubtaskBuilder<S> subtaskBuilder) {
+        super(JBossExtensionNames.WEB, subtaskBuilder);
+    }
+
+    protected static class MigrateWebSubsystemSubtaskBuilder<S> extends MigrateSubsystemResourceSubtaskBuilder<S> {
+        public MigrateWebSubsystemSubtaskBuilder() {
+            super(JBossSubsystemNames.WEB);
+        }
     }
 }
