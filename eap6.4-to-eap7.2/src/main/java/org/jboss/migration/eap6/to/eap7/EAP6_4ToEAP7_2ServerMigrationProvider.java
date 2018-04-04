@@ -21,6 +21,7 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
+import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateEESubsystem;
@@ -39,7 +40,6 @@ import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagi
 import org.jboss.migration.wfly10.config.task.subsystem.requestcontroller.AddRequestControllerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.web.MigrateWebSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
@@ -67,7 +67,8 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new MigrateJacorbSubsystem<>())
-                        .subtask(new MigrateWebSubsystem<>())
+                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new EAP7_1MigrateWebSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_2UpdateUndertowSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_2UpdateMessagingActiveMQSubsystem<>())
@@ -77,7 +78,6 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                         .subtask(new EAP6_4ToEAP7_2UpdateRemotingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
@@ -95,7 +95,8 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
-                                .subtask(new MigrateWebSubsystem<>())
+                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new EAP7_1MigrateWebSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_2UpdateMessagingActiveMQSubsystem<>())
@@ -105,7 +106,6 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP6_4ToEAP7_2UpdateRemotingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
