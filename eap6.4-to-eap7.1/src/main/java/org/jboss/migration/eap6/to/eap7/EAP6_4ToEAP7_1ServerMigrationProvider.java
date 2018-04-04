@@ -20,6 +20,7 @@ import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
 import org.jboss.migration.eap.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.eap.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEJB3Subsystem;
@@ -37,9 +38,9 @@ import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagi
 import org.jboss.migration.wfly10.config.task.subsystem.requestcontroller.AddRequestControllerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
-import org.jboss.migration.wfly10.config.task.subsystem.web.MigrateWebSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
+import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
@@ -49,7 +50,6 @@ import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFrom
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
-import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 
 /**
  * Server migration, from EAP 6.4 to EAP 7.1.
@@ -65,7 +65,8 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new MigrateJacorbSubsystem<>())
-                        .subtask(new MigrateWebSubsystem<>())
+                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new EAP7_1MigrateWebSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_1UpdateUndertowSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_1UpdateMessagingActiveMQSubsystem<>())
@@ -75,7 +76,6 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                         .subtask(new EAP6_4ToEAP7_1UpdateRemotingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
@@ -92,7 +92,8 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
-                                .subtask(new MigrateWebSubsystem<>())
+                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new EAP7_1MigrateWebSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_1UpdateUndertowSubsystem<>())
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_1UpdateMessagingActiveMQSubsystem<>())
@@ -102,7 +103,6 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP6_4ToEAP7_1UpdateRemotingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
