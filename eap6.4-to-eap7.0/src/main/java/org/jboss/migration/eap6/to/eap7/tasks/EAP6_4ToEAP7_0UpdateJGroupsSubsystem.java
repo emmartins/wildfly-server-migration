@@ -16,8 +16,8 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
-import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
+import org.jboss.migration.wfly10.config.task.subsystem.SubsystemNames;
 import org.jboss.migration.wfly10.config.task.subsystem.jgroups.UpdateProtocols;
 
 /**
@@ -25,7 +25,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.jgroups.UpdateProtocols;
  */
 public class EAP6_4ToEAP7_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemResources<S> {
     public EAP6_4ToEAP7_0UpdateJGroupsSubsystem() {
-        super(JBossSubsystemNames.JGROUPS,
+        super(SubsystemNames.JGROUPS,
                 new UpdateProtocols<>(new UpdateProtocols.Operations()
                         .replace("MERGE2", "MERGE3")
                         .replace("FD", "FD_ALL")
