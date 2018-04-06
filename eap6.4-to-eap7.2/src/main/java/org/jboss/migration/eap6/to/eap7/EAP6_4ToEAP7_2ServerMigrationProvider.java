@@ -17,6 +17,7 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateJGroupsSubsystem;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
@@ -75,6 +76,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                         .subtask(new EAP6_4ToEAP7_2UpdateInfinispanSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_2UpdateEESubsystem<>())
                         .subtask(new EAP6_4ToEAP7_2UpdateEJB3Subsystem<>())
+                        .subtask(new EAP6_4ToEAP7_2UpdateJGroupsSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_2UpdateRemotingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
@@ -103,6 +105,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP6_4ToEAP7_2UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_2UpdateEESubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_2UpdateEJB3Subsystem<>())
+                                .subtask(new EAP6_4ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_2UpdateRemotingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
