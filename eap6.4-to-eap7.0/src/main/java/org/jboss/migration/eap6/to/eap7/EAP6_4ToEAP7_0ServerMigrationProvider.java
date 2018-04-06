@@ -21,6 +21,7 @@ import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateEJB3Subsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateInfinispanSubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateJGroupsSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateMessagingActiveMQSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateUndertowSubsystem;
@@ -70,6 +71,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                         .subtask(new EAP6_4ToEAP7_0UpdateEESubsystem<>())
                         .subtask(new EAP6_4ToEAP7_0UpdateEJB3Subsystem<>())
                         .subtask(new EAP6_4ToEAP7_0UpdateRemotingSubsystem<>())
+                        .subtask(new EAP6_4ToEAP7_0UpdateJGroupsSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
@@ -94,6 +96,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP6_4ToEAP7_0UpdateEESubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_0UpdateEJB3Subsystem<>())
                                 .subtask(new EAP6_4ToEAP7_0UpdateRemotingSubsystem<>())
+                                .subtask(new EAP6_4ToEAP7_0UpdateJGroupsSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
