@@ -17,6 +17,7 @@
 package org.jboss.migration.wfly10.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.eap.task.hostexclude.EAP7_1AddHostExcludes;
 import org.jboss.migration.eap.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.eap.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
@@ -57,6 +58,7 @@ public class WildFly10_1ToEAP7_1ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new WildFly10_1ToEAP7_1UpdateUndertowSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new AddElytronSubsystem<>())
+                                .subtask(new EAP7_1AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
