@@ -25,6 +25,8 @@ import org.jboss.migration.core.jboss.XmlConfigurationMigration;
 public class MigrateReferencedPaths<S extends JBossServer<S>> extends ConfigurationPathsMigrationTaskFactory<S> {
     public MigrateReferencedPaths() {
         super(new XmlConfigurationMigration.Builder<S>()
-                .componentFactory(new VaultPathsMigration.Factory()));
+                .componentFactory(new VaultPathsMigration.Factory())
+                .componentFactory(new WebSubsystemPathsMigration.Factory())
+        );
     }
 }
