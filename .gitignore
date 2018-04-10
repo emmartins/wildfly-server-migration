@@ -16,3 +16,4 @@ migration.log
 testsuite/server
 testsuite/jboss-server-migration
 testsuite/server-migration-test-interactive.sh
+testsuite/*.log
