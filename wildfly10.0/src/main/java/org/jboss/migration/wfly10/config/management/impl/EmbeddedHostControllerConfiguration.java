@@ -41,6 +41,8 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
     private final DeploymentResourceImpl.Factory deploymentResources;
     private final DeploymentOverlayResourceImpl.Factory deploymentOverlayResources;
     private final HostResourceImpl.Factory hostResources;
+    private final HostExcludeResourceImpl.Factory hostExcludeResources;
+
     private final ProfileResourceImpl.Factory profileResources;
     private final ServerGroupResourceImpl.Factory serverGroupResources;
 
@@ -54,6 +56,8 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         addChildResourceFactory(deploymentOverlayResources);
         hostResources = new HostResourceImpl.Factory(getResourcePathAddress(), this);
         addChildResourceFactory(hostResources);
+        hostExcludeResources = new HostExcludeResourceImpl.Factory(getResourcePathAddress(), this);
+        addChildResourceFactory(hostExcludeResources);
         profileResources = new ProfileResourceImpl.Factory(getResourcePathAddress(), this);
         addChildResourceFactory(profileResources);
         serverGroupResources = new ServerGroupResourceImpl.Factory(getResourcePathAddress(), this);
