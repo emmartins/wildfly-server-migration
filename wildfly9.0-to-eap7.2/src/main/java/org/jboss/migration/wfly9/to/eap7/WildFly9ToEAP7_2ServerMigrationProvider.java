@@ -16,6 +16,7 @@
 package org.jboss.migration.wfly9.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
+import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
@@ -86,6 +87,7 @@ public class WildFly9ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                 .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
