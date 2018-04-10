@@ -17,6 +17,7 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
+import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateJGroupsSubsystem;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
@@ -117,6 +118,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddSocketBindingPortExpressions<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
+                                .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                 .subtask(new MigrateDeployments<>()))

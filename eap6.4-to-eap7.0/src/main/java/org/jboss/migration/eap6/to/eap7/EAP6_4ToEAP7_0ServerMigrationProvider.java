@@ -17,6 +17,7 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_0;
+import org.jboss.migration.eap.task.hostexclude.EAP7_0AddHostExcludes;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_0UpdateEJB3Subsystem;
@@ -105,6 +106,7 @@ public class EAP6_4ToEAP7_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingPortExpressions<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
+                                .subtask(new EAP7_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
