@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.jboss.migration</groupId>
         <artifactId>jboss-server-migration-parent</artifactId>
-        <version>1.0.5.Final-SNAPSHOT</version>
+        <version>1.0.5.Final</version>
     </parent>
 
     <artifactId>jboss-server-migration-wildfly9.0-to-eap7.0</artifactId>
