@@ -1,0 +1,12 @@
+= Add Host Excludes
+
+A {server-target-productName} domain controller may have functionality that is not supported by hosts running on older version, and it's through its "host-excludes" configuration that such functionality is filtered.
+
+The JBoss Migration Tool, when migrating a domain controller configuration, will add/replace the source's "host-excludes" configuration, with the target's one.
+
+The configuration changes are fully automated, and upon successful completion of the configuration, you should see the following messages in the console:
+
+[source,options="nowrap"]
+----
+  INFO  Host-excludes configuration added.
+----

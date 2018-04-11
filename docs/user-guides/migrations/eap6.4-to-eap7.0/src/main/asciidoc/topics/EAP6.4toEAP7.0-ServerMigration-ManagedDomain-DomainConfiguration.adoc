@@ -28,6 +28,8 @@ include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-ee.
 
 include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-ejb3.adoc[]
 
+include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]
+
 include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-remoting.adoc[]
 
 include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-undertow.adoc[]
@@ -49,6 +51,8 @@ include::ServerMigration-ServerConfiguration-SetupPrivateInterface.adoc[]
 include::ServerMigration-ServerConfiguration-AddSocketBindingPortExpressions.adoc[]
 
 include::ServerMigration-ServerConfiguration-JVM-RemovePermgenAttributes.adoc[]
+
+include::ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 

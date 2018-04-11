@@ -46,6 +46,8 @@ include::ServerMigration-ServerConfiguration-JVM-RemovePermgenAttributes.adoc[]
 
 include::ServerMigration-ServerConfiguration-AddLoadBalancerProfile.adoc[]
 
+include::ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
+
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 
 :leveloffset: -1

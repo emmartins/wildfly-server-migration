@@ -24,15 +24,17 @@ include::ServerMigration-ServerConfiguration-Subsystem-Migrate-messaging.adoc[]
 
 include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-infinispan.adoc[]
 
-include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-ee.adoc[]
+include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-ee.adoc[]
 
-include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-ejb3.adoc[]
+include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-ejb3.adoc[]
 
-include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-remoting.adoc[]
+include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]
+
+include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-remoting.adoc[]
 
 include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-undertow.adoc[]
 
-include::EAP6.4toEAP7.0-ServerMigration-ServerConfiguration-Subsystem-Update-messaging-activemq.adoc[]
+include::EAP6.4toEAP7.1-ServerMigration-ServerConfiguration-Subsystem-Update-messaging-activemq.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-batch-jberet.adoc[]
 

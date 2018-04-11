@@ -22,6 +22,8 @@ include::ServerMigration-ServerConfiguration-Subsystem-Add-core-management.adoc[
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-elytron.adoc[]
 
+include::ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
+
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 
 :leveloffset: -1
