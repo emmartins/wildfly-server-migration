@@ -1,5 +1,0 @@
-:subsystem-add-subsystemName: security-manager
-:subsystem-add-extensionName: org.wildfly.extension.security.manager
-:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides the support for Java EE 7 security permissions.
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

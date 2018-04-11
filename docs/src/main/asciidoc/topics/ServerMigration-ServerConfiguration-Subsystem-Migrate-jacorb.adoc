@@ -1,5 +1,0 @@
-:subsystem-migrate-legacySubsystemName: jacorb
-:subsystem-migrate-legacyExtensionName: org.jboss.as.jacorb
-:subsystem-migrate-replacementSubsystemName: iiop-openjdk
-
-include::ServerMigration-ServerConfiguration-Subsystem-Migrate.adoc[]

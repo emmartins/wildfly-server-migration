@@ -1,5 +1,0 @@
-:subsystem-add-subsystemName: batch-jberet
-:subsystem-add-extensionName: org.wildfly.extension.batch.jberet
-:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for https://jcp.org/en/jsr/detail?id=352[JSR 352: Batch Applications for the Java Platform].
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

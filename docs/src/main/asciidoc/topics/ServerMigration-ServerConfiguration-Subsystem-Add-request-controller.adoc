@@ -1,5 +1,0 @@
-:subsystem-add-subsystemName: request-controller
-:subsystem-add-extensionName: org.wildfly.extension.request-controller
-:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides congestion control and graceful shutdown functionality.
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

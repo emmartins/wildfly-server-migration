@@ -1,6 +1,0 @@
-:server-migration-serverConfigurationType: Domain
-
-= Domain Configuration File Migration
-
-When migrating the domain configuration, the JBoss Server Migration Tool first copies the source configuration files to the target server.
-It then updates the configuration to not only work correctly in the target server, but also to take advantage of the target server’s new functionality.

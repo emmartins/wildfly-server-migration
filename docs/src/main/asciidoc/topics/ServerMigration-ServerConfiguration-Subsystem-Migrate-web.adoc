@@ -1,5 +1,0 @@
-:subsystem-migrate-legacySubsystemName: web
-:subsystem-migrate-legacyExtensionName: org.jboss.as.web
-:subsystem-migrate-replacementSubsystemName: undertow
-
-include::ServerMigration-ServerConfiguration-Subsystem-Migrate.adoc[]

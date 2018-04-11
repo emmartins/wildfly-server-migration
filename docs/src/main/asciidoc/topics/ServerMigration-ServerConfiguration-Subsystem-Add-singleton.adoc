@@ -1,5 +1,0 @@
-:subsystem-add-subsystemName: singleton
-:subsystem-add-extensionName: org.wildfly.extension.clustering.singleton
-:subsystem-add-subsystemDescription: As its name indicates, the {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides the singleton functionality.
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

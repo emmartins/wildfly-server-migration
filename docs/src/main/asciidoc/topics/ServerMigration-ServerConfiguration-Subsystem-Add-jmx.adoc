@@ -1,5 +1,0 @@
-:subsystem-add-subsystemName: jmx
-:subsystem-add-extensionName: org.jboss.as.jmx
-:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides the ability to manage and monitor systems.
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

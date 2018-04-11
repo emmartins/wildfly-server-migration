@@ -1,5 +1,0 @@
-:subsystem-add-subsystemName: elytron
-:subsystem-add-extensionName: org.wildfly.extension.elytron
-:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides Elytron, a new security framework, which will completely replace the combination of PicketBox and JAAS as the unified client and server security mechanism.
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

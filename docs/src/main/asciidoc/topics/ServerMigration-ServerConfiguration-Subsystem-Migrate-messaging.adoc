@@ -1,5 +1,0 @@
-:subsystem-migrate-legacySubsystemName: messaging
-:subsystem-migrate-legacyExtensionName: org.jboss.as.messaging
-:subsystem-migrate-replacementSubsystemName: messaging-activemq
-
-include::ServerMigration-ServerConfiguration-Subsystem-Migrate.adoc[]
