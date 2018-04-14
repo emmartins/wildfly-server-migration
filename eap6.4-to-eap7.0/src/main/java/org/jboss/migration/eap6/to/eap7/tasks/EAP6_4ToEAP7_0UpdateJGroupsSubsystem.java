@@ -30,8 +30,6 @@ public class EAP6_4ToEAP7_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemReso
                         .replace("MERGE2", "MERGE3")
                         .replace("FD", "FD_ALL")
                         .replace("pbcast.NAKACK", "pbcast.NAKACK2")
-                        .readd("pbcast.STABLE")
-                        .readd("pbcast.GMS")
                         .replace("UNICAST2", "UNICAST3")
                         .remove("RSVP")
                 ));
