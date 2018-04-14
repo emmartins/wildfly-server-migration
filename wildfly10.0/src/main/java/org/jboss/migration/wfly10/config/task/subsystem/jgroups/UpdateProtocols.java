@@ -16,9 +16,10 @@
 package org.jboss.migration.wfly10.config.task.subsystem.jgroups;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.client.helpers.Operations;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -60,28 +62,33 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
         }
         final Set<String> protocolsRemoved = new HashSet<>();
         final Set<String> protocolsAdded = new HashSet<>();
+
         final org.jboss.as.controller.client.helpers.Operations.CompositeOperationBuilder compositeOperationBuilder = org.jboss.as.controller.client.helpers.Operations.CompositeOperationBuilder.create();
-        for (Operation operation : operations) {
-            for (String stackName : stacks.keys()) {
-                final ModelNode stack = config.get(STACK, stackName);
-                if (operation.removeProtocol != null) {
-                    if (stack.hasDefined(PROTOCOL, operation.removeProtocol)) {
-                        compositeOperationBuilder.addStep(Util.createRemoveOperation(subsystemPathAddress.append(STACK, stackName).append(PROTOCOL, operation.removeProtocol)));
-                        protocolsRemoved.add(operation.removeProtocol);
-                    } else {
-                        continue;
-                    }
+        for (String stackName : stacks.keys()) {
+            final ProtocolStack protocolStack = new ProtocolStack(stackName, config.get(STACK, stackName));
+            for (Operation operation : operations) {
+                operation.execute(protocolStack);
+            }
+            final Set<String> protocolsRemovedFromStack = protocolStack.getProtocolsRemoved();
+            final Set<String> protocolsAddedToStack = protocolStack.getProtocolsAdded();
+            if (!protocolsRemovedFromStack.isEmpty() || !protocolsAddedToStack.isEmpty()) {
+                // protocols order matters so...
+                // first remove the old set
+                for (Property protocol : protocolStack.sourceProtocols) {
+                    compositeOperationBuilder.addStep(Util.createRemoveOperation(subsystemPathAddress.append(STACK, stackName).append(PROTOCOL, protocol.getName())));
                 }
-                if (operation.addProtocol != null) {
-                    if (!stack.hasDefined(PROTOCOL, operation.addProtocol)) {
-                        compositeOperationBuilder.addStep(Util.createAddOperation(subsystemPathAddress.append(STACK, stackName).append(PROTOCOL, operation.addProtocol)));
-                        if (!protocolsRemoved.remove(operation.addProtocol)) {
-                            protocolsAdded.add(operation.addProtocol);
-                        }
-                    }
+                // then add the new set
+                for (Property protocol : protocolStack.targetProtocols) {
+                    final ModelNode addOp = protocol.getValue().clone();
+                    addOp.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.ADD);
+                    addOp.get(ModelDescriptionConstants.ADDRESS).set(subsystemPathAddress.append(STACK, stackName).append(PROTOCOL, protocol.getName()).toModelNode());
+                    compositeOperationBuilder.addStep(addOp);
                 }
+                protocolsRemoved.addAll(protocolsRemovedFromStack);
+                protocolsAdded.addAll(protocolsAddedToStack);
             }
         }
+
         if (protocolsRemoved.isEmpty() && protocolsAdded.isEmpty()) {
             context.getLogger().debugf("No protocols removed or added.");
             return ServerMigrationTaskResult.SKIPPED;
@@ -94,37 +101,87 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
                 .build();
     }
 
-    public static class Operations {
+    static class ProtocolStack {
 
-        private final List<Operation> operations = new ArrayList<>();
+        final List<Property> sourceProtocols;
+        final List<Property> targetProtocols;
+        final String name;
 
-        protected Operations operation(String removeProtocol, String addProtocol) {
-            final Operation operation = new Operation();
-            operation.removeProtocol = removeProtocol;
-            operation.addProtocol = addProtocol;
-            operations.add(operation);
-            return this;
+        ProtocolStack(String name, ModelNode stackModelNode) {
+            this.name = name;
+            final ModelNode protocolsModelNode = stackModelNode.get(PROTOCOL);
+            this.sourceProtocols = protocolsModelNode.clone().asPropertyList();
+            this.targetProtocols = protocolsModelNode.clone().asPropertyList();
         }
 
-        public Operations add(String protocol) {
-            return operation(null, protocol);
+        void add(String protocol) {
+            targetProtocols.add(new Property(protocol, new ModelNode()));
         }
 
-        public Operations readd(String protocol) {
-            return operation(protocol, protocol);
+        void replace(String oldProtocol, String newProtocol) {
+            final ListIterator<Property> li = targetProtocols.listIterator();
+            while (li.hasNext()) {
+                if (li.next().getName().equals(oldProtocol)) {
+                    li.set(new Property(newProtocol, new ModelNode()));
+                }
+            }
         }
 
-        public Operations replace(String oldProtocol, String newProtocol) {
-            return operation(oldProtocol, newProtocol);
+        boolean remove(String protocol) {
+            final ListIterator<Property> li = targetProtocols.listIterator();
+            while (li.hasNext()) {
+                if (li.next().getName().equals(protocol)) {
+                    li.remove();
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public Operations remove(String protocol) {
-            return operation(protocol, null);
+        Set<String> getProtocolsAdded() {
+            final Set<String> result = new HashSet<>();
+            for (Property protocol : targetProtocols) {
+                result.add(protocol.getName());
+            }
+            for (Property protocol : sourceProtocols) {
+                result.remove(protocol.getName());
+            }
+            return result;
+        }
+
+        Set<String> getProtocolsRemoved() {
+            final Set<String> result = new HashSet<>();
+            for (Property protocol : sourceProtocols) {
+                result.add(protocol.getName());
+            }
+            for (Property protocol : targetProtocols) {
+                result.remove(protocol.getName());
+            }
+            return result;
         }
     }
 
-    protected static class Operation {
-        String addProtocol;
-        String removeProtocol;
+    interface Operation {
+        void execute(ProtocolStack protocolStack);
+    }
+
+    public static class Operations {
+
+        final List<Operation> operations = new ArrayList<>();
+
+        public Operations add(String protocol) {
+            operations.add(protocolStack -> protocolStack.add(protocol));
+            return this;
+        }
+
+        public Operations replace(String oldProtocol, String newProtocol) {
+            operations.add(protocolStack -> protocolStack.replace(oldProtocol, newProtocol));
+            return this;
+        }
+
+        public Operations remove(String protocol) {
+            operations.add(protocolStack -> protocolStack.remove(protocol));
+            return this;
+        }
     }
 }
