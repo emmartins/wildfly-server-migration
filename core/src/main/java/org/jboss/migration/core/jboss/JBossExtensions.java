@@ -73,6 +73,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.EE)
             .build();
 
+    Extension EE_SECURITY = Extension.builder()
+            .module(JBossExtensionNames.EE_SECURITY)
+            .subsystem(JBossSubsystemNames.EE_SECURITY)
+            .build();
+
     Extension EJB3 = Extension.builder()
             .module(JBossExtensionNames.EJB3)
             .subsystem(JBossSubsystemNames.EJB3)

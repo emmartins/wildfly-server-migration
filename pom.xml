@@ -141,6 +141,7 @@
         <module>wildfly11.0-to-eap7.2</module>
         <module>wildfly11.0-to-wildfly12.0</module>
         <module>wildfly12.0</module>
+        <module>wildfly13.0/server</module>
     </modules>
 
     <build>
@@ -542,7 +543,7 @@
                 <artifactId>jboss-server-migration-wildfly8.2-to-wildfly12.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+                        
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly9.0</artifactId>
@@ -662,7 +663,13 @@
                 <artifactId>jboss-server-migration-wildfly12.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly13.0-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- External Dependencies -->
 
             <dependency>

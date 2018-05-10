@@ -31,6 +31,7 @@ public interface JBossSubsystemNames {
     String DEPLOYMENT_SCANNER = "deployment-scanner";
     String DISCOVERY = "discovery";
     String EE = "ee";
+    String EE_SECURITY = "ee-security";
     String EJB3 = "ejb3";
     String ELYTRON = "elytron";
     String IIOP_OPENJDK = "iiop-openjdk";

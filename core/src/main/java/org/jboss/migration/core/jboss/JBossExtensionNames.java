@@ -30,6 +30,7 @@ public interface JBossExtensionNames {
     String DEPLOYMENT_SCANNER = "org.jboss.as.deployment-scanner";
     String DISCOVERY = "org.wildfly.extension.discovery";
     String EE = "org.jboss.as.ee";
+    String EE_SECURITY = "org.wildfly.extension.ee-security";
     String EJB3 = "org.jboss.as.ejb3";
     String ELYTRON = "org.wildfly.extension.elytron";
     String IIOP_OPENJDK = "org.wildfly.iiop-openjdk";
