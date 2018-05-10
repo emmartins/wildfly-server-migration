@@ -143,6 +143,7 @@
         <module>wildfly12.0</module>
         <module>wildfly13.0/server</module>
         <module>wildfly13.0/migrations/wildfly8.2</module>
+        <module>wildfly13.0/migrations/wildfly9.0</module>
     </modules>
 
     <build>
@@ -677,6 +678,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly13.0-from-wildfly9.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <!-- External Dependencies -->
 
             <dependency>
