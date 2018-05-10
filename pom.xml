@@ -146,6 +146,7 @@
         <module>wildfly13.0/migrations/wildfly9.0</module>
         <module>wildfly13.0/migrations/wildfly10.0</module>
         <module>wildfly13.0/migrations/wildfly10.1</module>
+        <module>wildfly13.0/migrations/wildfly11.0</module>
     </modules>
 
     <build>
@@ -695,6 +696,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly13.0-from-wildfly10.1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly13.0-from-wildfly11.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
