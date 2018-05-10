@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.jboss</groupId>
         <artifactId>jboss-parent</artifactId>
-        <version>24</version>
+        <version>26</version>
     </parent>
 
     <groupId>org.jboss.migration</groupId>
@@ -61,7 +61,7 @@
             versions, add the artifactId or other qualifier to the property name.
             For example: <version.org.jboss.as.console>
          -->
-        <version.org.wildfly.core>4.0.0.Final</version.org.wildfly.core>
+        <version.org.wildfly.core>5.0.0.Alpha7</version.org.wildfly.core>
         <version.org.asciidoctor.asciidoctor-maven-plugin>1.5.6</version.org.asciidoctor.asciidoctor-maven-plugin>
 
         <!-- Surefire args -->
@@ -72,7 +72,7 @@
         <linkXRef>false</linkXRef>
         <version.checkstyle>6.8</version.checkstyle>
         <version.junit>4.12</version.junit>
-        <version.org.wildfly.build-tools>1.1.7.Final</version.org.wildfly.build-tools>
+        <version.org.wildfly.build-tools>1.2.10.Final</version.org.wildfly.build-tools>
         <version.org.wildfly.checkstyle-config>1.0.5.Final</version.org.wildfly.checkstyle-config>
 
     </properties>
@@ -177,21 +177,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${version.checkstyle.plugin}</version>
-                    <configuration>
-                        <configLocation>wildfly-checkstyle/checkstyle.xml</configLocation>
-                        <consoleOutput>true</consoleOutput>
-                        <failsOnError>true</failsOnError>
-                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <excludes>**/*$logger.java,**/*$bundle.java</excludes>
-                        <useFile/>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.wildfly.checkstyle</groupId>
-                            <artifactId>wildfly-checkstyle-config</artifactId>
-                            <version>${version.org.wildfly.checkstyle-config}</version>
-                        </dependency>
-                    </dependencies>
                     <executions>
                         <execution>
                             <id>check-style</id>
@@ -201,6 +186,21 @@
                             </goals>
                         </execution>
                     </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.wildfly.checkstyle</groupId>
+                            <artifactId>wildfly-checkstyle-config</artifactId>
+                            <version>${version.org.wildfly.checkstyle-config}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>wildfly-checkstyle/checkstyle.xml</configLocation>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <excludes>**/*$logger.java,**/*$bundle.java</excludes>
+                        <useFile></useFile>
+                    </configuration>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven migration itself.-->
                 <plugin>
@@ -273,14 +273,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.wildfly.checkstyle</groupId>
-            <artifactId>wildfly-checkstyle-config</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 
     <dependencyManagement>
         <dependencies>
