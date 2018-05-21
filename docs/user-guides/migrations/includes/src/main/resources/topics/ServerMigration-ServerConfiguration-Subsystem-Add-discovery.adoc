@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: discovery
+:subsystem-add-extensionName: org.wildfly.extension.discovery
+:subsystem-add-subsystemDescription: TODO
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

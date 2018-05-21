@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: ee-security
+:subsystem-add-extensionName: org.wildfly.extension.ee-security
+:subsystem-add-subsystemDescription: TODO
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]
