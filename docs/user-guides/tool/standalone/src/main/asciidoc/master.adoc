@@ -37,7 +37,7 @@ To build the tool, open a terminal, navigate to the root directory of the projec
 $ mvn clean install
 ----
 
-This creates the standalone distribution ZIP archive in the `build/target` directory containing the tool. As with the downloaded binary distribution, unzip the ZIP archive into the directory of your choice.
+This creates the standalone distribution ZIP archive in the `dist/standalone/target` directory containing the tool. As with the downloaded binary distribution, unzip the ZIP archive into the directory of your choice.
 
 == Executing the JBoss Server Migration Tool
 

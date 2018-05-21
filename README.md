@@ -19,10 +19,10 @@ Build the Server Migration Tool
 Run the Server Migration Tool (Standalone Build)
 ------------
 
-1. Navigate to the `build/target/` directory and unzip the ` jboss-server-migration-VERSION_NUMBER.zip` file
+1. Navigate to the `dist/standalone/target/` directory and unzip the ` jboss-server-migration-VERSION_NUMBER.zip` file
 
         unzip jboss-server-migration-1.1.0.zip
-2. Open a terminal and navigate to the `build/target/jboss-server-migration/` directory.
+2. Open a terminal and navigate to the `dist/standalone/target/jboss-server-migration/` directory.
 3. Run the following command.
 
         For Linux|Mac:   ./jboss-server-migration.sh -s SOURCE_SERVER_PATH -t TARGET_SERVER_PATH
