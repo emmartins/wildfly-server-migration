@@ -27,9 +27,9 @@
         <relativePath>../../..</relativePath>        
     </parent>
 
-    <artifactId>jboss-server-migration-wildfly13.0-from-wildfly10.1</artifactId>
+    <artifactId>jboss-server-migration-wildfly10.1-to-wildfly13.0</artifactId>
 
-    <name>JBoss Server Migration: WildFly 13.0 Migration From WildFly 10.1</name>
+    <name>JBoss Server Migration: WildFly 10.1 to WildFly 13.0</name>
 
     <dependencies>   
         <dependency>
