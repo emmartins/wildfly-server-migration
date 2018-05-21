@@ -75,6 +75,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
             cmds.add("--host-config="+ hostConfig);
         }
         cmds.add("--admin-only");
+        cmds.add("-Dorg.wildfly.logging.embedded=false");
         if (!getServer().getEnvironment().isDefaultDomainBaseDir()) {
             cmds.add("-Djboss.domain.base.dir="+getServer().getDomainDir());
         }

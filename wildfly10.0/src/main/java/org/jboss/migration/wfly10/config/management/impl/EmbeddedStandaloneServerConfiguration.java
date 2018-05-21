@@ -70,6 +70,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         final List<String> cmds = new ArrayList<>();
         cmds.add("--server-config="+config);
         cmds.add("--admin-only");
+        cmds.add("-Dorg.wildfly.logging.embedded=false");
         if (!getServer().getEnvironment().isDefaultStandaloneServerDir()) {
             cmds.add("-Djboss.server.base.dir="+getServer().getStandaloneDir());
         }
