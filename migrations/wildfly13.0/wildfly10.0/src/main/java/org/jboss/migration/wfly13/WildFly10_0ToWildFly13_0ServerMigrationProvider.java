@@ -32,7 +32,7 @@ import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_0;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
-import org.jboss.migration.wfly12.task.hostexclude.WildFly12_0AddHostExcludes;
+import org.jboss.migration.wfly13.task.hostexclude.WildFly13_0AddHostExcludes;
 import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 
@@ -77,7 +77,7 @@ public class WildFly10_0ToWildFly13_0ServerMigrationProvider implements WildFly1
                                 .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
-                                .subtask(new WildFly12_0AddHostExcludes<>())
+                                .subtask(new WildFly13_0AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
