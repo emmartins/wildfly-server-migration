@@ -17,14 +17,14 @@
 package org.jboss.migration.eap6.to.eap7.tasks;
 
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
-import org.jboss.migration.wfly11.task.subsystem.undertow.AddHttpInvoker;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddHttpsListener;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.AddWebsockets;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.EnableHttp2;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderServer;
-import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHostResponseHeaderXPoweredBy;
 import org.jboss.migration.wfly10.config.task.subsystem.undertow.SetDefaultHttpListenerRedirectSocket;
+import org.jboss.migration.wfly11.task.subsystem.undertow.AddHttpInvoker;
+import org.jboss.migration.wfly13.task.subsystem.undertow.UnsetDefaultHostResponseHeaderServer;
+import org.jboss.migration.wfly13.task.subsystem.undertow.UnsetDefaultHostResponseHeaderXPoweredBy;
 
 /**
  * @author emmartins
@@ -36,8 +36,8 @@ public class EAP6_4ToEAP7_2UpdateUndertowSubsystem<S> extends UpdateSubsystemRes
                 new AddWebsockets<>(),
                 new AddHttpsListener<>(),
                 new EnableHttp2<>(),
-                new SetDefaultHostResponseHeaderServer<>(),
-                new SetDefaultHostResponseHeaderXPoweredBy<>(),
+                new UnsetDefaultHostResponseHeaderServer<>(),
+                new UnsetDefaultHostResponseHeaderXPoweredBy<>(),
                 new AddHttpInvoker<>());
     }
 }
