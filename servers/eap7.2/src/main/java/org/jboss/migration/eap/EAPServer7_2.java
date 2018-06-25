@@ -20,7 +20,7 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
 import org.jboss.migration.wfly10.WildFlyServerMigrations10;
-import org.jboss.migration.wfly12.WildFlyFullServer12_0;
+import org.jboss.migration.wfly13.WildFly13_0Server;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -29,7 +29,7 @@ import java.util.ServiceLoader;
  * The EAP 7.2 {@link Server}
  * @author emmartins
  */
-public class EAPServer7_2 extends WildFlyFullServer12_0 {
+public class EAPServer7_2 extends WildFly13_0Server {
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(EAPServerMigrationProvider7_2.class));
 
