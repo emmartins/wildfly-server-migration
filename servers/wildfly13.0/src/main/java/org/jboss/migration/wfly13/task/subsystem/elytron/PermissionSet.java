@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc.
+ * Copyright 2018 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,41 +14,24 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly11.task.subsystem.elytron;
+package org.jboss.migration.wfly13.task.subsystem.elytron;
 
 import org.jboss.dmr.ModelNode;
 
 /**
  * @author emmartins
  */
-public class Permission {
-    private final String className;
-    private String module;
-    private String targetName;
+public class PermissionSet {
 
-    public Permission(String className) {
-        this.className = className;
-    }
+    private final String permissionSet;
 
-    public Permission module(String module) {
-        this.module = module;
-        return this;
-    }
-
-    public Permission targetName(String targetName) {
-        this.targetName = targetName;
-        return this;
+    public PermissionSet(String permissionSet) {
+        this.permissionSet = permissionSet;
     }
 
     public ModelNode toModelNode() {
         final ModelNode modelNode = new ModelNode();
-        modelNode.get("class-name").set(className);
-        if (module != null) {
-            modelNode.get("module").set(module);
-        }
-        if (targetName != null) {
-            modelNode.get("target-name").set(targetName);
-        }
+        modelNode.get("permission-set").set(permissionSet);
         return modelNode;
     }
 }
