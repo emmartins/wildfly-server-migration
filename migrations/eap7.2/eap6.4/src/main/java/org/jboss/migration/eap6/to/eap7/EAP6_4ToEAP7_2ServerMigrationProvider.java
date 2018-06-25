@@ -18,13 +18,8 @@ package org.jboss.migration.eap6.to.eap7;
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
 import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
-import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateJGroupsSubsystem;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
-import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
-import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateJGroupsSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateEJB3Subsystem;
@@ -50,9 +45,15 @@ import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRe
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
+import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
+import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
+
 
 /**
  * Server migration, from EAP 6.4 to EAP 7.2.
@@ -69,7 +70,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
                         .subtask(new MigrateJacorbSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new EAP7_1MigrateWebSubsystem<>())
                         .subtask(new EAP6_4ToEAP7_2UpdateUndertowSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
@@ -98,7 +99,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new EAP7_1MigrateWebSubsystem<>())
                                 .subtask(new EAP6_4ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new MigrateMessagingSubsystem<>())
@@ -127,7 +128,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new AddElytronSubsystem<>())
+                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new AddJmxSubsystemToHosts<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new SetupHttpUpgradeManagement<>())
