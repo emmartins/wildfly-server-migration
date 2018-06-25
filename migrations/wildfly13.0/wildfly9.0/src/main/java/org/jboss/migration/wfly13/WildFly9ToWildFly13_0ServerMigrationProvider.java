@@ -34,11 +34,11 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly13.task.hostexclude.WildFly13_0AddHostExcludes;
 import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 import org.jboss.migration.wfly9.WildFlyServer9;
 
 /**
@@ -62,7 +62,7 @@ public class WildFly9ToWildFly13_0ServerMigrationProvider implements WildFly13_0
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
@@ -83,7 +83,7 @@ public class WildFly9ToWildFly13_0ServerMigrationProvider implements WildFly13_0
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
@@ -100,7 +100,7 @@ public class WildFly9ToWildFly13_0ServerMigrationProvider implements WildFly13_0
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new AddElytronSubsystem<>())
+                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                         .subtask(new MigrateCompatibleSecurityRealms<>())

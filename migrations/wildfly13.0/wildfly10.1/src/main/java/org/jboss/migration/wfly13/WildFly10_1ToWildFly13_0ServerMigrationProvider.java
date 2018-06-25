@@ -27,11 +27,11 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly13.task.hostexclude.WildFly13_0AddHostExcludes;
 import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 
 /**
  * Server migration to WFLY 13.0, from WFLY 10.1.
@@ -52,7 +52,7 @@ public class WildFly10_1ToWildFly13_0ServerMigrationProvider implements WildFly1
                         .subtask(new WildFly10_1ToWildFly13_0UpdateUndertowSubsystem<>())
                         .subtask(new WildFly10_1ToWildFly13_0UpdateJGroupsSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
@@ -67,7 +67,7 @@ public class WildFly10_1ToWildFly13_0ServerMigrationProvider implements WildFly1
                                 .subtask(new WildFly10_1ToWildFly13_0UpdateUndertowSubsystem<>())
                                 .subtask(new WildFly10_1ToWildFly13_0UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new WildFly13_0AddHostExcludes<>())
@@ -78,7 +78,7 @@ public class WildFly10_1ToWildFly13_0ServerMigrationProvider implements WildFly1
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new AddElytronSubsystem<>())
+                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new MigrateCompatibleSecurityRealms<>()))))
                 .build();
     }
