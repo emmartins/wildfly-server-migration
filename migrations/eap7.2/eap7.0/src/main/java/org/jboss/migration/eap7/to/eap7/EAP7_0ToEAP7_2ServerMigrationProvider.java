@@ -21,9 +21,6 @@ import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
 import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
-import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -34,6 +31,9 @@ import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRe
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
+import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
+import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 
 /**
  * Server migration, from EAP 7.0 to EAP 7.2.
@@ -55,7 +55,7 @@ public class EAP7_0ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_0ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new EAP7_0ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
                                 .subtask(new AddApplicationRealmSSLServerIdentity<>())
@@ -70,7 +70,7 @@ public class EAP7_0ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_0ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new EAP7_0ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
                                 .subtask(new EAP7_2AddHostExcludes<>())
@@ -81,7 +81,7 @@ public class EAP7_0ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new AddElytronSubsystem<>())
+                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new MigrateCompatibleSecurityRealms<>())
                                         .subtask(new AddApplicationRealmSSLServerIdentity<>()))))
                 .build();
