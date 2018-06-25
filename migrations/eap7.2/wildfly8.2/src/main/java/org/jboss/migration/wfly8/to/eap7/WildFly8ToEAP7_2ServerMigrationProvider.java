@@ -19,9 +19,6 @@ import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
 import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
-import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
@@ -42,6 +39,9 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
+import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
+import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 import org.jboss.migration.wfly8.WildFlyServer8;
 
 /**
@@ -66,7 +66,7 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
@@ -88,7 +88,7 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
@@ -105,7 +105,7 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new AddElytronSubsystem<>())
+                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new AddJmxSubsystemToHosts<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new RemovePermgenAttributesFromJVMConfigs<>())

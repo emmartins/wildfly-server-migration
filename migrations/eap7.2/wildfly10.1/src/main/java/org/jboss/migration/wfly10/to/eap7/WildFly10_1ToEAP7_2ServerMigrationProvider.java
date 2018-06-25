@@ -29,8 +29,9 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
-import org.jboss.migration.wfly11.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
+
 /**
  * Server migration to EAP 7.2, from WFLY 10.1.
  * @author emmartins
@@ -50,7 +51,7 @@ public class WildFly10_1ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                         .subtask(new WildFly10_1ToEAP7_2UpdateUndertowSubsystem<>())
                         .subtask(new WildFly10_1ToEAP7_2UpdateJGroupsSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
-                        .subtask(new AddElytronSubsystem<>())
+                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -63,7 +64,7 @@ public class WildFly10_1ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new WildFly10_1ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new WildFly10_1ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
-                                .subtask(new AddElytronSubsystem<>())
+                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
@@ -72,7 +73,7 @@ public class WildFly10_1ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new MigrateReferencedPaths<>())
                                 .subtask(serverUpdateBuilders.hostBuilder()
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new AddElytronSubsystem<>())
+                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new MigrateCompatibleSecurityRealms<>()))))
                 .build();
     }
