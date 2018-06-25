@@ -28,6 +28,8 @@ import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
+import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 
 /**
  * Server migration, from EAP 7.1 to EAP 7.2.
@@ -48,6 +50,8 @@ public class EAP7_1ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_1ToEAP7_2UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP7_1ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new EAP7_1ToEAP7_2UpdateJGroupsSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
                                 .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -59,6 +63,8 @@ public class EAP7_1ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_1ToEAP7_2UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP7_1ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new EAP7_1ToEAP7_2UpdateJGroupsSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
