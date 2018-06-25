@@ -37,6 +37,8 @@ import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 import org.jboss.migration.wfly9.WildFlyServer9;
 
@@ -63,6 +65,8 @@ public class WildFly9ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new AddCoreManagementSubsystem<>())
                         .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
+                        .subtask(new AddDiscoverySubsystem<>())
+                        .subtask(new AddEESecuritySubsystem<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
@@ -82,6 +86,8 @@ public class WildFly9ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())

@@ -29,6 +29,8 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly11.WildFlyFullServer11_0;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 
 /**
  * Server migration to EAP 7.2, from WFLY 11.0.
@@ -48,6 +50,8 @@ public class WildFly11_0ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                         .subtask(new WildFly11_0ToEAP7_2UpdateInfinispanSubsystem<>())
                         .subtask(new WildFly11_0ToEAP7_2UpdateUndertowSubsystem<>())
                         .subtask(new WildFly11_0ToEAP7_2UpdateJGroupsSubsystem<>())
+                        .subtask(new AddDiscoverySubsystem<>())
+                        .subtask(new AddEESecuritySubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -59,6 +63,8 @@ public class WildFly11_0ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new WildFly11_0ToEAP7_2UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly11_0ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new WildFly11_0ToEAP7_2UpdateJGroupsSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))

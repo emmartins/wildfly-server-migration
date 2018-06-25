@@ -41,6 +41,8 @@ import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 import org.jboss.migration.wfly8.WildFlyServer8;
 
@@ -70,6 +72,8 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new AddRequestControllerSubsystem<>())
                         .subtask(new AddSecurityManagerSubsystem<>())
                         .subtask(new AddSingletonSubsystem<>())
+                        .subtask(new AddDiscoverySubsystem<>())
+                        .subtask(new AddEESecuritySubsystem<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
@@ -92,6 +96,8 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new AddRequestControllerSubsystem<>())
                                 .subtask(new AddSecurityManagerSubsystem<>())
                                 .subtask(new AddSingletonSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
