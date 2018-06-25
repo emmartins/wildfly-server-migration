@@ -33,6 +33,8 @@ import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 
 /**
@@ -56,6 +58,8 @@ public class EAP7_0ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_0ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new WildFly13_0AddElytronSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
                                 .subtask(new AddApplicationRealmSSLServerIdentity<>())
@@ -71,6 +75,8 @@ public class EAP7_0ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_0ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new WildFly13_0AddElytronSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
                                 .subtask(new EAP7_2AddHostExcludes<>())

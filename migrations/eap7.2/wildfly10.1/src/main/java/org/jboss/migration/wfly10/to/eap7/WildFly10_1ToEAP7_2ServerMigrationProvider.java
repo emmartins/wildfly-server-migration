@@ -30,6 +30,8 @@ import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.dist.full.WildFlyFullServer10_1;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
+import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
 
 /**
@@ -52,6 +54,8 @@ public class WildFly10_1ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                         .subtask(new WildFly10_1ToEAP7_2UpdateJGroupsSubsystem<>())
                         .subtask(new AddCoreManagementSubsystem<>())
                         .subtask(new WildFly13_0AddElytronSubsystem<>())
+                        .subtask(new AddDiscoverySubsystem<>())
+                        .subtask(new AddEESecuritySubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -65,6 +69,8 @@ public class WildFly10_1ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new WildFly10_1ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddCoreManagementSubsystem<>())
                                 .subtask(new WildFly13_0AddElytronSubsystem<>())
+                                .subtask(new AddDiscoverySubsystem<>())
+                                .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
