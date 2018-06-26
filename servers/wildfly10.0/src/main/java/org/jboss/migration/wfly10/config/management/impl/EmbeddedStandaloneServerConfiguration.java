@@ -27,9 +27,13 @@ import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
 import org.wildfly.core.embedded.StandaloneServer;
+import org.wildfly.security.manager.WildFlySecurityManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
@@ -48,9 +52,11 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
     private final ManagementInterfaceResourceImpl.Factory managementInterfaceResources;
     private final SecurityRealmResourceImpl.Factory securityRealmResources;
     private final SubsystemResourceImpl.Factory subsystemResources;
+    private final Map<String, String> propertiesToReset;
 
     public EmbeddedStandaloneServerConfiguration(JBossServerConfiguration configurationPath, WildFlyServer10 server) {
         super("", PathAddress.EMPTY_ADDRESS, configurationPath, server);
+        propertiesToReset = new HashMap<>();
         this.config = configurationPath.getPathRelativeToConfigurationDir().toString();
         deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
         addChildResourceFactory(deploymentResources);
@@ -72,10 +78,10 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         cmds.add("--admin-only");
         cmds.add("-Dorg.wildfly.logging.embedded=false");
         if (!getServer().getEnvironment().isDefaultStandaloneServerDir()) {
-            cmds.add("-Djboss.server.base.dir="+getServer().getStandaloneDir());
+            setSystemProperty("jboss.server.base.dir", getServer().getStandaloneDir());
         }
         if (!getServer().getEnvironment().isDefaultStandaloneConfigDir()) {
-            cmds.add("-Djboss.server.config.dir="+getServer().getStandaloneConfigurationDir());
+            setSystemProperty("jboss.server.config.dir", getServer().getStandaloneConfigurationDir());
         }
         final String[] systemPackages = {"org.jboss.logmanager"};
         standaloneServer = EmbeddedProcessFactory.createStandaloneServer(getServer().getBaseDir().toString(), null, systemPackages, cmds.toArray(new String[cmds.size()]));
@@ -92,6 +98,7 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         writeConfiguration();
         standaloneServer.stop();
         standaloneServer = null;
+        resetProperties();
     }
 
     @Override
@@ -123,6 +130,27 @@ public class EmbeddedStandaloneServerConfiguration extends AbstractManageableSer
         @Override
         public StandaloneServerConfiguration getManageableConfiguration(JBossServerConfiguration configurationPath, WildFlyServer10 server) {
             return new EmbeddedStandaloneServerConfiguration(configurationPath, server);
+        }
+    }
+
+    private void setSystemProperty(final String name, final Object value) {
+        if (value != null) {
+            final String currentValue = WildFlySecurityManager.getPropertyPrivileged(name, null);
+            WildFlySecurityManager.setPropertyPrivileged(name, value.toString());
+            propertiesToReset.put(name, currentValue);
+        }
+    }
+
+    private void resetProperties() {
+        final Iterator<Map.Entry<String, String>> iterator = propertiesToReset.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<String, String> entry = iterator.next();
+            if (entry.getValue() == null) {
+                WildFlySecurityManager.clearPropertyPrivileged(entry.getKey());
+            } else {
+                WildFlySecurityManager.setPropertyPrivileged(entry.getKey(), entry.getValue());
+            }
+            iterator.remove();
         }
     }
 }
