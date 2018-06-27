@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+
+<package-spec xmlns="urn:jboss:galleon:package:1.0" name="migration.tool">
+    <dependencies>
+        <package name="org.jboss.migration.cli"/>
+    </dependencies>
+</package-spec>
