@@ -25,9 +25,13 @@ import org.jboss.migration.wfly10.config.task.ServerConfigurationMigration;
 import org.wildfly.core.embedded.EmbeddedProcessFactory;
 import org.wildfly.core.embedded.EmbeddedProcessStartException;
 import org.wildfly.core.embedded.HostController;
+import org.wildfly.security.manager.WildFlySecurityManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author emmartins
@@ -45,9 +49,11 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
 
     private final ProfileResourceImpl.Factory profileResources;
     private final ServerGroupResourceImpl.Factory serverGroupResources;
+    private final Map<String, String> propertiesToReset;
 
     protected EmbeddedHostControllerConfiguration(String domainConfig, String hostConfig, JBossServerConfiguration configurationPath, WildFlyServer10 server) {
         super("", PathAddress.EMPTY_ADDRESS, configurationPath, server);
+        propertiesToReset = new HashMap<>();
         this.domainConfig = domainConfig;
         this.hostConfig = hostConfig;
         deploymentResources = new DeploymentResourceImpl.Factory(getResourcePathAddress(), this);
@@ -77,10 +83,10 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         cmds.add("--admin-only");
         cmds.add("-Dorg.wildfly.logging.embedded=false");
         if (!getServer().getEnvironment().isDefaultDomainBaseDir()) {
-            cmds.add("-Djboss.domain.base.dir="+getServer().getDomainDir());
+            setSystemProperty("jboss.domain.base.dir", getServer().getDomainDir());
         }
         if (!getServer().getEnvironment().isDefaultDomainConfigDir()) {
-            cmds.add("-Djboss.domain.config.dir="+getServer().getDomainConfigurationDir());
+            setSystemProperty("jboss.domain.config.dir", getServer().getDomainConfigurationDir());
         }
         final String[] systemPackages = {"org.jboss.logmanager"};
         hostController = EmbeddedProcessFactory.createHostController(getServer().getBaseDir().toString(), null, systemPackages, cmds.toArray(new String[cmds.size()]));
@@ -99,6 +105,7 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         }
         hostController.stop();
         hostController = null;
+        resetProperties();
     }
 
     public static class DomainConfigFileMigrationFactory implements ServerConfigurationMigration.ManageableConfigurationProvider {
@@ -112,6 +119,27 @@ public class EmbeddedHostControllerConfiguration extends AbstractManageableServe
         @Override
         public HostControllerConfiguration getManageableConfiguration(JBossServerConfiguration configurationPath, WildFlyServer10 server) {
             return new EmbeddedHostControllerConfiguration(null, configurationPath.getPathRelativeToConfigurationDir().toString(), configurationPath, server);
+        }
+    }
+
+    private void setSystemProperty(final String name, final Object value) {
+        if (value != null) {
+            final String currentValue = WildFlySecurityManager.getPropertyPrivileged(name, null);
+            WildFlySecurityManager.setPropertyPrivileged(name, value.toString());
+            propertiesToReset.put(name, currentValue);
+        }
+    }
+
+    private void resetProperties() {
+        final Iterator<Map.Entry<String, String>> iterator = propertiesToReset.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<String, String> entry = iterator.next();
+            if (entry.getValue() == null) {
+                WildFlySecurityManager.clearPropertyPrivileged(entry.getKey());
+            } else {
+                WildFlySecurityManager.setPropertyPrivileged(entry.getKey(), entry.getValue());
+            }
+            iterator.remove();
         }
     }
 }
