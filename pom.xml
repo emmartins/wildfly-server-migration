@@ -84,9 +84,7 @@
         <module>core</module>
         <module>dist/standalone</module>
         <module>dist/feature-packs/eap7.1</module>
-        <!--
         <module>dist/feature-packs/eap7.2</module>
-        -->
         <module>docs/user-guides/migrations/includes</module>
         <module>docs/user-guides/migrations/eap7.0/eap6.4</module>
         <module>docs/user-guides/migrations/eap7.0/wildfly8.2</module>
@@ -124,7 +122,6 @@
         <module>migrations/eap7.1/wildfly9.0</module>
         <module>migrations/eap7.1/wildfly10.0</module>
         <module>migrations/eap7.1/wildfly10.1</module>
-        <!--
         <module>migrations/eap7.2/eap6.4</module>
         <module>migrations/eap7.2/eap7.0</module>        
         <module>migrations/eap7.2/eap7.1</module>        
@@ -134,7 +131,6 @@
         <module>migrations/eap7.2/wildfly10.1</module>
         <module>migrations/eap7.2/wildfly11.0</module>
         <module>migrations/eap7.2/wildfly12.0</module>
-        -->
         <module>migrations/wildfly11.0/wildfly8.2</module>
         <module>migrations/wildfly11.0/wildfly9.0</module>
         <module>migrations/wildfly11.0/wildfly10.0</module>
@@ -153,9 +149,7 @@
         <module>servers/eap6.4</module>
         <module>servers/eap7.0</module>
         <module>servers/eap7.1</module>
-        <!--
         <module>servers/eap7.2</module>
-        -->
         <module>servers/wildfly8.2</module>
         <module>servers/wildfly9.0</module>
         <module>servers/wildfly10.0</module>
@@ -500,7 +494,7 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- eap 7.2
+            <!-- eap 7.2 -->
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -567,8 +561,6 @@
                 <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            -->
 
             <!-- wfly 8.2 -->
 

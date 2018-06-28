@@ -129,7 +129,7 @@
             <artifactId>jboss-server-migration-wildfly10.1-to-eap7.1</artifactId>
         </dependency>
 
-        <!-- eap 7.2
+        <!-- eap 7.2 -->
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -180,8 +180,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2</artifactId>
         </dependency>
-
-        -->
 
         <!-- wfly 8.2 -->
 
