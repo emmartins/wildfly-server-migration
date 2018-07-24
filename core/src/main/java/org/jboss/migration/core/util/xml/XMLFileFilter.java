@@ -18,6 +18,7 @@ package org.jboss.migration.core.util.xml;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
 
+import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.StartElement;
@@ -33,19 +34,24 @@ public interface XMLFileFilter {
      * @param startElement the element to filter
      * @param xmlEventReader the source XML file reader
      * @param xmlEventWriter the target xml file writer
+     * @param xmlEventFactory the xml event factory
      * @return the {@link Result} of the element filtering
      * @throws ServerMigrationFailureException if there was a failure filtering the element
      */
-    Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws ServerMigrationFailureException;
+    Result filter(StartElement startElement, XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter, XMLEventFactory xmlEventFactory) throws ServerMigrationFailureException;
 
     /**
      * The element filtering result.
      */
     enum Result {
         /**
-         * the xml element should be kept
+         * the xml element should be added
          */
-        KEEP,
+        ADD,
+        /**
+         * the xml element should be ignored, i.e. not added and not removed
+         */
+        CONTINUE,
         /**
          * the filter is not applicable to the element
          */
