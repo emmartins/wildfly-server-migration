@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.jboss.migration</groupId>
         <artifactId>jboss-server-migration-parent</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
+        <version>1.3.0.Beta</version>
         <relativePath>../../pom.xml</relativePath>        
     </parent>
 
