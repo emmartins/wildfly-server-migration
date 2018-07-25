@@ -356,23 +356,6 @@
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>assemble-src</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly-src.xml</descriptor>
-                            </descriptors>
-                            <finalName>jboss-server-migration-${project.version}</finalName>
-                            <appendAssemblyId>true</appendAssemblyId>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <workDirectory>${project.build.directory}/assembly-src/work</workDirectory>
-                            <tarLongFileMode>gnu</tarLongFileMode>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
