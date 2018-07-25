@@ -18,6 +18,7 @@ package org.jboss.migration.eap7.to.eap7;
 
 import org.jboss.migration.eap.EAPServer7_1;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
+import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
@@ -52,6 +53,7 @@ public class EAP7_1ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_1ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
                                 .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -65,6 +67,7 @@ public class EAP7_1ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_1ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
