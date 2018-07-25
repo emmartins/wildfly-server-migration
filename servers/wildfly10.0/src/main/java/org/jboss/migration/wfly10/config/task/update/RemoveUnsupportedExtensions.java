@@ -86,12 +86,12 @@ public class RemoveUnsupportedExtensions<S extends JBossServer<S>> implements Se
         accepted.removeAll(environment.getPropertyAsList(EnvironmentProperties.EXCLUDES, Collections.emptyList()));
         // setup and run the xml filter to remove not accepted extensions
         final Set<String> removed = new HashSet<>();
-        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter) -> {
+        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter, xmlEventFactory) -> {
             if (startElement.getName().getLocalPart().equals("extension")) {
                 Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
                 final String moduleName = moduleAttr.getValue();
                 if (accepted.contains(moduleName)) {
-                    return XMLFileFilter.Result.KEEP;
+                    return XMLFileFilter.Result.ADD;
                 } else {
                     // TODO if interactive mode, extension not excluded, and not a source server extension, then confirm with user its removal (feature to provide configless custom extension migration)
                     final ServerMigrationTask subtask = new SimpleComponentTask.Builder()

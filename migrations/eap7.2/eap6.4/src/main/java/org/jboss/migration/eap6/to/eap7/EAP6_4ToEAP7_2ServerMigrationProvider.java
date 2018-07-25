@@ -18,6 +18,7 @@ package org.jboss.migration.eap6.to.eap7;
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
 import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
+import org.jboss.migration.eap.task.subsystem.transactions.UpdateObjectStorePath;
 import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateJGroupsSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
@@ -71,6 +72,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
+                        .subtask(new UpdateObjectStorePath<>())
                         .subtask(new MigrateJacorbSubsystem<>())
                         .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new EAP7_1MigrateWebSubsystem<>())
@@ -102,6 +104,7 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new UpdateObjectStorePath<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
                                 .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new EAP7_1MigrateWebSubsystem<>())

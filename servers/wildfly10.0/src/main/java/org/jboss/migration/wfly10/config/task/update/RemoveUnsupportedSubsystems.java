@@ -88,13 +88,13 @@ public class RemoveUnsupportedSubsystems<S extends JBossServer<S>> implements Se
         accepted.removeAll(environment.getPropertyAsList(EnvironmentProperties.EXCLUDES, Collections.emptyList()));
         // setup and run the xml filter to remove the ones not accepted
         final Set<String> removed = new HashSet<>();
-        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter) -> {
+        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter, xmlEventFactory) -> {
             if (startElement.getName().getLocalPart().equals("subsystem")) {
                 final String namespaceURI = startElement.getName().getNamespaceURI();
                 // keep if the namespace uri starts with a supported subsystem's namespace without version
                 for (String namespaceWithoutVersion : accepted) {
                     if (namespaceURI != null && namespaceURI.startsWith(namespaceWithoutVersion+':')) {
-                        return XMLFileFilter.Result.KEEP;
+                        return XMLFileFilter.Result.ADD;
                     }
                 }
                 // not supported, remove subsystem
