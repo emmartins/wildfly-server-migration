@@ -1,0 +1,12 @@
+= Update the transaction Subsystem
+
+The JBoss Server Migration Tool updates the *transactions* subsystem with the configuration changes required by the {server-target-productName} server.
+
+The update of the *transactions* subsystem is done on its XML configurations, the JBoss Server Migration Tool moves any `path` and `relative-to` attributes found in a `core-environment` element, to a new `object-store` element.
+
+The configuration changes are fully automated, and when successfully applied you should see the following message in the console:
+
+[source,options="nowrap"]
+----
+ INFO  Subsystem transactions XML updated.
+----
