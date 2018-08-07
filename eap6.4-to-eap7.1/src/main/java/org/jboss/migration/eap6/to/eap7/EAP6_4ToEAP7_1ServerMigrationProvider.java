@@ -21,6 +21,7 @@ import org.jboss.migration.eap.task.hostexclude.EAP7_1AddHostExcludes;
 import org.jboss.migration.eap.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.eap.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
+import org.jboss.migration.eap.task.subsystem.transactions.UpdateObjectStorePath;
 import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEESubsystem;
@@ -66,6 +67,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                         .subtask(new RemoveAllUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
+                        .subtask(new UpdateObjectStorePath<>())
                         .subtask(new MigrateJacorbSubsystem<>())
                         .subtask(new AddElytronSubsystem<>())
                         .subtask(new EAP7_1MigrateWebSubsystem<>())
@@ -94,6 +96,7 @@ public class EAP6_4ToEAP7_1ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveAllUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new UpdateObjectStorePath<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
                                 .subtask(new AddElytronSubsystem<>())
                                 .subtask(new EAP7_1MigrateWebSubsystem<>())

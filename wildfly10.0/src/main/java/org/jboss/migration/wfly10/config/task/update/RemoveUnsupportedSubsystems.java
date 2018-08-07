@@ -85,14 +85,14 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
         final Set<String> extensionsRemoved = new HashSet<>();
         final Set<String> subsystemsRemoved = new HashSet<>();
         // setup the extensions filter
-        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter) -> {
+        final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter, xmlEventFactory) -> {
             if (startElement.getName().getLocalPart().equals("extension")) {
                 Attribute moduleAttr = startElement.getAttributeByName(new QName("module"));
                 final String moduleName = moduleAttr.getValue();
                 // keep if module matches a supported extension name
                 for (Extension extension : migrationExtensions) {
                     if (extension.getName().equals(moduleName)) {
-                        return XMLFileFilter.Result.KEEP;
+                        return XMLFileFilter.Result.ADD;
                     }
                 }
                 // not supported, remove it
@@ -117,14 +117,14 @@ public class RemoveUnsupportedSubsystems<S> implements ServerConfigurationMigrat
             }
         };
         // setup subsystems filter
-        final XMLFileFilter subsystemsFilter = (startElement, xmlEventReader, xmlEventWriter) -> {
+        final XMLFileFilter subsystemsFilter = (startElement, xmlEventReader, xmlEventWriter, xmlEventFactory) -> {
             if (startElement.getName().getLocalPart().equals("subsystem")) {
                 final String namespaceURI = startElement.getName().getNamespaceURI();
                 // keep if the namespace uri starts with a supported subsystem's namespace without version
                 for (Subsystem subsystem : migrationSubsystems) {
                     final String namespaceWithoutVersion = subsystem.getNamespaceWithoutVersion();
                     if (namespaceWithoutVersion != null && namespaceURI.startsWith(namespaceWithoutVersion + ':')) {
-                        return XMLFileFilter.Result.KEEP;
+                        return XMLFileFilter.Result.ADD;
                     }
                 }
                 // not supported, remove subsystem

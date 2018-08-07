@@ -18,6 +18,7 @@ package org.jboss.migration.core.util.xml;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
 
+import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
@@ -125,6 +126,7 @@ public class XMLFiles {
     private static void filter(final InputStream inputStream, final OutputStream outputStream, XMLFileFilter... filters) throws ServerMigrationFailureException {
         XMLEventReader xmlEventReader = null;
         XMLEventWriter xmlEventWriter = null;
+        final XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
         try {
             xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
             xmlEventWriter = XMLOutputFactory.newInstance().createXMLEventWriter(outputStream);
@@ -135,7 +137,7 @@ public class XMLFiles {
                     XMLFileFilter.Result filterResult = XMLFileFilter.Result.NOT_APPLICABLE;
                     if (filters != null) {
                         for (XMLFileFilter filter : filters) {
-                            filterResult = filter.filter(startElement, xmlEventReader, xmlEventWriter);
+                            filterResult = filter.filter(startElement, xmlEventReader, xmlEventWriter, xmlEventFactory);
                             if (filterResult != XMLFileFilter.Result.NOT_APPLICABLE) {
                                 break;
                             }
@@ -145,7 +147,9 @@ public class XMLFiles {
                         case REMOVE:
                             skipTillEndElement(xmlEventReader);
                             break;
-                        case KEEP:
+                        case CONTINUE:
+                            break;
+                        case ADD:
                         case NOT_APPLICABLE:
                         default:
                             xmlEventWriter.add(xmlEvent);
