@@ -32,6 +32,7 @@
     <name>JBoss Server Migration: Docs User-Guide Tool Standalone</name>
 
     <dependencies>
+
         <!-- includes -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -43,11 +44,24 @@
             <artifactId>jboss-server-migration-docs-userguide-migration-includes</artifactId>
         </dependency>
         -->
+
         <!-- migrations -->
+
+        <!-- EAP 7.0 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-eap6.4-to-eap7.0</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.0</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.0</artifactId>
+        </dependency>
+
+        <!-- EAP 7.1 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-eap6.4-to-eap7.1</artifactId>
@@ -58,23 +72,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.0</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.1</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly11.0</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly12.0</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.0</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -82,15 +80,59 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly11.0</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly12.0</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-eap7.1</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-eap7.1</artifactId>
+        </dependency>
+
+        <!-- EAP 7.2 -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap6.4-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.0-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.1-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly8.2-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly9.0-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.0-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly10.1-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly11.0-to-eap7.2-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</artifactId>
+        </dependency>
+
+        <!-- WFLY 11.0 -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly11.0</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly11.0</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -98,15 +140,21 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly12.0</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-eap7.1</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly11.0</artifactId>
+        </dependency>
+
+        <!-- WFLY 12.0 -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly12.0</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly12.0</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly12.0</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -116,6 +164,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-wildfly11.0-to-wildfly12.0</artifactId>
         </dependency>
+
         <!-- WFLY 13.0 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -199,7 +248,8 @@
                             <includeArtifactIds>jboss-server-migration-docs-userguide-tool-includes</includeArtifactIds>
                         </configuration>
                     </execution>
-                    
+
+                    <!-- EAP 7.0 -->
                     <execution>
                         <id>EAP6.4toEAP7.0</id>
                         <phase>generate-resources</phase>
@@ -211,6 +261,30 @@
                             <outputDirectory>${project.build.outputDirectory}/migrations/eap6.4-to-eap7.0</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>WFLY8.2toEAP7.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.0</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly8.2-to-eap7.0</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY9.0toEAP7.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.0</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-eap7.0</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- EAP 7.1 -->
                     <execution>
                         <id>EAP6.4toEAP7.1</id>
                         <phase>generate-resources</phase>
@@ -234,17 +308,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>WFLY8.2toEAP7.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.0</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly8.2-to-eap7.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>WFLY8.2toEAP7.1</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -255,6 +318,142 @@
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly8.2-to-eap7.1</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>WFLY9.0toEAP7.1</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.1</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-eap7.1</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY10.0toEAP7.1</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-eap7.1</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-eap7.1</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY10.1toEAP7.1</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-eap7.1</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.1-to-eap7.1</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- EAP 7.2 -->
+                    <execution>
+                        <id>EAP6.4toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap6.4-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap6.4-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>EAP7.0toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap7.0-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap7.0-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>EAP7.1toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap7.1-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap7.1-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY8.2toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-wildfly8.2-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly8.2-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY9.0toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-wildfly9.0-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY10.0toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-wildfly10.0-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY10.1toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-wildfly10.1-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.1-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY11.0toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-wildfly11.0-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly11.0-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY12.0toEAP7.2</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly12.0-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- WF 11 -->
                     <execution>
                         <id>WFLY8.2toWFLY11.0</id>
                         <phase>generate-resources</phase>
@@ -267,6 +466,41 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>WFLY9.0toWFLY11.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly11.0</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-wildfly11.0</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY10.0toWFLY11.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly11.0</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-wildfly11.0</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>WFLY10.1toWFLY11.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly11.0</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.1-to-wildfly11.0</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- WF 12 -->
+                    <execution>
                         <id>WFLY8.2toWFLY12.0</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -275,39 +509,6 @@
                         <configuration>	                        
                             <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly12.0</includeArtifactIds>
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly8.2-to-wildfly12.0</outputDirectory>                    
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY9.0toEAP7.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.0</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-eap7.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY9.0toEAP7.1</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.1</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-eap7.1</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY9.0toWFLY11.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly11.0</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-wildfly11.0</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -322,58 +523,14 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>WFLY10.0toEAP7.1</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-eap7.1</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-eap7.1</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY10.0toWFLY11.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly11.0</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-wildfly11.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>WFLY10.0toWFLY12.0</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>
-                        <configuration>	                        
+                        <configuration>
                             <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly12.0</includeArtifactIds>
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-wildfly12.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY10.1toEAP7.1</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-eap7.1</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.1-to-eap7.1</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY10.1toWFLY11.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>	                        
-                            <includeArtifactIds>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly11.0</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.1-to-wildfly11.0</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -398,6 +555,7 @@
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly11.0-to-wildfly12.0</outputDirectory>
                         </configuration>
                     </execution>
+
                     <!-- WF 13 -->
                     <execution>
                         <id>WFLY8.2toWFLY13.0</id>
@@ -465,6 +623,8 @@
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly12.0-to-wildfly13.0</outputDirectory>
                         </configuration>
                     </execution>
+
+
                 </executions>
             </plugin>
             <plugin>

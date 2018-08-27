@@ -1,0 +1,14 @@
+:toc:
+
+// include abstract
+include::ServerMigration-ManagedDomain.adoc[]
+
+// include configuration
+:leveloffset: +1
+
+include::ManagedDomain-DomainConfiguration.adoc[]
+
+include::ManagedDomain-HostConfiguration.adoc[]
+
+:leveloffset: -1
+
