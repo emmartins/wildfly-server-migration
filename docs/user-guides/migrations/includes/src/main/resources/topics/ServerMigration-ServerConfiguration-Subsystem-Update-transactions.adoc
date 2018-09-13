@@ -1,4 +1,4 @@
-= Update the transaction Subsystem
+= Update the transactions Subsystem
 
 The JBoss Server Migration Tool updates the *transactions* subsystem with the configuration changes required by the {server-target-productName} server.
 

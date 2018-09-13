@@ -6,9 +6,9 @@ include::ServerMigration-ManagedDomain.adoc[]
 // include configuration
 :leveloffset: +1
 
-include::ManagedDomain-DomainConfiguration.adoc[]
+include::EAP6.4toEAP7.2-ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
 
-include::ManagedDomain-HostConfiguration.adoc[]
+include::EAP6.4toEAP7.2-ServerMigration-ManagedDomain-HostConfiguration.adoc[]
 
 :leveloffset: -1
 
