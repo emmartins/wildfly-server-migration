@@ -61,7 +61,9 @@
             versions, add the artifactId or other qualifier to the property name.
             For example: <version.org.jboss.as.console>
          -->
-        <version.org.wildfly.core>5.0.0.Final</version.org.wildfly.core>
+        <version.org.wildfly.core>6.0.2.Final</version.org.wildfly.core>
+        <!-- version of wfly core galleon pack compatible with eap 7.2 beta, to be removed when eap 7.2 has wfly core 6+ -->
+        <version.org.wildfly.core.galleon.pack>5.0.0.Final</version.org.wildfly.core.galleon.pack>
         <version.org.asciidoctor.asciidoctor-maven-plugin>1.5.6</version.org.asciidoctor.asciidoctor-maven-plugin>
 
         <!-- Surefire args -->
