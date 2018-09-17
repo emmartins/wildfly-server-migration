@@ -14,4 +14,4 @@
 # limitations under the License.
 #
 
-org.jboss.migration.wfly.WildFly8_2ToWildFly14_0ServerMigrationProvider
+org.jboss.migration.wfly.WildFly8ToWildFly14_0ServerMigrationProvider

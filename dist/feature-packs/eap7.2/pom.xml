@@ -45,6 +45,7 @@
         <dependency>
             <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-core-galleon-pack</artifactId>
+            <version>${version.org.wildfly.core.galleon.pack}</version>
             <type>zip</type>
             <exclusions>
                 <exclusion>
