@@ -1,0 +1,21 @@
+:toc: macro
+:toc-title:
+
+// include abstract
+include::ServerMigration-ManagedDomain-HostConfiguration.adoc[]
+
+toc::[]
+
+:leveloffset: +1
+
+include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-core-management.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-elytron.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
+
+:leveloffset: -1
