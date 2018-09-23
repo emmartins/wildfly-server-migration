@@ -1,13 +1,13 @@
 // setup of vars used by this and/or included docs
-:server-source-productName: WildFly 10.1
+:server-source-productName: WildFly 13.0
 :server-source-name: WildFly
-:server-source-version: 10.1.0.Final
-:server-source-baseDir: wildfly-10.1
+:server-source-version: 13.0.0.Final
+:server-source-baseDir: wildfly-13.0
 
-:server-target-productName: WildFly 13.0 Final
+:server-target-productName: WildFly 14.0
 :server-target-name: WildFly
-:server-target-version: 13.0.0.Final
-:server-target-baseDir: wildfly-13.0
+:server-target-version: 14.0.1.Final
+:server-target-baseDir: wildfly-14.0
 
 :includesDir: topics
 
@@ -30,9 +30,9 @@ The server migration from {server-source-productName} to {server-target-productN
 
 include::{includesDir}/ServerMigration-Modules.adoc[]
 
-include::{includesDir}/WFLY10.1toWFLY13.0-ServerMigration-StandaloneServer.adoc[]
+include::{includesDir}/WFLY13.0toWFLY14.0-ServerMigration-StandaloneServer.adoc[]
 
-include::{includesDir}/WFLY10.1toWFLY13.0-ServerMigration-ManagedDomain.adoc[]
+include::{includesDir}/WFLY13.0toWFLY14.0-ServerMigration-ManagedDomain.adoc[]
 
 :leveloffset: -1
 
