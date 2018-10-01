@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.jboss</groupId>
         <artifactId>jboss-parent</artifactId>
-        <version>26</version>
+        <version>28.0.0.redhat-00001</version>
     </parent>
 
     <groupId>org.jboss.migration</groupId>
@@ -62,8 +62,6 @@
             For example: <version.org.jboss.as.console>
          -->
         <version.org.wildfly.core>6.0.2.Final</version.org.wildfly.core>
-        <!-- version of wfly core galleon pack compatible with eap 7.2 beta, to be removed when eap 7.2 has wfly core 6+ -->
-        <version.org.wildfly.core.galleon.pack>5.0.0.Final</version.org.wildfly.core.galleon.pack>
         <version.org.asciidoctor.asciidoctor-maven-plugin>1.5.6</version.org.asciidoctor.asciidoctor-maven-plugin>
 
         <!-- Surefire args -->
@@ -77,7 +75,7 @@
         <version.junit>4.12</version.junit>
         <version.org.wildfly.checkstyle-config>1.0.5.Final</version.org.wildfly.checkstyle-config>
         <version.org.wildfly.build-tools>1.2.10.Final</version.org.wildfly.build-tools>
-        <version.org.wildfly.galleon-plugins>1.0.1.Final</version.org.wildfly.galleon-plugins>
+        <version.org.jboss.galleon>2.0.0.Final</version.org.jboss.galleon>
     </properties>
 
     <modules>
@@ -289,9 +287,9 @@
                     <version>${version.org.wildfly.build-tools}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.wildfly.galleon-plugins</groupId>
-                    <artifactId>wildfly-galleon-maven-plugins</artifactId>
-                    <version>${version.org.wildfly.galleon-plugins}</version>
+                    <groupId>org.jboss.galleon</groupId>
+                    <artifactId>galleon-maven-plugin</artifactId>
+                    <version>${version.org.jboss.galleon}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.asciidoctor</groupId>
@@ -982,6 +980,21 @@
     </dependencyManagement>
 
     <repositories>
+        <!-- keep this repository the first -->
+        <repository>
+            <id>jboss-eap-7.2-product-repository</id>
+            <name>JBoss EAP Product Repository</name>
+            <url>http://download.devel.redhat.com/brewroot/repos/jb-eap-7.2-maven-build/latest/maven/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
@@ -993,20 +1006,6 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>central</id>
-            <name>Main Apache Maven Repository</name>
-            <url>http://central.maven.org/maven2/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
@@ -1014,20 +1013,9 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>jboss-public-repository-group</id>
-            <name>JBoss Public Repository Group</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>central</id>
-            <name>Main Apache Maven Repository</name>
-            <url>http://central.maven.org/maven2/</url>
+            <id>jboss-eap-7.2-product-repository</id>
+            <name>JBoss EAP Product Repository</name>
+            <url>http://download.devel.redhat.com/brewroot/repos/jb-eap-7.2-maven-build/latest/maven/</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -1036,6 +1024,17 @@
             <snapshots>
                 <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
