@@ -87,9 +87,6 @@
         <module>dist/feature-packs/eap7.1</module>
         <module>dist/feature-packs/eap7.2</module>
         <module>docs/user-guides/migrations/includes</module>
-        <module>docs/user-guides/migrations/eap7.0/eap6.4</module>
-        <module>docs/user-guides/migrations/eap7.0/wildfly8.2</module>
-        <module>docs/user-guides/migrations/eap7.0/wildfly9.0</module>        
         <module>docs/user-guides/migrations/eap7.1/eap6.4</module>
         <module>docs/user-guides/migrations/eap7.1/eap7.0</module>
         <module>docs/user-guides/migrations/eap7.1/wildfly8.2</module>
@@ -105,21 +102,6 @@
         <module>docs/user-guides/migrations/eap7.2/wildfly10.1</module>
         <module>docs/user-guides/migrations/eap7.2/wildfly11.0</module>
         <module>docs/user-guides/migrations/eap7.2/wildfly12.0</module>
-        <module>docs/user-guides/migrations/wildfly11.0/wildfly8.2</module>
-        <module>docs/user-guides/migrations/wildfly11.0/wildfly9.0</module>
-        <module>docs/user-guides/migrations/wildfly11.0/wildfly10.0</module>
-        <module>docs/user-guides/migrations/wildfly11.0/wildfly10.1</module>
-        <module>docs/user-guides/migrations/wildfly12.0/wildfly8.2</module>
-        <module>docs/user-guides/migrations/wildfly12.0/wildfly9.0</module>        
-        <module>docs/user-guides/migrations/wildfly12.0/wildfly10.0</module>        
-        <module>docs/user-guides/migrations/wildfly12.0/wildfly10.1</module>
-        <module>docs/user-guides/migrations/wildfly12.0/wildfly11.0</module>
-        <module>docs/user-guides/migrations/wildfly13.0/wildfly8.2</module>
-        <module>docs/user-guides/migrations/wildfly13.0/wildfly9.0</module>
-        <module>docs/user-guides/migrations/wildfly13.0/wildfly10.0</module>
-        <module>docs/user-guides/migrations/wildfly13.0/wildfly10.1</module>
-        <module>docs/user-guides/migrations/wildfly13.0/wildfly11.0</module>
-        <module>docs/user-guides/migrations/wildfly13.0/wildfly12.0</module>
         <module>docs/user-guides/migrations/wildfly14.0/wildfly8.2</module>
         <module>docs/user-guides/migrations/wildfly14.0/wildfly9.0</module>
         <module>docs/user-guides/migrations/wildfly14.0/wildfly10.0</module>
@@ -130,9 +112,6 @@
         <module>docs/user-guides/tool/includes</module>
         <module>docs/user-guides/tool/integrated-eap7.1</module>
         <module>docs/user-guides/tool/standalone</module>
-        <module>migrations/eap7.0/eap6.4</module>
-        <module>migrations/eap7.0/wildfly8.2</module>
-        <module>migrations/eap7.0/wildfly9.0</module>
         <module>migrations/eap7.1/eap6.4</module>
         <module>migrations/eap7.1/eap7.0</module>        
         <module>migrations/eap7.1/wildfly8.2</module>
@@ -148,21 +127,6 @@
         <module>migrations/eap7.2/wildfly10.1</module>
         <module>migrations/eap7.2/wildfly11.0</module>
         <module>migrations/eap7.2/wildfly12.0</module>
-        <module>migrations/wildfly11.0/wildfly8.2</module>
-        <module>migrations/wildfly11.0/wildfly9.0</module>
-        <module>migrations/wildfly11.0/wildfly10.0</module>
-        <module>migrations/wildfly11.0/wildfly10.1</module>
-        <module>migrations/wildfly12.0/wildfly8.2</module>
-        <module>migrations/wildfly12.0/wildfly9.0</module>
-        <module>migrations/wildfly12.0/wildfly10.0</module>
-        <module>migrations/wildfly12.0/wildfly10.1</module>
-        <module>migrations/wildfly12.0/wildfly11.0</module>                                
-        <module>migrations/wildfly13.0/wildfly8.2</module>
-        <module>migrations/wildfly13.0/wildfly9.0</module>
-        <module>migrations/wildfly13.0/wildfly10.0</module>
-        <module>migrations/wildfly13.0/wildfly10.1</module>
-        <module>migrations/wildfly13.0/wildfly11.0</module>
-        <module>migrations/wildfly13.0/wildfly12.0</module>
         <module>migrations/wildfly14.0/wildfly8.2</module>
         <module>migrations/wildfly14.0/wildfly9.0</module>
         <module>migrations/wildfly14.0/wildfly10.0</module>
@@ -388,42 +352,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap7.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-eap6.4-to-eap7.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8.2-to-eap7.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9.0-to-eap7.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-eap6.4-to-eap7.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-eap7.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-eap7.0</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -681,54 +609,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8.2-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9.0-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.0-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.1-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly11.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- wfly 12.0 -->
 
             <dependency>
@@ -737,142 +617,11 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8.2-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9.0-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.0-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.1-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly11.0-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly8.2-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly9.0-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.0-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly10.1-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-docs-userguide-migration-wildfly11.0-to-wildfly12.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- wfly 13.0 -->
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly13.0-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8.2-to-wildfly13.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly8.2-to-wildfly13.0-userguide</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9.0-to-wildfly13.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly9.0-to-wildfly13.0-userguide</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.0-to-wildfly13.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.0-to-wildfly13.0-userguide</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.1-to-wildfly13.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly10.1-to-wildfly13.0-userguide</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly11.0-to-wildfly13.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly11.0-to-wildfly13.0-userguide</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly12.0-to-wildfly13.0</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jboss-server-migration-wildfly12.0-to-wildfly13.0-userguide</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

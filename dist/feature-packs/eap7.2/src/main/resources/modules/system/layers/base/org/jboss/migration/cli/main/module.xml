@@ -34,7 +34,6 @@
         <artifact name="${org.jboss.migration:jboss-server-migration-cli}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-core}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-eap6.4}"/>
-        <artifact name="${org.jboss.migration:jboss-server-migration-eap6.4-to-eap7.0}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-eap6.4-to-eap7.2}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-eap7.0}"/>
         <artifact name="${org.jboss.migration:jboss-server-migration-eap7.0-to-eap7.2}"/>

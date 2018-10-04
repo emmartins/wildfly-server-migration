@@ -17,11 +17,12 @@ package org.jboss.migration.eap6.to.eap7;
 
 import org.jboss.migration.eap.EAPServer6_4;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_1;
+import org.jboss.migration.eap.task.AddSocketBindingPortExpressions;
+import org.jboss.migration.eap.task.SetupHttpUpgradeManagement;
 import org.jboss.migration.eap.task.hostexclude.EAP7_1AddHostExcludes;
 import org.jboss.migration.eap.task.subsystem.elytron.AddElytronSubsystem;
 import org.jboss.migration.eap.task.subsystem.transactions.UpdateObjectStorePath;
 import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
-import org.jboss.migration.eap6.to.eap7.tasks.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateEJB3Subsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateInfinispanSubsystem;
@@ -29,7 +30,6 @@ import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateJGroupsSubsyst
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateMessagingActiveMQSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_1UpdateUndertowSubsystem;
-import org.jboss.migration.eap6.to.eap7.tasks.SetupHttpUpgradeManagement;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
