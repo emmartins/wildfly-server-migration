@@ -29,7 +29,7 @@
 
     <artifactId>jboss-server-migration-build</artifactId>
 
-    <name>JBoss Server Migration: Build</name>
+    <name>JBoss Server Migration: Standalone Distribution</name>
     <packaging>pom</packaging>
 
     <properties>
