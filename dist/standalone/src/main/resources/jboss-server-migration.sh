@@ -5,6 +5,26 @@
 # A simple tool for migrating servers.
 #
 
+setModularJdk() {
+  $JAVA --add-modules=java.se -version > /dev/null 2>&1 && MODULAR_JDK=true || MODULAR_JDK=false
+}
+
+setDefaultModularJvmOptions() {
+  setModularJdk
+  if [ "$MODULAR_JDK" = "true" ]; then
+    DEFAULT_MODULAR_JVM_OPTIONS=`echo $* | $GREP "\-\-add\-modules"`
+    if [ "x$DEFAULT_MODULAR_JVM_OPTIONS" = "x" ]; then
+      # Set default modular jdk options
+      DEFAULT_MODULAR_JVM_OPTIONS="$DEFAULT_MODULAR_JVM_OPTIONS --add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
+      DEFAULT_MODULAR_JVM_OPTIONS="$DEFAULT_MODULAR_JVM_OPTIONS --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED"
+      DEFAULT_MODULAR_JVM_OPTIONS="$DEFAULT_MODULAR_JVM_OPTIONS --add-exports=jdk.unsupported/sun.reflect=ALL-UNNAMED"
+      DEFAULT_MODULAR_JVM_OPTIONS="$DEFAULT_MODULAR_JVM_OPTIONS --add-modules=java.se"
+    else
+      DEFAULT_MODULAR_JVM_OPTIONS=""
+    fi
+  fi
+}
+
 TOOL_OPTS=""
 while [ "$#" -gt 0 ]
 do
@@ -50,6 +70,10 @@ if $cygwin; then
     BASE_DIR=`cygpath --path --windows "$BASE_DIR"`
     JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
 fi
+
+# Set default modular JVM options
+setDefaultModularJvmOptions $JAVA_OPTS
+JAVA_OPTS="$JAVA_OPTS $DEFAULT_MODULAR_JVM_OPTIONS"
 
 # Sample JPDA settings for remote socket debugging
 #JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y"

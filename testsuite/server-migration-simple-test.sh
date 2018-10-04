@@ -15,7 +15,7 @@ if [ "x$SOURCE_DIST_DIR" != "x" ]; then
         SOURCE_DIST_DIR="$TEST_DIR/$SOURCE_DIST_DIR"
     fi
 else
-    echo "### Usage: ./server-migration-test.sh SOURCE_DIST_DIR TARGET_SRC_DIR"
+    echo "### Usage: ./server-migration-simple-test.sh SOURCE_DIST_DIR TARGET_DIST_DIR"
     exit
 fi
 
@@ -95,7 +95,7 @@ cp -Rf "$TEST_BEFORE_DIR"/standalone-deployments/ $SOURCE_DIST_STANDALONE_DEPLOY
 echo "### setting up vault in source server"
 mkdir $SOURCE_DIST_VAULT_DIR
 keytool -genseckey -alias vault -storetype jceks -keyalg AES -keysize 128 -storepass vault22 -keypass vault22 -validity 730 -keystore $SOURCE_DIST_VAULT_DIR/vault.keystore
-$SOURCE_DIST_DIR/bin/vault.sh --keystore $SOURCE_DIST_VAULT_DIR/vault.keystore --keystore-password vault22 --alias vault --vault-block vb --attribute password --sec-attr 0penS3sam3 --enc-dir $SOURCE_DIST_VAULT_DIR --iteration 120 --salt 1234abcd
+$TARGET_DIST_DIR/bin/vault.sh --keystore $SOURCE_DIST_VAULT_DIR/vault.keystore --keystore-password vault22 --alias vault --vault-block vb --attribute password --sec-attr 0penS3sam3 --enc-dir $SOURCE_DIST_VAULT_DIR --iteration 120 --salt 1234abcd
 
 echo "### Setting up cmtool-standalone.xml and cmtool-domain.xml"
 cp $SOURCE_DIST_STANDALONE_CONFIG_DIR/standalone.xml $SOURCE_DIST_STANDALONE_CONFIG_DIR/cmtool-standalone.xml
