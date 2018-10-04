@@ -106,3 +106,8 @@ Run the Server Migration Tool (Standalone Build)
   * `migration-report.xml`: The XML file includes all migration data collected.
 11. File log(s) may be found in the `logs/` directory.
   * `migration.log`: The log contains detailed information about the server migration execution.
+  
+Development
+------------
+
+* [Issue Tracker](https://issues.jboss.org/browse/CMTOOL)
