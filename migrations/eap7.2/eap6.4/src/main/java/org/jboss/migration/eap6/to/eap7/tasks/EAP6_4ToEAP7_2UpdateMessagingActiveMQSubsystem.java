@@ -16,8 +16,16 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
+import org.jboss.migration.wfly10.config.task.subsystem.messagingactivemq.AddHttpAcceptorsAndConnectors;
+
 /**
  * @author emmartins
  */
-public class EAP6_4ToEAP7_2UpdateMessagingActiveMQSubsystem<S> extends EAP6_4ToEAP7_0UpdateMessagingActiveMQSubsystem<S> {
+public class EAP6_4ToEAP7_2UpdateMessagingActiveMQSubsystem<S> extends UpdateSubsystemResources<S> {
+    public EAP6_4ToEAP7_2UpdateMessagingActiveMQSubsystem() {
+        super(JBossSubsystemNames.MESSAGING_ACTIVEMQ,
+                new AddHttpAcceptorsAndConnectors<>());
+    }
 }

@@ -16,8 +16,20 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
+import org.jboss.migration.wfly10.config.task.subsystem.ejb3.AddInfinispanPassivationStoreAndDistributableCache;
+import org.jboss.migration.wfly10.config.task.subsystem.ejb3.DefinePassivationDisabledCacheRef;
+import org.jboss.migration.wfly10.config.task.subsystem.ejb3.RefHttpRemotingConnectorInEJB3Remote;
+
 /**
  * @author emmartins
  */
-public class EAP6_4ToEAP7_2UpdateEJB3Subsystem<S> extends EAP6_4ToEAP7_0UpdateEJB3Subsystem<S> {
+public class EAP6_4ToEAP7_2UpdateEJB3Subsystem<S> extends UpdateSubsystemResources<S> {
+    public EAP6_4ToEAP7_2UpdateEJB3Subsystem() {
+        super(JBossSubsystemNames.EJB3,
+                new RefHttpRemotingConnectorInEJB3Remote<>(),
+                new DefinePassivationDisabledCacheRef<>(),
+                new AddInfinispanPassivationStoreAndDistributableCache<>());
+    }
 }

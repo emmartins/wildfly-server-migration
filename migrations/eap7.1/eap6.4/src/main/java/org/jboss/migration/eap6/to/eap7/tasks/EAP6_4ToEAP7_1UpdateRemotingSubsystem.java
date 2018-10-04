@@ -16,8 +16,18 @@
 
 package org.jboss.migration.eap6.to.eap7.tasks;
 
+import org.jboss.migration.core.jboss.JBossSubsystemNames;
+import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
+import org.jboss.migration.wfly10.config.task.subsystem.remoting.AddEndpointIfMissing;
+import org.jboss.migration.wfly10.config.task.subsystem.remoting.AddHttpConnectorIfMissing;
+
 /**
  * @author emmartins
  */
-public class EAP6_4ToEAP7_1UpdateRemotingSubsystem<S> extends EAP6_4ToEAP7_0UpdateRemotingSubsystem<S> {
+public class EAP6_4ToEAP7_1UpdateRemotingSubsystem<S> extends UpdateSubsystemResources<S> {
+    public EAP6_4ToEAP7_1UpdateRemotingSubsystem() {
+        super(JBossSubsystemNames.REMOTING,
+                new AddEndpointIfMissing<>(),
+                new AddHttpConnectorIfMissing<>());
+    }
 }

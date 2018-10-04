@@ -36,11 +36,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-server-migration-docs-userguide-migration-includes</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-docs-userguide-migration-eap6.4-to-eap7.0</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
