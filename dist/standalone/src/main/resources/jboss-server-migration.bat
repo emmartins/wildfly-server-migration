@@ -11,12 +11,10 @@ rem $Id$
 @if "%OS%" == "Windows_NT" setlocal
 
 if "%OS%" == "Windows_NT" (
-  set "DIRNAME=%~dp0%"
+  set "BASE_DIR=%~dp0%"
 ) else (
-  set DIRNAME=.\
+  set BASE_DIR=.\
 )
-
-set "BASE_DIR=%CD%"
 
 rem Setup JBoss specific properties
 if "x%JAVA_HOME%" == "x" (
@@ -27,14 +25,11 @@ if "x%JAVA_HOME%" == "x" (
   set "JAVA=%JAVA_HOME%\bin\java"
 )
 
-:setModularJdk
-    "%JAVA%" --add-modules=java.se -version >nul 2>&1 && (set MODULAR_JDK=true) || (set MODULAR_JDK=false)
-goto :eof
-
-:setDefaultModularJvmOptions
-  call :setModularJdk
-  if "!MODULAR_JDK!" == "true" (
-    echo "%~1" | findstr /I "\-\-add\-modules" > nul
+rem set default modular jvm parameters
+setlocal EnableDelayedExpansion
+"%JAVA%" --add-modules=java.se -version >nul 2>&1 && (set MODULAR_JDK=true) || (set MODULAR_JDK=false)
+if "!MODULAR_JDK!" == "true" (
+    echo "%JAVA_OPTS%" | findstr /I "\-\-add\-modules" > nul
     if errorlevel == 1 (
       rem Set default modular jdk options
       set "DEFAULT_MODULAR_JVM_OPTIONS=!DEFAULT_MODULAR_JVM_OPTIONS! --add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
@@ -44,12 +39,7 @@ goto :eof
     ) else (
       set "DEFAULT_MODULAR_JVM_OPTIONS="
     )
-  )
-goto:eof
-
-rem set default modular jvm parameters
-setlocal EnableDelayedExpansion
-call :setDefaultModularJvmOptions "!JAVA_OPTS!"
+)
 set "JAVA_OPTS=!JAVA_OPTS! !DEFAULT_MODULAR_JVM_OPTIONS!"
 setlocal DisableDelayedExpansion
 
