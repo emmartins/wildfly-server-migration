@@ -56,6 +56,11 @@ if errorlevel == 1 (
   echo logging.configuration already set in JAVA_OPTS
 )
 
+echo %JAVA_OPTS% ^
+         -cp "%BASE_DIR%\lib\*" ^
+         org.jboss.migration.cli.CommandLineServerMigration ^
+         %*
+         
 "%JAVA%" %JAVA_OPTS% ^
     -cp "%BASE_DIR%\lib\*" ^
     org.jboss.migration.cli.CommandLineServerMigration ^
