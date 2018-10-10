@@ -29,7 +29,7 @@ if "x%JAVA_HOME%" == "x" (
 
 :setModularJdk
     "%JAVA%" --add-modules=java.se -version >nul 2>&1 && (set MODULAR_JDK=true) || (set MODULAR_JDK=false)
-goto :eof
+exit /B 0
 
 :setDefaultModularJvmOptions
   call :setModularJdk
@@ -45,7 +45,7 @@ goto :eof
       set "DEFAULT_MODULAR_JVM_OPTIONS="
     )
   )
-goto:eof
+exit /B 0
 
 rem set default modular jvm parameters
 setlocal EnableDelayedExpansion
