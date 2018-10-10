@@ -27,32 +27,6 @@ if "x%JAVA_HOME%" == "x" (
   set "JAVA=%JAVA_HOME%\bin\java"
 )
 
-:setModularJdk
-    "%JAVA%" --add-modules=java.se -version >nul 2>&1 && (set MODULAR_JDK=true) || (set MODULAR_JDK=false)
-exit /B 0
-
-:setDefaultModularJvmOptions
-  call :setModularJdk
-  if "!MODULAR_JDK!" == "true" (
-    echo "%~1" | findstr /I "\-\-add\-modules" > nul
-    if errorlevel == 1 (
-      rem Set default modular jdk options
-      set "DEFAULT_MODULAR_JVM_OPTIONS=!DEFAULT_MODULAR_JVM_OPTIONS! --add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
-      set "DEFAULT_MODULAR_JVM_OPTIONS=!DEFAULT_MODULAR_JVM_OPTIONS! --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED"
-      set "DEFAULT_MODULAR_JVM_OPTIONS=!DEFAULT_MODULAR_JVM_OPTIONS! --add-exports=jdk.unsupported/sun.reflect=ALL-UNNAMED"
-      set "DEFAULT_MODULAR_JVM_OPTIONS=!DEFAULT_MODULAR_JVM_OPTIONS! --add-modules=java.se"
-    ) else (
-      set "DEFAULT_MODULAR_JVM_OPTIONS="
-    )
-  )
-exit /B 0
-
-rem set default modular jvm parameters
-setlocal EnableDelayedExpansion
-call :setDefaultModularJvmOptions "!JAVA_OPTS!"
-set "JAVA_OPTS=!JAVA_OPTS! !DEFAULT_MODULAR_JVM_OPTIONS!"
-setlocal DisableDelayedExpansion
-
 set "JAVA_OPTS=%JAVA_OPTS% -Djboss.server.migration.baseDir=%BASE_DIR%"
 
 echo "%JAVA_OPTS%" | findstr /I "logging.configuration" > nul
