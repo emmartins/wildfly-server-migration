@@ -1,0 +1,25 @@
+:toc: macro
+:toc-title:
+
+// include abstract
+include::ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
+
+toc::[]
+
+:leveloffset: +1
+
+include::ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
+
+include::WFLY12.0toWFLY15.0-ServerMigration-ServerConfiguration-Subsystem-Update-undertow.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-discovery.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-ee-security.adoc[]
+
+include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
+
+:leveloffset: -1
