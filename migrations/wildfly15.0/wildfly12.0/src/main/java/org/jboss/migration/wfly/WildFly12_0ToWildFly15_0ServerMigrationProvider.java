@@ -16,6 +16,10 @@
 package org.jboss.migration.wfly;
 
 import org.jboss.migration.wfly.task.hostexclude.WildFly15_0AddHostExcludes;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileOpentracingSmallryeSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -47,6 +51,10 @@ public class WildFly12_0ToWildFly15_0ServerMigrationProvider implements WildFly1
                         .subtask(new WildFly12_0ToWildFly15_0UpdateUndertowSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
+                        .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileHealthSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileMetricsSmallryeSubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -58,6 +66,8 @@ public class WildFly12_0ToWildFly15_0ServerMigrationProvider implements WildFly1
                                 .subtask(new WildFly12_0ToWildFly15_0UpdateUndertowSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                                .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                                 .subtask(new WildFly15_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
