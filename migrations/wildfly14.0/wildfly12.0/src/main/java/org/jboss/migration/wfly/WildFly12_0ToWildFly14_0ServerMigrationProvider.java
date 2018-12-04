@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.wfly;
 
+import org.jboss.migration.wfly.task.hostexclude.WildFly14_0AddHostExcludes;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -25,7 +26,6 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly12.WildFlyFullServer12_0;
-import org.jboss.migration.wfly13.task.hostexclude.WildFly13_0AddHostExcludes;
 import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
 
@@ -58,7 +58,7 @@ public class WildFly12_0ToWildFly14_0ServerMigrationProvider implements WildFly1
                                 .subtask(new WildFly12_0ToWildFly14_0UpdateUndertowSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
-                                .subtask(new WildFly13_0AddHostExcludes<>())
+                                .subtask(new WildFly14_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
