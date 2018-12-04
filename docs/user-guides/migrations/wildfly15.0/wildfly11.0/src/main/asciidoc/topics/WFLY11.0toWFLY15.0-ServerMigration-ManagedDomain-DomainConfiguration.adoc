@@ -24,6 +24,8 @@ include::ServerMigration-ServerConfiguration-Subsystem-Add-discovery.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-ee-security.adoc[]
 
+include::ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
+
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 
 :leveloffset: -1
