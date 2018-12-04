@@ -6,9 +6,9 @@ include::ServerMigration-ManagedDomain.adoc[]
 // include configuration
 :leveloffset: +1
 
-include::WFLY10.0toWFLY12.0-ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
+include::WFLY10.0toWFLY14.0-ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
 
-include::WFLY10.0toWFLY12.0-ServerMigration-ManagedDomain-HostConfiguration.adoc[]
+include::WFLY10.0toWFLY14.0-ServerMigration-ManagedDomain-HostConfiguration.adoc[]
 
 :leveloffset: -1
 
