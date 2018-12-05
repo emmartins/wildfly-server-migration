@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: microprofile-health-smallrye
+:subsystem-add-extensionName: org.wildfly.extension.microprofile.health-smallrye
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for Eclipse MicroProfile Health.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

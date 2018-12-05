@@ -51,6 +51,10 @@ public interface JBossSubsystemNames {
     String MAIL = "mail";
     String MESSAGING = "messaging";
     String MESSAGING_ACTIVEMQ = "messaging-activemq";
+    String MICROPROFILE_CONFIG_SMALLRYE = "microprofile-config-smallrye";
+    String MICROPROFILE_HEALTH_SMALLRYE = "microprofile-health-smallrye";
+    String MICROPROFILE_METRICS_SMALLRYE = "microprofile-metrics-smallrye";
+    String MICROPROFILE_OPENTRACING_SMALLRYE = "microprofile-opentracing-smallrye";
     String MODCLUSTER = "modcluster";
     String NAMING = "naming";
     String OSGI = "osgi";

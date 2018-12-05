@@ -49,6 +49,10 @@ public interface JBossExtensionNames {
     String MAIL = "org.jboss.as.mail";
     String MESSAGING = "org.jboss.as.messaging";
     String MESSAGING_ACTIVEMQ = "org.wildfly.extension.messaging-activemq";
+    String MICROPROFILE_CONFIG_SMALLRYE = "org.wildfly.extension.microprofile.config-smallrye";
+    String MICROPROFILE_HEALTH_SMALLRYE = "org.wildfly.extension.microprofile.health-smallrye";
+    String MICROPROFILE_OPENTRACING_SMALLRYE = "org.wildfly.extension.microprofile.opentracing-smallrye";
+    String MICROPROFILE_METRICS_SMALLRYE = "org.wildfly.extension.microprofile.metrics-smallrye";
     String MODCLUSTER = "org.jboss.as.modcluster";
     String NAMING = "org.jboss.as.naming";
     String OSGI = "org.jboss.as.osgi";

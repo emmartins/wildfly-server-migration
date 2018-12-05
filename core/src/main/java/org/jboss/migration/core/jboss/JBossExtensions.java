@@ -85,7 +85,7 @@ public interface JBossExtensions {
 
     Extension ELYTRON = Extension.builder()
             .module(JBossExtensionNames.ELYTRON)
-            .subsystem(Subsystem.builder().name(JBossSubsystemNames.ELYTRON).namespaceWithoutVersion("urn:wildfly:elytron"))
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.ELYTRON).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.ELYTRON))
             .build();
 
     Extension IIOP_OPENJDK = Extension.builder()
@@ -166,6 +166,26 @@ public interface JBossExtensions {
     Extension MESSAGING_ACTIVEMQ = Extension.builder()
             .module(JBossExtensionNames.MESSAGING_ACTIVEMQ)
             .subsystem(JBossSubsystemNames.MESSAGING_ACTIVEMQ)
+            .build();
+
+    Extension MICROPROFILE_CONFIG_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_CONFIG_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_CONFIG_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_CONFIG_SMALLRYE))
+            .build();
+
+    Extension MICROPROFILE_HEALTH_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_HEALTH_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_HEALTH_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_HEALTH_SMALLRYE))
+            .build();
+
+    Extension MICROPROFILE_METRICS_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_METRICS_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_METRICS_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_METRICS_SMALLRYE))
+            .build();
+
+    Extension MICROPROFILE_OPENTRACING_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_OPENTRACING_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_OPENTRACING_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_OPENTRACING_SMALLRYE))
             .build();
 
     Extension MODCLUSTER = Extension.builder()

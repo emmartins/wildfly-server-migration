@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: microprofile-metrics-smallrye
+:subsystem-add-extensionName: org.wildfly.extension.microprofile.metrics-smallrye
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for Eclipse MicroProfile Metrics.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

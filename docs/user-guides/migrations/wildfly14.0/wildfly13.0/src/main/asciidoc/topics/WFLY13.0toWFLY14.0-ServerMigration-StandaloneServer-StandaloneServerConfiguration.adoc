@@ -14,6 +14,12 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
+include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-config-smallrye.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-health-smallrye.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-opentracing-smallrye.adoc[]
+
 include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]

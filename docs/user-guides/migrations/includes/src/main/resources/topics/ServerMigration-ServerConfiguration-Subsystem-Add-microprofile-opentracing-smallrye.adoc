@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: microprofile-opentracing-smallrye
+:subsystem-add-extensionName: org.wildfly.extension.microprofile.opentracing-smallrye
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for Eclipse MicroProfile OpenTracing.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

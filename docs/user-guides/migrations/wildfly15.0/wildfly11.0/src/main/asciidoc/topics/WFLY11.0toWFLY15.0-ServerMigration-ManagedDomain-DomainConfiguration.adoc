@@ -24,6 +24,10 @@ include::ServerMigration-ServerConfiguration-Subsystem-Add-discovery.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-ee-security.adoc[]
 
+include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-config-smallrye.adoc[]
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-opentracing-smallrye.adoc[]
+
 include::ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]

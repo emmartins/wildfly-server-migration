@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: microprofile-config-smallrye
+:subsystem-add-extensionName: org.wildfly.extension.microprofile.config-smallrye
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for Eclipse MicroProfile Config.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

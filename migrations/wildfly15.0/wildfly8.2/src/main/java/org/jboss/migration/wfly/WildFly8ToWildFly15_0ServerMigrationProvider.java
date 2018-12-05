@@ -16,6 +16,10 @@
 package org.jboss.migration.wfly;
 
 import org.jboss.migration.wfly.task.hostexclude.WildFly15_0AddHostExcludes;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileOpentracingSmallryeSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
@@ -73,6 +77,10 @@ public class WildFly8ToWildFly15_0ServerMigrationProvider implements WildFly15_0
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
+                        .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileHealthSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileMetricsSmallryeSubsystem<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
@@ -97,6 +105,8 @@ public class WildFly8ToWildFly15_0ServerMigrationProvider implements WildFly15_0
                                 .subtask(new AddSingletonSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                                .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
