@@ -35,6 +35,7 @@ public class WildFly14_0Server extends WildFlyServer10 {
 
     public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
             .extensions(WildFly13_0Server.EXTENSIONS)
+            .extension(JBossExtensions.DATASOURCES_AGROAL)
             .extension(JBossExtensions.MICROPROFILE_CONFIG_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_HEALTH_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_OPENTRACING_SMALLRYE)
