@@ -27,6 +27,7 @@ public interface JBossExtensionNames {
     String CONFIGADMIN = "org.jboss.as.configadmin";
     String CONNECTOR = "org.jboss.as.connector";
     String CORE_MANAGEMENT = "org.wildfly.extension.core-management";
+    String DATASOURCES_AGROAL = "org.wildfly.extension.datasources-agroal";
     String DEPLOYMENT_SCANNER = "org.jboss.as.deployment-scanner";
     String DISCOVERY = "org.wildfly.extension.discovery";
     String EE = "org.jboss.as.ee";

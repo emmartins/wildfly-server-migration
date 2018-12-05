@@ -28,6 +28,7 @@ public interface JBossSubsystemNames {
     String CONFIGADMIN = "configadmin";
     String CORE_MANAGEMENT = "core-management";
     String DATASOURCES = "datasources";
+    String DATASOURCES_AGROAL = "datasources-agroal";
     String DEPLOYMENT_SCANNER = "deployment-scanner";
     String DISCOVERY = "discovery";
     String EE = "ee";

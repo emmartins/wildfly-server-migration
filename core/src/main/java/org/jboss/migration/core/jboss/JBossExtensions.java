@@ -58,6 +58,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.CORE_MANAGEMENT)
             .build();
 
+    Extension DATASOURCES_AGROAL = Extension.builder()
+            .module(JBossExtensionNames.DATASOURCES_AGROAL)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.DATASOURCES_AGROAL).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.DATASOURCES_AGROAL))
+            .build();
+
     Extension DEPLOYMENT_SCANNER = Extension.builder()
             .module(JBossExtensionNames.DEPLOYMENT_SCANNER)
             .subsystem(JBossSubsystemNames.DEPLOYMENT_SCANNER)
