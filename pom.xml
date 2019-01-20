@@ -149,6 +149,7 @@
         <module>servers/eap7.0</module>
         <module>servers/eap7.1</module>
         <module>servers/eap7.2</module>
+        <module>servers/eap7.3</module>        
         <module>servers/wildfly8.2</module>
         <module>servers/wildfly9.0</module>
         <module>servers/wildfly10.0</module>
@@ -550,6 +551,14 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- eap 7.3 -->
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.3-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
