@@ -17,6 +17,9 @@ package org.jboss.migration.wfly8.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
 import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileOpentracingSmallryeSubsystem;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
@@ -74,6 +77,9 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
+                        .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileHealthSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
@@ -98,6 +104,8 @@ public class WildFly8ToEAP7_2ServerMigrationProvider implements EAPServerMigrati
                                 .subtask(new AddSingletonSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                                .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())

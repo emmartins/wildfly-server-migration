@@ -29,6 +29,9 @@ import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateInfinispanSubs
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateMessagingActiveMQSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_2UpdateUndertowSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileOpentracingSmallryeSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
@@ -91,6 +94,9 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
+                        .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileHealthSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                         .subtask(new SetupHttpUpgradeManagement<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingPortExpressions<>())
@@ -123,6 +129,8 @@ public class EAP6_4ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddSingletonSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                                .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingPortExpressions<>())
