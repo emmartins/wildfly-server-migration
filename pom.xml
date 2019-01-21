@@ -130,7 +130,8 @@
         <module>migrations/eap7.2/wildfly10.1</module>
         <module>migrations/eap7.2/wildfly11.0</module>
         <module>migrations/eap7.2/wildfly12.0</module>
-        <module>migrations/eap7.3/eap6.4</module>        
+        <module>migrations/eap7.3/eap6.4</module>
+        <module>migrations/eap7.3/eap7.2</module>
         <module>migrations/wildfly14.0/wildfly8.2</module>
         <module>migrations/wildfly14.0/wildfly9.0</module>
         <module>migrations/wildfly14.0/wildfly10.0</module>
@@ -566,6 +567,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap6.4-to-eap7.3</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.2-to-eap7.3</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
