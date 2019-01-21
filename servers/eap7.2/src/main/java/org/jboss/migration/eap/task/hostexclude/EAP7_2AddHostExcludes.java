@@ -25,6 +25,30 @@ import org.jboss.migration.wfly10.config.task.hostexclude.AddHostExcludes;
 public class EAP7_2AddHostExcludes<S> extends AddHostExcludes<S> {
 
     private static final HostExcludes HOST_EXCLUDES = HostExcludes.builder()
+            /*
+            <host-exclude name="EAP62">
+                <host-release id="EAP6.2"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.batch.jberet"/>
+                    <extension module="org.wildfly.extension.bean-validation"/>
+                    <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.core-management"/>
+                    <extension module="org.wildfly.extension.datasources-agroal"/>
+                    <extension module="org.wildfly.extension.discovery"/>
+                    <extension module="org.wildfly.extension.ee-security"/>
+                    <extension module="org.wildfly.extension.elytron"/>
+                    <extension module="org.wildfly.extension.io"/>
+                    <extension module="org.wildfly.extension.messaging-activemq"/>
+                    <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                    <extension module="org.wildfly.extension.request-controller"/>
+                    <extension module="org.wildfly.extension.security.manager"/>
+                    <extension module="org.wildfly.extension.undertow"/>
+                    <extension module="org.wildfly.iiop-openjdk"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
             .hostExclude(HostExclude.builder()
                     .name("EAP62")
                     .release("EAP6.2")
@@ -32,15 +56,44 @@ public class EAP7_2AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
                     .excludedExtension("org.wildfly.extension.core-management")
+                    .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
                     .excludedExtension("org.wildfly.extension.ee-security")
                     .excludedExtension("org.wildfly.extension.elytron")
                     .excludedExtension("org.wildfly.extension.io")
                     .excludedExtension("org.wildfly.extension.messaging-activemq")
+                    .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye")
                     .excludedExtension("org.wildfly.extension.request-controller")
                     .excludedExtension("org.wildfly.extension.security.manager")
                     .excludedExtension("org.wildfly.extension.undertow")
                     .excludedExtension("org.wildfly.iiop-openjdk"))
+            /*
+            <host-exclude name="EAP63">
+                <host-release id="EAP6.3"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.batch.jberet"/>
+                    <extension module="org.wildfly.extension.bean-validation"/>
+                    <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.core-management"/>
+                    <extension module="org.wildfly.extension.datasources-agroal"/>
+                    <extension module="org.wildfly.extension.discovery"/>
+                    <extension module="org.wildfly.extension.ee-security"/>
+                    <extension module="org.wildfly.extension.elytron"/>
+                    <extension module="org.wildfly.extension.io"/>
+                    <extension module="org.wildfly.extension.messaging-activemq"/>
+                    <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                    <extension module="org.wildfly.extension.request-controller"/>
+                    <extension module="org.wildfly.extension.security.manager"/>
+                    <extension module="org.wildfly.extension.undertow"/>
+                    <extension module="org.wildfly.iiop-openjdk"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
+
             .hostExclude(HostExclude.builder()
                     .name("EAP63")
                     .release("EAP6.3")
@@ -48,15 +101,43 @@ public class EAP7_2AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
                     .excludedExtension("org.wildfly.extension.core-management")
+                    .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
                     .excludedExtension("org.wildfly.extension.ee-security")
                     .excludedExtension("org.wildfly.extension.elytron")
                     .excludedExtension("org.wildfly.extension.io")
                     .excludedExtension("org.wildfly.extension.messaging-activemq")
+                    .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye")
                     .excludedExtension("org.wildfly.extension.request-controller")
                     .excludedExtension("org.wildfly.extension.security.manager")
                     .excludedExtension("org.wildfly.extension.undertow")
                     .excludedExtension("org.wildfly.iiop-openjdk"))
+            /*
+            <host-exclude name="EAP64">
+                <host-release id="EAP6.4"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.batch.jberet"/>
+                    <extension module="org.wildfly.extension.bean-validation"/>
+                    <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.core-management"/>
+                    <extension module="org.wildfly.extension.datasources-agroal"/>
+                    <extension module="org.wildfly.extension.discovery"/>
+                    <extension module="org.wildfly.extension.ee-security"/>
+                    <extension module="org.wildfly.extension.elytron"/>
+                    <extension module="org.wildfly.extension.io"/>
+                    <extension module="org.wildfly.extension.messaging-activemq"/>
+                    <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                    <extension module="org.wildfly.extension.request-controller"/>
+                    <extension module="org.wildfly.extension.security.manager"/>
+                    <extension module="org.wildfly.extension.undertow"/>
+                    <extension module="org.wildfly.iiop-openjdk"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
             .hostExclude(HostExclude.builder()
                     .name("EAP64")
                     .release("EAP6.4")
@@ -64,15 +145,43 @@ public class EAP7_2AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
                     .excludedExtension("org.wildfly.extension.core-management")
+                    .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
                     .excludedExtension("org.wildfly.extension.ee-security")
                     .excludedExtension("org.wildfly.extension.elytron")
                     .excludedExtension("org.wildfly.extension.io")
                     .excludedExtension("org.wildfly.extension.messaging-activemq")
+                    .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye")
                     .excludedExtension("org.wildfly.extension.request-controller")
                     .excludedExtension("org.wildfly.extension.security.manager")
                     .excludedExtension("org.wildfly.extension.undertow")
                     .excludedExtension("org.wildfly.iiop-openjdk"))
+            /*
+              <host-exclude name="EAP64z">
+                <host-api-version major-version="1" minor-version="8"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.batch.jberet"/>
+                    <extension module="org.wildfly.extension.bean-validation"/>
+                    <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.core-management"/>
+                    <extension module="org.wildfly.extension.datasources-agroal"/>
+                    <extension module="org.wildfly.extension.discovery"/>
+                    <extension module="org.wildfly.extension.ee-security"/>
+                    <extension module="org.wildfly.extension.elytron"/>
+                    <extension module="org.wildfly.extension.io"/>
+                    <extension module="org.wildfly.extension.messaging-activemq"/>
+                    <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                    <extension module="org.wildfly.extension.request-controller"/>
+                    <extension module="org.wildfly.extension.security.manager"/>
+                    <extension module="org.wildfly.extension.undertow"/>
+                    <extension module="org.wildfly.iiop-openjdk"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
             .hostExclude(HostExclude.builder()
                     .name("EAP64z")
                     .apiVersion("1","8")
@@ -80,26 +189,65 @@ public class EAP7_2AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
                     .excludedExtension("org.wildfly.extension.core-management")
+                    .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
                     .excludedExtension("org.wildfly.extension.ee-security")
                     .excludedExtension("org.wildfly.extension.elytron")
                     .excludedExtension("org.wildfly.extension.io")
                     .excludedExtension("org.wildfly.extension.messaging-activemq")
+                    .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye")
                     .excludedExtension("org.wildfly.extension.request-controller")
                     .excludedExtension("org.wildfly.extension.security.manager")
                     .excludedExtension("org.wildfly.extension.undertow")
                     .excludedExtension("org.wildfly.iiop-openjdk"))
+            /*
+            <host-exclude name="EAP70">
+                <host-release id="EAP7.0"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.core-management"/>
+                    <extension module="org.wildfly.extension.datasources-agroal"/>
+                    <extension module="org.wildfly.extension.discovery"/>
+                    <extension module="org.wildfly.extension.ee-security"/>
+                    <extension module="org.wildfly.extension.elytron"/>
+                    <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
             .hostExclude(HostExclude.builder()
                     .name("EAP70")
                     .release("EAP7.0")
                     .excludedExtension("org.wildfly.extension.core-management")
+                    .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
                     .excludedExtension("org.wildfly.extension.ee-security")
-                    .excludedExtension("org.wildfly.extension.elytron"))
+                    .excludedExtension("org.wildfly.extension.elytron")
+                    .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye"))
+            /*
+            <host-exclude name="EAP71">
+                <host-release id="EAP7.1"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.datasources-agroal"/>
+                    <extension module="org.wildfly.extension.ee-security"/>
+                    <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+                    <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
             .hostExclude(HostExclude.builder()
                     .name("EAP71")
                     .release("EAP7.1")
-                    .excludedExtension("org.wildfly.extension.ee-security"))
+                    .excludedExtension("org.wildfly.extension.datasources-agroal")
+                    .excludedExtension("org.wildfly.extension.ee-security")
+                    .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye"))
             .build();
 
     public EAP7_2AddHostExcludes() {

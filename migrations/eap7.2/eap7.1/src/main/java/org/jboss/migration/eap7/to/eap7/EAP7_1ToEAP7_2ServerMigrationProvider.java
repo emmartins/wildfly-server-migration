@@ -53,7 +53,6 @@ public class EAP7_1ToEAP7_2ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new EAP7_1ToEAP7_2UpdateJGroupsSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
-                                .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
                                 .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
