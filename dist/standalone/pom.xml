@@ -166,6 +166,18 @@
             <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2</artifactId>
         </dependency>
 
+        <!-- eap 7.3 -->
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.3-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap6.4-to-eap7.3</artifactId>
+        </dependency>
+
         <!-- wfly 8.2 -->
 
         <dependency>
