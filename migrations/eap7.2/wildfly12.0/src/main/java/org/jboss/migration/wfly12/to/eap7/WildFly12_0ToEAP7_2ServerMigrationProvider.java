@@ -18,6 +18,9 @@ package org.jboss.migration.wfly12.to.eap7;
 
 import org.jboss.migration.eap.EAPServerMigrationProvider7_2;
 import org.jboss.migration.eap.task.hostexclude.EAP7_2AddHostExcludes;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileOpentracingSmallryeSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -49,6 +52,9 @@ public class WildFly12_0ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                         .subtask(new WildFly12_0ToEAP7_2UpdateUndertowSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
+                        .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileHealthSmallryeSubsystem<>())
+                        .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                         .subtask(new MigrateCompatibleSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -60,6 +66,8 @@ public class WildFly12_0ToEAP7_2ServerMigrationProvider implements EAPServerMigr
                                 .subtask(new WildFly12_0ToEAP7_2UpdateUndertowSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
+                                .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
+                                .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                                 .subtask(new EAP7_2AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
