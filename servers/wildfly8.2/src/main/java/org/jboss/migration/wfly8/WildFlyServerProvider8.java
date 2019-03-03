@@ -21,7 +21,6 @@ import org.jboss.migration.core.Server;
 import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.jboss.JBossServer;
-import org.jboss.migration.core.jboss.ModuleIdentifier;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -40,11 +39,15 @@ public class WildFlyServerProvider8 extends AbstractServerProvider {
 
     @Override
     protected ProductInfo getProductInfo(Path baseDir, MigrationEnvironment migrationEnvironment) throws IllegalArgumentException, ServerMigrationFailureException {
-        final JBossServer.Module module = new JBossServer.Modules(baseDir).getModule("org.jboss.as.version");
+        final JBossServer.Modules modules = new JBossServer.Modules(baseDir);
+        if (modules.getModule("org.jboss.as.product:wildfly-full") != null) {
+            return null;
+        }
+        final JBossServer.Module module = modules.getModule("org.jboss.as.version");
         if (module == null) {
             return null;
         }
-        final Path versionModuleMainDirPath = new JBossServer.Modules(baseDir).getModuleDir(ModuleIdentifier.fromString("org.jboss.as.version"));
+        final Path versionModuleMainDirPath = module.getModuleDir();
         if (!Files.isDirectory(versionModuleMainDirPath)) {
             return null;
         }
