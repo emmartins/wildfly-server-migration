@@ -111,36 +111,6 @@
             <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</artifactId>
         </dependency>
 
-        <!-- WFLY 14.0 -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly8.2-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly9.0-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly10.0-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly10.1-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly11.0-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly12.0-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jboss-server-migration-wildfly13.0-to-wildfly14.0-userguide</artifactId>
-        </dependency>
-
         <!-- WFLY 15.0 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -437,85 +407,6 @@
                         <configuration>
                             <includeArtifactIds>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</includeArtifactIds>
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly12.0-to-eap7.2</outputDirectory>
-                        </configuration>
-                    </execution>
-
-                    <!-- WF 14 -->
-                    <execution>
-                        <id>WFLY8.2toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly8.2-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly8.2-to-wildfly14.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY9.0toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly9.0-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly9.0-to-wildfly14.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY10.0toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly10.0-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.0-to-wildfly14.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY10.1toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly10.1-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly10.1-to-wildfly14.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY11.0toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly11.0-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly11.0-to-wildfly14.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY12.0toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly12.0-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly12.0-to-wildfly14.0</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>WFLY13.0toWFLY14.0</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>jboss-server-migration-wildfly13.0-to-wildfly14.0-userguide</includeArtifactIds>
-                            <outputDirectory>${project.build.outputDirectory}/migrations/wildfly13.0-to-wildfly14.0</outputDirectory>
                         </configuration>
                     </execution>
 
