@@ -6,7 +6,7 @@
 
 :server-target-productName: JBoss EAP 7.2
 :server-target-name: JBoss EAP
-:server-target-version: 7.2.0.Beta
+:server-target-version: 7.2.0.GA
 :server-target-baseDir: jboss-eap-7.2
 
 :includesDir: topics
