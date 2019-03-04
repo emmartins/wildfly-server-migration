@@ -28,6 +28,9 @@ import java.io.IOException;
  * @author emmartins
  */
 public class DefaultJsfImplModulesFinder implements ConfigurationModulesMigrationTaskFactory.ModulesFinder {
+
+    private static final String JSF_IMPL_MODULE_NAME = "org.jboss.as.jsf-injection:";
+
     @Override
     public String getElementLocalName() {
         return "subsystem";
@@ -39,9 +42,9 @@ public class DefaultJsfImplModulesFinder implements ConfigurationModulesMigratio
         if (namespaceURI == null || !namespaceURI.startsWith("urn:jboss:domain:"+ JBossSubsystemNames.JSF)) {
             return;
         }
-        final String moduleId = reader.getAttributeValue(null, "default-jsf-impl-slot");
-        if (moduleId != null) {
-            moduleMigrator.migrateModule(moduleId, "Referenced as the source of default JSF implementation", context);
+        final String moduleSlot = reader.getAttributeValue(null, "default-jsf-impl-slot");
+        if (moduleSlot != null) {
+            moduleMigrator.migrateModule(JSF_IMPL_MODULE_NAME + moduleSlot, "Referenced as the source of default JSF implementation", context);
         }
     }
 }
