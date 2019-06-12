@@ -25,5 +25,8 @@ import org.jboss.migration.core.jboss.JBossExtensionNames;
 public class AddSingletonSubsystem<S> extends AddSubsystemResources<S> {
     public AddSingletonSubsystem() {
         super(JBossExtensionNames.SINGLETON, new AddSingletonSubsystemResource<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 }

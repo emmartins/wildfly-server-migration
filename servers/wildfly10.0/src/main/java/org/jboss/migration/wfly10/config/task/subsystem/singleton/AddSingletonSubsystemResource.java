@@ -22,6 +22,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
@@ -34,6 +35,8 @@ public class AddSingletonSubsystemResource<S> extends AddSubsystemResourceSubtas
 
     protected AddSingletonSubsystemResource() {
         super(JBossSubsystemNames.SINGLETON);
+        // do not add subsystem config to profile "load-balancer"
+        skipPolicyBuilder(buildParameters -> context -> buildParameters.getResource().getResourceType() == ProfileResource.RESOURCE_TYPE && buildParameters.getResource().getResourceName().equals("load-balancer"));
     }
 
     private static final String DEFAULT_ATTR_NAME = "default";

@@ -37,6 +37,9 @@ public class AddJmxSubsystemToHosts<S> extends AddSubsystemResources<S> {
 
     public AddJmxSubsystemToHosts() {
         super(JBossExtensionNames.JMX, new AddJMXSubsystemConfig<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 
     public static class AddJMXSubsystemConfig<S> extends AddSubsystemResourceSubtaskBuilder<S> {

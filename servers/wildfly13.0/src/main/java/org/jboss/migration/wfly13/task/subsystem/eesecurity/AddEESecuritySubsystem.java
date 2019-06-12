@@ -29,6 +29,9 @@ public class AddEESecuritySubsystem<S> extends AddSubsystemResources<S> {
 
     public AddEESecuritySubsystem() {
         super(JBossExtensionNames.EE_SECURITY, new AddEESecuritySubsystemResourceSubtaskBuilder<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 
     static class AddEESecuritySubsystemResourceSubtaskBuilder<S> extends AddSubsystemResourceSubtaskBuilder<S> {

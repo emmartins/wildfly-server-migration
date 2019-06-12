@@ -16,6 +16,8 @@
 
 package org.jboss.migration.wfly11.task.subsystem.coremanagement;
 
+import org.jboss.migration.wfly10.config.management.ProfileResource;
+import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResources;
 import org.jboss.migration.core.jboss.JBossExtensionNames;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
@@ -25,6 +27,17 @@ import org.jboss.migration.core.jboss.JBossSubsystemNames;
  */
 public class AddCoreManagementSubsystem<S> extends AddSubsystemResources<S> {
     public AddCoreManagementSubsystem() {
-        super(JBossExtensionNames.CORE_MANAGEMENT, JBossSubsystemNames.CORE_MANAGEMENT);
+        super(JBossExtensionNames.CORE_MANAGEMENT, new AddCoreManagementSubsystemResourceSubtaskBuilder<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
+    }
+
+    static class AddCoreManagementSubsystemResourceSubtaskBuilder<S> extends AddSubsystemResourceSubtaskBuilder<S> {
+        AddCoreManagementSubsystemResourceSubtaskBuilder() {
+            super(JBossSubsystemNames.CORE_MANAGEMENT);
+            // do not add subsystem config to profile "load-balancer"
+            skipPolicyBuilder(buildParameters -> context -> buildParameters.getResource().getResourceType() == ProfileResource.RESOURCE_TYPE && buildParameters.getResource().getResourceName().equals("load-balancer"));
+        }
     }
 }

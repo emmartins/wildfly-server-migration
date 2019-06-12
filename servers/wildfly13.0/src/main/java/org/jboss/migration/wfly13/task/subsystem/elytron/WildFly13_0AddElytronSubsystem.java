@@ -25,5 +25,8 @@ import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemR
 public class WildFly13_0AddElytronSubsystem<S> extends AddSubsystemResources<S> {
     public WildFly13_0AddElytronSubsystem() {
         super(JBossExtensionNames.ELYTRON, new WildFly13_0AddElytronSubsystemConfig<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 }

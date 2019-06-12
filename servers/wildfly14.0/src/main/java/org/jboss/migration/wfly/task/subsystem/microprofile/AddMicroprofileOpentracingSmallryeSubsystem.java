@@ -29,6 +29,9 @@ public class AddMicroprofileOpentracingSmallryeSubsystem<S> extends AddSubsystem
 
     public AddMicroprofileOpentracingSmallryeSubsystem() {
         super(JBossExtensionNames.MICROPROFILE_OPENTRACING_SMALLRYE, new SubtaskBuilder<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 
     static class SubtaskBuilder<S> extends AddSubsystemResourceSubtaskBuilder<S> {
