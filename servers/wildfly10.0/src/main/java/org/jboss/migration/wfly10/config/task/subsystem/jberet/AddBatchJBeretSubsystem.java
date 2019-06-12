@@ -25,5 +25,8 @@ import org.jboss.migration.core.jboss.JBossExtensionNames;
 public class AddBatchJBeretSubsystem<S> extends AddSubsystemResources<S> {
     public AddBatchJBeretSubsystem() {
         super(JBossExtensionNames.BATCH_JBERET, new AddBatchJBeretSubsystemResource<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 }

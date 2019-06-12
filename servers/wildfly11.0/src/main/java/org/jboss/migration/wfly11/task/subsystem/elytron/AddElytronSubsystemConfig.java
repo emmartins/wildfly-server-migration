@@ -23,13 +23,12 @@ import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfigurationType;
+import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
-
-import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
 /**
  * @author emmartins
@@ -38,7 +37,8 @@ public class AddElytronSubsystemConfig<S> extends AddSubsystemResourceSubtaskBui
 
     protected AddElytronSubsystemConfig() {
         super(JBossSubsystemNames.ELYTRON);
-        skipPolicy(skipIfDefaultTaskSkipPropertyIsSet());
+        // do not add subsystem config to profile "load-balancer"
+        skipPolicyBuilder(buildParameters -> context -> buildParameters.getResource().getResourceType() == ProfileResource.RESOURCE_TYPE && buildParameters.getResource().getResourceName().equals("load-balancer"));
     }
 
     @Override

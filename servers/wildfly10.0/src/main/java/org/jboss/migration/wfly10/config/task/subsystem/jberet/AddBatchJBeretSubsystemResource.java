@@ -21,6 +21,7 @@ import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.management.ProfileResource;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
 import org.jboss.migration.wfly10.config.task.management.subsystem.AddSubsystemResourceSubtaskBuilder;
@@ -33,6 +34,8 @@ public class AddBatchJBeretSubsystemResource<S> extends AddSubsystemResourceSubt
 
     protected AddBatchJBeretSubsystemResource() {
         super(JBossSubsystemNames.BATCH_JBERET);
+        // do not add subsystem config to profile "load-balancer"
+        skipPolicyBuilder(buildParameters -> context -> buildParameters.getResource().getResourceType() == ProfileResource.RESOURCE_TYPE && buildParameters.getResource().getResourceName().equals("load-balancer"));
     }
 
     private static final String DEFAULT_JOB_REPOSITORY_ATTR_NAME = "default-job-repository";

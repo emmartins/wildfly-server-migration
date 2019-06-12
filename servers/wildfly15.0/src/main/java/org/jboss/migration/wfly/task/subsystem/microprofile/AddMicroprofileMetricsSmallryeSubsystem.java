@@ -34,6 +34,9 @@ public class AddMicroprofileMetricsSmallryeSubsystem<S> extends AddSubsystemReso
 
     public AddMicroprofileMetricsSmallryeSubsystem() {
         super(JBossExtensionNames.MICROPROFILE_METRICS_SMALLRYE, new SubtaskBuilder<>());
+        // do not add subsystem config to "standalone-load-balancer.xml" config
+        skipPolicyBuilders(getSkipPolicyBuilder(),
+                buildParameters -> context -> buildParameters.getServerConfiguration().getConfigurationPath().getPath().endsWith("standalone-load-balancer.xml"));
     }
 
     static class SubtaskBuilder<S> extends AddSubsystemResourceSubtaskBuilder<S> {
