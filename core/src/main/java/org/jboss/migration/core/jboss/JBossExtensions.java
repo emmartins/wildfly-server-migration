@@ -36,6 +36,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.BEAN_VALIDATION)
             .build();
 
+    Extension CLUSTERING_WEB = Extension.builder()
+            .module(JBossExtensionNames.CLUSTERING_WEB)
+            .subsystem(JBossSubsystemNames.DISTRIBUTABLE_WEB)
+            .build();
+
     Extension CMP = Extension.builder()
             .module(JBossExtensionNames.CMP)
             .subsystem(JBossSubsystemNames.CMP)

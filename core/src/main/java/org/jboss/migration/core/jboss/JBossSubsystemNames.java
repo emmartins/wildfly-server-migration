@@ -31,6 +31,7 @@ public interface JBossSubsystemNames {
     String DATASOURCES_AGROAL = "datasources-agroal";
     String DEPLOYMENT_SCANNER = "deployment-scanner";
     String DISCOVERY = "discovery";
+    String DISTRIBUTABLE_WEB = "distributable-web";
     String EE = "ee";
     String EE_SECURITY = "ee-security";
     String EJB3 = "ejb3";
