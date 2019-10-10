@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly;
 
-import org.jboss.migration.wfly.task.hostexclude.WildFly15_0AddHostExcludes;
+import org.jboss.migration.wfly.task.hostexclude.WildFly17_0AddHostExcludes;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
@@ -68,7 +68,7 @@ public class WildFly12_0ToWildFly17_0ServerMigrationProvider implements WildFly1
                                 .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
                                 .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
-                                .subtask(new WildFly15_0AddHostExcludes<>())
+                                .subtask(new WildFly17_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
