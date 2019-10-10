@@ -15,6 +15,7 @@
  */
 package org.jboss.migration.wfly;
 
+import org.jboss.migration.wfly.task.hostexclude.WildFly17_0AddHostExcludes;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -48,6 +49,7 @@ public class WildFly15_0ToWildFly17_0ServerMigrationProvider implements WildFly1
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly17_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
