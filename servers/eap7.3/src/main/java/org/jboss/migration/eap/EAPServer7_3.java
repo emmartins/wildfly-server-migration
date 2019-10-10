@@ -18,9 +18,9 @@ package org.jboss.migration.eap;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.wfly.WildFly18_0Server;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
 import org.jboss.migration.wfly10.WildFlyServerMigrations10;
-import org.jboss.migration.wfly.WildFly15_0Server;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -29,7 +29,7 @@ import java.util.ServiceLoader;
  * The JBoss EAP 7.3 {@link Server}
  * @author emmartins
  */
-public class EAPServer7_3 extends WildFly15_0Server {
+public class EAPServer7_3 extends WildFly18_0Server {
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(EAPServerMigrationProvider7_3.class));
 

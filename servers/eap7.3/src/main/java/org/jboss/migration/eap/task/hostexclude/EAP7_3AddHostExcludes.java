@@ -32,6 +32,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     <extension module="org.wildfly.extension.batch.jberet"/>
                     <extension module="org.wildfly.extension.bean-validation"/>
                     <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.clustering.web"/>
                     <extension module="org.wildfly.extension.core-management"/>
                     <extension module="org.wildfly.extension.datasources-agroal"/>
                     <extension module="org.wildfly.extension.discovery"/>
@@ -58,6 +59,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.batch.jberet")
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
                     .excludedExtension("org.wildfly.extension.core-management")
                     .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
@@ -82,6 +84,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     <extension module="org.wildfly.extension.batch.jberet"/>
                     <extension module="org.wildfly.extension.bean-validation"/>
                     <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.clustering.web"/>
                     <extension module="org.wildfly.extension.core-management"/>
                     <extension module="org.wildfly.extension.datasources-agroal"/>
                     <extension module="org.wildfly.extension.discovery"/>
@@ -108,6 +111,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.batch.jberet")
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
                     .excludedExtension("org.wildfly.extension.core-management")
                     .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
@@ -131,6 +135,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     <extension module="org.wildfly.extension.batch.jberet"/>
                     <extension module="org.wildfly.extension.bean-validation"/>
                     <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.clustering.web"/>
                     <extension module="org.wildfly.extension.core-management"/>
                     <extension module="org.wildfly.extension.datasources-agroal"/>
                     <extension module="org.wildfly.extension.discovery"/>
@@ -156,6 +161,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.batch.jberet")
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
                     .excludedExtension("org.wildfly.extension.core-management")
                     .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
@@ -179,6 +185,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     <extension module="org.wildfly.extension.batch.jberet"/>
                     <extension module="org.wildfly.extension.bean-validation"/>
                     <extension module="org.wildfly.extension.clustering.singleton"/>
+                    <extension module="org.wildfly.extension.clustering.web"/>
                     <extension module="org.wildfly.extension.core-management"/>
                     <extension module="org.wildfly.extension.datasources-agroal"/>
                     <extension module="org.wildfly.extension.discovery"/>
@@ -204,6 +211,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension("org.wildfly.extension.batch.jberet")
                     .excludedExtension("org.wildfly.extension.bean-validation")
                     .excludedExtension("org.wildfly.extension.clustering.singleton")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
                     .excludedExtension("org.wildfly.extension.core-management")
                     .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
@@ -224,6 +232,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
             <host-exclude name="EAP70">
                 <host-release id="EAP7.0"/>
                 <excluded-extensions>
+                    <extension module="org.wildfly.extension.clustering.web"/>
                     <extension module="org.wildfly.extension.core-management"/>
                     <extension module="org.wildfly.extension.datasources-agroal"/>
                     <extension module="org.wildfly.extension.discovery"/>
@@ -239,6 +248,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
             .hostExclude(HostExclude.builder()
                     .name("EAP70")
                     .release("EAP7.0")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
                     .excludedExtension("org.wildfly.extension.core-management")
                     .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.discovery")
@@ -252,6 +262,7 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
             <host-exclude name="EAP71">
                 <host-release id="EAP7.1"/>
                 <excluded-extensions>
+                    <extension module="org.wildfly.extension.clustering.web"/>
                     <extension module="org.wildfly.extension.datasources-agroal"/>
                     <extension module="org.wildfly.extension.ee-security"/>
                     <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
@@ -264,12 +275,27 @@ public class EAP7_3AddHostExcludes<S> extends AddHostExcludes<S> {
             .hostExclude(HostExclude.builder()
                     .name("EAP71")
                     .release("EAP7.1")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
                     .excludedExtension("org.wildfly.extension.datasources-agroal")
                     .excludedExtension("org.wildfly.extension.ee-security")
                     .excludedExtension("org.wildfly.extension.microprofile.config-smallrye")
                     .excludedExtension("org.wildfly.extension.microprofile.health-smallrye")
                     .excludedExtension("org.wildfly.extension.microprofile.metrics-smallrye")
                     .excludedExtension("org.wildfly.extension.microprofile.opentracing-smallrye"))
+            /*
+            <host-exclude name="EAP72">
+                <host-release id="EAP7.2"/>
+                <excluded-extensions>
+                    <extension module="org.wildfly.extension.clustering.web"/>
+                    <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                </excluded-extensions>
+            </host-exclude>
+             */
+            .hostExclude(HostExclude.builder()
+                    .name("EAP72")
+                    .release("EAP7.2")
+                    .excludedExtension("org.wildfly.extension.clustering.web")
+                    .excludedExtension("org.wildfly.extension.microprofile.metrics-smallrye"))
             .build();
 
     public EAP7_3AddHostExcludes() {
