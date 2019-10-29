@@ -111,6 +111,16 @@
             <artifactId>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</artifactId>
         </dependency>
 
+        <!-- EAP 7.3 -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap6.4-to-eap7.3-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.2-to-eap7.3-userguide</artifactId>
+        </dependency>
+
         <!-- WFLY 17.0 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -424,6 +434,30 @@
                         <configuration>
                             <includeArtifactIds>jboss-server-migration-wildfly12.0-to-eap7.2-userguide</includeArtifactIds>
                             <outputDirectory>${project.build.outputDirectory}/migrations/wildfly12.0-to-eap7.2</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- EAP 7.3 -->
+                    <execution>
+                        <id>EAP6.4toEAP7.3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap6.4-to-eap7.3-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap6.4-to-eap7.3</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>EAP7.2toEAP7.3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap7.2-to-eap7.3-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap7.2-to-eap7.3</outputDirectory>
                         </configuration>
                     </execution>
 
