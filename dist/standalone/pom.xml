@@ -372,6 +372,13 @@
             <artifactId>jboss-server-migration-wildfly17.0-to-wildfly18.0</artifactId>
         </dependency>
 
+        <!-- wfly 19.0 -->
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-wildfly19.0-server</artifactId>
+        </dependency>
+
         <!-- EXTERNAL DEPENDENCIES -->
 
         <dependency>
