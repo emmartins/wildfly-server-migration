@@ -53,6 +53,7 @@ public interface JBossExtensionNames {
     String MESSAGING_ACTIVEMQ = "org.wildfly.extension.messaging-activemq";
     String MICROPROFILE_CONFIG_SMALLRYE = "org.wildfly.extension.microprofile.config-smallrye";
     String MICROPROFILE_HEALTH_SMALLRYE = "org.wildfly.extension.microprofile.health-smallrye";
+    String MICROPROFILE_JWT_SMALLRYE = "org.wildfly.extension.microprofile.jwt-smallrye";
     String MICROPROFILE_OPENTRACING_SMALLRYE = "org.wildfly.extension.microprofile.opentracing-smallrye";
     String MICROPROFILE_METRICS_SMALLRYE = "org.wildfly.extension.microprofile.metrics-smallrye";
     String MODCLUSTER = "org.jboss.as.modcluster";

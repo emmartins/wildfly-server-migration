@@ -55,6 +55,7 @@ public interface JBossSubsystemNames {
     String MESSAGING_ACTIVEMQ = "messaging-activemq";
     String MICROPROFILE_CONFIG_SMALLRYE = "microprofile-config-smallrye";
     String MICROPROFILE_HEALTH_SMALLRYE = "microprofile-health-smallrye";
+    String MICROPROFILE_JWT_SMALLRYE = "microprofile-jwt-smallrye";
     String MICROPROFILE_METRICS_SMALLRYE = "microprofile-metrics-smallrye";
     String MICROPROFILE_OPENTRACING_SMALLRYE = "microprofile-opentracing-smallrye";
     String MODCLUSTER = "modcluster";
