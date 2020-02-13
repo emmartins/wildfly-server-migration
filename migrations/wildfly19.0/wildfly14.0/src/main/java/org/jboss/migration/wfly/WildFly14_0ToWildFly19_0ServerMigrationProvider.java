@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly;
 
-import org.jboss.migration.wfly.task.hostexclude.WildFly17_0AddHostExcludes;
+import org.jboss.migration.wfly.task.hostexclude.WildFly19_0AddHostExcludes;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
@@ -51,7 +51,7 @@ public class WildFly14_0ToWildFly19_0ServerMigrationProvider implements WildFly1
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
-                                .subtask(new WildFly17_0AddHostExcludes<>())
+                                .subtask(new WildFly19_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())

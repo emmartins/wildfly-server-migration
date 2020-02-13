@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc.
+ * Copyright 2020 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly;
 
-import org.jboss.migration.wfly.task.hostexclude.WildFly17_0AddHostExcludes;
+import org.jboss.migration.wfly.task.hostexclude.WildFly19_0AddHostExcludes;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
@@ -112,7 +112,7 @@ public class WildFly8ToWildFly19_0ServerMigrationProvider implements WildFly19_0
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                 .subtask(new AddLoadBalancerProfile<>())
-                                .subtask(new WildFly17_0AddHostExcludes<>())
+                                .subtask(new WildFly19_0AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
