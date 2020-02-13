@@ -15,7 +15,7 @@
  */
 package org.jboss.migration.wfly;
 
-import org.jboss.migration.wfly.task.hostexclude.WildFly17_0AddHostExcludes;
+import org.jboss.migration.wfly.task.hostexclude.WildFly19_0AddHostExcludes;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
@@ -102,7 +102,7 @@ public class WildFly9ToWildFly19_0ServerMigrationProvider implements WildFly19_0
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
                                 .subtask(new AddLoadBalancerProfile<>())
-                                .subtask(new WildFly17_0AddHostExcludes<>())
+                                .subtask(new WildFly19_0AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
