@@ -29,6 +29,11 @@ import java.nio.file.Path;
 public class WildFly19_0ServerProvider extends WildFlyFullServerProvider10_0 {
 
     @Override
+    protected String getProductModuleId() {
+        return "org.jboss.as.product";
+    }
+
+    @Override
     protected String getProductVersionRegex() {
         return "19.0\\..*";
     }
