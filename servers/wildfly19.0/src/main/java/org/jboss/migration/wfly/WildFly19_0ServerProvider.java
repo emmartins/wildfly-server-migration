@@ -23,7 +23,7 @@ import org.jboss.migration.wfly10.dist.full.WildFlyFullServerProvider10_0;
 import java.nio.file.Path;
 
 /**
- * The WildFly 19.0 {@link org.jboss.migration.core.ServerProvider}.
+ * The WildFly 19.x {@link org.jboss.migration.core.ServerProvider}.
  *  @author emmartins
  */
 public class WildFly19_0ServerProvider extends WildFlyFullServerProvider10_0 {
@@ -35,7 +35,7 @@ public class WildFly19_0ServerProvider extends WildFlyFullServerProvider10_0 {
 
     @Override
     protected String getProductVersionRegex() {
-        return "19.0\\..*";
+        return "19.[01]\\..*";
     }
 
     @Override
@@ -45,6 +45,6 @@ public class WildFly19_0ServerProvider extends WildFlyFullServerProvider10_0 {
 
     @Override
     public String getName() {
-        return "WildFly 19.0";
+        return "WildFly 19.x";
     }
 }
