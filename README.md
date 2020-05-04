@@ -21,7 +21,7 @@ Run the Server Migration Tool (Standalone Build)
 
 1. Navigate to the `dist/standalone/target/` directory and unzip the ` jboss-server-migration-VERSION_NUMBER.zip` file
 
-        unzip jboss-server-migration-1.8.0.Final-SNAPSHOT.zip
+        unzip jboss-server-migration-1.8.0.Final.zip
 2. Open a terminal and navigate to the `dist/standalone/target/jboss-server-migration/` directory.
 3. Run the following command.
 
@@ -38,7 +38,7 @@ Run the Server Migration Tool (Standalone Build)
         
         Retrieving servers...
          INFO  SOURCE server name: WildFly Full, version: 11.0.0.Final.
-         INFO  TARGET server name: WildFly Full, version: 18.0.0.Final.
+         INFO  TARGET server name: WildFly Full, version: 19.1.0.Final.
         
         ----------------------------------------------------------
         ----------------------------------------------------------
