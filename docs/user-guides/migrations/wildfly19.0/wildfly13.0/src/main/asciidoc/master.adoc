@@ -4,10 +4,10 @@
 :server-source-version: 13.0.0.Final
 :server-source-baseDir: wildfly-13.0
 
-:server-target-productName: WildFly 19.0
+:server-target-productName: WildFly 19.1
 :server-target-name: WildFly
-:server-target-version: 19.0.0.Final
-:server-target-baseDir: wildfly-19.0
+:server-target-version: 19.1.0.Final
+:server-target-baseDir: wildfly-19.1
 
 :includesDir: topics
 
