@@ -64,7 +64,7 @@ public class MigrationFiles {
             throw new IllegalArgumentException("Target path "+target+" is not an absolute path.");
         }
         try {
-            Files.createDirectories(target.getParent());
+            createDirectories(target.getParent());
             if (Files.isDirectory(source)) {
                 copyDir(source, target, copiedFiles);
             } else {
@@ -77,6 +77,25 @@ public class MigrationFiles {
 
     private static final CopyOption[] COPY_FILE_OPTIONS = { COPY_ATTRIBUTES, REPLACE_EXISTING };
     private static final CopyOption[] BACKUP_FILE_OPTIONS = { REPLACE_EXISTING };
+
+    private static void createDirectories(Path path) throws IOException {
+        if (!Files.isDirectory(path)) {
+            // get the last existing parent
+            Path dir = path.getParent();
+            while (dir != null && !Files.exists(dir)) {
+                dir = dir.getParent();
+            }
+            if (dir == null || !Files.isDirectory(dir)) {
+                throw new IOException("Invalid parent directory: " + dir);
+            }
+            // create all the directories that are missing
+            Path child = dir;
+            for (Path name : dir.relativize(path)) {
+                child = child.resolve(name);
+                Files.createDirectory(child);
+            }
+        }
+    }
 
     private static void copyFile(Path source, Path target, Map<Path, Path> copiedFiles) throws IOException {
         if (copiedFiles.put(target, source) == null) {
