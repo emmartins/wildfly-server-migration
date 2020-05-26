@@ -173,14 +173,14 @@ public class AddElytronSubsystemConfig<S> extends AddSubsystemResourceSubtaskBui
             compositeOperationBuilder.addStep(new HttpAuthenticationFactoryAddOperation(subsystemPathAddress, "management-http-authentication")
                     .securityDomain("ManagementDomain")
                     .httpServerMechanismFactory("global")
-                    .addMechanismConfiguration(new MechanismConfiguration("BASIC").addMechanismRealmConfiguration(new MechanismRealmConfiguration("Management Realm")))
+                    .addMechanismConfiguration(new MechanismConfiguration("BASIC").addMechanismRealmConfiguration(new MechanismRealmConfiguration("ManagementRealm")))
                     .toModelNode());
         }
         if (configurationType == StandaloneServerConfiguration.RESOURCE_TYPE || configurationType == HostControllerConfiguration.RESOURCE_TYPE) {
             compositeOperationBuilder.addStep(new HttpAuthenticationFactoryAddOperation(subsystemPathAddress, "application-http-authentication")
                     .securityDomain("ApplicationDomain")
                     .httpServerMechanismFactory("global")
-                    .addMechanismConfiguration(new MechanismConfiguration("BASIC").addMechanismRealmConfiguration(new MechanismRealmConfiguration("Application Realm")))
+                    .addMechanismConfiguration(new MechanismConfiguration("BASIC").addMechanismRealmConfiguration(new MechanismRealmConfiguration("ApplicationRealm")))
                     .addMechanismConfiguration(new MechanismConfiguration("FORM"))
                     .toModelNode());
         }
