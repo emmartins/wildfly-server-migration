@@ -17,6 +17,7 @@
 package org.jboss.migration.eap7.to.eap7;
 
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
+import org.jboss.migration.eap.task.subsystem.jgroups.EAP7_2MoveTcpPingTimeoutOperation;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.jgroups.UpdateProtocols;
 
@@ -28,6 +29,7 @@ public class EAP7_1ToEAP7_2UpdateJGroupsSubsystem<S> extends UpdateSubsystemReso
         super(JBossSubsystemNames.JGROUPS,
                 new UpdateProtocols<>(new UpdateProtocols.Operations()
                         .replace("FRAG2", "FRAG3")
+                        .custom(new EAP7_2MoveTcpPingTimeoutOperation())
                 ));
     }
 }
