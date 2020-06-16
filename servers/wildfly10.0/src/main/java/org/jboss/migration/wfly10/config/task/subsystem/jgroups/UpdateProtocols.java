@@ -65,9 +65,9 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
 
         final org.jboss.as.controller.client.helpers.Operations.CompositeOperationBuilder compositeOperationBuilder = org.jboss.as.controller.client.helpers.Operations.CompositeOperationBuilder.create();
         for (String stackName : stacks.keys()) {
-            final ProtocolStack protocolStack = new ProtocolStack(stackName, config.get(STACK, stackName));
+            final ProtocolStack protocolStack = new ProtocolStack(stackName, config.get(STACK, stackName), context);
             for (Operation operation : operations) {
-                operation.execute(protocolStack);
+                operation.execute(protocolStack, context);
             }
             final Set<String> protocolsRemovedFromStack = protocolStack.getProtocolsRemoved();
             final Set<String> protocolsAddedToStack = protocolStack.getProtocolsAdded();
@@ -101,24 +101,49 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
                 .build();
     }
 
-    static class ProtocolStack {
+    public static class ProtocolStack {
 
         final List<Property> sourceProtocols;
         final List<Property> targetProtocols;
         final String name;
+        final TaskContext taskContext;
 
-        ProtocolStack(String name, ModelNode stackModelNode) {
+        ProtocolStack(String name, ModelNode stackModelNode, TaskContext taskContext) {
             this.name = name;
             final ModelNode protocolsModelNode = stackModelNode.get(PROTOCOL);
             this.sourceProtocols = protocolsModelNode.clone().asPropertyList();
             this.targetProtocols = protocolsModelNode.clone().asPropertyList();
+            this.taskContext = taskContext;
         }
 
-        void add(String protocol) {
+        public void add(String protocol) {
+            taskContext.getLogger().debug("Adding protocol "+protocol);
             targetProtocols.add(new Property(protocol, new ModelNode()));
         }
 
-        void replace(String oldProtocol, String newProtocol) {
+        public ModelNode get(String protocol) {
+            final ListIterator<Property> li = targetProtocols.listIterator();
+            while (li.hasNext()) {
+                Property p = li.next();
+                if (p.getName().equals(protocol)) {
+                    return p.getValue().clone();
+                }
+            }
+            return null;
+        }
+
+        public void update(String protocolName, ModelNode protocolValue) {
+            taskContext.getLogger().debug("Updating protocol "+protocolName+": "+protocolValue);
+            final ListIterator<Property> li = targetProtocols.listIterator();
+            while (li.hasNext()) {
+                if (li.next().getName().equals(protocolName)) {
+                    li.set(new Property(protocolName, protocolValue.clone()));
+                }
+            }
+        }
+
+        public void replace(String oldProtocol, String newProtocol) {
+            taskContext.getLogger().debug("Replacing protocol "+oldProtocol+" with "+newProtocol);
             final ListIterator<Property> li = targetProtocols.listIterator();
             while (li.hasNext()) {
                 if (li.next().getName().equals(oldProtocol)) {
@@ -127,7 +152,8 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
             }
         }
 
-        boolean remove(String protocol) {
+        public boolean remove(String protocol) {
+            taskContext.getLogger().debug("Removing protocol "+protocol);
             final ListIterator<Property> li = targetProtocols.listIterator();
             while (li.hasNext()) {
                 if (li.next().getName().equals(protocol)) {
@@ -161,8 +187,8 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
         }
     }
 
-    interface Operation {
-        void execute(ProtocolStack protocolStack);
+    public interface Operation {
+        void execute(ProtocolStack protocolStack, TaskContext context);
     }
 
     public static class Operations {
@@ -170,17 +196,22 @@ public class UpdateProtocols<S> extends UpdateSubsystemResourceSubtaskBuilder<S>
         final List<Operation> operations = new ArrayList<>();
 
         public Operations add(String protocol) {
-            operations.add(protocolStack -> protocolStack.add(protocol));
+            operations.add((protocolStack, context) -> protocolStack.add(protocol));
             return this;
         }
 
         public Operations replace(String oldProtocol, String newProtocol) {
-            operations.add(protocolStack -> protocolStack.replace(oldProtocol, newProtocol));
+            operations.add((protocolStack, context) -> protocolStack.replace(oldProtocol, newProtocol));
             return this;
         }
 
         public Operations remove(String protocol) {
-            operations.add(protocolStack -> protocolStack.remove(protocol));
+            operations.add((protocolStack, context) -> protocolStack.remove(protocol));
+            return this;
+        }
+
+        public Operations custom(Operation operation) {
+            operations.add(operation);
             return this;
         }
     }
