@@ -18,8 +18,10 @@ package org.jboss.migration.eap;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.wfly.WildFly18_0Server;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
+import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigrations10;
 
 import java.nio.file.Path;
@@ -29,12 +31,14 @@ import java.util.ServiceLoader;
  * The JBoss EAP 7.3 {@link Server}
  * @author emmartins
  */
-public class EAPServer7_3 extends WildFly18_0Server {
+public class EAPServer7_3 extends WildFlyServer10 {
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(EAPServerMigrationProvider7_3.class));
 
+    public static final JBossServer.Extensions EXTENSIONS = WildFly18_0Server.EXTENSIONS;
+
     public EAPServer7_3(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        super(migrationName, productInfo, baseDir, migrationEnvironment);
+        super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS);
     }
 
     @Override
