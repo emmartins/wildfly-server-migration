@@ -149,6 +149,10 @@ public class XMLFiles {
                             break;
                         case CONTINUE:
                             break;
+                        case ADD_ALL:
+                            xmlEventWriter.add(xmlEvent);
+                            addTillEndElement(xmlEventReader, xmlEventWriter);
+                            break;
                         case ADD:
                         case NOT_APPLICABLE:
                         default:
@@ -189,6 +193,20 @@ public class XMLFiles {
             else if(xmlEvent.isEndElement()){
                 endElementsLeft--;
             }
+        } while (xmlEventReader.hasNext() && endElementsLeft > 0);
+    }
+
+    private static void addTillEndElement(XMLEventReader xmlEventReader, XMLEventWriter xmlEventWriter) throws XMLStreamException {
+        int endElementsLeft = 1;
+        do {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                endElementsLeft++;
+            }
+            else if(xmlEvent.isEndElement()){
+                endElementsLeft--;
+            }
+            xmlEventWriter.add(xmlEvent);
         } while (xmlEventReader.hasNext() && endElementsLeft > 0);
     }
 }
