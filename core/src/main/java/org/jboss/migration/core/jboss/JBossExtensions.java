@@ -183,6 +183,11 @@ public interface JBossExtensions {
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_CONFIG_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_CONFIG_SMALLRYE))
             .build();
 
+    Extension MICROPROFILE_FAULT_TOLERANCE_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_FAULT_TOLERANCE_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_FAULT_TOLERANCE_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_FAULT_TOLERANCE_SMALLRYE))
+            .build();
+
     Extension MICROPROFILE_HEALTH_SMALLRYE = Extension.builder()
             .module(JBossExtensionNames.MICROPROFILE_HEALTH_SMALLRYE)
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_HEALTH_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_HEALTH_SMALLRYE))

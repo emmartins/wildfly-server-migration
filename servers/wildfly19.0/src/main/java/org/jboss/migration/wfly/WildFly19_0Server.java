@@ -34,6 +34,7 @@ public class WildFly19_0Server extends WildFlyServer10 {
 
     public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
             .extensions(WildFly18_0Server.EXTENSIONS)
+            .extension(JBossExtensions.MICROPROFILE_FAULT_TOLERANCE_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_JWT_SMALLRYE)
             .build();
 
