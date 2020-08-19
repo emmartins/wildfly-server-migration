@@ -203,6 +203,11 @@ public interface JBossExtensions {
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_METRICS_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_METRICS_SMALLRYE))
             .build();
 
+    Extension MICROPROFILE_OPENAPI_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_OPENAPI_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_OPENAPI_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_OPENAPI_SMALLRYE))
+            .build();
+
     Extension MICROPROFILE_OPENTRACING_SMALLRYE = Extension.builder()
             .module(JBossExtensionNames.MICROPROFILE_OPENTRACING_SMALLRYE)
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_OPENTRACING_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_OPENTRACING_SMALLRYE))

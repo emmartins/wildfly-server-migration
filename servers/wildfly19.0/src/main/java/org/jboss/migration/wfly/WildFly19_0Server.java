@@ -36,6 +36,7 @@ public class WildFly19_0Server extends WildFlyServer10 {
             .extensions(WildFly18_0Server.EXTENSIONS)
             .extension(JBossExtensions.MICROPROFILE_FAULT_TOLERANCE_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_JWT_SMALLRYE)
+            .extension(JBossExtensions.MICROPROFILE_OPENAPI_SMALLRYE)
             .build();
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(WildFly19_0ServerMigrationProvider.class));
