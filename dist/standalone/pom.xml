@@ -198,6 +198,28 @@
             <artifactId>jboss-server-migration-eap7.3-to-eap7.3</artifactId>
         </dependency>
 
+        <!-- eap 7.4 -->
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.4-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap6.4-to-eap7.4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.3-to-eap7.4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.4-to-eap7.4</artifactId>
+        </dependency>
+
         <!-- wfly 8.2 -->
 
         <dependency>
