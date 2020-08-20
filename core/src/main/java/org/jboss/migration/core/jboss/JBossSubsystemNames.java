@@ -58,6 +58,7 @@ public interface JBossSubsystemNames {
     String MICROPROFILE_HEALTH_SMALLRYE = "microprofile-health-smallrye";
     String MICROPROFILE_JWT_SMALLRYE = "microprofile-jwt-smallrye";
     String MICROPROFILE_METRICS_SMALLRYE = "microprofile-metrics-smallrye";
+    String MICROPROFILE_OPENAPI_SMALLRYE = "microprofile-openapi-smallrye";
     String MICROPROFILE_OPENTRACING_SMALLRYE = "microprofile-opentracing-smallrye";
     String MODCLUSTER = "modcluster";
     String NAMING = "naming";

@@ -55,6 +55,7 @@ public interface JBossExtensionNames {
     String MICROPROFILE_FAULT_TOLERANCE_SMALLRYE = "org.wildfly.extension.microprofile.fault-tolerance-smallrye";
     String MICROPROFILE_HEALTH_SMALLRYE = "org.wildfly.extension.microprofile.health-smallrye";
     String MICROPROFILE_JWT_SMALLRYE = "org.wildfly.extension.microprofile.jwt-smallrye";
+    String MICROPROFILE_OPENAPI_SMALLRYE = "org.wildfly.extension.microprofile.openapi-smallrye";
     String MICROPROFILE_OPENTRACING_SMALLRYE = "org.wildfly.extension.microprofile.opentracing-smallrye";
     String MICROPROFILE_METRICS_SMALLRYE = "org.wildfly.extension.microprofile.metrics-smallrye";
     String MODCLUSTER = "org.jboss.as.modcluster";
