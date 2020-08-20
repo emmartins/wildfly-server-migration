@@ -108,7 +108,12 @@ public class RemoveUnsupportedExtensions<S extends JBossServer<S>> implements Se
                     return XMLFileFilter.Result.REMOVE;
                 }
             } else {
-                return XMLFileFilter.Result.NOT_APPLICABLE;
+                if (startElement.getName().getLocalPart().equals("excluded-extensions")) {
+                    // this element also has extension child elements, yet those should not be filtered
+                    return XMLFileFilter.Result.ADD_ALL;
+                } else {
+                    return XMLFileFilter.Result.NOT_APPLICABLE;
+                }
             }
         };
         XMLFiles.filter(targetConfigurationPath.getPath(), extensionsFilter);

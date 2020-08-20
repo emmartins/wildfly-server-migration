@@ -49,6 +49,10 @@ public interface XMLFileFilter {
          */
         ADD,
         /**
+         * the xml element and children should be added
+         */
+        ADD_ALL,
+        /**
          * the xml element should be ignored, i.e. not added and not removed
          */
         CONTINUE,
