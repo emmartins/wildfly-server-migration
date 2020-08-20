@@ -27,6 +27,7 @@ import org.jboss.migration.core.util.xml.XMLFileMatcher;
 import org.jboss.migration.core.util.xml.XMLFiles;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -339,13 +341,36 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
     public static class Modules {
 
         private final Path modulesDir;
-        private final Path systemLayersBaseDir;
+        private final List<Path> layerDirs;
         private final Path overlayDir;
 
         public Modules(Path serverBaseDir) {
             this.modulesDir = serverBaseDir.resolve("modules");
-            this.systemLayersBaseDir = modulesDir.resolve("system").resolve("layers").resolve("base");
-            final Path overlaysDir = systemLayersBaseDir.resolve(".overlays");
+            this.layerDirs = new ArrayList<>();
+            // process layers.conf (if exists)
+            final Path layersConfigFile = modulesDir.resolve("layers.conf");
+            if (Files.exists(layersConfigFile)) {
+                try (BufferedReader reader = Files.newBufferedReader(layersConfigFile)) {
+                    Properties properties = new Properties();
+                    properties.load(reader);
+                    final String layers = properties.getProperty("layers");
+                    if (layers != null) {
+                        for (String layer : layers.split(",")) {
+                            layer.trim();
+                            if (!layer.isEmpty()) {
+                                layerDirs.add(modulesDir.resolve("system").resolve("layers").resolve(layer));
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new ServerMigrationFailureException("failed to read layers file", e);
+                }
+            }
+            // add base layer
+            final Path baseLayerDir = modulesDir.resolve("system").resolve("layers").resolve("base");
+            layerDirs.add(baseLayerDir);
+            // check for base overlays
+            final Path overlaysDir = baseLayerDir.resolve(".overlays");
             final Path overlaysFile = overlaysDir.resolve(".overlays");
             if (Files.exists(overlaysFile)) {
                 try {
@@ -402,9 +427,11 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
                     return overlayModuleDir;
                 }
             }
-            final Path systemLayersBaseModuleDir = systemLayersBaseDir.resolve(modulePath);
-            if (Files.exists(systemLayersBaseModuleDir)) {
-                return systemLayersBaseModuleDir;
+            for (Path layerDir : layerDirs) {
+                final Path layerModuleDir = layerDir.resolve(modulePath);
+                if (Files.exists(layerModuleDir)) {
+                    return layerModuleDir;
+                }
             }
             return modulesDir.resolve(modulePath);
         }
