@@ -48,13 +48,9 @@ include::ServerMigration-ServerConfiguration-Subsystem-Add-ee-security.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-elytron.adoc[]
 
-include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-config-smallrye.adoc[]
+include::ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
-include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-health-smallrye.adoc[]
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-metrics-smallrye.adoc[]
-
-include::ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-opentracing-smallrye.adoc[]
+include::ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-request-controller.adoc[]
 
