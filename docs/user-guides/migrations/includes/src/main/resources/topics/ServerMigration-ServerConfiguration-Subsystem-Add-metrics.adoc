@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: metrics
+:subsystem-add-extensionName: org.wildfly.extension.metrics
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for server's metrics functionality.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

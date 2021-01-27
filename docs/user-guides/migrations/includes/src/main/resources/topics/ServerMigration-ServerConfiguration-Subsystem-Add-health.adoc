@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: health
+:subsystem-add-extensionName: org.wildfly.extension.health
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for server's health functionality.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

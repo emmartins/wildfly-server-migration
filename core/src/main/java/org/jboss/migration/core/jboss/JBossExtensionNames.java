@@ -35,6 +35,7 @@ public interface JBossExtensionNames {
     String EE_SECURITY = "org.wildfly.extension.ee-security";
     String EJB3 = "org.jboss.as.ejb3";
     String ELYTRON = "org.wildfly.extension.elytron";
+    String HEALTH = "org.wildfly.extension.health";
     String IIOP_OPENJDK = "org.wildfly.iiop-openjdk";
     String INFINISPAN = "org.jboss.as.clustering.infinispan";
     String IO = "org.wildfly.extension.io";
@@ -49,6 +50,7 @@ public interface JBossExtensionNames {
     String JSR77 = "org.jboss.as.jsr77";
     String LOGGING = "org.jboss.as.logging";
     String MAIL = "org.jboss.as.mail";
+    String METRICS = "org.wildfly.extension.metrics";
     String MESSAGING = "org.jboss.as.messaging";
     String MESSAGING_ACTIVEMQ = "org.wildfly.extension.messaging-activemq";
     String MICROPROFILE_CONFIG_SMALLRYE = "org.wildfly.extension.microprofile.config-smallrye";
