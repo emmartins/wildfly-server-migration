@@ -1,0 +1,5 @@
+:subsystem-add-subsystemName: microprofile-jwt-smallrye
+:subsystem-add-extensionName: org.wildfly.extension.microprofile.jwt-smallrye
+:subsystem-add-subsystemDescription: The {server-target-productName} *{subsystem-add-subsystemName}* subsystem provides support for Eclipse MicroProfile JWT.
+
+include::ServerMigration-ServerConfiguration-Subsystem-Add.adoc[]

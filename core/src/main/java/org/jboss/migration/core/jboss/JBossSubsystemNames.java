@@ -36,6 +36,7 @@ public interface JBossSubsystemNames {
     String EE_SECURITY = "ee-security";
     String EJB3 = "ejb3";
     String ELYTRON = "elytron";
+    String HEALTH = "health";
     String IIOP_OPENJDK = "iiop-openjdk";
     String INFINISPAN = "infinispan";
     String IO = "io";
@@ -51,6 +52,7 @@ public interface JBossSubsystemNames {
     String JSR77 = "jsr77";
     String LOGGING = "logging";
     String MAIL = "mail";
+    String METRICS = "metrics";
     String MESSAGING = "messaging";
     String MESSAGING_ACTIVEMQ = "messaging-activemq";
     String MICROPROFILE_CONFIG_SMALLRYE = "microprofile-config-smallrye";

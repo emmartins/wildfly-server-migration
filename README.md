@@ -38,7 +38,7 @@ Run the Server Migration Tool (Standalone Build)
         
         Retrieving servers...
          INFO  SOURCE server name: WildFly Full, version: 11.0.0.Final.
-         INFO  TARGET server name: WildFly Full, version: 20.0.0.Final.
+         INFO  TARGET server name: WildFly Full, version: 22.0.0.Final.
         
         ----------------------------------------------------------
         ----------------------------------------------------------

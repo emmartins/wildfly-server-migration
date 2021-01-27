@@ -98,6 +98,11 @@ public interface JBossExtensions {
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.ELYTRON).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.ELYTRON))
             .build();
 
+    Extension HEALTH = Extension.builder()
+            .module(JBossExtensionNames.HEALTH)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.HEALTH).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.HEALTH))
+            .build();
+
     Extension IIOP_OPENJDK = Extension.builder()
             .module(JBossExtensionNames.IIOP_OPENJDK)
             .subsystem(JBossSubsystemNames.IIOP_OPENJDK)
@@ -166,6 +171,11 @@ public interface JBossExtensions {
     Extension MAIL = Extension.builder()
             .module(JBossExtensionNames.MAIL)
             .subsystem(JBossSubsystemNames.MAIL)
+            .build();
+
+    Extension METRICS = Extension.builder()
+            .module(JBossExtensionNames.METRICS)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.METRICS).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.METRICS))
             .build();
 
     Extension MESSAGING = Extension.builder()
