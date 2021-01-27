@@ -16,11 +16,16 @@
 
 package org.jboss.migration.wfly10.config.task.module;
 
+import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.jboss.ModulesMigrationTask;
 import org.jboss.migration.core.task.TaskContext;
+import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Finds modules referenced by Extensions.
@@ -40,7 +45,14 @@ public class ExtensionModulesFinder implements ConfigurationModulesMigrationTask
         }
         final String moduleId = reader.getAttributeValue(null, "module");
         if (moduleId != null) {
-            moduleMigrator.migrateModule(moduleId, "Required by Extension", context);
+            // gather the module names of extensions to accept (env property includes + target server extensions - env property excludes)
+            final Set<String> accepted = new HashSet<>(moduleMigrator.getTargetServer().getExtensions().getExtensionModuleNames());
+            final MigrationEnvironment environment = context.getMigrationEnvironment();
+            accepted.addAll(environment.getPropertyAsList(RemoveUnsupportedExtensions.EnvironmentProperties.INCLUDES, Collections.emptyList()));
+            accepted.removeAll(environment.getPropertyAsList(RemoveUnsupportedExtensions.EnvironmentProperties.EXCLUDES, Collections.emptyList()));
+            if (accepted.contains(moduleId)) {
+                moduleMigrator.migrateModule(moduleId, "Required by Extension", context);
+            }
         }
     }
 }

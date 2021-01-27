@@ -89,17 +89,29 @@ public class ModulesMigrationTask implements ServerMigrationTask {
 
     public static class ModuleMigrator {
 
+        private final JBossServer sourceServer;
+        private final JBossServer targetServer;
         private final JBossServer.Modules sourceModules;
         private final JBossServer.Modules targetModules;
         private final Set<ModuleIdentifier> excludedByEnvironment;
 
         protected ModuleMigrator(JBossServer source, JBossServer target, MigrationEnvironment environment) {
+            this.sourceServer = source;
+            this.targetServer = target;
             this.sourceModules = source.getModules();
             this.targetModules = target.getModules();
             this.excludedByEnvironment = new HashSet<>();
             for (String excludedModule : environment.getPropertyAsList(ENVIRONMENT_PROPERTY_EXCLUDES, Collections.emptyList())) {
                 this.excludedByEnvironment.add(ModuleIdentifier.fromString(excludedModule));
             }
+        }
+
+        public JBossServer getSourceServer() {
+            return sourceServer;
+        }
+
+        public JBossServer getTargetServer() {
+            return targetServer;
         }
 
         public void migrateModule(String moduleId, String reason, final TaskContext context) {

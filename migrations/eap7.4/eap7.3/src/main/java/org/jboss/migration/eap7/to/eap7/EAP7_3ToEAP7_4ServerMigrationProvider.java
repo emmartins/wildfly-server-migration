@@ -19,6 +19,8 @@ package org.jboss.migration.eap7.to.eap7;
 import org.jboss.migration.eap.EAPServer7_3;
 import org.jboss.migration.eap.EAPServerMigrationProvider7_4;
 import org.jboss.migration.eap.task.hostexclude.EAP7_4AddHostExcludes;
+import org.jboss.migration.eap.task.subsystem.metrics.EAP7_4AddMetricsSubsystem;
+import org.jboss.migration.wfly.task.subsystem.health.WildFly22_0AddHealthSubsystem;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.WildFlyServer10;
@@ -45,6 +47,8 @@ public class EAP7_3ToEAP7_4ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly22_0AddHealthSubsystem<>())
+                                .subtask(new EAP7_4AddMetricsSubsystem<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
                                 .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()

@@ -18,11 +18,12 @@ package org.jboss.migration.eap;
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossExtensions;
 import org.jboss.migration.core.jboss.JBossServer;
-import org.jboss.migration.wfly.WildFly20_0Server;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigrations10;
+import org.jboss.migration.wfly13.WildFly13_0Server;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -35,7 +36,13 @@ public class EAPServer7_4 extends WildFlyServer10 {
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(EAPServerMigrationProvider7_4.class));
 
-    public static final JBossServer.Extensions EXTENSIONS = WildFly20_0Server.EXTENSIONS;
+    public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
+            .extensions(WildFly13_0Server.EXTENSIONS)
+            .extension(JBossExtensions.DATASOURCES_AGROAL)
+            .extension(JBossExtensions.CLUSTERING_WEB)
+            .extension(JBossExtensions.HEALTH)
+            .extension(JBossExtensions.METRICS)
+            .build();
 
     public EAPServer7_4(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
         super(migrationName, productInfo, baseDir, migrationEnvironment, EXTENSIONS);

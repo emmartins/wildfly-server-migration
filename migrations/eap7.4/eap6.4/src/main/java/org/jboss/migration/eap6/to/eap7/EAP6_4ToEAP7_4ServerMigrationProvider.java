@@ -20,19 +20,17 @@ import org.jboss.migration.eap.EAPServerMigrationProvider7_4;
 import org.jboss.migration.eap.task.AddSocketBindingPortExpressions;
 import org.jboss.migration.eap.task.SetupHttpUpgradeManagement;
 import org.jboss.migration.eap.task.hostexclude.EAP7_4AddHostExcludes;
+import org.jboss.migration.eap.task.subsystem.metrics.EAP7_4AddMetricsSubsystem;
 import org.jboss.migration.eap.task.subsystem.transactions.UpdateObjectStorePath;
 import org.jboss.migration.eap.task.subsystem.web.EAP7_1MigrateWebSubsystem;
-import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateJGroupsSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateEESubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateEJB3Subsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateInfinispanSubsystem;
+import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateJGroupsSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateMessagingActiveMQSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP7_4UpdateUndertowSubsystem;
-import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileConfigSmallryeSubsystem;
-import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileHealthSmallryeSubsystem;
-import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileMetricsSmallryeSubsystem;
-import org.jboss.migration.wfly.task.subsystem.microprofile.AddMicroprofileOpentracingSmallryeSubsystem;
+import org.jboss.migration.wfly.task.subsystem.health.WildFly22_0AddHealthSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
@@ -44,6 +42,7 @@ import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecur
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
 import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
+import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
 import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
@@ -54,7 +53,6 @@ import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
 import org.jboss.migration.wfly10.config.task.update.UpdateUnsecureInterface;
-import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagementSubsystem;
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
@@ -95,10 +93,8 @@ public class EAP6_4ToEAP7_4ServerMigrationProvider implements EAPServerMigration
                         .subtask(new AddSingletonSubsystem<>())
                         .subtask(new AddDiscoverySubsystem<>())
                         .subtask(new AddEESecuritySubsystem<>())
-                        .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
-                        .subtask(new AddMicroprofileHealthSmallryeSubsystem<>())
-                        .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
-                        .subtask(new AddMicroprofileMetricsSmallryeSubsystem<>())
+                        .subtask(new WildFly22_0AddHealthSubsystem<>())
+                        .subtask(new EAP7_4AddMetricsSubsystem<>())
                         .subtask(new SetupHttpUpgradeManagement<>())
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingPortExpressions<>())
@@ -131,8 +127,6 @@ public class EAP6_4ToEAP7_4ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddSingletonSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())
-                                .subtask(new AddMicroprofileConfigSmallryeSubsystem<>())
-                                .subtask(new AddMicroprofileOpentracingSmallryeSubsystem<>())
                                 .subtask(new UpdateUnsecureInterface<>())
                                 .subtask(new AddPrivateInterface<>())
                                 .subtask(new AddSocketBindingPortExpressions<>())
