@@ -19,6 +19,7 @@ import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.Server;
 import org.jboss.migration.core.env.MigrationEnvironment;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -34,7 +35,21 @@ public class EAPServerProvider7_3 extends EAPServerProvider7_2 {
 
     @Override
     protected Server constructServer(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
-        return new EAPServer7_3(migrationName, productInfo, baseDir, migrationEnvironment);
+        return isXp(baseDir) ? new EAPXPServer7_3(migrationName, new ProductInfo("JBoss EAP XP", productInfo.getVersion()), baseDir, migrationEnvironment) : new EAPServer7_3(migrationName, productInfo, baseDir, migrationEnvironment);
+    }
+
+    protected boolean isXp(Path baseDir) {
+        if (Files.exists(baseDir.resolve(".installation").resolve("jboss-eap-xp-1.0.conf"))) {
+            return true;
+        }
+        if (Files.exists(baseDir.resolve(".installation").resolve("jboss-eap-xp-2.0.conf"))) {
+            return true;
+        }
+        // fallback for internal XP builds
+        if (Files.isDirectory(baseDir.resolve("modules").resolve("system").resolve("layers").resolve("microprofile").resolve("org").resolve("wildfly").resolve("extension").resolve("microprofile"))) {
+            return true;
+        }
+        return false;
     }
 
     @Override
