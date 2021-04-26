@@ -223,6 +223,16 @@ public interface JBossExtensions {
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_OPENTRACING_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_OPENTRACING_SMALLRYE))
             .build();
 
+    Extension MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE))
+            .build();
+
+    Extension MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE))
+            .build();
+
     Extension MODCLUSTER = Extension.builder()
             .module(JBossExtensionNames.MODCLUSTER)
             .subsystem(JBossSubsystemNames.MODCLUSTER)

@@ -43,6 +43,8 @@ public class EAPXPServer7_4 extends WildFlyServer10 {
             .extension(JBossExtensions.MICROPROFILE_METRICS_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_OPENAPI_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_OPENTRACING_SMALLRYE)
+            .extension(JBossExtensions.MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE)
+            .extension(JBossExtensions.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE)
             .build();
 
     public EAPXPServer7_4(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {
