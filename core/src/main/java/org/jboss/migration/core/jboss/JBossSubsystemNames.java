@@ -62,6 +62,8 @@ public interface JBossSubsystemNames {
     String MICROPROFILE_METRICS_SMALLRYE = "microprofile-metrics-smallrye";
     String MICROPROFILE_OPENAPI_SMALLRYE = "microprofile-openapi-smallrye";
     String MICROPROFILE_OPENTRACING_SMALLRYE = "microprofile-opentracing-smallrye";
+    String MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE = "microprofile-reactive-messaging-smallrye";
+    String MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE = "microprofile-reactive-streams-operators-smallrye";
     String MODCLUSTER = "modcluster";
     String NAMING = "naming";
     String OSGI = "osgi";
