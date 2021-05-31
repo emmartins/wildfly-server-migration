@@ -32,6 +32,7 @@ public class MigrateResolvablePathTaskBuilder {
     private ResolvablePath path;
     private JBossServerConfiguration source;
     private JBossServerConfiguration target;
+    private boolean skipIfSourcePathDoesNotExists = false;
 
     public MigrateResolvablePathTaskBuilder name(String name) {
         this.name = name;
@@ -40,6 +41,11 @@ public class MigrateResolvablePathTaskBuilder {
 
     public MigrateResolvablePathTaskBuilder path(ResolvablePath path) {
         this.path = path;
+        return this;
+    }
+
+    public MigrateResolvablePathTaskBuilder skipIfSourcePathDoesNotExists(boolean skipIfSourcePathDoesNotExists) {
+        this.skipIfSourcePathDoesNotExists = skipIfSourcePathDoesNotExists;
         return this;
     }
 
@@ -57,7 +63,7 @@ public class MigrateResolvablePathTaskBuilder {
         return new SimpleComponentTask.Builder()
                 .name(new ServerMigrationTaskName.Builder(Objects.requireNonNull(name)).addAttribute("path", Objects.requireNonNull(path.toString())).build())
                 .skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet())
-                .runnable(new MigrateResolvablePathTaskRunnable(Objects.requireNonNull(path), Objects.requireNonNull(source), Objects.requireNonNull(target)))
+                .runnable(new MigrateResolvablePathTaskRunnable(Objects.requireNonNull(path), Objects.requireNonNull(source), Objects.requireNonNull(target), skipIfSourcePathDoesNotExists))
                 .build();
     }
 }
