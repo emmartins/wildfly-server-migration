@@ -27,6 +27,8 @@ public class MigrateReferencedPaths<S extends JBossServer<S>> extends Configurat
         super(new XmlConfigurationMigration.Builder<S>()
                 .componentFactory(new VaultPathsMigration.Factory())
                 .componentFactory(new WebSubsystemPathsMigration.Factory())
+                .componentFactory(new ElytronSubsystemPropertiesPathsMigration.Factory())
+                .componentFactory(new ElytronSubsystemKeystorePathsMigration.Factory())
         );
     }
 }

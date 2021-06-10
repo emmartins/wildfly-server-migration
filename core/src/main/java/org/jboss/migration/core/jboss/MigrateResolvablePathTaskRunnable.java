@@ -21,6 +21,7 @@ import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.component.TaskRunnable;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -31,9 +32,15 @@ public class MigrateResolvablePathTaskRunnable implements TaskRunnable {
     private final ResolvablePath path;
     private final JBossServerConfiguration sourceConfiguration;
     private final JBossServerConfiguration targetConfiguration;
+    private final boolean skipIfSourcePathDoesNotExists;
 
     public MigrateResolvablePathTaskRunnable(ResolvablePath path, JBossServerConfiguration sourceConfiguration, JBossServerConfiguration targetConfiguration) {
+        this(path, sourceConfiguration, targetConfiguration,false);
+    }
+
+    public MigrateResolvablePathTaskRunnable(ResolvablePath path, JBossServerConfiguration sourceConfiguration, JBossServerConfiguration targetConfiguration, boolean skipIfSourcePathDoesNotExists) {
         this.path = path;
+        this.skipIfSourcePathDoesNotExists = skipIfSourcePathDoesNotExists;
         this.sourceConfiguration = sourceConfiguration;
         this.targetConfiguration = targetConfiguration;
     }
@@ -65,7 +72,12 @@ public class MigrateResolvablePathTaskRunnable implements TaskRunnable {
                     }
                 }
             }
-            return new CopyPath(sourcePath, targetPath).run(context);
+            if (skipIfSourcePathDoesNotExists && !Files.exists(sourcePath)) {
+                context.getLogger().debugf("Skipping migration of optional path '%s', source path does not exists!", path);
+                return ServerMigrationTaskResult.SKIPPED;
+            } else {
+                return new CopyPath(sourcePath, targetPath).run(context);
+            }
         } else {
             context.getLogger().warnf("Skipping migration of path '%s', not a relative path!", path);
             return ServerMigrationTaskResult.SKIPPED;
