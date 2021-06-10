@@ -3,7 +3,7 @@
 In addition to migrating the *web* subsystem to {server-target-productName}, the JBoss Server Migration Tool adds the following functionality provided by the new *undertow* subsystem, which is configured in the {server-target-productName} default server configurations.
 
 * Sets the default `HTTP Listener` redirect socket.
-* Adds support for Java EE 7 `Websockets`.
+* Adds support for Jakarta EE `Websockets`.
 * Sets the default `HTTPS` listener.
 * Adds support for `HTTP2`.
 * Sets the default `Server` response header.
