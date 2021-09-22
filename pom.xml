@@ -104,6 +104,9 @@
         <module>docs/user-guides/migrations/eap7.3/eap7.2</module>
         <module>docs/user-guides/migrations/eap7.3/eap7.3</module>
         <module>docs/user-guides/migrations/eap7.4/eap6.4</module>
+        <module>docs/user-guides/migrations/eap7.4/eap7.0</module>
+        <module>docs/user-guides/migrations/eap7.4/eap7.1</module>
+        <module>docs/user-guides/migrations/eap7.4/eap7.2</module>
         <module>docs/user-guides/migrations/eap7.4/eap7.3</module>
         <module>docs/user-guides/migrations/eap7.4/eap7.4</module>
         <module>docs/user-guides/migrations/wildfly21.0/wildfly8.2</module>
@@ -195,6 +198,9 @@
         <module>migrations/eap7.3/eap7.2</module>
         <module>migrations/eap7.3/eap7.3</module>
         <module>migrations/eap7.4/eap6.4</module>
+        <module>migrations/eap7.4/eap7.0</module>
+        <module>migrations/eap7.4/eap7.1</module>
+        <module>migrations/eap7.4/eap7.2</module>
         <module>migrations/eap7.4/eap7.3</module>
         <module>migrations/eap7.4/eap7.4</module>
         <module>migrations/wildfly21.0/wildfly8.2</module>
@@ -767,6 +773,42 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-eap6.4-to-eap7.4-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.0-to-eap7.4</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.0-to-eap7.4-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.1-to-eap7.4</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.1-to-eap7.4-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.2-to-eap7.4</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-eap7.2-to-eap7.4-userguide</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

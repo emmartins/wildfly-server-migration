@@ -6,7 +6,7 @@ include::ServerMigration-StandaloneServer-StandaloneServerConfiguration.adoc[]
 
 toc::[]
 
-// include doc for each standalone task in EAP7_3ToEAP7_4ServerMigrationProvider.java
+// include doc for each standalone task in EAP7_2ToEAP7_4ServerMigrationProvider.java
 
 :leveloffset: +1
 
