@@ -16,11 +16,11 @@
 package org.jboss.migration.wfly;
 
 import org.jboss.migration.wfly.task.hostexclude.WildFly25_0AddHostExcludes;
+import org.jboss.migration.wfly.task.paths.WildFly25MigrateReferencedPaths;
+import org.jboss.migration.wfly.task.xml.WildFly25MigrateSecurityRealms;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
-import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
-import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
@@ -40,22 +40,21 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                         .subtask(new RemoveUnsupportedExtensions<>())
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
-                        .subtask(new MigrateReferencedPaths<>())
-                        .subtask(new MigrateCompatibleSecurityRealms<>())
+                        .subtask(new WildFly25MigrateReferencedPaths<>())
+                        .subtask(new WildFly25MigrateSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new RemoveUnsupportedExtensions<>())
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly25MigrateReferencedPaths<>())
                                 .subtask(new WildFly25_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
-                                .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(new MigrateCompatibleSecurityRealms<>()))))
+                                .subtask(new WildFly25MigrateReferencedPaths<>())
+                                .subtask(new WildFly25MigrateSecurityRealms<>())))
                 .build();
     }
 
