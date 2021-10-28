@@ -21,6 +21,7 @@ import org.jboss.migration.core.jboss.XmlConfigurationMigration;
 import org.jboss.migration.wfly10.config.task.paths.ConfigurationPathsMigrationTaskFactory;
 import org.jboss.migration.wfly10.config.task.paths.ElytronSubsystemKeystorePathsMigration;
 import org.jboss.migration.wfly10.config.task.paths.ElytronSubsystemPropertiesPathsMigration;
+import org.jboss.migration.wfly10.config.task.paths.VaultPathsMigration;
 import org.jboss.migration.wfly10.config.task.paths.WebSubsystemPathsMigration;
 
 /**
@@ -30,6 +31,7 @@ public class WildFly25MigrateReferencedPaths<S extends JBossServer<S>> extends C
     public WildFly25MigrateReferencedPaths() {
         super(new XmlConfigurationMigration.Builder<S>()
                 .componentFactory(new WebSubsystemPathsMigration.Factory())
+                .componentFactory(new VaultPathsMigration.Factory())
                 .componentFactory(new SecurityRealmKeystorePathsMigration.Factory())
                 .componentFactory(new SecurityRealmPropertiesPathsMigration.Factory())
                 .componentFactory(new ElytronSubsystemPropertiesPathsMigration.Factory())
