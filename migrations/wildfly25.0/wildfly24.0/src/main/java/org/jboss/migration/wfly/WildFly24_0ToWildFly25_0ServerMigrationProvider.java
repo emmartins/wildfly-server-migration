@@ -18,6 +18,7 @@ package org.jboss.migration.wfly;
 import org.jboss.migration.wfly.task.hostexclude.WildFly25_0AddHostExcludes;
 import org.jboss.migration.wfly.task.paths.WildFly25MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.xml.WildFly25MigrateSecurityRealms;
+import org.jboss.migration.wfly.task.xml.WildFly25MigrateVault;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -41,6 +42,7 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly25MigrateReferencedPaths<>())
+                        .subtask(new WildFly25MigrateVault<>())
                         .subtask(new WildFly25MigrateSecurityRealms<>())
                         .subtask(new MigrateDeployments<>()))
                 .domain(serverUpdateBuilders.domainBuilder()

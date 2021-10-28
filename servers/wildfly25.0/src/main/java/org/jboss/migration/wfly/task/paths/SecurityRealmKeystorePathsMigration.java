@@ -42,6 +42,6 @@ public class SecurityRealmKeystorePathsMigration extends ResolvablePathsMigratio
     public static final Set<String> ELEMENT_LOCAL_NAMES = Stream.of("keystore").collect(Collectors.toSet());
 
     protected SecurityRealmKeystorePathsMigration() {
-        super("security-realm.keystore", ELEMENT_LOCAL_NAMES, "urn:jboss:domain:");
+        super("security-realm.keystore", ELEMENT_LOCAL_NAMES, "urn:jboss:domain:", true);
     }
 }
