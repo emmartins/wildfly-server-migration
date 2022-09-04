@@ -17,6 +17,7 @@ package org.jboss.migration.wfly;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
 import org.jboss.migration.wfly10.WildFlyServer10;
@@ -32,7 +33,7 @@ import java.util.ServiceLoader;
 public class WildFly25_0Server extends WildFlyServer10 {
 
     public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
-            .extensions(WildFly24_0Server.EXTENSIONS)
+            .extensionsExcept(WildFly24_0Server.EXTENSIONS, JBossExtensionNames.SECURITY)
             .build();
 
     private static final WildFlyServerMigrations10 SERVER_MIGRATIONS = new ServiceLoaderWildFlyServerMigrations10<>(ServiceLoader.load(WildFly25_0ServerMigrationProvider.class));

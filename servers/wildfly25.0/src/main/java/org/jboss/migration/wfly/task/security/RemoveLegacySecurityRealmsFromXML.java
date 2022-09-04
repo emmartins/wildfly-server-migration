@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc.
+ * Copyright 2022 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly.task.xml;
+package org.jboss.migration.wfly.task.security;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.jboss.JBossServer;
@@ -43,9 +43,9 @@ import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefau
 /**
  * @author emmartins
  */
-public class WildFly25MigrateSecurityRealms<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<JBossServerConfiguration<S>> {
+public class RemoveLegacySecurityRealmsFromXML<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<JBossServerConfiguration<S>> {
 
-    public static final String TASK_NAME = "security.migrate-security-realms";
+    public static final String TASK_NAME = "security.remove-legacy-security-realms";
 
     private static final String SECURITY_REALMS = "security-realms";
     private static final String SECURITY_REALM = "security-realm";
@@ -59,12 +59,12 @@ public class WildFly25MigrateSecurityRealms<S extends JBossServer<S>> implements
                 .name(TASK_NAME)
                 .skipPolicy(skipIfDefaultTaskSkipPropertyIsSet())
                 .runnable(context -> {
-                    context.getLogger().debugf("Searching for legacy security realms XML configuration, not supported by the target server...");
+                    context.getLogger().debug("Removing legacy security realms from the XML configuration...");
                     final ServerMigrationTaskResult taskResult = processXMLConfiguration(source, targetConfigurationPath, context);
                     if (taskResult.getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
-                        context.getLogger().debugf("No legacy security realms XML configuration found.");
+                        context.getLogger().debugf("No legacy security realms found.");
                     } else {
-                        context.getLogger().infof("Legacy security realms XML configuration migrated.");
+                        context.getLogger().infof("Legacy security realms  removed from XML configuration.");
                     }
                     return taskResult;
                 })

@@ -17,7 +17,7 @@ package org.jboss.migration.wfly;
 
 import org.jboss.migration.wfly.task.hostexclude.WildFly25_0AddHostExcludes;
 import org.jboss.migration.wfly.task.paths.WildFly25MigrateReferencedPaths;
-import org.jboss.migration.wfly.task.xml.WildFly25MigrateSecurityRealms;
+import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
 import org.jboss.migration.wfly.task.xml.WildFly25MigrateVault;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
@@ -36,15 +36,19 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
     @Override
     public WildFlyServerMigration10 getServerMigration() {
         final ServerUpdate.Builders<WildFlyServer10> serverUpdateBuilders = new ServerUpdate.Builders<>();
+        final LegacySecurityConfigurationMigration<WildFlyServer10> legacySecurityConfigurationMigration = new LegacySecurityConfigurationMigration<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
+                        .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                         .subtask(new RemoveUnsupportedExtensions<>())
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly25MigrateReferencedPaths<>())
                         .subtask(new WildFly25MigrateVault<>())
-                        .subtask(new WildFly25MigrateSecurityRealms<>())
-                        .subtask(new MigrateDeployments<>()))
+                        .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
+                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                        .subtask(new MigrateDeployments<>())
+                )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
                                 .subtask(new RemoveUnsupportedExtensions<>())
@@ -52,11 +56,18 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly25MigrateReferencedPaths<>())
                                 .subtask(new WildFly25_0AddHostExcludes<>())
-                                .subtask(new MigrateDeployments<>()))
+                                .subtask(new MigrateDeployments<>())
+                        )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly25MigrateReferencedPaths<>())
-                                .subtask(new WildFly25MigrateSecurityRealms<>())))
+                                .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
+                                .subtask(serverUpdateBuilders.hostBuilder()
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron()))
+
+                                )
+                        )
                 .build();
     }
 
