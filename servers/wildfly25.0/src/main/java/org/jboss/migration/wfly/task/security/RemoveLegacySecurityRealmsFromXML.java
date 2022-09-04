@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.wfly.task.xml;
+package org.jboss.migration.wfly.task.security;
 
 import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.jboss.JBossServer;
@@ -43,9 +43,9 @@ import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefau
 /**
  * @author emmartins
  */
-public class WildFly25MigrateSecurityRealms<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<JBossServerConfiguration<S>> {
+public class RemoveLegacySecurityRealmsFromXML<S extends JBossServer<S>> implements ServerConfigurationMigration.XMLConfigurationSubtaskFactory<JBossServerConfiguration<S>> {
 
-    public static final String TASK_NAME = "security.migrate-security-realms";
+    public static final String TASK_NAME = "security.remove-legacy-security-realms";
 
     private static final String SECURITY_REALMS = "security-realms";
     private static final String SECURITY_REALM = "security-realm";
