@@ -44,14 +44,38 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
 
     public static final String TASK_NAME = "security.read-legacy-security-configuration";
 
-    private static final String SECURITY_REALMS = "security-realms";
-    private static final String SECURITY_REALM = "security-realm";
-    private static final String HTTP_INTERFACE = "http-interface";
-    private static final String REMOTE = "remote";
+    public static final String ALIAS = "alias";
+    public static final String ALLOWED_USERS = "allowed-users";
 
-    private final LegacySecurityConfigurations<S> legacySecurityConfigurations;
+    public static final String AUTHENTICATION = "authentication";
+    public static final String AUTHORIZATION = "authorization";
+    public static final String GENERATE_SELF_SIGNED_CERTIFICATE_HOST = "generate-self-signed-certificate-host";
 
-    public ReadLegacySecurityConfigurationFromXML(LegacySecurityConfigurations<S> legacySecurityConfigurations) {
+    public static final String HTTP_INTERFACE = "http-interface";
+
+    public static final String KEY_PASSWORD = "key-password";
+    public static final String KEYSTORE = "keystore";
+    public static final String KEYSTORE_PASSWORD = "keystore-password";
+    public static final String LOCAL = "local";
+
+    public static final String MANAGEMENT = "management";
+    public static final String MANAGEMENT_INTERFACES = "management-interfaces";
+    public static final String PATH = "path";
+    public static final String PLAIN_TEXT = "plain-text";
+    public static final String PROPERTIES = "properties";
+    public static final String RELATIVE_TO = "relative-to";
+
+    public static final String SECURITY_REALM = "security-realm";
+    public static final String SECURITY_REALMS = "security-realms";
+    public static final String SERVER_IDENTITIES = "server-identities";
+    public static final String SSL = "ssl";
+
+    private static final String DEFAULT_USER = "default-user";
+    private static final String SKIP_GROUP_LOADING = "skip-group-loading";
+
+    private final LegacySecurityConfigurations legacySecurityConfigurations;
+
+    public ReadLegacySecurityConfigurationFromXML(LegacySecurityConfigurations legacySecurityConfigurations) {
         this.legacySecurityConfigurations = legacySecurityConfigurations;
     }
 
@@ -62,12 +86,12 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 .skipPolicy(skipIfDefaultTaskSkipPropertyIsSet())
                 .runnable(context -> {
                     context.getLogger().debugf("Searching for legacy security XML configuration, not supported by the target server...");
-                    final LegacySecurityConfiguration<S> legacySecurityConfiguration = processXMLConfiguration(source, targetConfigurationPath, context);
+                    final LegacySecurityConfiguration legacySecurityConfiguration = processXMLConfiguration(source, targetConfigurationPath, context);
                     ServerMigrationTaskResult taskResult = legacySecurityConfiguration != null ? ServerMigrationTaskResult.SUCCESS : ServerMigrationTaskResult.SKIPPED;
                     if (taskResult.getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
                         context.getLogger().debugf("No legacy security XML configuration found.");
                     } else {
-                        legacySecurityConfigurations.securityConfigurations.putIfAbsent(legacySecurityConfiguration.sourceConfiguration, legacySecurityConfiguration);
+                        legacySecurityConfigurations.getSecurityConfigurations().putIfAbsent(legacySecurityConfiguration.getTargetConfiguration().getPath().toString(), legacySecurityConfiguration);
                         context.getLogger().infof("Legacy security XML configuration found: "+legacySecurityConfiguration);
                     }
                     return taskResult;
@@ -75,10 +99,8 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 .build();
     }
 
-    protected LegacySecurityConfiguration<S> processXMLConfiguration(final JBossServerConfiguration<S> source, final JBossServerConfiguration targetConfigurationPath, final TaskContext context) {
-        final LegacySecurityConfiguration<S> legacySecurityConfiguration = new LegacySecurityConfiguration<>();
-        legacySecurityConfiguration.sourceConfiguration = source;
-        legacySecurityConfiguration.targetConfiguration = targetConfigurationPath;
+    protected LegacySecurityConfiguration processXMLConfiguration(final JBossServerConfiguration<S> source, final JBossServerConfiguration targetConfigurationPath, final TaskContext context) {
+        final LegacySecurityConfiguration legacySecurityConfiguration = new LegacySecurityConfiguration(targetConfigurationPath);
         // setup and run the xml processor
         final XMLFileProcessor xmlFileProcessor = (startElement, xmlEventReader) -> {
             try {
@@ -87,10 +109,11 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                     if (xmlEvent.isStartElement()) {
                         final StartElement element = xmlEvent.asStartElement();
                         final String elementLocalName = element.getName().getLocalPart();
-                        if (elementLocalName.equals("management")) {
+                        if (elementLocalName.equals(MANAGEMENT)) {
                             processElementManagement(element, xmlEventReader, legacySecurityConfiguration);
                         } else {
                             // ignore element
+                            System.out.println("Skipping unexpected element: "+elementLocalName);
                             skipElement(element, xmlEventReader);
                         }
                     } else if (xmlEvent.isEndElement()) {
@@ -105,7 +128,8 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         return legacySecurityConfiguration;
     }
 
-    private void processElementManagement(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration<S> legacySecurityConfiguration) throws XMLStreamException {
+    private void processElementManagement(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
+        System.out.println("Processing management...");
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
@@ -113,10 +137,11 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 final String elementLocalName = element.getName().getLocalPart();
                 if (elementLocalName.equals(SECURITY_REALMS)) {
                     processElementSecurityRealms(element, xmlEventReader, legacySecurityConfiguration);
-                } else if (elementLocalName.equals("management-interfaces")) {
+                } else if (elementLocalName.equals(MANAGEMENT_INTERFACES)) {
                     processElementManagementInterfaces(element, xmlEventReader, legacySecurityConfiguration);
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected child element of management: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -125,7 +150,8 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         }
     }
 
-    private void processElementManagementInterfaces(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration<S> legacySecurityConfiguration) throws XMLStreamException {
+    private void processElementManagementInterfaces(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
+        System.out.println("Processing management-interfaces...");
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
@@ -135,6 +161,7 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                     processElementHttpInterface(element, xmlEventReader, legacySecurityConfiguration);
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected child element of management>management-interfaces: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -143,16 +170,19 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         }
     }
 
-    protected void processElementHttpInterface(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration<S> legacySecurityConfiguration) throws XMLStreamException {
-        Attribute securityRealmAttr = startElement.getAttributeByName(new QName(startElement.getName().getNamespaceURI(),"security-realm"));
+    protected void processElementHttpInterface(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
+        System.out.println("Processing http-interface...");
+        Attribute securityRealmAttr = startElement.getAttributeByName(new QName("security-realm"));
         if (securityRealmAttr != null) {
             final LegacySecuredManagementInterface<S> securedManagementInterface = new LegacySecuredManagementInterface<>("http-interface", securityRealmAttr.getValue());
-            legacySecurityConfiguration.securedManagementInterfaces.add(securedManagementInterface);
+            legacySecurityConfiguration.getSecuredManagementInterfaces().add(securedManagementInterface);
+            System.out.println("Http Interface secured by legacy security realm "+securedManagementInterface.getSecurityRealm()+" added to legacy configuration");
         }
         skipElement(startElement, xmlEventReader);
     }
 
-    private void processElementSecurityRealms(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration<S> legacySecurityConfiguration) throws XMLStreamException {
+    private void processElementSecurityRealms(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
+        System.out.println("Processing security-realms...");
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
@@ -162,6 +192,7 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                     processElementSecurityRealm(element, xmlEventReader, legacySecurityConfiguration);
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected child element of management>security-realms: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -170,63 +201,69 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         }
     }
 
-    protected void processElementSecurityRealm(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration<S> legacySecurityConfiguration) throws XMLStreamException {
-        final LegacySecurityRealm securityRealm = new LegacySecurityRealm();
-        securityRealm.name = startElement.getAttributeByName(new QName(startElement.getName().getNamespaceURI(),"name")).getValue();
+    protected void processElementSecurityRealm(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
+        System.out.println("Processing security realm start elemement "+startElement.getName());
+        final String securityRealmName = startElement.getAttributeByName(new QName("name")).getValue();
+        final LegacySecurityRealm securityRealm = new LegacySecurityRealm(securityRealmName);
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                if (elementLocalName.equals("server-identities")) {
+                if (elementLocalName.equals(SERVER_IDENTITIES)) {
                     processElementServerIdentities(element, xmlEventReader, securityRealm);
-                } else if (elementLocalName.equals("authentication")) {
+                } else if (elementLocalName.equals(AUTHENTICATION)) {
                     processElementAuthentication(element, xmlEventReader, securityRealm);
-                } else if (elementLocalName.equals("authorization")) {
+                } else if (elementLocalName.equals(AUTHORIZATION)) {
                     processElementAuthorization(element, xmlEventReader, securityRealm);
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected element children of security realm: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
             }
         }
-        if (legacySecurityConfiguration.legacySecurityRealms.putIfAbsent(securityRealm.name, securityRealm) != null) {
+        if (legacySecurityConfiguration.getLegacySecurityRealms().putIfAbsent(securityRealm.getName(), securityRealm) != null) {
             throw new IllegalStateException("security realm "+securityRealm+" already added to the legacy security configuration");
         }
     }
 
     protected void processElementServerIdentities(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm securityRealm) throws XMLStreamException {
         LegacySecurityRealm.ServerIdentities serverIdentities = new LegacySecurityRealm.ServerIdentities();
+        System.out.println("Processing server identities for security realm "+securityRealm);
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                if (elementLocalName.equals("ssl")) {
+                if (elementLocalName.equals(SSL)) {
                     processElementServerIdentitiesSSL(element, xmlEventReader, serverIdentities);
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected element children of server identities: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
             }
         }
-        securityRealm.serverIdentities = serverIdentities;
+        securityRealm.setServerIdentities(serverIdentities);
     }
 
     protected void processElementServerIdentitiesSSL(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm.ServerIdentities serverIdentities) throws XMLStreamException {
+        System.out.println("Processing server identities ssl...");
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                if (elementLocalName.equals("keystore")) {
+                if (elementLocalName.equals(KEYSTORE)) {
                     processElementServerIdentitiesSSLKeystore(element, xmlEventReader, serverIdentities);
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected element children of server identities ssl: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -236,21 +273,24 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
     }
 
     protected void processElementServerIdentitiesSSLKeystore(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm.ServerIdentities serverIdentities) throws XMLStreamException {
+        System.out.println("Processing server identities ssl keystore...");
         final Iterator<Attribute> iterator = startElement.getAttributes();
         while(iterator.hasNext()) {
             Attribute attribute = iterator.next();
-            if (attribute.getName().getLocalPart().equals("path")) {
-                serverIdentities.sslKeystorePath = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("relative-to")) {
-                serverIdentities.sslKeystoreRelativeTo = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("keystore-password")) {
-                serverIdentities.sslKeystoreKeystorePassword = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("alias")) {
-                serverIdentities.sslKeystoreAlias = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("key-password")) {
-                serverIdentities.sslKeystoreKeyPassword = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("generate-self-signed-certificate-host")) {
-                serverIdentities.sslKeystoreGenerateSelfSignedCertificateHost = attribute.getValue();
+            if (attribute.getName().getLocalPart().equals(PATH)) {
+                serverIdentities.setSslKeystorePath(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(RELATIVE_TO)) {
+                serverIdentities.setSslKeystoreRelativeTo(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(KEYSTORE_PASSWORD)) {
+                serverIdentities.setSslKeystoreKeystorePassword(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(ALIAS)) {
+                serverIdentities.setSslKeystoreAlias(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(KEY_PASSWORD)) {
+                serverIdentities.setSslKeystoreKeyPassword(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(GENERATE_SELF_SIGNED_CERTIFICATE_HOST)) {
+                serverIdentities.setSslKeystoreGenerateSelfSignedCertificateHost(attribute.getValue());
+            } else {
+                System.out.println("Skipping unexpected attribute of server identities ssl keystore: "+attribute.getName().getLocalPart());
             }
         }
         skipElement(startElement, xmlEventReader);
@@ -258,54 +298,62 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
 
     protected void processElementAuthentication(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm securityRealm) throws XMLStreamException {
         LegacySecurityRealm.Authentication authentication = new LegacySecurityRealm.Authentication();
+        System.out.println("Processing authentication for security realm "+securityRealm);
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                if (elementLocalName.equals("local")) {
+                if (elementLocalName.equals(LOCAL)) {
                     processElementLocal(element, xmlEventReader, authentication);
-                } else if (elementLocalName.equals("properties")) {
-                    authentication.properties = processElementProperties(element, xmlEventReader);
+                } else if (elementLocalName.equals(PROPERTIES)) {
+                    authentication.setProperties(processElementProperties(element, xmlEventReader));
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected element children of authentication: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
             }
         }
-        securityRealm.authentication = authentication;
+        securityRealm.setAuthentication(authentication);
     }
 
     protected void processElementLocal(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm.Authentication authentication) throws XMLStreamException {
+        System.out.println("Processing authentication local...");
         LegacySecurityRealm.Local local = new LegacySecurityRealm.Local();
         final Iterator<Attribute> iterator = startElement.getAttributes();
         while(iterator.hasNext()) {
             Attribute attribute = iterator.next();
-            if (attribute.getName().getLocalPart().equals("default-user")) {
-                local.defaultUser = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("skip-group-loading")) {
-                local.skipGroupLoading = Boolean.valueOf(attribute.getValue());
-            } else if (attribute.getName().getLocalPart().equals("allowed-users")) {
-                local.allowedUsers = attribute.getValue();
+            if (attribute.getName().getLocalPart().equals(DEFAULT_USER)) {
+                local.setDefaultUser(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(SKIP_GROUP_LOADING)) {
+                local.setSkipGroupLoading(Boolean.valueOf(attribute.getValue()));
+            } else if (attribute.getName().getLocalPart().equals(ALLOWED_USERS)) {
+                local.setAllowedUsers(attribute.getValue());
+            } else {
+                System.out.println("Skipping unexpected attribute of authentication local: "+attribute.getName().getLocalPart());
             }
         }
         skipElement(startElement, xmlEventReader);
-        authentication.local = local;
+        authentication.setLocal(local);
     }
 
     protected LegacySecurityRealm.Properties processElementProperties(final StartElement startElement, XMLEventReader xmlEventReader) throws XMLStreamException {
+        System.out.println("Processing properties...");
         LegacySecurityRealm.Properties properties = new LegacySecurityRealm.Properties();
         final Iterator<Attribute> iterator = startElement.getAttributes();
         while(iterator.hasNext()) {
             Attribute attribute = iterator.next();
-            if (attribute.getName().getLocalPart().equals("path")) {
-                properties.path = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("relative-to")) {
-                properties.relativeTo = attribute.getValue();
-            } else if (attribute.getName().getLocalPart().equals("plain-text")) {
-                properties.plainText = Boolean.valueOf(attribute.getValue());
+            if (attribute.getName().getLocalPart().equals(PATH)) {
+                properties.setPath(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(RELATIVE_TO)) {
+                properties.setRelativeTo(attribute.getValue());
+            } else if (attribute.getName().getLocalPart().equals(PLAIN_TEXT)) {
+                properties.setPlainText(Boolean.valueOf(attribute.getValue()));
+            } else {
+                System.out.println("Skipping unexpected attribute of properties: "+attribute.getName().getLocalPart());
             }
         }
         skipElement(startElement, xmlEventReader);
@@ -313,27 +361,29 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
     }
 
     protected void processElementAuthorization(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm securityRealm) throws XMLStreamException {
+        System.out.println("Processing authorization for security realm "+securityRealm);
         LegacySecurityRealm.Authorization authorization = new LegacySecurityRealm.Authorization();
-        Attribute mapGroupsToRolesAttr = startElement.getAttributeByName(new QName(startElement.getName().getNamespaceURI(),"map-groups-to-roles"));
+        Attribute mapGroupsToRolesAttr = startElement.getAttributeByName(new QName("map-groups-to-roles"));
         if (mapGroupsToRolesAttr != null) {
-            authorization.mapGroupsToRoles = Boolean.valueOf(mapGroupsToRolesAttr.getValue());
+            authorization.setMapGroupsToRoles(Boolean.valueOf(mapGroupsToRolesAttr.getValue()));
         }
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                if (elementLocalName.equals("properties")) {
-                    authorization.properties = processElementProperties(element, xmlEventReader);
+                if (elementLocalName.equals(PROPERTIES)) {
+                    authorization.setProperties(processElementProperties(element, xmlEventReader));
                 } else {
                     // ignore element
+                    System.out.println("Skipping unexpected element children of authorization: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
             }
         }
-        securityRealm.authorization = authorization;
+        securityRealm.setAuthorization(authorization);
     }
 
     protected void skipElement(StartElement startElement, XMLEventReader xmlEventReader) throws XMLStreamException {

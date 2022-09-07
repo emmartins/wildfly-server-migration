@@ -36,4 +36,12 @@ public class LegacySecuredManagementInterface<S extends JBossServer<S>> {
     public int hashCode() {
         return Objects.hash(name, securityRealm);
     }
+
+    @Override
+    public String toString() {
+        return "LegacySecuredManagementInterface{" +
+                "name='" + name + '\'' +
+                ", securityRealm='" + securityRealm + '\'' +
+                '}';
+    }
 }

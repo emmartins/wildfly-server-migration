@@ -17,13 +17,14 @@
 package org.jboss.migration.wfly.task.security;
 
 import org.jboss.migration.core.jboss.JBossServer;
+import org.jboss.migration.core.jboss.JBossServerConfiguration;
 
 /**
  * @author emmartins
  */
 public class LegacySecurityConfigurationMigration<S extends JBossServer<S>> {
 
-    private final LegacySecurityConfigurations<S> legacySecurityConfigurations = new LegacySecurityConfigurations<>();
+    private final LegacySecurityConfigurations legacySecurityConfigurations = new LegacySecurityConfigurations();
 
     public ReadLegacySecurityConfigurationFromXML<S> getReadLegacySecurityConfiguration() {
         return new ReadLegacySecurityConfigurationFromXML<>(legacySecurityConfigurations);
@@ -31,5 +32,9 @@ public class LegacySecurityConfigurationMigration<S extends JBossServer<S>> {
 
     public RemoveLegacySecurityRealmsFromXML<S> getRemoveLegacySecurityRealms() {
         return new RemoveLegacySecurityRealmsFromXML<>();
+    }
+
+    public MigrateLegacySecurityUpdateElytronSubsystem<JBossServerConfiguration<S>> getMigrateLegacySecurityUpdateElytronSubsystem() {
+        return new MigrateLegacySecurityUpdateElytronSubsystem<>(legacySecurityConfigurations);
     }
 }
