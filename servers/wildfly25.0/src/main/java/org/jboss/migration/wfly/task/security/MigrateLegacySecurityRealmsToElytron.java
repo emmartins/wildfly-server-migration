@@ -17,31 +17,39 @@
 package org.jboss.migration.wfly.task.security;
 
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
-import org.jboss.migration.core.env.TaskEnvironment;
+import org.jboss.dmr.Property;
+import org.jboss.logging.Logger;
+import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.component.TaskSkipPolicy;
+import org.jboss.migration.wfly10.config.management.HostControllerConfiguration;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
+import org.jboss.migration.wfly10.config.management.ManageableServerConfigurationType;
 import org.jboss.migration.wfly10.config.management.ManagementInterfaceResource;
-import org.jboss.migration.wfly10.config.management.SocketBindingResource;
 import org.jboss.migration.wfly10.config.management.StandaloneServerConfiguration;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
+import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeSubtasks;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationCompositeTask;
 import org.jboss.migration.wfly10.config.task.management.configuration.ManageableServerConfigurationLeafTask;
 import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceTaskRunnableBuilder;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResourceSubtaskBuilder;
-import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
+import org.jboss.migration.wfly11.task.subsystem.elytron.HttpAuthenticationFactoryAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.KeyManagerAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.KeystoreAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.MechanismConfiguration;
+import org.jboss.migration.wfly11.task.subsystem.elytron.MechanismRealmConfiguration;
+import org.jboss.migration.wfly11.task.subsystem.elytron.PropertiesRealmAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.SaslAuthenticationFactoryAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.SecurityDomainAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.ServerSSLContextAddOperation;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HTTP_UPGRADE_ENABLED;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.controller.operations.common.Util.getUndefineAttributeOperation;
+import static org.jboss.as.controller.operations.common.Util.getWriteAttributeOperation;
 
 /**
  * @author emmartins
@@ -54,148 +62,240 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         name(TASK_NAME);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().debugf("Migrating legacy security realms to Elytron..."));
-        //subtasks(ManageableServerConfigurationCompositeSubtasks.of(new UpdateElytronSubsystemm<>(legacySecurityConfigurations), new UpdateManagementHttpsSocketBindingPort<>()));
+        subtasks(ManageableServerConfigurationCompositeSubtasks.of(new MigrateToElytron<>(legacySecurityConfigurations), new SetManagementInterfacesHttpUpgradeEnabled<>(legacySecurityConfigurations)));
         afterRun(context -> context.getLogger().infof("Legacy security realms migrated to Elytron."));
     }
 
-    public static class UpdateElytronSubsystemm<S> extends UpdateSubsystemResources<S> {
-        public UpdateElytronSubsystemm(final LegacySecurityConfigurations legacySecurityConfigurations) {
-            super(JBossSubsystemNames.ELYTRON,
-                    new UpdateSubsystemResourceSubtaskBuilder<S>() {
-                        @Override
-                        protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext taskContext, TaskEnvironment taskEnvironment) {
-                            LegacySecurityConfiguration legacySecurityConfiguration = legacySecurityConfigurations.getSecurityConfigurations().get(subsystemResource.getServerConfiguration().getConfigurationPath());
-                            taskContext.getLogger().warn("Legacy config: "+legacySecurityConfiguration);
-                            // update elytron config by adding properties-realm, security-domain, http-factory and sasl
-                            return ServerMigrationTaskResult.SUCCESS;
-                        }
-                    });
-        }
-    }
+    public static class MigrateToElytron<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
-    public static class UnsetDefaultHostResponseHeader<S> extends UpdateSubsystemResourceSubtaskBuilder<S> {
+        private static final String SUBTASK_NAME = TASK_NAME + ".update-elytron";
 
-        public static final String TASK_NAME = "remove-response-header";
-        private static final String SERVER_NAME = "default-server";
-        private static final String HOST_NAME = "default-host";
-        private static final String FILTER_REF = "filter-ref";
-
-        private static final String CONFIGURATION = "configuration";
-        private static final String FILTER = "filter";
-        private static final String RESPONSE_HEADER = "response-header";
-        private static final String HEADER_NAME = "header-name";
-
-        protected final String filterName;
-        protected final String headerName;
-
-        public UnsetDefaultHostResponseHeader(String filterName, String headerName) {
-            subtaskName(TASK_NAME+"."+filterName);
-            this.filterName = filterName;
-            this.headerName = headerName;
+        protected MigrateToElytron(final LegacySecurityConfigurations legacySecurityConfigurations) {
+            name(SUBTASK_NAME);
+            skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
+            final ManageableResourceTaskRunnableBuilder<S, SubsystemResource> runnableBuilder = params -> context -> {
+                final SubsystemResource subsystemResource = params.getResource();
+                final LegacySecurityConfiguration legacySecurityConfiguration = legacySecurityConfigurations.getSecurityConfigurations().get(subsystemResource.getServerConfiguration().getConfigurationPath().getPath().toString());
+                for (LegacySecurityRealm securityRealm : legacySecurityConfiguration.getLegacySecurityRealms().values()) {
+                    migrateSecurityRealm(securityRealm, legacySecurityConfiguration, subsystemResource, context);
+                }
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            runBuilder(SubsystemResource.class, JBossSubsystemNames.ELYTRON, runnableBuilder);
         }
 
-        @Override
-        protected ServerMigrationTaskResult updateConfiguration(ModelNode config, S source, SubsystemResource subsystemResource, TaskContext context, TaskEnvironment taskEnvironment) {
-            final PathAddress configPathAddress = subsystemResource.getResourcePathAddress();
-            // check if server is defined
-            final PathAddress serverPathAddress = configPathAddress.append(PathElement.pathElement(SERVER, SERVER_NAME));
-            if (!config.hasDefined(SERVER, SERVER_NAME)) {
-                context.getLogger().debugf("Skipping task, server '%s' not found in Undertow's config %s", serverPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            final ModelNode server = config.get(SERVER, SERVER_NAME);
-            // check if host is defined
-            final PathAddress defaultHostPathAddress = serverPathAddress.append(PathElement.pathElement(HOST, HOST_NAME));
-            if (!server.hasDefined(HOST, HOST_NAME)) {
-                context.getLogger().debugf("Skipping task, host '%s' not found in Undertow's config %s", defaultHostPathAddress.toCLIStyleString(), configPathAddress.toCLIStyleString());
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-            final ModelNode filter = config.get(CONFIGURATION, FILTER, RESPONSE_HEADER, filterName);
-            if (!filter.isDefined()) {
-                context.getLogger().debugf("Skipping task, filter name '%s' not found in Undertow's config %s", filterName, configPathAddress.toCLIStyleString());
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-
-            // verify the header name
-            final ModelNode filterHeaderName = filter.get(HEADER_NAME);
-            if (!filterHeaderName.isDefined() || !filterHeaderName.asString().equals(headerName)) {
-                context.getLogger().debugf("Skipping task, filter name '%s' found in Undertow's config %s but header name is %s, expected was %s", filterName, configPathAddress.toCLIStyleString(), filterHeaderName.asString(), headerName);
-                return ServerMigrationTaskResult.SKIPPED;
-            }
-
-            // remove the filter and ref
+        protected void migrateSecurityRealm(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, TaskContext taskContext) {
+            final ManageableServerConfiguration configuration = subsystemResource.getServerConfiguration();
             final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
-            if (server.hasDefined(HOST, HOST_NAME, FILTER_REF, filterName)) {
-                final PathAddress filterRefPathAddress = defaultHostPathAddress.append(FILTER_REF, filterName);
-                compositeOperationBuilder.addStep(Util.createRemoveOperation(filterRefPathAddress));
-            }
-            final PathAddress responseHeaderPathAddress = configPathAddress.append(CONFIGURATION, FILTER).append(RESPONSE_HEADER, filterName);
-            compositeOperationBuilder.addStep(Util.createRemoveOperation(responseHeaderPathAddress));
-            subsystemResource.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
+            addOperationSteps(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            configuration.executeManagementOperation(compositeOperationBuilder.build().getOperation());
+        }
 
-            context.getLogger().debugf("Filter '%s', with header '%s', removed from Undertow's config %s", filterName, headerName, configPathAddress.toCLIStyleString());
-            return ServerMigrationTaskResult.SUCCESS;
+        protected void addOperationSteps(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            addSecurityRealm(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            addSecurityDomain(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            addHttp(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            addSasl(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            addServerIdentities(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+        }
+
+        protected void addSecurityRealm(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            final ManageableServerConfigurationType configurationType = subsystemResource.getServerConfiguration().getConfigurationType();
+            if (configurationType == StandaloneServerConfiguration.RESOURCE_TYPE || configurationType == HostControllerConfiguration.RESOURCE_TYPE) {
+                compositeOperationBuilder.addStep(new PropertiesRealmAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronPropertiesRealmName())
+                        .usersProperties(new PropertiesRealmAddOperation.Properties(securityRealm.getAuthentication().getProperties().getPath())
+                                .relativeTo(securityRealm.getAuthentication().getProperties().getRelativeTo())
+                                .plainText(securityRealm.getAuthentication().getProperties().isPlainText())
+                                .digestRealmName(securityRealm.getName())
+                        )
+                        .groupsProperties(new PropertiesRealmAddOperation.Properties(securityRealm.getAuthorization().getProperties().getPath())
+                                .relativeTo(securityRealm.getAuthorization().getProperties().getRelativeTo())
+                                .plainText(securityRealm.getAuthorization().getProperties().isPlainText())
+                        )
+                        .toModelNode());
+            }
+        }
+
+        protected void addSecurityDomain(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            final ManageableServerConfigurationType configurationType = subsystemResource.getServerConfiguration().getConfigurationType();
+            if (configurationType == StandaloneServerConfiguration.RESOURCE_TYPE || configurationType == HostControllerConfiguration.RESOURCE_TYPE) {
+                // TODO assert elytron config has permissionMapper named default-permission-mapper
+                // TODO assert elytron config has role decoder groups-to-roles
+                final SecurityDomainAddOperation securityDomainAddOperation = new SecurityDomainAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronSecurityDomainName())
+                        .permissionMapper("default-permission-mapper")
+                        .defaultRealm(securityRealm.getElytronPropertiesRealmName())
+                        .addRealm(new SecurityDomainAddOperation.Realm(securityRealm.getElytronPropertiesRealmName())
+                                .roleDecoder(securityRealm.getAuthorization().isMapGroupsToRoles() ? "groups-to-roles" : null));
+                if (securityRealm.getAuthentication().getLocal() != null) {
+                    // TODO assert elytron config has realm local and role mapper super-user-mapper
+                    securityDomainAddOperation.addRealm(new SecurityDomainAddOperation.Realm("local").roleMapper(securityRealm.getAuthentication().getLocal().getAllowedUsers() == null ? "super-user-mapper" : null));
+                }
+                compositeOperationBuilder.addStep(securityDomainAddOperation.toModelNode());
+            }
+        }
+
+        protected void addHttp(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            // TODO assert elytron config has httpServerMechanismFactory named global
+            compositeOperationBuilder.addStep(new HttpAuthenticationFactoryAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronHttpAuthenticationFactoryName())
+                    .securityDomain(securityRealm.getElytronSecurityDomainName())
+                    .httpServerMechanismFactory("global")
+                    .addMechanismConfiguration(new MechanismConfiguration("DIGEST").addMechanismRealmConfiguration(new MechanismRealmConfiguration(securityRealm.getName())))
+                    .toModelNode());
+        }
+
+        protected void addSasl(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            // TODO assert elytron config has saslServerFactory named configured
+            compositeOperationBuilder.addStep(new SaslAuthenticationFactoryAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronSaslAuthenticationFactoryName())
+                    .securityDomain(securityRealm.getElytronSecurityDomainName())
+                    .saslServerFactory("configured")
+                    .addMechanismConfiguration(new MechanismConfiguration("JBOSS-LOCAL-USER").realmMapper("local"))
+                    .addMechanismConfiguration(new MechanismConfiguration("DIGEST-MD5").addMechanismRealmConfiguration(new MechanismRealmConfiguration(securityRealm.getName())))
+                    .toModelNode());
+            // replace any remoting subsystem usage of the legacy security realm, with the created elytron sasl factory
+            final Logger logger = taskContext.getLogger();
+            logger.warn("Looking for Remoting subsystem http-connector resources using the legacy security-realm...");
+            final SubsystemResource remotingSubsystemResource = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.REMOTING);
+            if (remotingSubsystemResource != null) {
+                logger.warn("Remoting subsystem config found.");
+                final ModelNode remotingSubsystemConfig = remotingSubsystemResource.getResourceConfiguration();
+                if (remotingSubsystemConfig.hasDefined("http-connector")) {
+                    logger.warn("Remoting subsystem config has http-connector resources defined.");
+                    for (Property remotingHttpConnectorProperty : remotingSubsystemConfig.get("http-connector").asPropertyList()) {
+                        final String remotingHttpConnectorName = remotingHttpConnectorProperty.getName();
+                        logger.warnf("Processing Remoting subsystem http-connector named %s.", remotingHttpConnectorName);
+                        final ModelNode remotingHttpConnectorConfig = remotingHttpConnectorProperty.getValue();
+                        if (securityRealm.getName().equals(remotingHttpConnectorConfig.get(SECURITY_REALM).asStringOrNull())) {
+                            // we found a http connector using the legacy security-real, update it to use the created Elytron's sasl factory
+                            logger.warn("Remoting subsystem http-invoker uses the legacy security-realm, updating....");
+                            final PathAddress remotingConnectorAddress = remotingSubsystemResource.getResourcePathAddress().append("http-connector", remotingHttpConnectorName);
+                            compositeOperationBuilder.addStep(getUndefineAttributeOperation(remotingConnectorAddress, SECURITY_REALM));
+                            compositeOperationBuilder.addStep(getWriteAttributeOperation(remotingConnectorAddress, "sasl-authentication-factory", securityRealm.getElytronSaslAuthenticationFactoryName()));
+                        }
+                    }
+                }
+            }
+        }
+
+        protected void addServerIdentities(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            addServerIdentitySSL(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+        }
+
+        protected void addServerIdentitySSL(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
+            final Logger logger = taskContext.getLogger();
+            if (securityRealm.getServerIdentities() != null) {
+                final LegacySecurityRealmSSLServerIdentity sslServerIdentity = securityRealm.getServerIdentities().getSsl();
+                if (sslServerIdentity != null) {
+                    logger.warn("Migrating Legacy SSL server identity to Elytron...");
+                    // add key-store
+                    compositeOperationBuilder.addStep(new KeystoreAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronTLSKeyStoreName())
+                            .keystorePassword(sslServerIdentity.getKeystore().getKeystorePassword())
+                            .path(sslServerIdentity.getKeystore().getPath())
+                            .relativeTo(sslServerIdentity.getKeystore().getRelativeTo())
+                            .type(sslServerIdentity.getKeystore().getProvider())
+                            .toModelNode());
+                    // add key-manager
+                    compositeOperationBuilder.addStep(new KeyManagerAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronTLSKeyManagerName())
+                            .keystore(securityRealm.getElytronTLSKeyStoreName())
+                            .aliasFilter(sslServerIdentity.getKeystore().getAlias())
+                            .generateSelfSignedCertificateHost(sslServerIdentity.getKeystore().getGenerateSelfSignedCertificateHost() != null)
+                            .keyPassword(sslServerIdentity.getKeystore().getKeyPassword())
+                            .toModelNode());
+                    // add ssl server context
+                    compositeOperationBuilder.addStep(new ServerSSLContextAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronTLSServerSSLContextName())
+                            .keyManager(securityRealm.getElytronTLSKeyManagerName())
+                            .toModelNode());
+                    // replace any undertow usage of the legacy security realm, with the created elytron ssl context
+                    logger.warn("Looking for Undertow subsystem https-listener resources using the legacy security-realm...");
+                    final SubsystemResource undertowSubsystemResource = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.UNDERTOW);
+                    if (undertowSubsystemResource != null) {
+                        logger.warn("Undertow subsystem config found.");
+                        final ModelNode undertowSubsystemConfig = undertowSubsystemResource.getResourceConfiguration();
+                        if (undertowSubsystemConfig.hasDefined("server")) {
+                            logger.warn("Undertow subsystem config has server resource defined.");
+                            for (Property undertowServerProperty : undertowSubsystemConfig.get("server").asPropertyList()) {
+                                final String undertowServerName = undertowServerProperty.getName();
+                                logger.warnf("Processing Undertow subsystem server named %s.", undertowServerName);
+                                final ModelNode undertowServerConfig = undertowServerProperty.getValue();
+                                if (undertowServerConfig.hasDefined("https-listener")) {
+                                    logger.warn("Undertow subsystem server has https-listener resource defined.");
+                                    for (Property undertowHttpsListenerProperty : undertowServerConfig.get("https-listener").asPropertyList()) {
+                                        final String undertowHttpsListenerName = undertowHttpsListenerProperty.getName();
+                                        logger.warnf("Processing Undertow https-listener named %s.", undertowServerName);
+                                        final ModelNode undertowHttpsListenerConfig = undertowHttpsListenerProperty.getValue();
+                                        if (securityRealm.getName().equals(undertowHttpsListenerConfig.get(SECURITY_REALM).asStringOrNull())) {
+                                            // we found a http listener using the legacy security-real, update it to use Elytron's server ssl context insteadhttps listener config
+                                            logger.warn("Undertow subsystem https-listener uses the legacy security-realm, updating....");
+                                            final PathAddress undertowConnectorAddress = undertowSubsystemResource.getResourcePathAddress().append("server", undertowServerName).append("https-listener", undertowHttpsListenerName);
+                                            compositeOperationBuilder.addStep(getUndefineAttributeOperation(undertowConnectorAddress, SECURITY_REALM));
+                                            compositeOperationBuilder.addStep(getWriteAttributeOperation(undertowConnectorAddress, SSL_CONTEXT, securityRealm.getElytronTLSServerSSLContextName()));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+
+
+                }
+            }
         }
     }
+
+
 
     public static class SetManagementInterfacesHttpUpgradeEnabled<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
-        private static final String MANAGEMENT_INTERFACE_NAME = "http-interface";
-        private static final String SUBTASK_NAME = TASK_NAME + ".management-interface."+MANAGEMENT_INTERFACE_NAME+".enable-http-upgrade";
+        private static final String SUBTASK_NAME = TASK_NAME + ".update-management-interfaces";
 
-        protected SetManagementInterfacesHttpUpgradeEnabled() {
+        protected SetManagementInterfacesHttpUpgradeEnabled(final LegacySecurityConfigurations legacySecurityConfigurations) {
             name(SUBTASK_NAME);
             skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
-            final ManageableResourceTaskRunnableBuilder<S, ManagementInterfaceResource> runnableBuilder = params -> context -> {
-                // check if attribute is defined
-                final ManagementInterfaceResource resource = params.getResource();
-                final ModelNode resourceConfig = resource.getResourceConfiguration();
-                if (resourceConfig.hasDefined(HTTP_UPGRADE_ENABLED) && resourceConfig.get(HTTP_UPGRADE_ENABLED).asBoolean()) {
-                    context.getLogger().debugf("Management interface %s http upgrade already enabled.", MANAGEMENT_INTERFACE_NAME);
-                    return ServerMigrationTaskResult.SKIPPED;
+            final ManageableResourceTaskRunnableBuilder<S, ManagementInterfaceResource.Parent> runnableBuilder = params -> context -> {
+                final ManagementInterfaceResource.Parent resource = params.getResource();
+                final LegacySecurityConfiguration legacySecurityConfiguration = legacySecurityConfigurations.getSecurityConfiguration(resource.getServerConfiguration().getConfigurationPath().getPath());
+                final Operations.CompositeOperationBuilder compositeOperationBuilder = Operations.CompositeOperationBuilder.create();
+                ServerMigrationTaskResult taskResult = ServerMigrationTaskResult.SKIPPED;
+                if (legacySecurityConfiguration != null) {
+                    for (LegacySecuredManagementInterface managementInterface : legacySecurityConfiguration.getSecuredManagementInterfaces()) {
+                        final ManagementInterfaceResource managementInterfaceResource = resource.getManagementInterfaceResource(managementInterface.getName());
+                        final LegacySecurityRealm securityRealm = legacySecurityConfiguration.getLegacySecurityRealm(managementInterface.getSecurityRealm());
+                        if (securityRealm == null) {
+                            throw new ServerMigrationFailureException("Missing legacy security-realm named " + managementInterface.getSecurityRealm() + ", referred by managed-interface " + managementInterface.getName());
+                        }
+                        if (managementInterface.getName().equals(HTTP_INTERFACE)) {
+                            // set http authentication factory
+                            final ModelNode writeHttpAuthFactoryAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, managementInterfaceResource.getResourcePathAddress());
+                            writeHttpAuthFactoryAttrOp.get(NAME).set(HTTP_AUTHENTICATION_FACTORY);
+                            writeHttpAuthFactoryAttrOp.get(VALUE).set(securityRealm.getElytronHttpAuthenticationFactoryName());
+                            compositeOperationBuilder.addStep(writeHttpAuthFactoryAttrOp);
+                            if (managementInterfaceResource.getResourceConfiguration().hasDefined(HTTP_UPGRADE)) {
+                                // set sasl auth factory
+                                final ModelNode writeSaslAuthFactoryAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, managementInterfaceResource.getResourcePathAddress());
+                                writeSaslAuthFactoryAttrOp.get(NAME).set(HTTP_UPGRADE + "." + SASL_AUTHENTICATION_FACTORY);
+                                writeSaslAuthFactoryAttrOp.get(VALUE).set(securityRealm.getElytronSaslAuthenticationFactoryName());
+                                compositeOperationBuilder.addStep(writeSaslAuthFactoryAttrOp);
+                            }
+                            taskResult = ServerMigrationTaskResult.SUCCESS;
+                        } else if (managementInterface.getName().equals(NATIVE_INTERFACE)) {
+                            // set sasl auth factory
+                            final ModelNode writeSaslAuthFactoryAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, managementInterfaceResource.getResourcePathAddress());
+                            writeSaslAuthFactoryAttrOp.get(NAME).set(SASL_AUTHENTICATION_FACTORY);
+                            writeSaslAuthFactoryAttrOp.get(VALUE).set(securityRealm.getElytronSaslAuthenticationFactoryName());
+                            compositeOperationBuilder.addStep(writeSaslAuthFactoryAttrOp);
+                            taskResult = ServerMigrationTaskResult.SUCCESS;
+                        } else {
+                            context.getLogger().debugf("Skipping Management interface %s.", managementInterface.getName());
+                        }
+                    }
                 }
-                // set attribute value
-                final PathAddress pathAddress = resource.getResourcePathAddress();
-                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                writeAttrOp.get(NAME).set(HTTP_UPGRADE_ENABLED);
-                writeAttrOp.get(VALUE).set(true);
-                resource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().debugf("Management interface '%s' http upgrade enabled.", MANAGEMENT_INTERFACE_NAME);
-                return ServerMigrationTaskResult.SUCCESS;
-            };
-            runBuilder(ManagementInterfaceResource.class, MANAGEMENT_INTERFACE_NAME, runnableBuilder);
-        }
-    }
-
-    static class UpdateManagementHttpsSocketBindingPort<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
-
-        public static final String DEFAULT_PORT = "${jboss.management.https.port:9993}";
-        private static final String SOCKET_BINDING_NAME = "management-https";
-        private static final String SOCKET_BINDING_PORT_ATTR = "port";
-
-        private static final String SUBTASK_NAME = TASK_NAME + ".socket-binding." + SOCKET_BINDING_NAME + ".update-port";
-
-        protected UpdateManagementHttpsSocketBindingPort() {
-            name(SUBTASK_NAME);
-            skipPolicyBuilders(buildParameters -> TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet(),
-                buildParameters -> context -> !(buildParameters.getServerConfiguration() instanceof StandaloneServerConfiguration));
-            final ManageableResourceTaskRunnableBuilder<S, SocketBindingResource> runnableBuilder = params -> context -> {
-                final SocketBindingResource resource = params.getResource();
-                final TaskEnvironment taskEnvironment = new TaskEnvironment(context.getMigrationEnvironment(), context.getTaskName());
-                String envPropertyPort = taskEnvironment.getPropertyAsString("port");
-                if (envPropertyPort == null || envPropertyPort.isEmpty()) {
-                    envPropertyPort = DEFAULT_PORT;
+                if (taskResult == ServerMigrationTaskResult.SUCCESS) {
+                    resource.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
                 }
-                // management-https binding found, update port
-                final PathAddress pathAddress = resource.getResourcePathAddress();
-                final ModelNode writeAttrOp = Util.createEmptyOperation(WRITE_ATTRIBUTE_OPERATION, pathAddress);
-                writeAttrOp.get(NAME).set(SOCKET_BINDING_PORT_ATTR);
-                writeAttrOp.get(VALUE).set(envPropertyPort);
-                resource.getServerConfiguration().executeManagementOperation(writeAttrOp);
-                context.getLogger().debugf("Socket binding '%s' port set to "+envPropertyPort+".", SOCKET_BINDING_NAME);
-                return ServerMigrationTaskResult.SUCCESS;
+                return taskResult;
             };
-            runBuilder(SocketBindingResource.class, SOCKET_BINDING_NAME, runnableBuilder);
+            runBuilder(ManagementInterfaceResource.Parent.class, runnableBuilder);
         }
     }
 }

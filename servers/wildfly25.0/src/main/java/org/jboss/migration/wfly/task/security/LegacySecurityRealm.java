@@ -1,3 +1,18 @@
+/*
+ * Copyright 2022 Red Hat, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jboss.migration.wfly.task.security;
 
 public class LegacySecurityRealm {
@@ -55,6 +70,18 @@ public class LegacySecurityRealm {
         return name+"-saslAuthenticationFactory";
     }
 
+    public String getElytronTLSKeyStoreName() {
+        return name+"-TLS-keyStore";
+    }
+
+    public String getElytronTLSKeyManagerName() {
+        return name+"-TLS-keyManager";
+    }
+
+    public String getElytronTLSServerSSLContextName() {
+        return name+"-TLS-serverSSLContext";
+    }
+
     @Override
     public String toString() {
         return "LegacySecurityRealm{" +
@@ -65,31 +92,22 @@ public class LegacySecurityRealm {
                 '}';
     }
 
-    public static class Authentication {
-        private Local local;
-        private Properties properties;
+    public static class ServerIdentities {
 
-        public Local getLocal() {
-            return local;
+        private LegacySecurityRealmSSLServerIdentity ssl;
+
+        public LegacySecurityRealmSSLServerIdentity getSsl() {
+            return ssl;
         }
 
-        public void setLocal(Local local) {
-            this.local = local;
-        }
-
-        public Properties getProperties() {
-            return properties;
-        }
-
-        public void setProperties(Properties properties) {
-            this.properties = properties;
+        public void setSsl(LegacySecurityRealmSSLServerIdentity ssl) {
+            this.ssl = ssl;
         }
 
         @Override
         public String toString() {
-            return "Authentication{" +
-                    "local=" + local +
-                    ", properties=" + properties +
+            return "ServerIdentities{" +
+                    "ssl=" + ssl +
                     '}';
         }
     }
@@ -118,6 +136,35 @@ public class LegacySecurityRealm {
         public String toString() {
             return "Authorization{" +
                     "mapGroupsToRoles=" + mapGroupsToRoles +
+                    ", properties=" + properties +
+                    '}';
+        }
+    }
+
+    public static class Authentication {
+        private Local local;
+        private Properties properties;
+
+        public Local getLocal() {
+            return local;
+        }
+
+        public void setLocal(Local local) {
+            this.local = local;
+        }
+
+        public Properties getProperties() {
+            return properties;
+        }
+
+        public void setProperties(Properties properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String toString() {
+            return "Authentication{" +
+                    "local=" + local +
                     ", properties=" + properties +
                     '}';
         }
@@ -201,72 +248,4 @@ public class LegacySecurityRealm {
         }
     }
 
-    public static class ServerIdentities {
-        private String sslKeystorePath;
-        private String sslKeystoreRelativeTo;
-        private String sslKeystoreKeystorePassword;
-        private String sslKeystoreAlias;
-        private String sslKeystoreKeyPassword;
-        private String sslKeystoreGenerateSelfSignedCertificateHost;
-
-        public String getSslKeystorePath() {
-            return sslKeystorePath;
-        }
-
-        public void setSslKeystorePath(String sslKeystorePath) {
-            this.sslKeystorePath = sslKeystorePath;
-        }
-
-        public String getSslKeystoreRelativeTo() {
-            return sslKeystoreRelativeTo;
-        }
-
-        public void setSslKeystoreRelativeTo(String sslKeystoreRelativeTo) {
-            this.sslKeystoreRelativeTo = sslKeystoreRelativeTo;
-        }
-
-        public String getSslKeystoreKeystorePassword() {
-            return sslKeystoreKeystorePassword;
-        }
-
-        public void setSslKeystoreKeystorePassword(String sslKeystoreKeystorePassword) {
-            this.sslKeystoreKeystorePassword = sslKeystoreKeystorePassword;
-        }
-
-        public String getSslKeystoreAlias() {
-            return sslKeystoreAlias;
-        }
-
-        public void setSslKeystoreAlias(String sslKeystoreAlias) {
-            this.sslKeystoreAlias = sslKeystoreAlias;
-        }
-
-        public String getSslKeystoreKeyPassword() {
-            return sslKeystoreKeyPassword;
-        }
-
-        public void setSslKeystoreKeyPassword(String sslKeystoreKeyPassword) {
-            this.sslKeystoreKeyPassword = sslKeystoreKeyPassword;
-        }
-
-        public String getSslKeystoreGenerateSelfSignedCertificateHost() {
-            return sslKeystoreGenerateSelfSignedCertificateHost;
-        }
-
-        public void setSslKeystoreGenerateSelfSignedCertificateHost(String sslKeystoreGenerateSelfSignedCertificateHost) {
-            this.sslKeystoreGenerateSelfSignedCertificateHost = sslKeystoreGenerateSelfSignedCertificateHost;
-        }
-
-        @Override
-        public String toString() {
-            return "ServerIdentities{" +
-                    "sslKeystorePath='" + sslKeystorePath + '\'' +
-                    ", sslKeystoreRelativeTo='" + sslKeystoreRelativeTo + '\'' +
-                    ", sslKeystoreKeystorePassword='" + sslKeystoreKeystorePassword + '\'' +
-                    ", sslKeystoreAlias='" + sslKeystoreAlias + '\'' +
-                    ", sslKeystoreKeyPassword='" + sslKeystoreKeyPassword + '\'' +
-                    ", sslKeystoreGenerateSelfSignedCertificateHost='" + sslKeystoreGenerateSelfSignedCertificateHost + '\'' +
-                    '}';
-        }
-    }
 }

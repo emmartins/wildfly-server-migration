@@ -34,7 +34,7 @@ public class LegacySecurityConfigurationMigration<S extends JBossServer<S>> {
         return new RemoveLegacySecurityRealmsFromXML<>();
     }
 
-    public MigrateLegacySecurityUpdateElytronSubsystem<JBossServerConfiguration<S>> getMigrateLegacySecurityUpdateElytronSubsystem() {
-        return new MigrateLegacySecurityUpdateElytronSubsystem<>(legacySecurityConfigurations);
+    public MigrateLegacySecurityRealmsToElytron<JBossServerConfiguration<S>> getMigrateLegacySecurityRealmsToElytron() {
+        return new MigrateLegacySecurityRealmsToElytron<>(legacySecurityConfigurations);
     }
 }

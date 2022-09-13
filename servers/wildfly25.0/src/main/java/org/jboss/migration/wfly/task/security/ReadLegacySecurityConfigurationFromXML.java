@@ -49,22 +49,21 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
 
     public static final String AUTHENTICATION = "authentication";
     public static final String AUTHORIZATION = "authorization";
+    private static final String ENGINE = "engine";
     public static final String GENERATE_SELF_SIGNED_CERTIFICATE_HOST = "generate-self-signed-certificate-host";
-
     public static final String HTTP_INTERFACE = "http-interface";
-
     public static final String KEY_PASSWORD = "key-password";
     public static final String KEYSTORE = "keystore";
     public static final String KEYSTORE_PASSWORD = "keystore-password";
     public static final String LOCAL = "local";
-
     public static final String MANAGEMENT = "management";
     public static final String MANAGEMENT_INTERFACES = "management-interfaces";
+    public static final String NATIVE_INTERFACE = "native-interface";
+    public static final String NATIVE_REMOTING_INTERFACE = "native-remoting-interface";
     public static final String PATH = "path";
     public static final String PLAIN_TEXT = "plain-text";
     public static final String PROPERTIES = "properties";
     public static final String RELATIVE_TO = "relative-to";
-
     public static final String SECURITY_REALM = "security-realm";
     public static final String SECURITY_REALMS = "security-realms";
     public static final String SERVER_IDENTITIES = "server-identities";
@@ -113,7 +112,6 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                             processElementManagement(element, xmlEventReader, legacySecurityConfiguration);
                         } else {
                             // ignore element
-                            System.out.println("Skipping unexpected element: "+elementLocalName);
                             skipElement(element, xmlEventReader);
                         }
                     } else if (xmlEvent.isEndElement()) {
@@ -141,7 +139,6 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                     processElementManagementInterfaces(element, xmlEventReader, legacySecurityConfiguration);
                 } else {
                     // ignore element
-                    System.out.println("Skipping unexpected child element of management: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -157,28 +154,17 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                if (elementLocalName.equals(HTTP_INTERFACE)) {
-                    processElementHttpInterface(element, xmlEventReader, legacySecurityConfiguration);
-                } else {
-                    // ignore element
-                    System.out.println("Skipping unexpected child element of management>management-interfaces: "+elementLocalName);
-                    skipElement(element, xmlEventReader);
+                Attribute securityRealmAttr = startElement.getAttributeByName(new QName("security-realm"));
+                if (securityRealmAttr != null) {
+                    final LegacySecuredManagementInterface<S> securedManagementInterface = new LegacySecuredManagementInterface<>(elementLocalName, securityRealmAttr.getValue());
+                    legacySecurityConfiguration.getSecuredManagementInterfaces().add(securedManagementInterface);
+                    System.out.println("Management Interface secured by legacy security realm "+securedManagementInterface.getSecurityRealm()+" added to legacy configuration: "+securedManagementInterface);
                 }
-            } else if (xmlEvent.isEndElement()) {
+                skipElement(startElement, xmlEventReader);
+           } else if (xmlEvent.isEndElement()) {
                 break;
             }
         }
-    }
-
-    protected void processElementHttpInterface(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
-        System.out.println("Processing http-interface...");
-        Attribute securityRealmAttr = startElement.getAttributeByName(new QName("security-realm"));
-        if (securityRealmAttr != null) {
-            final LegacySecuredManagementInterface<S> securedManagementInterface = new LegacySecuredManagementInterface<>("http-interface", securityRealmAttr.getValue());
-            legacySecurityConfiguration.getSecuredManagementInterfaces().add(securedManagementInterface);
-            System.out.println("Http Interface secured by legacy security realm "+securedManagementInterface.getSecurityRealm()+" added to legacy configuration");
-        }
-        skipElement(startElement, xmlEventReader);
     }
 
     private void processElementSecurityRealms(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration) throws XMLStreamException {
@@ -192,7 +178,6 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                     processElementSecurityRealm(element, xmlEventReader, legacySecurityConfiguration);
                 } else {
                     // ignore element
-                    System.out.println("Skipping unexpected child element of management>security-realms: "+elementLocalName);
                     skipElement(element, xmlEventReader);
                 }
             } else if (xmlEvent.isEndElement()) {
@@ -217,9 +202,10 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 } else if (elementLocalName.equals(AUTHORIZATION)) {
                     processElementAuthorization(element, xmlEventReader, securityRealm);
                 } else {
-                    // ignore element
-                    System.out.println("Skipping unexpected element children of security realm: "+elementLocalName);
-                    skipElement(element, xmlEventReader);
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security realm element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
@@ -241,9 +227,10 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 if (elementLocalName.equals(SSL)) {
                     processElementServerIdentitiesSSL(element, xmlEventReader, serverIdentities);
                 } else {
-                    // ignore element
-                    System.out.println("Skipping unexpected element children of server identities: "+elementLocalName);
-                    skipElement(element, xmlEventReader);
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security realm server identity of type "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
@@ -254,46 +241,51 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
 
     protected void processElementServerIdentitiesSSL(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm.ServerIdentities serverIdentities) throws XMLStreamException {
         System.out.println("Processing server identities ssl...");
+        LegacySecurityRealmSSLServerIdentity serverIdentity = new LegacySecurityRealmSSLServerIdentity();
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
                 if (elementLocalName.equals(KEYSTORE)) {
-                    processElementServerIdentitiesSSLKeystore(element, xmlEventReader, serverIdentities);
+                    processElementServerIdentitiesSSLKeystore(element, xmlEventReader, serverIdentity);
                 } else {
-                    // ignore element
-                    System.out.println("Skipping unexpected element children of server identities ssl: "+elementLocalName);
-                    skipElement(element, xmlEventReader);
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security realm SSL's element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
             }
         }
+        serverIdentities.setSsl(serverIdentity);
     }
 
-    protected void processElementServerIdentitiesSSLKeystore(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm.ServerIdentities serverIdentities) throws XMLStreamException {
+    protected void processElementServerIdentitiesSSLKeystore(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealmSSLServerIdentity serverIdentity) throws XMLStreamException {
         System.out.println("Processing server identities ssl keystore...");
+        LegacySecurityRealmKeystore keystore = new LegacySecurityRealmKeystore();
         final Iterator<Attribute> iterator = startElement.getAttributes();
         while(iterator.hasNext()) {
             Attribute attribute = iterator.next();
             if (attribute.getName().getLocalPart().equals(PATH)) {
-                serverIdentities.setSslKeystorePath(attribute.getValue());
+                keystore.setPath(attribute.getValue());
             } else if (attribute.getName().getLocalPart().equals(RELATIVE_TO)) {
-                serverIdentities.setSslKeystoreRelativeTo(attribute.getValue());
+                keystore.setRelativeTo(attribute.getValue());
             } else if (attribute.getName().getLocalPart().equals(KEYSTORE_PASSWORD)) {
-                serverIdentities.setSslKeystoreKeystorePassword(attribute.getValue());
+                keystore.setKeystorePassword(attribute.getValue());
             } else if (attribute.getName().getLocalPart().equals(ALIAS)) {
-                serverIdentities.setSslKeystoreAlias(attribute.getValue());
+                keystore.setAlias(attribute.getValue());
             } else if (attribute.getName().getLocalPart().equals(KEY_PASSWORD)) {
-                serverIdentities.setSslKeystoreKeyPassword(attribute.getValue());
+                keystore.setKeyPassword(attribute.getValue());
             } else if (attribute.getName().getLocalPart().equals(GENERATE_SELF_SIGNED_CERTIFICATE_HOST)) {
-                serverIdentities.setSslKeystoreGenerateSelfSignedCertificateHost(attribute.getValue());
+                keystore.setGenerateSelfSignedCertificateHost(attribute.getValue());
             } else {
                 System.out.println("Skipping unexpected attribute of server identities ssl keystore: "+attribute.getName().getLocalPart());
             }
         }
         skipElement(startElement, xmlEventReader);
+        serverIdentity.setKeystore(keystore);
     }
 
     protected void processElementAuthentication(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityRealm securityRealm) throws XMLStreamException {
@@ -309,9 +301,10 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 } else if (elementLocalName.equals(PROPERTIES)) {
                     authentication.setProperties(processElementProperties(element, xmlEventReader));
                 } else {
-                    // ignore element
-                    System.out.println("Skipping unexpected element children of authentication: "+elementLocalName);
-                    skipElement(element, xmlEventReader);
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security realm authentication element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;
@@ -375,9 +368,10 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 if (elementLocalName.equals(PROPERTIES)) {
                     authorization.setProperties(processElementProperties(element, xmlEventReader));
                 } else {
-                    // ignore element
-                    System.out.println("Skipping unexpected element children of authorization: "+elementLocalName);
-                    skipElement(element, xmlEventReader);
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security realm authorization's element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
                 }
             } else if (xmlEvent.isEndElement()) {
                 break;

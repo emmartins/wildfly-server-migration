@@ -46,7 +46,7 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                         .subtask(new WildFly25MigrateReferencedPaths<>())
                         .subtask(new WildFly25MigrateVault<>())
                         .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
-                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityUpdateElytronSubsystem())
+                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                         .subtask(new MigrateDeployments<>())
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -64,7 +64,7 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                                 .subtask(new WildFly25MigrateReferencedPaths<>())
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityUpdateElytronSubsystem()))
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron()))
 
                                 )
                         )
