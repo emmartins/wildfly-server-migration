@@ -54,8 +54,12 @@ public class LegacySecurityRealm {
         this.serverIdentities = serverIdentities;
     }
 
+    public static String getElytronSecurityDomainName(String legacySecurityRealmName) {
+        return legacySecurityRealmName+"-securitydomain";
+    }
+
     public String getElytronSecurityDomainName() {
-        return name+"-securitydomain";
+        return getElytronSecurityDomainName(name);
     }
 
     public String getElytronPropertiesRealmName() {

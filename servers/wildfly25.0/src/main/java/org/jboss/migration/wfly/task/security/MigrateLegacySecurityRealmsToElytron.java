@@ -65,7 +65,11 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
 
     public static class MigrateToElytron<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
-        private static final String SUBTASK_NAME = TASK_NAME + ".update-elytron";
+        private static final String SUBTASK_NAME = TASK_NAME + ".update-subsystems";
+        private static final String SETTING = "setting";
+        private static final String HTTP_INVOKER = "http-invoker";
+        private static final String HTTPS_LISTENER = "https-listener";
+        private static final String HTTP_CONNECTOR = "http-connector";
 
         protected MigrateToElytron(final LegacySecurityConfigurations legacySecurityConfigurations) {
             name(SUBTASK_NAME);
@@ -151,16 +155,16 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
             final SubsystemResource remotingSubsystemResource = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.REMOTING);
             if (remotingSubsystemResource != null) {
                 final ModelNode remotingSubsystemConfig = remotingSubsystemResource.getResourceConfiguration();
-                if (remotingSubsystemConfig.hasDefined("http-connector")) {
-                    for (Property remotingHttpConnectorProperty : remotingSubsystemConfig.get("http-connector").asPropertyList()) {
+                if (remotingSubsystemConfig.hasDefined(HTTP_CONNECTOR)) {
+                    for (Property remotingHttpConnectorProperty : remotingSubsystemConfig.get(HTTP_CONNECTOR).asPropertyList()) {
                         final String remotingHttpConnectorName = remotingHttpConnectorProperty.getName();
                         final ModelNode remotingHttpConnectorConfig = remotingHttpConnectorProperty.getValue();
                         if (securityRealm.getName().equals(remotingHttpConnectorConfig.get(SECURITY_REALM).asStringOrNull())) {
                             // we found a http connector using the legacy security-real, update it to use the created Elytron's sasl factory
                             logger.debugf("Remoting subsystem's http-connector resource using the legacy security-realm %s found.", securityRealm.getName());
-                            final PathAddress remotingConnectorAddress = remotingSubsystemResource.getResourcePathAddress().append("http-connector", remotingHttpConnectorName);
+                            final PathAddress remotingConnectorAddress = remotingSubsystemResource.getResourcePathAddress().append(HTTP_CONNECTOR, remotingHttpConnectorName);
                             compositeOperationBuilder.addStep(getUndefineAttributeOperation(remotingConnectorAddress, SECURITY_REALM));
-                            compositeOperationBuilder.addStep(getWriteAttributeOperation(remotingConnectorAddress, "sasl-authentication-factory", securityRealm.getElytronSaslAuthenticationFactoryName()));
+                            compositeOperationBuilder.addStep(getWriteAttributeOperation(remotingConnectorAddress, SASL_AUTHENTICATION_FACTORY, securityRealm.getElytronSaslAuthenticationFactoryName()));
                         }
                     }
                 }
@@ -199,20 +203,33 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                     final SubsystemResource undertowSubsystemResource = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.UNDERTOW);
                     if (undertowSubsystemResource != null) {
                         final ModelNode undertowSubsystemConfig = undertowSubsystemResource.getResourceConfiguration();
-                        if (undertowSubsystemConfig.hasDefined("server")) {
-                            for (Property undertowServerProperty : undertowSubsystemConfig.get("server").asPropertyList()) {
+                        if (undertowSubsystemConfig.hasDefined(SERVER)) {
+                            for (Property undertowServerProperty : undertowSubsystemConfig.get(SERVER).asPropertyList()) {
                                 final String undertowServerName = undertowServerProperty.getName();
                                 final ModelNode undertowServerConfig = undertowServerProperty.getValue();
-                                if (undertowServerConfig.hasDefined("https-listener")) {
-                                    for (Property undertowHttpsListenerProperty : undertowServerConfig.get("https-listener").asPropertyList()) {
+                                if (undertowServerConfig.hasDefined(HTTPS_LISTENER)) {
+                                    for (Property undertowHttpsListenerProperty : undertowServerConfig.get(HTTPS_LISTENER).asPropertyList()) {
                                         final String undertowHttpsListenerName = undertowHttpsListenerProperty.getName();
                                         final ModelNode undertowHttpsListenerConfig = undertowHttpsListenerProperty.getValue();
                                         if (securityRealm.getName().equals(undertowHttpsListenerConfig.get(SECURITY_REALM).asStringOrNull())) {
-                                            // we found a http listener using the legacy security-real, update it to use Elytron's server ssl context insteadhttps listener config
+                                            // we found a http listener using the legacy security-real, update it to use Elytron's server ssl context instead
                                             logger.debugf("Undertow subsystem https-listener resource using the legacy security-realm %s found.", securityRealm.getName());
-                                            final PathAddress undertowConnectorAddress = undertowSubsystemResource.getResourcePathAddress().append("server", undertowServerName).append("https-listener", undertowHttpsListenerName);
+                                            final PathAddress undertowConnectorAddress = undertowSubsystemResource.getResourcePathAddress().append(SERVER, undertowServerName).append(HTTPS_LISTENER, undertowHttpsListenerName);
                                             compositeOperationBuilder.addStep(getUndefineAttributeOperation(undertowConnectorAddress, SECURITY_REALM));
                                             compositeOperationBuilder.addStep(getWriteAttributeOperation(undertowConnectorAddress, SSL_CONTEXT, securityRealm.getElytronTLSServerSSLContextName()));
+                                        }
+                                    }
+                                }
+                                if (undertowServerConfig.hasDefined(HOST)) {
+                                    for (Property undertowHostProperty : undertowServerConfig.get(HOST).asPropertyList()) {
+                                        final String undertowHostName = undertowHostProperty.getName();
+                                        final ModelNode undertowHostConfig = undertowHostProperty.getValue();
+                                        final ModelNode undertowHttpInvokerConfig = undertowHostConfig.get(SETTING, HTTP_INVOKER);
+                                        if (undertowHttpInvokerConfig.isDefined() && securityRealm.getName().equals(undertowHttpInvokerConfig.get(SECURITY_REALM).asStringOrNull())) {
+                                            logger.debugf("Undertow subsystem http-invoker resource using the legacy security-realm %s found.", securityRealm.getName());
+                                            final PathAddress pathAddress = undertowSubsystemResource.getResourcePathAddress().append(SERVER, undertowServerName).append(HOST, undertowHostName).append(SETTING, HTTP_INVOKER);
+                                            compositeOperationBuilder.addStep(getUndefineAttributeOperation(pathAddress, SECURITY_REALM));
+                                            compositeOperationBuilder.addStep(getWriteAttributeOperation(pathAddress, HTTP_AUTHENTICATION_FACTORY, securityRealm.getElytronHttpAuthenticationFactoryName()));
                                         }
                                     }
                                 }
