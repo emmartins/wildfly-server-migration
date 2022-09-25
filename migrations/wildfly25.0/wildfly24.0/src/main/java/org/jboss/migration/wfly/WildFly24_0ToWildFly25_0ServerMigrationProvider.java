@@ -46,16 +46,22 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                         .subtask(new WildFly25MigrateReferencedPaths<>())
                         .subtask(new WildFly25MigrateVault<>())
                         .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
+                        .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
                         .subtask(new MigrateDeployments<>())
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new RemoveUnsupportedExtensions<>())
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly25MigrateReferencedPaths<>())
                                 .subtask(new WildFly25_0AddHostExcludes<>())
+                                .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
                                 .subtask(new MigrateDeployments<>())
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
@@ -64,11 +70,12 @@ public class WildFly24_0ToWildFly25_0ServerMigrationProvider implements WildFly2
                                 .subtask(new WildFly25MigrateReferencedPaths<>())
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron()))
-
+                                        .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
                                 )
                         )
-                .build();
+                ).build();
     }
 
     @Override

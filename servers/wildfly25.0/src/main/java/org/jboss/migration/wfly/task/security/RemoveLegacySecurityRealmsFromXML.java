@@ -64,7 +64,7 @@ public class RemoveLegacySecurityRealmsFromXML<S extends JBossServer<S>> impleme
                     if (taskResult.getStatus() == ServerMigrationTaskResult.Status.SKIPPED) {
                         context.getLogger().debugf("No legacy security realms found.");
                     } else {
-                        context.getLogger().infof("Legacy security realms  removed from XML configuration.");
+                        context.getLogger().infof("Legacy security realms removed from XML configuration.");
                     }
                     return taskResult;
                 })

@@ -35,6 +35,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Iterator;
+import java.util.Objects;
 
 import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet;
 
@@ -48,7 +49,11 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
     public static final String ALIAS = "alias";
     public static final String ALLOWED_USERS = "allowed-users";
 
+    public static final String AUTH_MODULE = "auth-module";
+
     public static final String AUTHENTICATION = "authentication";
+    public static final String AUTHENTICATION_JASPI = "authentication-jaspi";
+
     public static final String AUTHORIZATION = "authorization";
     private static final String ENGINE = "engine";
     public static final String GENERATE_SELF_SIGNED_CERTIFICATE_HOST = "generate-self-signed-certificate-host";
@@ -57,19 +62,28 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
     public static final String KEYSTORE = "keystore";
     public static final String KEYSTORE_PASSWORD = "keystore-password";
     public static final String LOCAL = "local";
+    public static final String LOGIN_MODULE = "login-module";
+    public static final String LOGIN_MODULE_STACK = "login-module-stack";
     public static final String MANAGEMENT = "management";
     public static final String MANAGEMENT_INTERFACES = "management-interfaces";
+    public static final String MODULE_OPTION = "module-option";
     public static final String NATIVE_INTERFACE = "native-interface";
     public static final String NATIVE_REMOTING_INTERFACE = "native-remoting-interface";
     public static final String PATH = "path";
     public static final String PLAIN_TEXT = "plain-text";
+    public static final String POLICY_MODULE = "policy-module";
+    public static final String PROFILE = "profile";
+    public static final String PROFILES = "profiles";
     public static final String PROPERTIES = "properties";
     public static final String RELATIVE_TO = "relative-to";
     private static final String SECRET = "secret";
+    public static final String SECURITY_DOMAIN = "security-domain";
+    public static final String SECURITY_DOMAINS = "security-domains";
     public static final String SECURITY_REALM = "security-realm";
     public static final String SECURITY_REALMS = "security-realms";
     public static final String SERVER_IDENTITIES = "server-identities";
     public static final String SSL = "ssl";
+    public static final String SUBSYSTEM = "subsystem";
 
     private static final String DEFAULT_USER = "default-user";
     private static final String SKIP_GROUP_LOADING = "skip-group-loading";
@@ -114,6 +128,10 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                         final String elementLocalName = element.getName().getLocalPart();
                         if (elementLocalName.equals(MANAGEMENT)) {
                             processElementManagement(element, xmlEventReader, legacySecurityConfiguration, context);
+                        } else if (elementLocalName.equals(PROFILES)) {
+                            processElementProfiles(element, xmlEventReader, legacySecurityConfiguration, context);
+                        } else if (elementLocalName.equals(PROFILE)) {
+                            processElementProfile(element, xmlEventReader, legacySecurityConfiguration, context);
                         } else {
                             // ignore element
                             skipElement(element, xmlEventReader);
@@ -150,13 +168,31 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         }
     }
 
+    private void processElementProfiles(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final TaskContext context) throws XMLStreamException {
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(PROFILE)) {
+                    processElementProfile(element, xmlEventReader, legacySecurityConfiguration, context);
+                } else {
+                    // ignore element
+                    skipElement(element, xmlEventReader);
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+    }
+
     private void processElementManagementInterfaces(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final TaskContext context) throws XMLStreamException {
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 final StartElement element = xmlEvent.asStartElement();
                 final String elementLocalName = element.getName().getLocalPart();
-                Attribute securityRealmAttr = startElement.getAttributeByName(new QName("security-realm"));
+                Attribute securityRealmAttr = element.getAttributeByName(new QName("security-realm"));
                 if (securityRealmAttr != null) {
                     final LegacySecuredManagementInterface<S> securedManagementInterface = new LegacySecuredManagementInterface<>(elementLocalName, securityRealmAttr.getValue());
                     legacySecurityConfiguration.getSecuredManagementInterfaces().add(securedManagementInterface);
@@ -214,7 +250,6 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         if (legacySecurityConfiguration.getLegacySecurityRealms().putIfAbsent(securityRealm.getName(), securityRealm) != null) {
             throw new IllegalStateException("security realm "+securityRealm+" already added to the legacy security configuration");
         } else {
-            // FIXME
             context.getLogger().debugf("Legacy security realm %s found.",securityRealm.getName());
         }
     }
@@ -370,6 +405,267 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
             }
         }
         securityRealm.setAuthorization(authorization);
+    }
+
+    protected void processElementProfile(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final TaskContext context) throws XMLStreamException {
+        final Attribute profileNameAttribute = startElement.getAttributeByName(new QName("name"));
+        final String profileName = profileNameAttribute != null ? profileNameAttribute.getValue() : null;
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                if (element.getName().getLocalPart().equals(SUBSYSTEM) && element.getName().getNamespaceURI().startsWith("urn:jboss:domain:security:")) {
+                    processElementSecuritySubsystem(element, xmlEventReader, legacySecurityConfiguration, profileName, context);
+                } else {
+                    // ignore
+                    skipElement(element, xmlEventReader);
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+    }
+
+    protected void processElementSecuritySubsystem(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final String profileName, final TaskContext context) throws XMLStreamException {
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(SECURITY_DOMAINS)) {
+                    processElementSecurityDomains(element, xmlEventReader, legacySecurityConfiguration, profileName, context);
+                } else {
+                    // ignore element
+                    skipElement(element, xmlEventReader);
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+    }
+
+    protected void processElementSecurityDomains(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final String profileName, final TaskContext context) throws XMLStreamException {
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(SECURITY_DOMAIN)) {
+                    processElementSecurityDomain(element, xmlEventReader, legacySecurityConfiguration, profileName, context);
+                } else {
+                    // ignore element
+                    skipElement(element, xmlEventReader);
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+    }
+
+    protected void processElementSecurityDomain(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final String profileName, final TaskContext context) throws XMLStreamException {
+        final String securityDomainName = startElement.getAttributeByName(new QName("name")).getValue();
+        final LegacySecurityDomain securityDomain = new LegacySecurityDomain(securityDomainName, profileName);
+        final Attribute securityDomainCacheTypeAttr = startElement.getAttributeByName(new QName("cache-type"));
+        if (securityDomainCacheTypeAttr != null) {
+            securityDomain.setCacheType(securityDomainCacheTypeAttr.getValue());
+        }
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(AUTHENTICATION)) {
+                    processElementSecurityDomainAuthentication(element, xmlEventReader, securityDomain, context);
+                } else if (elementLocalName.equals(AUTHENTICATION_JASPI)) {
+                    processElementSecurityDomainAuthenticationJaspi(element, xmlEventReader, securityDomain, context);
+                } else if (elementLocalName.equals(AUTHORIZATION)) {
+                    processElementSecurityDomainAuthorization(element, xmlEventReader, securityDomain, context);
+                } else {
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security domain element "+elementLocalName+" is not supported, please refer to this specific Migration Task documentation in the Tool's User Guide for more information");
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+        legacySecurityConfiguration.getLegacySecurityDomains().add(securityDomain);
+        if (securityDomain.getProfile() == null) {
+            context.getLogger().debugf("Legacy security domain %s found.", securityDomain.getName());
+        } else {
+            context.getLogger().debugf("Legacy security domain %s found on profile %s.", securityDomain.getName(), securityDomain.getProfile());
+        }
+    }
+
+    protected void processElementSecurityDomainAuthentication(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain securityDomain, final TaskContext context) throws XMLStreamException {
+        LegacySecurityDomain.Authentication authentication = new LegacySecurityDomain.Authentication();
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(LOGIN_MODULE)) {
+                    final LegacySecurityDomain.LoginModule loginModule = processElementLoginModule(element, xmlEventReader, context);
+                    if (loginModule != null) {
+                        authentication.getLoginModules().add(loginModule);
+                    }
+                } else {
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security domain authentication element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+        securityDomain.setAuthentication(authentication);
+    }
+
+    protected LegacySecurityDomain.LoginModule processElementLoginModule(final StartElement startElement, XMLEventReader xmlEventReader, final TaskContext context) throws XMLStreamException {
+        final LegacySecurityDomain.LoginModule module = new LegacySecurityDomain.LoginModule();
+        processElementModule(startElement, xmlEventReader, module, context);
+        Objects.requireNonNull(module.getCode());
+        Objects.requireNonNull(module.getFlag());
+        if (LegacySecurityDomain.SUPPORTED_LOGIN_MODULE_CODES.contains(module.getCode())) {
+            return module;
+        } else {
+            // unsupported login module
+            // FIXME should this be ignored or migration should fail?
+            context.getLogger().warnf("Legacy security domain's login-module with code %s found. Please note that the migration for such element is not available and will be ignored, which may result on an invalid/different migrated security domain configuration.", module.getCode());
+            return null;
+        }
+    }
+
+    protected void processElementModule(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain.Module module, final TaskContext context) throws XMLStreamException {
+        final Attribute codeAttribute = startElement.getAttributeByName(new QName("code"));
+        if (codeAttribute != null) {
+            module.setCode(codeAttribute.getValue());
+        }
+        final Attribute flagAttribute = startElement.getAttributeByName(new QName("flag"));
+        if (flagAttribute != null) {
+            module.setFlag(flagAttribute.getValue());
+        }
+        final Attribute nameAttribute = startElement.getAttributeByName(new QName("name"));
+        if (nameAttribute != null) {
+            module.setName(nameAttribute.getValue());
+        }
+        final Attribute moduleAttribute = startElement.getAttributeByName(new QName("module"));
+        if (moduleAttribute != null) {
+            module.setName(moduleAttribute.getValue());
+        }
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(MODULE_OPTION)) {
+                    processElementModuleOption(element, xmlEventReader, module, context);
+                } else {
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security domain authentication element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+    }
+    protected void processElementModuleOption(final StartElement startElement, XMLEventReader xmlEventReader, final LegacySecurityDomain.Module module, final TaskContext context) throws XMLStreamException {
+        final String name = startElement.getAttributeByName(new QName("name")).getValue();
+        final String value = startElement.getAttributeByName(new QName("value")).getValue();
+        module.getModuleOptions().put(name, value);
+        skipElement(startElement, xmlEventReader);
+    }
+
+    protected void processElementSecurityDomainAuthorization(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain securityDomain, final TaskContext context) throws XMLStreamException {
+        LegacySecurityDomain.Authorization authorization = new LegacySecurityDomain.Authorization();
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(POLICY_MODULE)) {
+                    processElementPolicyModule(element, xmlEventReader, authorization, context);
+                } else {
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security domain authorization element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+        securityDomain.setAuthorization(authorization);
+    }
+
+    protected void processElementPolicyModule(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain.Authorization authorization, final TaskContext context) throws XMLStreamException {
+        final LegacySecurityDomain.PolicyModule module = new LegacySecurityDomain.PolicyModule();
+        processElementModule(startElement, xmlEventReader, module, context);
+        Objects.requireNonNull(module.getCode());
+        Objects.requireNonNull(module.getFlag());
+        authorization.getPolicyModules().add(module);
+    }
+
+    protected void processElementSecurityDomainAuthenticationJaspi(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain securityDomain, final TaskContext context) throws XMLStreamException {
+        LegacySecurityDomain.AuthenticationJaspi authentication = new LegacySecurityDomain.AuthenticationJaspi();
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(LOGIN_MODULE_STACK)) {
+                    processElementLoginModuleStack(element, xmlEventReader, authentication, context);
+                } else if (elementLocalName.equals(AUTH_MODULE)) {
+                    processElementAuthModule(element, xmlEventReader, authentication, context);
+                } else {
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security domain authentication element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+        securityDomain.setAuthenticationJaspi(authentication);
+    }
+
+    protected void processElementLoginModuleStack(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain.AuthenticationJaspi authentication, final TaskContext context) throws XMLStreamException {
+        final String name = startElement.getAttributeByName(new QName("name")).getValue();
+        LegacySecurityDomain.LoginModuleStack loginModuleStack = new LegacySecurityDomain.LoginModuleStack(name);
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(LOGIN_MODULE)) {
+                    loginModuleStack.getLoginModules().add(processElementLoginModule(element, xmlEventReader, context));
+                } else {
+                    // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
+                    // skipElement(element, xmlEventReader);
+                    // fail the migration
+                    throw new UnsupportedOperationException("Legacy security domain authentication-jaspi login module stack element "+elementLocalName+" is not supported, please refer to this specific Migration documentation in the Tool's User Guide for more information");
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+        authentication.getLoginModulesStacks().add(loginModuleStack);
+    }
+
+    protected void processElementAuthModule(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityDomain.AuthenticationJaspi authentication, final TaskContext context) throws XMLStreamException {
+        final LegacySecurityDomain.AuthModule module = new LegacySecurityDomain.AuthModule();
+        final Attribute loginModuleStackRefAttribute = startElement.getAttributeByName(new QName("login-module-stack-ref"));
+        if (loginModuleStackRefAttribute != null) {
+            module.setLoginModuleStackRef(loginModuleStackRefAttribute.getValue());
+        }
+        processElementModule(startElement, xmlEventReader, module, context);
+        Objects.requireNonNull(module.getCode());
+        authentication.getAuthModules().add(module);
     }
 
     protected void skipElement(StartElement startElement, XMLEventReader xmlEventReader) throws XMLStreamException {

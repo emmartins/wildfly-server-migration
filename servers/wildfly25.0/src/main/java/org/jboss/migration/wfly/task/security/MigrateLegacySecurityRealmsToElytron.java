@@ -77,6 +77,9 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
             final ManageableResourceTaskRunnableBuilder<S, SubsystemResource> runnableBuilder = params -> context -> {
                 final SubsystemResource subsystemResource = params.getResource();
                 final LegacySecurityConfiguration legacySecurityConfiguration = legacySecurityConfigurations.getSecurityConfigurations().get(subsystemResource.getServerConfiguration().getConfigurationPath().getPath().toString());
+                if (legacySecurityConfiguration == null || !legacySecurityConfiguration.requiresMigration()) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
                 for (LegacySecurityRealm securityRealm : legacySecurityConfiguration.getLegacySecurityRealms().values()) {
                     migrateSecurityRealm(securityRealm, legacySecurityConfiguration, subsystemResource, context);
                 }
@@ -118,22 +121,18 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         }
 
         protected void addSecurityDomain(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
-            // TODO assert elytron config has permissionMapper named default-permission-mapper
-            // TODO assert elytron config has role decoder groups-to-roles
             final SecurityDomainAddOperation securityDomainAddOperation = new SecurityDomainAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronSecurityDomainName())
                     .permissionMapper("default-permission-mapper")
                     .defaultRealm(securityRealm.getElytronPropertiesRealmName())
                     .addRealm(new SecurityDomainAddOperation.Realm(securityRealm.getElytronPropertiesRealmName())
                             .roleDecoder(securityRealm.getAuthorization().isMapGroupsToRoles() ? "groups-to-roles" : null));
             if (securityRealm.getAuthentication().getLocal() != null) {
-                // TODO assert elytron config has realm local and role mapper super-user-mapper
                 securityDomainAddOperation.addRealm(new SecurityDomainAddOperation.Realm("local").roleMapper(securityRealm.getAuthentication().getLocal().getAllowedUsers() == null ? "super-user-mapper" : null));
             }
             compositeOperationBuilder.addStep(securityDomainAddOperation.toModelNode());
         }
 
         protected void addHttp(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
-            // TODO assert elytron config has httpServerMechanismFactory named global
             compositeOperationBuilder.addStep(new HttpAuthenticationFactoryAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronHttpAuthenticationFactoryName())
                     .securityDomain(securityRealm.getElytronSecurityDomainName())
                     .httpServerMechanismFactory("global")
@@ -142,7 +141,6 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         }
 
         protected void addSasl(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
-            // TODO assert elytron config has saslServerFactory named configured
             compositeOperationBuilder.addStep(new SaslAuthenticationFactoryAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronSaslAuthenticationFactoryName())
                     .securityDomain(securityRealm.getElytronSecurityDomainName())
                     .saslServerFactory("configured")
@@ -165,6 +163,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                             final PathAddress remotingConnectorAddress = remotingSubsystemResource.getResourcePathAddress().append(HTTP_CONNECTOR, remotingHttpConnectorName);
                             compositeOperationBuilder.addStep(getUndefineAttributeOperation(remotingConnectorAddress, SECURITY_REALM));
                             compositeOperationBuilder.addStep(getWriteAttributeOperation(remotingConnectorAddress, SASL_AUTHENTICATION_FACTORY, securityRealm.getElytronSaslAuthenticationFactoryName()));
+                            logger.debugf("Migrated Remoting subsystem's http-connector resource using the legacy security-realm %s.", securityRealm.getName());
                         }
                     }
                 }
@@ -217,6 +216,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                                             final PathAddress undertowConnectorAddress = undertowSubsystemResource.getResourcePathAddress().append(SERVER, undertowServerName).append(HTTPS_LISTENER, undertowHttpsListenerName);
                                             compositeOperationBuilder.addStep(getUndefineAttributeOperation(undertowConnectorAddress, SECURITY_REALM));
                                             compositeOperationBuilder.addStep(getWriteAttributeOperation(undertowConnectorAddress, SSL_CONTEXT, securityRealm.getElytronTLSServerSSLContextName()));
+                                            logger.debugf("Migrated Undertow subsystem https-listener resource using the legacy security-realm %s.", securityRealm.getName());
                                         }
                                     }
                                 }
@@ -230,6 +230,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                                             final PathAddress pathAddress = undertowSubsystemResource.getResourcePathAddress().append(SERVER, undertowServerName).append(HOST, undertowHostName).append(SETTING, HTTP_INVOKER);
                                             compositeOperationBuilder.addStep(getUndefineAttributeOperation(pathAddress, SECURITY_REALM));
                                             compositeOperationBuilder.addStep(getWriteAttributeOperation(pathAddress, HTTP_AUTHENTICATION_FACTORY, securityRealm.getElytronHttpAuthenticationFactoryName()));
+                                            logger.debugf("Migrated Undertow subsystem http-invoker resource using the legacy security-realm %s.", securityRealm.getName());
                                         }
                                     }
                                 }
@@ -289,7 +290,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                 if (taskResult == ServerMigrationTaskResult.SUCCESS) {
                     context.getLogger().debugf("Legacy secure management interfaces op to migrate to Elytron: %s", compositeOperationBuilder.build().getOperation());
                     resource.getServerConfiguration().executeManagementOperation(compositeOperationBuilder.build().getOperation());
-                    context.getLogger().info("Management interfaces secured by legacy security realms migrated to Elytron.");
+                    context.getLogger().debugf("Management interfaces secured by legacy security realms migrated to Elytron.");
                 }
                 return taskResult;
             };

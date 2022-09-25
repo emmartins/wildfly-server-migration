@@ -17,8 +17,10 @@ package org.jboss.migration.wfly.task.security;
 
 import org.jboss.migration.core.jboss.JBossServerConfiguration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +29,7 @@ public class LegacySecurityConfiguration {
     private final JBossServerConfiguration targetConfiguration;
     private final Map<String, LegacySecurityRealm> legacySecurityRealms = new HashMap<>();
     private final Set<LegacySecuredManagementInterface> securedManagementInterfaces = new HashSet<>();
+    private final List<LegacySecurityDomain> legacySecurityDomains = new ArrayList<>();
 
     public LegacySecurityConfiguration(JBossServerConfiguration targetConfiguration) {
         this.targetConfiguration = targetConfiguration;
@@ -48,12 +51,21 @@ public class LegacySecurityConfiguration {
         return securedManagementInterfaces;
     }
 
+    public List<LegacySecurityDomain> getLegacySecurityDomains() {
+        return legacySecurityDomains;
+    }
+
     @Override
     public String toString() {
         return "LegacySecurityConfiguration{" +
                 "targetConfiguration=" + targetConfiguration +
                 ", legacySecurityRealms=" + legacySecurityRealms.values() +
                 ", securedManagementInterfaces=" + securedManagementInterfaces +
+                ", legacySecurityDomains=" + legacySecurityDomains +
                 '}';
+    }
+
+    public boolean requiresMigration() {
+        return !legacySecurityRealms.isEmpty() || !legacySecurityDomains.isEmpty() || !securedManagementInterfaces.isEmpty();
     }
 }
