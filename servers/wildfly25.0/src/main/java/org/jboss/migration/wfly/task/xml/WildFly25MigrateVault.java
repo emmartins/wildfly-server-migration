@@ -16,6 +16,7 @@
 
 package org.jboss.migration.wfly.task.xml;
 
+import org.jboss.migration.core.env.TaskEnvironment;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.JBossServerConfiguration;
 import org.jboss.migration.core.task.ServerMigrationTask;
@@ -61,8 +62,12 @@ public class WildFly25MigrateVault<S extends JBossServer<S>> implements ServerCo
         final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter, xmlEventFactory) -> {
             final String elementLocalName = startElement.getName().getLocalPart();
             if (elementLocalName.equals(VAULT) && startElement.getName().getNamespaceURI().startsWith("urn:jboss:domain:")) {
-                taskResultBuilder.success();
-                return XMLFileFilter.Result.REMOVE;
+                if (new TaskEnvironment(context.getMigrationEnvironment(), context.getTaskName()).getPropertyAsBoolean("fail-if-vault-found",true)) {
+                    throw new UnsupportedOperationException("The source configuration includes Vault, which migration is unsupported by the tool and needs to be done manually in advance. If you want to proceed with the migration please restart migration with environment property "+TASK_NAME+".fail-if-vault-found set as false.");
+                } else {
+                    taskResultBuilder.success();
+                    return XMLFileFilter.Result.REMOVE;
+                }
             } else {
                 return XMLFileFilter.Result.NOT_APPLICABLE;
             }
