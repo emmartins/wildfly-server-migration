@@ -36,6 +36,7 @@ public interface JBossSubsystemNames {
     String EE_SECURITY = "ee-security";
     String EJB3 = "ejb3";
     String ELYTRON = "elytron";
+    String ELYTRON_OIDC_CLIENT = "elytron-oidc-client";
     String HEALTH = "health";
     String IIOP_OPENJDK = "iiop-openjdk";
     String INFINISPAN = "infinispan";
@@ -66,6 +67,7 @@ public interface JBossSubsystemNames {
     String MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE = "microprofile-reactive-streams-operators-smallrye";
     String MODCLUSTER = "modcluster";
     String NAMING = "naming";
+    String OPENTELEMETRY = "opentelemetry";
     String OSGI = "osgi";
     String POJO = "pojo";
     String REMOTING = "remoting";
