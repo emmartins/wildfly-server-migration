@@ -87,6 +87,8 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
 
     private static final String DEFAULT_USER = "default-user";
     private static final String SKIP_GROUP_LOADING = "skip-group-loading";
+    public static final String DOMAIN_CONTROLLER = "domain-controller";
+    public static final String REMOTE = "remote";
 
     private final LegacySecurityConfigurations legacySecurityConfigurations;
 
@@ -132,6 +134,8 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                             processElementProfiles(element, xmlEventReader, legacySecurityConfiguration, context);
                         } else if (elementLocalName.equals(PROFILE)) {
                             processElementProfile(element, xmlEventReader, legacySecurityConfiguration, context);
+                        } else if (elementLocalName.equals(DOMAIN_CONTROLLER)) {
+                            processElementDomainController(element, xmlEventReader, legacySecurityConfiguration, context);
                         } else {
                             // ignore element
                             skipElement(element, xmlEventReader);
@@ -148,7 +152,7 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         return legacySecurityConfiguration;
     }
 
-    private void processElementManagement(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final TaskContext context) throws XMLStreamException {
+    protected void processElementManagement(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final TaskContext context) throws XMLStreamException {
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
@@ -666,6 +670,35 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
         processElementModule(startElement, xmlEventReader, module, context);
         Objects.requireNonNull(module.getCode());
         authentication.getAuthModules().add(module);
+    }
+
+    protected void processElementDomainController(StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration legacySecurityConfiguration, final TaskContext context) throws XMLStreamException {
+        while (xmlEventReader.hasNext()) {
+            XMLEvent xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement()) {
+                final StartElement element = xmlEvent.asStartElement();
+                final String elementLocalName = element.getName().getLocalPart();
+                if (elementLocalName.equals(REMOTE)) {
+                    processElementRemote(element, xmlEventReader, legacySecurityConfiguration, context);
+                } else {
+                    // ignore element
+                    skipElement(element, xmlEventReader);
+                }
+            } else if (xmlEvent.isEndElement()) {
+                break;
+            }
+        }
+    }
+
+    protected void processElementRemote(final StartElement startElement, XMLEventReader xmlEventReader, LegacySecurityConfiguration configuration, TaskContext context) throws XMLStreamException {
+        final Attribute securityRealmAttribute = startElement.getAttributeByName(new QName(SECURITY_REALM));
+        if (securityRealmAttribute != null) {
+            final String securityRealm = securityRealmAttribute.getValue();
+            if (!securityRealm.isEmpty()) {
+                configuration.setDomainControllerRemoteSecurityRealm(securityRealm);
+            }
+        }
+        skipElement(startElement, xmlEventReader);
     }
 
     protected void skipElement(StartElement startElement, XMLEventReader xmlEventReader) throws XMLStreamException {

@@ -30,6 +30,7 @@ public class LegacySecurityConfiguration {
     private final Map<String, LegacySecurityRealm> legacySecurityRealms = new HashMap<>();
     private final Set<LegacySecuredManagementInterface> securedManagementInterfaces = new HashSet<>();
     private final List<LegacySecurityDomain> legacySecurityDomains = new ArrayList<>();
+    private String domainControllerRemoteSecurityRealm;
 
     public LegacySecurityConfiguration(JBossServerConfiguration targetConfiguration) {
         this.targetConfiguration = targetConfiguration;
@@ -55,13 +56,22 @@ public class LegacySecurityConfiguration {
         return legacySecurityDomains;
     }
 
+    public String getDomainControllerRemoteSecurityRealm() {
+        return domainControllerRemoteSecurityRealm;
+    }
+
+    public void setDomainControllerRemoteSecurityRealm(String domainControllerRemoteSecurityRealm) {
+        this.domainControllerRemoteSecurityRealm = domainControllerRemoteSecurityRealm;
+    }
+
     @Override
     public String toString() {
         return "LegacySecurityConfiguration{" +
                 "targetConfiguration=" + targetConfiguration +
-                ", legacySecurityRealms=" + legacySecurityRealms.values() +
+                ", legacySecurityRealms=" + legacySecurityRealms +
                 ", securedManagementInterfaces=" + securedManagementInterfaces +
                 ", legacySecurityDomains=" + legacySecurityDomains +
+                ", domainControllerRemoteSecurityRealm='" + domainControllerRemoteSecurityRealm + '\'' +
                 '}';
     }
 

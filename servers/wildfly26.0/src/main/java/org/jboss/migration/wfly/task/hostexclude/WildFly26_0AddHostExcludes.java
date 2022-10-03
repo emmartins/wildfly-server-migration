@@ -135,6 +135,7 @@ public class WildFly26_0AddHostExcludes<S> extends AddHostExcludes<S> {
                     .excludedExtension(JBossExtensionNames.METRICS)
                     .excludedExtension("org.wildfly.extension.microprofile.fault-tolerance-smallrye")
                     .excludedExtension("org.wildfly.extension.microprofile.jwt-smallrye")
+                    .excludedExtension("org.wildfly.extension.microprofile.metrics-smallrye")
                     .excludedExtension("org.wildfly.extension.microprofile.openapi-smallrye")
                     .excludedExtension(JBossExtensionNames.MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE)
                     .excludedExtension(JBossExtensionNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE)
