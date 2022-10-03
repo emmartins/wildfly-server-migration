@@ -71,7 +71,11 @@ public class LegacySecurityRealm {
     }
 
     public String getElytronSaslAuthenticationFactoryName() {
-        return name+"-saslAuthenticationFactory";
+        return getElytronSaslAuthenticationFactoryName(name);
+    }
+
+    public static String getElytronSaslAuthenticationFactoryName(String legacySecurityRealmName) {
+        return legacySecurityRealmName+"-saslAuthenticationFactory";
     }
 
     public String getElytronTLSKeyStoreName() {

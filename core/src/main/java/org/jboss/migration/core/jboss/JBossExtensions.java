@@ -36,6 +36,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.BEAN_VALIDATION)
             .build();
 
+    Extension CLUSTERING_EJB = Extension.builder()
+            .module(JBossExtensionNames.CLUSTERING_EJB)
+            .subsystem(JBossSubsystemNames.DISTRIBUTABLE_EJB)
+            .build();
+
     Extension CLUSTERING_WEB = Extension.builder()
             .module(JBossExtensionNames.CLUSTERING_WEB)
             .subsystem(JBossSubsystemNames.DISTRIBUTABLE_WEB)

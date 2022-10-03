@@ -23,6 +23,7 @@ public interface JBossExtensionNames {
     String BATCH = "org.wildfly.extension.batch";
     String BATCH_JBERET = "org.wildfly.extension.batch.jberet";
     String BEAN_VALIDATION = "org.wildfly.extension.bean-validation";
+    String CLUSTERING_EJB = "org.wildfly.extension.clustering.ejb";
     String CLUSTERING_WEB = "org.wildfly.extension.clustering.web";
     String CMP = "org.jboss.as.cmp";
     String CONFIGADMIN = "org.jboss.as.configadmin";

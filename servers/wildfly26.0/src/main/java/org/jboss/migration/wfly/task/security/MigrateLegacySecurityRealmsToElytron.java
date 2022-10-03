@@ -27,6 +27,7 @@ import org.jboss.migration.core.jboss.JBossSubsystemNames;
 import org.jboss.migration.core.task.ServerMigrationTaskResult;
 import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.core.task.component.TaskSkipPolicy;
+import org.jboss.migration.wfly10.config.management.HostConfiguration;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
 import org.jboss.migration.wfly10.config.management.ManagementInterfaceResource;
 import org.jboss.migration.wfly10.config.management.SubsystemResource;
@@ -59,7 +60,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         name(TASK_NAME);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().debugf("Migrating legacy security realms to Elytron..."));
-        subtasks(ManageableServerConfigurationCompositeSubtasks.of(new MigrateToElytron<>(legacySecurityConfigurations), new SetManagementInterfacesHttpUpgradeEnabled<>(legacySecurityConfigurations)));
+        subtasks(ManageableServerConfigurationCompositeSubtasks.of(new UpdateDomainController<>(legacySecurityConfigurations), new MigrateToElytron<>(legacySecurityConfigurations), new UpdateManagementInterfaces<>(legacySecurityConfigurations)));
         afterRun(context -> context.getLogger().debugf("Legacy security realms migrated to Elytron."));
     }
 
@@ -242,11 +243,11 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         }
     }
 
-    public static class SetManagementInterfacesHttpUpgradeEnabled<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
+    public static class UpdateManagementInterfaces<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
 
         private static final String SUBTASK_NAME = TASK_NAME + ".update-management-interfaces";
 
-        protected SetManagementInterfacesHttpUpgradeEnabled(final LegacySecurityConfigurations legacySecurityConfigurations) {
+        protected UpdateManagementInterfaces(final LegacySecurityConfigurations legacySecurityConfigurations) {
             name(SUBTASK_NAME);
             skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
             final ManageableResourceTaskRunnableBuilder<S, ManagementInterfaceResource.Parent> runnableBuilder = params -> context -> {
@@ -297,4 +298,42 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
             runBuilder(ManagementInterfaceResource.Parent.class, runnableBuilder);
         }
     }
+
+    public static class UpdateDomainController<S> extends ManageableServerConfigurationLeafTask.Builder<S> {
+
+        private static final String SUBTASK_NAME = TASK_NAME + ".update-domain-controller";
+
+        protected UpdateDomainController(final LegacySecurityConfigurations legacySecurityConfigurations) {
+            name(SUBTASK_NAME);
+            skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
+            final ManageableResourceTaskRunnableBuilder<S, ManageableServerConfiguration> runnableBuilder = params -> context -> {
+                if (params.getResource().getConfigurationType() != HostConfiguration.RESOURCE_TYPE) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                final LegacySecurityConfiguration legacySecurityConfiguration = legacySecurityConfigurations.getSecurityConfigurations().get(params.getServerConfiguration().getConfigurationPath().getPath().toString());
+                if (legacySecurityConfiguration == null) {
+                    context.getLogger().debug("Legacy config not found.");
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                final String domainControllerRemoteSecurityRealm = legacySecurityConfiguration.getDomainControllerRemoteSecurityRealm();
+                if (domainControllerRemoteSecurityRealm == null) {
+                    context.getLogger().debug("Legacy config domainControllerRemoteSecurityRealm is null.");
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+                context.getLogger().debug("Migrating Domain Controller configuration to Elytron...");
+                if (!params.getResource().getResourceConfiguration().hasDefined(DOMAIN_CONTROLLER, REMOTE)) {
+                    return ServerMigrationTaskResult.SKIPPED;
+                }
+
+                final ModelNode domainControllerConfig = params.getResource().getResourceConfiguration().get(DOMAIN_CONTROLLER).clone();
+                domainControllerConfig.get(REMOTE).get(AUTHENTICATION_CONTEXT).set(LegacySecurityRealm.getElytronSaslAuthenticationFactoryName(domainControllerRemoteSecurityRealm));
+                final ModelNode op = getWriteAttributeOperation(params.getResource().getResourcePathAddress(), DOMAIN_CONTROLLER, domainControllerConfig);
+                params.getServerConfiguration().executeManagementOperation(op);
+                context.getLogger().info("Domain Controller configuration migrated to Elytron.");
+                return ServerMigrationTaskResult.SUCCESS;
+            };
+            runBuilder(ManageableServerConfiguration.class, runnableBuilder);
+        }
+    }
+
 }
