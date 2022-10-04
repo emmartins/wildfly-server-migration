@@ -481,9 +481,13 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
                 if (elementLocalName.equals(AUTHENTICATION)) {
                     processElementSecurityDomainAuthentication(element, xmlEventReader, securityDomain, context);
                 } else if (elementLocalName.equals(AUTHENTICATION_JASPI)) {
-                    processElementSecurityDomainAuthenticationJaspi(element, xmlEventReader, securityDomain, context);
+                    //processElementSecurityDomainAuthenticationJaspi(element, xmlEventReader, securityDomain, context);
+                    context.getLogger().warnf("Migration of legacy security domain %s's authentication-jaspi%s is not supported and will be ignored.", securityDomain.getName(), (profileName != null ? ", on profile "+profileName+"," : ""));
+                    skipElement(element, xmlEventReader);
                 } else if (elementLocalName.equals(AUTHORIZATION)) {
-                    processElementSecurityDomainAuthorization(element, xmlEventReader, securityDomain, context);
+                    //processElementSecurityDomainAuthorization(element, xmlEventReader, securityDomain, context);
+                    context.getLogger().warnf("Migration of legacy security domain %s's authorization%s is not supported and will be ignored.", securityDomain.getName(), (profileName != null ? ", on profile "+profileName+"," : ""));
+                    skipElement(element, xmlEventReader);
                 } else {
                     // TODO add user interaction and env property for allowing the migration to proceed by skipping the processing for the unsupported element (i.e. skip parsing)
                     // skipElement(element, xmlEventReader);
@@ -536,7 +540,6 @@ public class ReadLegacySecurityConfigurationFromXML<S extends JBossServer<S>> im
             return module;
         } else {
             // unsupported login module
-            // FIXME should this be ignored or migration should fail?
             context.getLogger().warnf("Legacy security domain's login-module with code %s found. Please note that the migration for such element is not available and will be ignored, which may result on an invalid/different migrated security domain configuration.", module.getCode());
             return null;
         }

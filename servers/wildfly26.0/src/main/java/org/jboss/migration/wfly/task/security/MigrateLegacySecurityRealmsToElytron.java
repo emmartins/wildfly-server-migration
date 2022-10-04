@@ -60,7 +60,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         name(TASK_NAME);
         skipPolicy(TaskSkipPolicy.skipIfDefaultTaskSkipPropertyIsSet());
         beforeRun(context -> context.getLogger().debugf("Migrating legacy security realms to Elytron..."));
-        subtasks(ManageableServerConfigurationCompositeSubtasks.of(new UpdateDomainController<>(legacySecurityConfigurations), new MigrateToElytron<>(legacySecurityConfigurations), new UpdateManagementInterfaces<>(legacySecurityConfigurations)));
+        subtasks(ManageableServerConfigurationCompositeSubtasks.of(new MigrateToElytron<>(legacySecurityConfigurations), new UpdateManagementInterfaces<>(legacySecurityConfigurations)));
         afterRun(context -> context.getLogger().debugf("Legacy security realms migrated to Elytron."));
     }
 
@@ -326,7 +326,8 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                 }
 
                 final ModelNode domainControllerConfig = params.getResource().getResourceConfiguration().get(DOMAIN_CONTROLLER).clone();
-                domainControllerConfig.get(REMOTE).get(AUTHENTICATION_CONTEXT).set(LegacySecurityRealm.getElytronSaslAuthenticationFactoryName(domainControllerRemoteSecurityRealm));
+                // TODO code below is wrong, attr should point to a new Elytron auth context related with server identity on the legacy security realm (e.g. secret)
+                // domainControllerConfig.get(REMOTE).get(AUTHENTICATION_CONTEXT).set(LegacySecurityRealm.getElytronSaslAuthenticationFactoryName(domainControllerRemoteSecurityRealm));
                 final ModelNode op = getWriteAttributeOperation(params.getResource().getResourcePathAddress(), DOMAIN_CONTROLLER, domainControllerConfig);
                 params.getServerConfiguration().executeManagementOperation(op);
                 context.getLogger().info("Domain Controller configuration migrated to Elytron.");

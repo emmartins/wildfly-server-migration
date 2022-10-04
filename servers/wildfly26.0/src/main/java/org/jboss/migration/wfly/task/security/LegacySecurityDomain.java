@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 public class LegacySecurityDomain {
 
-    public static final Set<String> SUPPORTED_LOGIN_MODULE_CODES = Stream.of("RealmDirect", "Remoting", "UsersRoles").collect(Collectors.toSet());
+    public static final Set<String> SUPPORTED_LOGIN_MODULE_CODES = Stream.of("RealmDirect", "Remoting").collect(Collectors.toSet());
 
     private final String name;
     private final String profile;

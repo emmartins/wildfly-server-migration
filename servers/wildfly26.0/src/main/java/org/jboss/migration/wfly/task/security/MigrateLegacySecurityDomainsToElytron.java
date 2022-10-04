@@ -154,7 +154,8 @@ public class MigrateLegacySecurityDomainsToElytron<S> extends ManageableServerCo
             final String migratedSecurityDomainName = LegacySecurityRealm.getElytronSecurityDomainName(legacySecurityRealmName);
             boolean updated = addSubsystemDependenciesMigrationOperationSteps(migratedSecurityDomainName, securityDomain, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
             if (updated && !subsystemResource.getResourceConfiguration().hasDefined("security-domain", migratedSecurityDomainName)) {
-                taskContext.getLogger().warnf("Legacy Security Domain %s depends on missing Elytron Security Domain %s, the expected Elytron Security Domain added when migrating the Legacy Security Realm %s, and due to this the migrated configuration may FAIL to boot.", securityDomain.getName(), migratedSecurityDomainName, legacySecurityRealmName);
+                final String profileName = subsystemResource.getParentResource().getResourceType() == ProfileResource.RESOURCE_TYPE ? subsystemResource.getParentResource().getResourceName() : null;
+                taskContext.getLogger().warnf("Legacy Security Domain %s depends on missing Elytron Security Domain %s, the expected Elytron Security Domain added when migrating the Legacy Security Realm %s, and due to this the migrated configuration profile %s may FAIL to boot.", securityDomain.getName(), migratedSecurityDomainName, legacySecurityRealmName, profileName);
             }
             return updated;
         }
