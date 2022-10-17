@@ -17,6 +17,7 @@ package org.jboss.migration.wfly;
 
 import org.jboss.migration.core.ProductInfo;
 import org.jboss.migration.core.env.MigrationEnvironment;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 import org.jboss.migration.core.jboss.JBossExtensions;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.wfly10.ServiceLoaderWildFlyServerMigrations10;
@@ -33,7 +34,7 @@ import java.util.ServiceLoader;
 public class WildFly27_0Server extends WildFlyServer10 {
 
     public static final JBossServer.Extensions EXTENSIONS = JBossServer.Extensions.builder()
-            .extensions(WildFly26_0Server.EXTENSIONS)
+            .extensionsExcept(WildFly26_0Server.EXTENSIONS, JBossExtensionNames.JSR77)
             .extension(JBossExtensions.CLUSTERING_EJB)
             .build();
 

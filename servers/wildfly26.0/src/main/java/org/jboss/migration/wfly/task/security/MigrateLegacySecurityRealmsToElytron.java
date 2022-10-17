@@ -100,25 +100,33 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
         }
 
         protected void addOperationSteps(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
-            addSecurityRealm(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
-            addSecurityDomain(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
-            addHttp(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
-            addSasl(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            if (securityRealm.getAuthentication() != null && securityRealm.getAuthorization() != null) {
+                addSecurityRealm(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+                addSecurityDomain(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+                addHttp(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+                addSasl(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
+            }
             addServerIdentities(securityRealm, legacySecurityConfiguration, subsystemResource, compositeOperationBuilder, taskContext);
         }
 
         protected void addSecurityRealm(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
-            compositeOperationBuilder.addStep(new PropertiesRealmAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronPropertiesRealmName())
-                    .usersProperties(new PropertiesRealmAddOperation.Properties(securityRealm.getAuthentication().getProperties().getPath())
-                            .relativeTo(securityRealm.getAuthentication().getProperties().getRelativeTo())
-                            .plainText(securityRealm.getAuthentication().getProperties().isPlainText())
-                            .digestRealmName(securityRealm.getName())
-                    )
-                    .groupsProperties(new PropertiesRealmAddOperation.Properties(securityRealm.getAuthorization().getProperties().getPath())
-                            .relativeTo(securityRealm.getAuthorization().getProperties().getRelativeTo())
-                            .plainText(securityRealm.getAuthorization().getProperties().isPlainText())
-                    )
-                    .toModelNode());
+            final LegacySecurityRealm.Properties authenticationProperties = securityRealm.getAuthentication() != null ? securityRealm.getAuthentication().getProperties() : null;
+            final LegacySecurityRealm.Properties authorizationProperties = securityRealm.getAuthorization() != null ? securityRealm.getAuthorization().getProperties() : null;
+            final PropertiesRealmAddOperation propertiesRealmAddOperation = new PropertiesRealmAddOperation(subsystemResource.getResourcePathAddress(), securityRealm.getElytronPropertiesRealmName());
+            if (authenticationProperties != null) {
+                propertiesRealmAddOperation.usersProperties(new PropertiesRealmAddOperation.Properties(authenticationProperties.getPath())
+                        .relativeTo(authenticationProperties.getRelativeTo())
+                        .plainText(authenticationProperties.isPlainText())
+                        .digestRealmName(securityRealm.getName())
+                );
+            }
+            if (authorizationProperties != null) {
+                propertiesRealmAddOperation.groupsProperties(new PropertiesRealmAddOperation.Properties(authorizationProperties.getPath())
+                        .relativeTo(authorizationProperties.getRelativeTo())
+                        .plainText(authorizationProperties.isPlainText())
+                );
+            }
+            compositeOperationBuilder.addStep(propertiesRealmAddOperation.toModelNode());
         }
 
         protected void addSecurityDomain(LegacySecurityRealm securityRealm, LegacySecurityConfiguration legacySecurityConfiguration, SubsystemResource subsystemResource, Operations.CompositeOperationBuilder compositeOperationBuilder, TaskContext taskContext) {
@@ -126,8 +134,8 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                     .permissionMapper("default-permission-mapper")
                     .defaultRealm(securityRealm.getElytronPropertiesRealmName())
                     .addRealm(new SecurityDomainAddOperation.Realm(securityRealm.getElytronPropertiesRealmName())
-                            .roleDecoder(securityRealm.getAuthorization().isMapGroupsToRoles() ? "groups-to-roles" : null));
-            if (securityRealm.getAuthentication().getLocal() != null) {
+                            .roleDecoder(securityRealm.getAuthorization() != null && securityRealm.getAuthorization().isMapGroupsToRoles() ? "groups-to-roles" : null));
+            if (securityRealm.getAuthentication() != null && securityRealm.getAuthentication().getLocal() != null) {
                 securityDomainAddOperation.addRealm(new SecurityDomainAddOperation.Realm("local").roleMapper(securityRealm.getAuthentication().getLocal().getAllowedUsers() == null ? "super-user-mapper" : null));
             }
             compositeOperationBuilder.addStep(securityDomainAddOperation.toModelNode());
@@ -230,7 +238,9 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
                                             logger.debugf("Undertow subsystem http-invoker resource using the legacy security-realm %s found.", securityRealm.getName());
                                             final PathAddress pathAddress = undertowSubsystemResource.getResourcePathAddress().append(SERVER, undertowServerName).append(HOST, undertowHostName).append(SETTING, HTTP_INVOKER);
                                             compositeOperationBuilder.addStep(getUndefineAttributeOperation(pathAddress, SECURITY_REALM));
-                                            compositeOperationBuilder.addStep(getWriteAttributeOperation(pathAddress, HTTP_AUTHENTICATION_FACTORY, securityRealm.getElytronHttpAuthenticationFactoryName()));
+                                            if (securityRealm.getAuthentication() != null && securityRealm.getAuthorization() != null) {
+                                                compositeOperationBuilder.addStep(getWriteAttributeOperation(pathAddress, HTTP_AUTHENTICATION_FACTORY, securityRealm.getElytronHttpAuthenticationFactoryName()));
+                                            }
                                             logger.debugf("Migrated Undertow subsystem http-invoker resource using the legacy security-realm %s.", securityRealm.getName());
                                         }
                                     }
