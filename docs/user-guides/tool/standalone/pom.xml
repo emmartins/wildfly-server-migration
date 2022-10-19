@@ -73,6 +73,20 @@
             <artifactId>jboss-server-migration-eap7.4-to-eap7.4-userguide</artifactId>
         </dependency>
 
+        <!-- EAP 8.0 -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.3-to-eap8.0-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap7.4-to-eap8.0-userguide</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jboss-server-migration-eap8.0-to-eap8.0-userguide</artifactId>
+        </dependency>
+
         <!-- WFLY 26.0 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -293,6 +307,41 @@
                         <configuration>
                             <includeArtifactIds>jboss-server-migration-eap7.4-to-eap7.4-userguide</includeArtifactIds>
                             <outputDirectory>${project.build.outputDirectory}/migrations/eap7.4-to-eap7.4</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- EAP 8.0 -->
+                    <execution>
+                        <id>EAP7.3toEAP8.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap7.3-to-eap8.0-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap7.3-to-eap8.0</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>EAP7.4toEAP8.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap7.4-to-eap8.0-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap7.4-to-eap8.0</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>EAP8.0toEAP8.0</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>jboss-server-migration-eap8.0-to-eap8.0-userguide</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}/migrations/eap8.0-to-eap8.0</outputDirectory>
                         </configuration>
                     </execution>
 
