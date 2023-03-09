@@ -21,6 +21,7 @@ import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigrati
 import org.jboss.migration.wfly.task.subsystem.health.WildFly26_0AddHealthSubsystem;
 import org.jboss.migration.wfly.task.subsystem.metrics.WildFly26_0AddMetricsSubsystem;
 import org.jboss.migration.wfly.task.subsystem.microprofile.WildFly26_0AddMicroprofileJwtSmallryeSubsystem;
+import org.jboss.migration.wfly.task.update.WildFly22_0UpdateInfinispanSubsystem;
 import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties;
 import org.jboss.migration.wfly.task.xml.WildFly26_0MigrateVault;
 import org.jboss.migration.wfly10.WildFlyServer10;
@@ -48,6 +49,7 @@ public class WildFly18_0ToWildFly27_0ServerMigrationProvider implements WildFly2
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                        .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                         .subtask(new WildFly26_0MigrateVault<>())
                         .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                         .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
@@ -65,6 +67,7 @@ public class WildFly18_0ToWildFly27_0ServerMigrationProvider implements WildFly2
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                                .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly26_0AddMicroprofileJwtSmallryeSubsystem<>())
                                 .subtask(new WildFly27_0AddHostExcludes<>())
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
