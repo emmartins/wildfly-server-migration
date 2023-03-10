@@ -21,6 +21,7 @@ import org.jboss.migration.eap.EAPServerMigrationProvider8_0;
 import org.jboss.migration.eap.task.hostexclude.EAP8_0AddHostExcludes;
 import org.jboss.migration.eap.task.subsystem.metrics.EAP8_0AddMetricsSubsystem;
 import org.jboss.migration.wfly.task.subsystem.health.WildFly22_0AddHealthSubsystem;
+import org.jboss.migration.wfly.task.update.WildFly22_0UpdateInfinispanSubsystem;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
@@ -47,6 +48,7 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly22_0AddHealthSubsystem<>())
                                 .subtask(new EAP8_0AddMetricsSubsystem<>())
                                 .subtask(new MigrateCompatibleSecurityRealms<>())
@@ -57,6 +59,7 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP8_0AddHostExcludes<>())
                                 .subtask(new MigrateDeployments<>()))
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()

@@ -31,6 +31,7 @@ import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP8_0UpdateMessagingActiv
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP8_0UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap7.tasks.EAP6_4ToEAP8_0UpdateUndertowSubsystem;
 import org.jboss.migration.wfly.task.subsystem.health.WildFly22_0AddHealthSubsystem;
+import org.jboss.migration.wfly.task.update.WildFly22_0UpdateInfinispanSubsystem;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
 import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
@@ -74,6 +75,7 @@ public class EAP6_4ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
                         .subtask(new MigrateReferencedPaths<>())
+                        .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                         .subtask(new UpdateObjectStorePath<>())
                         .subtask(new MigrateJacorbSubsystem<>())
                         .subtask(new WildFly13_0AddElytronSubsystem<>())
@@ -108,6 +110,7 @@ public class EAP6_4ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new UpdateObjectStorePath<>())
                                 .subtask(new MigrateJacorbSubsystem<>())
                                 .subtask(new WildFly13_0AddElytronSubsystem<>())
