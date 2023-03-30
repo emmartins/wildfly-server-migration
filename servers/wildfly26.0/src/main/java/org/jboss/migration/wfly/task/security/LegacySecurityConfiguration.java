@@ -64,6 +64,50 @@ public class LegacySecurityConfiguration {
         this.domainControllerRemoteSecurityRealm = domainControllerRemoteSecurityRealm;
     }
 
+    public String getDefaultElytronApplicationRealmName() {
+        return "migration-defaultApplicationRealm";
+    }
+
+    public String getDefaultElytronManagementRealmName() {
+        return "migration-defaultManagementRealm";
+    }
+
+    public String getDefaultElytronApplicationDomainName() {
+        return "migration-defaultApplicationDomain";
+    }
+
+    public String getDefaultElytronManagementDomainName() {
+        return "migration-defaultManagementDomain";
+    }
+
+    public String getDefaultElytronApplicationHttpAuthenticationFactoryName() {
+        return "migration-defaultApplicationHttpAuthenticationFactory";
+    }
+
+    public String getDefaultElytronManagementHttpAuthenticationFactoryName() {
+        return "migration-defaultManagementHttpAuthenticationFactory";
+    }
+
+    public String getDefaultElytronApplicationSaslAuthenticationFactoryName() {
+        return "migration-defaultApplicationSaslAuthenticationFactory";
+    }
+
+    public String getDefaultElytronManagementSaslAuthenticationFactoryName() {
+        return "migration-defaultManagementSaslAuthenticationFactory";
+    }
+
+    public String getDefaultElytronTLSKeyStoreName() {
+        return "migration-defaultTLSKeyStore";
+    }
+
+    public String getDefaultElytronTLSKeyManagerName() {
+        return "migration-defaultTLSKeyManager";
+    }
+
+    public String getDefaultElytronTLSServerSSLContextName() {
+        return "migration-defaultTLSServerSSLContext";
+    }
+
     @Override
     public String toString() {
         return "LegacySecurityConfiguration{" +
