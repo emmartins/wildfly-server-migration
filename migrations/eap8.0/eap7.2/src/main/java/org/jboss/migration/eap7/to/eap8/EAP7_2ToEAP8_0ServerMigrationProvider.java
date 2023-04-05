@@ -20,15 +20,14 @@ import org.jboss.migration.eap.EAPServer7_2;
 import org.jboss.migration.eap.EAPServerMigrationProvider8_0;
 import org.jboss.migration.eap.task.hostexclude.EAP8_0AddHostExcludes;
 import org.jboss.migration.eap.task.subsystem.metrics.EAP8_0AddMetricsSubsystem;
+import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
-import org.jboss.migration.wfly.task.subsystem.health.WildFly22_0AddHealthSubsystem;
-import org.jboss.migration.wfly.task.update.WildFly22_0UpdateInfinispanSubsystem;
+import org.jboss.migration.wfly.task.subsystem.health.WildFly26_0AddHealthSubsystem;
+import org.jboss.migration.wfly.task.xml.WildFly26_0MigrateVault;
+import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties;
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
-import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
-import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -46,29 +45,46 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(
                         serverUpdateBuilders.standaloneConfigurationBuilder()
+                                .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new RemoveUnsupportedExtensions<>())
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
-                                .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
-                                .subtask(new WildFly22_0AddHealthSubsystem<>())
+                                .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                                .subtask(new WildFly26_0MigrateVault<>())
+                                .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
+                                .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                                .subtask(new WildFly26_0AddHealthSubsystem<>())
                                 .subtask(new EAP8_0AddMetricsSubsystem<>())
-                                .subtask(new MigrateCompatibleSecurityRealms<>())
-                                .subtask(new MigrateDeployments<>()))
+                )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new RemoveUnsupportedExtensions<>())
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
-                                .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
+                                .subtask(new WildFly26_0MigrateReferencedPaths<>())
                                 .subtask(new EAP8_0AddHostExcludes<>())
-                                .subtask(new MigrateDeployments<>()))
+                                .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                        )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                                .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(serverUpdateBuilders.hostBuilder()
-                                        .subtask(new MigrateCompatibleSecurityRealms<>()))))
+                                        .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                                )
+                        )
+                )
                 .build();
     }
 
