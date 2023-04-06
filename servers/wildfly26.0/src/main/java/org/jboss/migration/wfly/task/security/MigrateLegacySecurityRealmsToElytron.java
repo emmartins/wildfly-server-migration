@@ -68,6 +68,7 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
 
         private static final String SUBTASK_NAME = TASK_NAME + ".update-subsystems";
         private static final String SETTING = "setting";
+        private static final String CONNECTOR = "connector";
         private static final String HTTP_INVOKER = "http-invoker";
         private static final String HTTPS_LISTENER = "https-listener";
         private static final String HTTP_CONNECTOR = "http-connector";
@@ -162,6 +163,20 @@ public class MigrateLegacySecurityRealmsToElytron<S> extends ManageableServerCon
             final SubsystemResource remotingSubsystemResource = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.REMOTING);
             if (remotingSubsystemResource != null) {
                 final ModelNode remotingSubsystemConfig = remotingSubsystemResource.getResourceConfiguration();
+                if (remotingSubsystemConfig.hasDefined(CONNECTOR)) {
+                    for (Property remotingConnectorProperty : remotingSubsystemConfig.get(CONNECTOR).asPropertyList()) {
+                        final String remotingConnectorName = remotingConnectorProperty.getName();
+                        final ModelNode remotingConnectorConfig = remotingConnectorProperty.getValue();
+                        if (securityRealm.getName().equals(remotingConnectorConfig.get(SECURITY_REALM).asStringOrNull())) {
+                            // we found a connector using the legacy security-real, update it to use the created Elytron's sasl factory
+                            logger.debugf("Remoting subsystem's connector resource using the legacy security-realm %s found.", securityRealm.getName());
+                            final PathAddress remotingConnectorAddress = remotingSubsystemResource.getResourcePathAddress().append(CONNECTOR, remotingConnectorName);
+                            compositeOperationBuilder.addStep(getUndefineAttributeOperation(remotingConnectorAddress, SECURITY_REALM));
+                            compositeOperationBuilder.addStep(getWriteAttributeOperation(remotingConnectorAddress, SASL_AUTHENTICATION_FACTORY, securityRealm.getElytronSaslAuthenticationFactoryName()));
+                            logger.debugf("Migrated Remoting subsystem's connector resource using the legacy security-realm %s.", securityRealm.getName());
+                        }
+                    }
+                }
                 if (remotingSubsystemConfig.hasDefined(HTTP_CONNECTOR)) {
                     for (Property remotingHttpConnectorProperty : remotingSubsystemConfig.get(HTTP_CONNECTOR).asPropertyList()) {
                         final String remotingHttpConnectorName = remotingHttpConnectorProperty.getName();

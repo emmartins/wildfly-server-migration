@@ -30,25 +30,23 @@ import org.jboss.migration.eap6.to.eap8.tasks.EAP6_4ToEAP8_0UpdateJGroupsSubsyst
 import org.jboss.migration.eap6.to.eap8.tasks.EAP6_4ToEAP8_0UpdateMessagingActiveMQSubsystem;
 import org.jboss.migration.eap6.to.eap8.tasks.EAP6_4ToEAP8_0UpdateRemotingSubsystem;
 import org.jboss.migration.eap6.to.eap8.tasks.EAP6_4ToEAP8_0UpdateUndertowSubsystem;
+import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
 import org.jboss.migration.wfly.task.subsystem.health.WildFly22_0AddHealthSubsystem;
-import org.jboss.migration.wfly10.WildFlyServer10;
+import org.jboss.migration.wfly.task.xml.WildFly26_0MigrateVault;
+import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
-import org.jboss.migration.wfly10.config.task.paths.MigrateReferencedPaths;
 import org.jboss.migration.wfly10.config.task.subsystem.jacorb.MigrateJacorbSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.jberet.AddBatchJBeretSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.messaging.MigrateMessagingSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.requestcontroller.AddRequestControllerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.securitymanager.AddSecurityManagerSubsystem;
 import org.jboss.migration.wfly10.config.task.subsystem.singleton.AddSingletonSubsystem;
-import org.jboss.migration.wfly10.config.task.update.AddApplicationRealmSSLServerIdentity;
 import org.jboss.migration.wfly10.config.task.update.AddJmxSubsystemToHosts;
 import org.jboss.migration.wfly10.config.task.update.AddLoadBalancerProfile;
 import org.jboss.migration.wfly10.config.task.update.AddPrivateInterface;
 import org.jboss.migration.wfly10.config.task.update.AddSocketBindingMulticastAddressExpressions;
-import org.jboss.migration.wfly10.config.task.update.MigrateCompatibleSecurityRealms;
-import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemovePermgenAttributesFromJVMConfigs;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsecureInterface;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
@@ -59,8 +57,6 @@ import org.jboss.migration.wfly11.task.subsystem.coremanagement.AddCoreManagemen
 import org.jboss.migration.wfly11.task.subsystem.logging.RemoveConsoleHandlerFromLoggingSubsystem;
 import org.jboss.migration.wfly13.task.subsystem.discovery.AddDiscoverySubsystem;
 import org.jboss.migration.wfly13.task.subsystem.eesecurity.AddEESecuritySubsystem;
-import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystem;
-
 
 /**
  * Server migration, from EAP 6.4 to EAP 8.0.
@@ -69,24 +65,28 @@ import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSu
 public class EAP6_4ToEAP8_0ServerMigrationProvider implements EAPServerMigrationProvider8_0 {
     @Override
     public WildFlyServerMigration10 getServerMigration() {
-        final LegacySecurityConfigurationMigration<WildFlyServer10> legacySecurityConfigurationMigration = new LegacySecurityConfigurationMigration<>();
+        final LegacySecurityConfigurationMigration<EAPServer6_4> legacySecurityConfigurationMigration = new LegacySecurityConfigurationMigration<>();
         final ServerUpdate.Builders<EAPServer6_4> serverUpdateBuilders = new ServerUpdate.Builders<>();
         return serverUpdateBuilders.serverUpdateBuilder()
                 .standaloneServer(serverUpdateBuilders.standaloneConfigurationBuilder()
+                        .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
+                        .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                         .subtask(new RemoveUnsupportedExtensions<>())
                         .subtask(new RemoveUnsupportedSubsystems<>())
                         .subtask(new MigrateReferencedModules<>())
-                        .subtask(new MigrateReferencedPaths<>())
+                        .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                        .subtask(new WildFly26_0MigrateVault<>())
                         .subtask(new UpdateObjectStorePath<>())
+                        .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
+                        .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                         .subtask(new MigrateJacorbSubsystem<>())
-                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                         .subtask(new EAP7_1MigrateWebSubsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateUndertowSubsystem<>())
+                        .subtask(new EAP6_4ToEAP8_0UpdateRemotingSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateMessagingActiveMQSubsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateInfinispanSubsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateEESubsystem<>())
-                        .subtask(new EAP6_4ToEAP8_0UpdateRemotingSubsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateEJB3Subsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateJGroupsSubsystem<>())
                         .subtask(new AddBatchJBeretSubsystem<>())
@@ -102,25 +102,29 @@ public class EAP6_4ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                         .subtask(new AddPrivateInterface<>())
                         .subtask(new AddSocketBindingPortExpressions<>())
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
-                        .subtask(new MigrateCompatibleSecurityRealms<>())
-                        .subtask(new AddApplicationRealmSSLServerIdentity<>())
-                        .subtask(new MigrateDeployments<>()))
+                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
+                                .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new RemoveUnsupportedExtensions<>())
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                                .subtask(new EAP8_0AddHostExcludes<>())
                                 .subtask(new UpdateObjectStorePath<>())
+                                .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
+                                .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(new MigrateJacorbSubsystem<>())
-                                .subtask(new WildFly13_0AddElytronSubsystem<>())
                                 .subtask(new EAP7_1MigrateWebSubsystem<>())
                                 .subtask(new EAP6_4ToEAP8_0UpdateUndertowSubsystem<>())
+                                .subtask(new EAP6_4ToEAP8_0UpdateRemotingSubsystem<>())
                                 .subtask(new MigrateMessagingSubsystem<>())
                                 .subtask(new EAP6_4ToEAP8_0UpdateMessagingActiveMQSubsystem<>())
                                 .subtask(new EAP6_4ToEAP8_0UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP6_4ToEAP8_0UpdateEESubsystem<>())
-                                .subtask(new EAP6_4ToEAP8_0UpdateRemotingSubsystem<>())
                                 .subtask(new EAP6_4ToEAP8_0UpdateEJB3Subsystem<>())
                                 .subtask(new EAP6_4ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(new AddBatchJBeretSubsystem<>())
@@ -135,22 +139,29 @@ public class EAP6_4ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddSocketBindingPortExpressions<>())
                                 .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                                 .subtask(new AddLoadBalancerProfile<>())
-                                .subtask(new EAP8_0AddHostExcludes<>())
                                 .subtask(new RemoveConsoleHandlerFromLoggingSubsystem<>())
                                 .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
-                                .subtask(new MigrateDeployments<>()))
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                        )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
+                                .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
+                                .subtask(legacySecurityConfigurationMigration.getReadLegacySecurityConfiguration())
                                 .subtask(new MigrateReferencedModules<>())
-                                .subtask(new MigrateReferencedPaths<>())
+                                .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                                .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(serverUpdateBuilders.hostBuilder()
+                                        .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                         .subtask(new AddCoreManagementSubsystem<>())
-                                        .subtask(new WildFly13_0AddElytronSubsystem<>())
                                         .subtask(new AddJmxSubsystemToHosts<>())
                                         .subtask(new RemoveUnsecureInterface<>())
                                         .subtask(new SetupHttpUpgradeManagement<>())
                                         .subtask(new RemovePermgenAttributesFromJVMConfigs<>())
-                                        .subtask(new MigrateCompatibleSecurityRealms<>())
-                                        .subtask(new AddApplicationRealmSSLServerIdentity<>()))))
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
+                                        .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                                )
+                        )
+                )
                 .build();
     }
 
