@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc.
+ * Copyright 2023 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap7.to.eap7;
+package org.jboss.migration.wfly.task.update;
 
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
+import org.jboss.migration.wfly.task.subsystem.infinispan.WildFly22_0FixHibernateCacheModuleName;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
-import org.jboss.migration.wfly12.task.subsystem.infinispan.WildFly12_0FixHibernateCacheModuleName;
 
 /**
- * @author emmartins
+ * @author istudens
  */
-public class EAP7_1ToEAP7_4UpdateInfinispanSubsystem<S> extends UpdateSubsystemResources<S> {
-    public EAP7_1ToEAP7_4UpdateInfinispanSubsystem() {
+public class WildFly22_0UpdateInfinispanSubsystem<S> extends UpdateSubsystemResources<S> {
+    public WildFly22_0UpdateInfinispanSubsystem() {
         super(JBossSubsystemNames.INFINISPAN,
-                new WildFly12_0FixHibernateCacheModuleName<>());
+                new WildFly22_0FixHibernateCacheModuleName<>());
     }
 }
