@@ -101,7 +101,6 @@ public class EAP6_4ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                         .subtask(new AddSocketBindingMulticastAddressExpressions<>())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
-
                         .subtask(new MigrateJacorbSubsystem<>())
                         .subtask(new MigrateMessagingSubsystem<>())
                         .subtask(new EAP6_4ToEAP8_0UpdateMessagingActiveMQSubsystem<>())

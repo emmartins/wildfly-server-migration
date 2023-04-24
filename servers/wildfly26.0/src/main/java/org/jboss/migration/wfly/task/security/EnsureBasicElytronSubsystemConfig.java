@@ -18,18 +18,12 @@ package org.jboss.migration.wfly.task.security;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.client.helpers.Operations;
-import org.jboss.migration.core.task.TaskContext;
 import org.jboss.migration.wfly10.config.management.ManageableServerConfiguration;
-import org.jboss.migration.wfly10.config.management.SubsystemResource;
-import org.jboss.migration.wfly10.config.task.management.resource.ManageableResourceBuildParameters;
-import org.jboss.migration.wfly11.task.subsystem.elytron.ConfigurableSaslServerFactoryAddOperation;
-import org.jboss.migration.wfly11.task.subsystem.elytron.IdentityRealmAddOperation;
-import org.jboss.migration.wfly11.task.subsystem.elytron.MechanismProviderFilteringSaslServerFactoryAddOperation;
-import org.jboss.migration.wfly11.task.subsystem.elytron.ProviderHttpServerMechanismFactoryAddOperation;
-import org.jboss.migration.wfly11.task.subsystem.elytron.ProviderSaslServerFactoryAddOperation;
+import org.jboss.migration.wfly11.task.subsystem.elytron.*;
 import org.jboss.migration.wfly13.task.subsystem.elytron.WildFly13_0AddElytronSubsystemConfig;
 
 /**
+ * A task which adds a basic Elytron config, if missing.
  * @author emmartins
  */
 public class EnsureBasicElytronSubsystemConfig<S> extends WildFly13_0AddElytronSubsystemConfig<S> {
@@ -38,15 +32,6 @@ public class EnsureBasicElytronSubsystemConfig<S> extends WildFly13_0AddElytronS
 
     public EnsureBasicElytronSubsystemConfig(LegacySecurityConfigurations legacySecurityConfigurations) {
         this.legacySecurityConfigurations = legacySecurityConfigurations;
-    }
-
-    @Override
-    protected void addConfiguration(ManageableResourceBuildParameters<S, SubsystemResource.Parent> params, TaskContext taskContext) {
-        // only add basic elytron config if there are legacy security resources to migrate
-        final LegacySecurityConfiguration legacySecurityConfiguration = legacySecurityConfigurations.getSecurityConfigurations().get(params.getServerConfiguration().getConfigurationPath().getPath().toString());
-        if (legacySecurityConfiguration != null && legacySecurityConfiguration.requiresMigration()) {
-            super.addConfiguration(params, taskContext);
-        }
     }
 
     @Override

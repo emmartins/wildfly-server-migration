@@ -74,7 +74,6 @@ public class RemoveLegacySecurityRealmsFromXML<S extends JBossServer<S>> impleme
 
     protected ServerMigrationTaskResult processXMLConfiguration(final JBossServerConfiguration<S> source, final JBossServerConfiguration targetConfigurationPath, final TaskContext context) {
         // setup and run the xml filter
-        final Boolean updated = false;
         ServerMigrationTaskResult.Builder taskResultBuilder = new ServerMigrationTaskResult.Builder().skipped();
         final XMLFileFilter extensionsFilter = (startElement, xmlEventReader, xmlEventWriter, xmlEventFactory) -> {
             final String elementLocalName = startElement.getName().getLocalPart();
