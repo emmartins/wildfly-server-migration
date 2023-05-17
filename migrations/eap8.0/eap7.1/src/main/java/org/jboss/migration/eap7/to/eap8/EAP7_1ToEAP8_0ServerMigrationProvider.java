@@ -28,6 +28,7 @@ import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
+import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
 import org.jboss.migration.wfly10.config.task.update.ServerUpdate;
@@ -66,6 +67,7 @@ public class EAP7_1ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new AddEESecuritySubsystem<>())
                                 .subtask(new WildFly26_0AddHealthSubsystem<>())
                                 .subtask(new EAP8_0AddMetricsSubsystem<>())
+                                .subtask(new MigrateDeployments<>())
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
@@ -86,6 +88,7 @@ public class EAP7_1ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                                .subtask(new MigrateDeployments<>())
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new WildFly27_0MigrateJBossDomainProperties<>())
