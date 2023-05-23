@@ -18,6 +18,7 @@ package org.jboss.migration.wfly;
 import org.jboss.migration.wfly.task.hostexclude.WildFly27_0AddHostExcludes;
 import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
+import org.jboss.migration.wfly.task.subsystem.picketlink.MigratePicketLinkSubsystem;
 import org.jboss.migration.wfly.task.xml.WildFly26_0MigrateVault;
 import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties;
 import org.jboss.migration.wfly10.WildFlyServer10;
@@ -50,6 +51,7 @@ public class WildFly24_0ToWildFly27_0ServerMigrationProvider implements WildFly2
                         .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                        .subtask(new MigratePicketLinkSubsystem<>())
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
@@ -63,6 +65,7 @@ public class WildFly24_0ToWildFly27_0ServerMigrationProvider implements WildFly2
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
+                                .subtask(new MigratePicketLinkSubsystem<>())
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new WildFly27_0MigrateJBossDomainProperties<>())

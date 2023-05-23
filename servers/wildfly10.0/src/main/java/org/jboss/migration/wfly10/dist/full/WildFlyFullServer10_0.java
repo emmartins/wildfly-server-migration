@@ -53,6 +53,7 @@ public class WildFlyFullServer10_0 extends WildFlyServer10 {
             .extension(JBossExtensions.MODCLUSTER)
             .extension(JBossExtensions.NAMING)
             .extension(JBossExtensions.POJO)
+            .extension(JBossExtensions.PICKETLINK)
             .extension(JBossExtensions.REMOTING)
             .extension(JBossExtensions.REQUEST_CONTROLLER)
             .extension(JBossExtensions.SAR)

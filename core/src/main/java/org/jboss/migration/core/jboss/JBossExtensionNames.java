@@ -68,6 +68,7 @@ public interface JBossExtensionNames {
     String NAMING = "org.jboss.as.naming";
     String OPENTELEMETRY = "org.wildfly.extension.opentelemetry";
     String OSGI = "org.jboss.as.osgi";
+    String PICKETLINK = "org.wildfly.extension.picketlink";
     String POJO = "org.jboss.as.pojo";
     String REMOTING = "org.jboss.as.remoting";
     String REQUEST_CONTROLLER = "org.wildfly.extension.request-controller";
