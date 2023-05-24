@@ -263,6 +263,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.OSGI)
             .build();
 
+    Extension PICKETLINK = Extension.builder()
+            .module(JBossExtensionNames.PICKETLINK)
+            .subsystem(JBossSubsystemNames.PICKETLINK_FEDERATION)
+            .build();
+
     Extension POJO = Extension.builder()
             .module(JBossExtensionNames.POJO)
             .subsystem(JBossSubsystemNames.POJO)

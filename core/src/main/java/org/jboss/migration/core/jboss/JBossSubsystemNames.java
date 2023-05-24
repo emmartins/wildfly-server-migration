@@ -70,6 +70,7 @@ public interface JBossSubsystemNames {
     String NAMING = "naming";
     String OPENTELEMETRY = "opentelemetry";
     String OSGI = "osgi";
+    String PICKETLINK_FEDERATION = "picketlink-federation";
     String POJO = "pojo";
     String REMOTING = "remoting";
     String REQUEST_CONTROLLER = "request-controller";
