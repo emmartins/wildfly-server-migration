@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc.
+ * Copyright 2023 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package org.jboss.migration.eap7.to.eap8;
+package org.jboss.migration.eap.task.subsystem.jgroups;
 
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
-import org.jboss.migration.eap.task.subsystem.jgroups.EAP7_2AddFDSockProtocolOperation;
-import org.jboss.migration.eap.task.subsystem.jgroups.EAP7_2AddPingMPingProtocolOperation;
-import org.jboss.migration.eap.task.subsystem.jgroups.EAP7_2MoveTcpPingTimeoutOperation;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.jgroups.UpdateProtocols;
 
 /**
- * @author emmartins
+ * @author istudens
  */
-public class EAP7_0ToEAP8_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemResources<S> {
-    public EAP7_0ToEAP8_0UpdateJGroupsSubsystem() {
+public class EAP7_2ToEAP8_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemResources<S> {
+    public EAP7_2ToEAP8_0UpdateJGroupsSubsystem() {
         super(JBossSubsystemNames.JGROUPS,
                 new UpdateProtocols<>(new UpdateProtocols.Operations()
                         .remove("PING")
@@ -35,7 +32,6 @@ public class EAP7_0ToEAP8_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemReso
                         .remove("MERGE3")
                         .remove("FD_SOCK")
                         .remove("FD_ALL")
-                        .remove("FD")
                         .remove("VERIFY_SUSPECT")
                         .remove("pbcast.NAKACK2")
                         .remove("UNICAST3")
@@ -43,7 +39,7 @@ public class EAP7_0ToEAP8_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemReso
                         .remove("pbcast.GMS")
                         .remove("UFC")
                         .remove("MFC")
-                        .remove("FRAG2")
+                        .remove("FRAG3")
                         .add("RED")
                         .custom(new EAP7_2AddPingMPingProtocolOperation())
                         .add("MERGE3")
@@ -57,7 +53,6 @@ public class EAP7_0ToEAP8_0UpdateJGroupsSubsystem<S> extends UpdateSubsystemReso
                         .add("UFC")
                         .add("MFC")
                         .add("FRAG4")
-                        .custom(new EAP7_2MoveTcpPingTimeoutOperation())
                 ));
     }
 }
