@@ -51,6 +51,7 @@ public interface JBossExtensionNames {
     String JSF = "org.jboss.as.jsf";
     String JSR77 = "org.jboss.as.jsr77";
     String KEYCLOAK = "org.keycloak.keycloak-adapter-subsystem";
+    String KEYCLOAK_SAML = "org.keycloak.keycloak-saml-adapter-subsystem";
     String LOGGING = "org.jboss.as.logging";
     String MAIL = "org.jboss.as.mail";
     String METRICS = "org.wildfly.extension.metrics";
