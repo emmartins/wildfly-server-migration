@@ -30,6 +30,7 @@ import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
+import org.jboss.migration.wfly10.config.task.update.AddJGroupsFDSocketBindings;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
@@ -61,6 +62,7 @@ public class EAP7_1ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(new EAP7_1ToEAP8_0UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP7_1ToEAP8_0UpdateUndertowSubsystem<>())
+                                .subtask(new AddJGroupsFDSocketBindings<>())
                                 .subtask(new EAP7_1ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
@@ -84,6 +86,7 @@ public class EAP7_1ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(new EAP7_1ToEAP8_0UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP7_1ToEAP8_0UpdateUndertowSubsystem<>())
+                                .subtask(new AddJGroupsFDSocketBindings<>())
                                 .subtask(new EAP7_1ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(new AddDiscoverySubsystem<>())
                                 .subtask(new AddEESecuritySubsystem<>())

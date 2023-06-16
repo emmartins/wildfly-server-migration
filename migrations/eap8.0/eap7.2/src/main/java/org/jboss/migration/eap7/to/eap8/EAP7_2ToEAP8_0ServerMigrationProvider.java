@@ -32,6 +32,7 @@ import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties
 import org.jboss.migration.wfly10.WildFlyServer10;
 import org.jboss.migration.wfly10.WildFlyServerMigration10;
 import org.jboss.migration.wfly10.config.task.module.MigrateReferencedModules;
+import org.jboss.migration.wfly10.config.task.update.AddJGroupsFDSocketBindings;
 import org.jboss.migration.wfly10.config.task.update.MigrateDeployments;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedExtensions;
 import org.jboss.migration.wfly10.config.task.update.RemoveUnsupportedSubsystems;
@@ -59,6 +60,7 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly26_0MigrateVault<>())
+                                .subtask(new AddJGroupsFDSocketBindings<>())
                                 .subtask(new EAP7_2ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
@@ -77,6 +79,7 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new RemoveUnsupportedSubsystems<>())
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly26_0MigrateReferencedPaths<>())
+                                .subtask(new AddJGroupsFDSocketBindings<>())
                                 .subtask(new EAP7_2ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
