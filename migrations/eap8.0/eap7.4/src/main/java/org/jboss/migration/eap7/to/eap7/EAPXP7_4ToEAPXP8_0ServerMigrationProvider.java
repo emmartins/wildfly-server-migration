@@ -21,6 +21,7 @@ import org.jboss.migration.eap.EAPXPServerMigrationProvider8_0;
 import org.jboss.migration.eap.task.hostexclude.EAP8_0AddHostExcludes;
 import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
+import org.jboss.migration.wfly.task.subsystem.keycloak.MigrateKeycloakSubsystem;
 import org.jboss.migration.wfly.task.subsystem.picketlink.MigratePicketLinkSubsystem;
 import org.jboss.migration.wfly.task.xml.WildFly26_0MigrateVault;
 import org.jboss.migration.wfly.task.xml.WildFly27_0MigrateJBossDomainProperties;
@@ -55,6 +56,7 @@ public class EAPXP7_4ToEAPXP8_0ServerMigrationProvider implements EAPXPServerMig
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
                         .subtask(new MigratePicketLinkSubsystem<>())
+                        .subtask(new MigrateKeycloakSubsystem<>())
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
                         .domainConfigurations(serverUpdateBuilders.domainConfigurationBuilder()
@@ -69,6 +71,7 @@ public class EAPXP7_4ToEAPXP8_0ServerMigrationProvider implements EAPXPServerMig
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
                                 .subtask(new MigratePicketLinkSubsystem<>())
+                                .subtask(new MigrateKeycloakSubsystem<>())
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
                                 .subtask(new WildFly27_0MigrateJBossDomainProperties<>())

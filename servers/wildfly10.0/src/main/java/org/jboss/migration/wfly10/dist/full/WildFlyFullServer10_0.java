@@ -46,6 +46,7 @@ public class WildFlyFullServer10_0 extends WildFlyServer10 {
             .extension(JBossExtensions.JPA)
             .extension(JBossExtensions.JSF)
             .extension(JBossExtensions.JSR77)
+            .extension(JBossExtensions.KEYCLOAK)
             .extension(JBossExtensions.LOGGING)
             .extension(JBossExtensions.MAIL)
             .extension(JBossExtensions.MESSAGING)

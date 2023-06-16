@@ -173,6 +173,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.JSR77)
             .build();
 
+    Extension KEYCLOAK = Extension.builder()
+            .module(JBossExtensionNames.KEYCLOAK)
+            .subsystem(JBossSubsystemNames.KEYCLOAK)
+            .build();
+
     Extension LOGGING = Extension.builder()
             .module(JBossExtensionNames.LOGGING)
             .subsystem(JBossSubsystemNames.LOGGING)

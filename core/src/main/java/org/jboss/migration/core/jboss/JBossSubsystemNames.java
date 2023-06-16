@@ -52,6 +52,7 @@ public interface JBossSubsystemNames {
     String JPA = "jpa";
     String JSF = "jsf";
     String JSR77 = "jsr77";
+    String KEYCLOAK = "keycloak";
     String LOGGING = "logging";
     String MAIL = "mail";
     String METRICS = "metrics";

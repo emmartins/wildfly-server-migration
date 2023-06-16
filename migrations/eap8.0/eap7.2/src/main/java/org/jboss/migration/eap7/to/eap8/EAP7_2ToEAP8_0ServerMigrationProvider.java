@@ -23,6 +23,7 @@ import org.jboss.migration.eap.task.subsystem.metrics.EAP8_0AddMetricsSubsystem;
 import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
 import org.jboss.migration.wfly.task.subsystem.health.WildFly26_0AddHealthSubsystem;
+import org.jboss.migration.wfly.task.subsystem.keycloak.MigrateKeycloakSubsystem;
 import org.jboss.migration.wfly.task.subsystem.picketlink.MigratePicketLinkSubsystem;
 import org.jboss.migration.wfly.task.update.WildFly22_0UpdateInfinispanSubsystem;
 import org.jboss.migration.wfly.task.xml.WildFly26_0MigrateVault;
@@ -63,6 +64,7 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new WildFly26_0AddHealthSubsystem<>())
                                 .subtask(new EAP8_0AddMetricsSubsystem<>())
                                 .subtask(new MigratePicketLinkSubsystem<>())
+                                .subtask(new MigrateKeycloakSubsystem<>())
                                 .subtask(new MigrateDeployments<>())
                 )
                 .domain(serverUpdateBuilders.domainBuilder()
@@ -80,6 +82,7 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
                                 .subtask(new MigratePicketLinkSubsystem<>())
+                                .subtask(new MigrateKeycloakSubsystem<>())
                                 .subtask(new MigrateDeployments<>())
                         )
                         .hostConfigurations(serverUpdateBuilders.hostConfigurationBuilder()
