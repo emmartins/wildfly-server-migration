@@ -153,19 +153,21 @@ public class MigrateLegacySecurityDomainsToElytron<S> extends ManageableServerCo
             final SubsystemResource messagingSubsystemResource = subsystemResource.getParentResource().getSubsystemResource(JBossSubsystemNames.MESSAGING_ACTIVEMQ);
             if (messagingSubsystemResource != null) {
                 final ModelNode subsystemConfig = messagingSubsystemResource.getResourceConfiguration();
-                for (Property serverProperty : subsystemConfig.get(SERVER).asPropertyList()) {
-                    final String serverName = serverProperty.getName();
-                    final ModelNode serverConfig = serverProperty.getValue();
-                    if (!serverConfig.hasDefined(SECURITY_ENABLED) || serverConfig.get(SECURITY_ENABLED).asBoolean()) {
-                        if (!serverConfig.hasDefined(ELYTRON_DOMAIN)) {
-                            final ModelNode serverSecurityDomainNode = serverConfig.get(SECURITY_DOMAIN);
-                            final String messagingSubsystemSecurityDomain = serverSecurityDomainNode.isDefined() ? serverSecurityDomainNode.asString() : "other";
-                            taskContext.getLogger().debugf("Found messaging-activemq subsystem server %s using the legacy security-domain %s.", serverName, messagingSubsystemSecurityDomain);
-                            final PathAddress pathAddress = messagingSubsystemResource.getResourcePathAddress().append(SERVER, serverName);
-                            compositeOperationBuilder.addStep(getUndefineAttributeOperation(pathAddress, SECURITY_DOMAIN));
-                            compositeOperationBuilder.addStep(getWriteAttributeOperation(pathAddress, ELYTRON_DOMAIN, legacySecurityConfiguration.getDefaultElytronApplicationDomainName()));
-                            taskContext.getLogger().warnf("Migrated messaging-activemq subsystem server resource %s, to Elytron's default application Security Domain. Please note that further manual Elytron configuration may be needed if the legacy security domain being used was not the source server's default Application Domain configuration!", pathAddress.toPathStyleString());
-                            requiresUpdate = true;
+                if (subsystemConfig.hasDefined(SERVER)) {
+                    for (Property serverProperty : subsystemConfig.get(SERVER).asPropertyList()) {
+                        final String serverName = serverProperty.getName();
+                        final ModelNode serverConfig = serverProperty.getValue();
+                        if (!serverConfig.hasDefined(SECURITY_ENABLED) || serverConfig.get(SECURITY_ENABLED).asBoolean()) {
+                            if (!serverConfig.hasDefined(ELYTRON_DOMAIN)) {
+                                final ModelNode serverSecurityDomainNode = serverConfig.get(SECURITY_DOMAIN);
+                                final String messagingSubsystemSecurityDomain = serverSecurityDomainNode.isDefined() ? serverSecurityDomainNode.asString() : "other";
+                                taskContext.getLogger().debugf("Found messaging-activemq subsystem server %s using the legacy security-domain %s.", serverName, messagingSubsystemSecurityDomain);
+                                final PathAddress pathAddress = messagingSubsystemResource.getResourcePathAddress().append(SERVER, serverName);
+                                compositeOperationBuilder.addStep(getUndefineAttributeOperation(pathAddress, SECURITY_DOMAIN));
+                                compositeOperationBuilder.addStep(getWriteAttributeOperation(pathAddress, ELYTRON_DOMAIN, legacySecurityConfiguration.getDefaultElytronApplicationDomainName()));
+                                taskContext.getLogger().warnf("Migrated messaging-activemq subsystem server resource %s, to Elytron's default application Security Domain. Please note that further manual Elytron configuration may be needed if the legacy security domain being used was not the source server's default Application Domain configuration!", pathAddress.toPathStyleString());
+                                requiresUpdate = true;
+                            }
                         }
                     }
                 }
