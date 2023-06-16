@@ -449,10 +449,12 @@ public abstract class JBossServer<S extends JBossServer<S>> extends AbstractServ
                     return layerModuleDir;
                 }
             }
-            for (Path addonDir : addonDirs) {
-                final Path addonModuleDir = addonDir.resolve(modulePath);
-                if (Files.exists(addonModuleDir)) {
-                    return addonModuleDir;
+            if (addonDirs != null) {
+                for (Path addonDir : addonDirs) {
+                    final Path addonModuleDir = addonDir.resolve(modulePath);
+                    if (Files.exists(addonModuleDir)) {
+                        return addonModuleDir;
+                    }
                 }
             }
             return modulesDir.resolve(modulePath);
