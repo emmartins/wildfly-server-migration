@@ -45,12 +45,11 @@ import static org.jboss.migration.core.task.component.TaskSkipPolicy.skipIfDefau
 public class AddJGroupsFDSocketBindings<S> extends ManageableServerConfigurationCompositeTask.Builder<S> {
 
     private static final List<SocketBinding> SOCKET_BINDINGS = Arrays.asList(
-        new SocketBinding.Builder().name("jgroups-tcp-fd").interfaceName("private").port(57600).build(),
-        new SocketBinding.Builder().name("jgroups-udp-fd").interfaceName("private").port(54200).build()
+        new SocketBinding.Builder().name("jgroups-tcp-fd").requires("jgroups-tcp").interfaceName("private").port(57600).build(),
+        new SocketBinding.Builder().name("jgroups-udp-fd").requires("jgroups-udp").interfaceName("private").port(54200).build()
     );
 
     private static final String REQUIRED_SUBSYSTEM = "jgroups";
-    private static final String STANDARD_SOCKETS = "standard-sockets";
     private static final String TASK_NAME = "socket-bindings.jgroups-fd.add";
 
 
@@ -60,13 +59,13 @@ public class AddJGroupsFDSocketBindings<S> extends ManageableServerConfiguration
                 buildParameters -> context -> buildParameters.getServerConfiguration().findResources(SubsystemResource.class, REQUIRED_SUBSYSTEM).isEmpty());
         beforeRun(context -> context.getLogger().debugf("Adding JGroups FD socket bindings..."));
         final ManageableServerConfigurationCompositeSubtasks.Builder<S> subtasks = new ManageableServerConfigurationCompositeSubtasks.Builder<>();
-        subtasks.subtask(SocketBindingGroupResource.class, STANDARD_SOCKETS, new AddSocketBinding<>(SOCKET_BINDINGS));
+        subtasks.subtask(SocketBindingGroupResource.class, new AddSocketBinding<>(SOCKET_BINDINGS));
         subtasks(subtasks);
         afterRun(context -> {
             if (context.hasSucessfulSubtasks()) {
-                context.getLogger().infof("Socket bindings added.");
+                context.getLogger().infof("JGroups FD Socket bindings added.");
             } else {
-                context.getLogger().debugf("No socket bindings added.");
+                context.getLogger().debugf("No JGroups FD socket bindings added.");
             }
         });
     }
@@ -84,11 +83,13 @@ public class AddJGroupsFDSocketBindings<S> extends ManageableServerConfiguration
                 final org.jboss.as.controller.client.helpers.Operations.CompositeOperationBuilder compositeOperationBuilder = org.jboss.as.controller.client.helpers.Operations.CompositeOperationBuilder.create();
                 // add steps for each socket binding
                 socketBindings.stream().forEach(binding -> {
-                    final ModelNode addOp = Util.createEmptyOperation(ADD, socketBindingGroupAddress.append(SOCKET_BINDING, binding.getName()));
-                    addOp.get(INTERFACE).set(binding.getInterfaceName());
-                    addOp.get(PORT).set(binding.getPort());
-                    compositeOperationBuilder.addStep(addOp);
-                    context.getLogger().debugf("Socket binding %s added.", binding.toString());
+                    if (socketBindingGroupResource.hasSocketBindingResource(binding.requires)) {
+                        final ModelNode addOp = Util.createEmptyOperation(ADD, socketBindingGroupAddress.append(SOCKET_BINDING, binding.getName()));
+                        addOp.get(INTERFACE).set(binding.getInterfaceName());
+                        addOp.get(PORT).set(binding.getPort());
+                        compositeOperationBuilder.addStep(addOp);
+                        context.getLogger().debugf("JGroups FD Socket binding %s added to group %s.", binding.toString(), socketBindingGroupResource.getResourceName());
+                    }
                 });
 
                 serverConfiguration.executeManagementOperation(compositeOperationBuilder.build().getOperation());
@@ -103,6 +104,7 @@ public class AddJGroupsFDSocketBindings<S> extends ManageableServerConfiguration
 
     public static class SocketBinding {
         private final String name;
+        private final String requires;
         private final String interfaceName;
         private final int port;
 
@@ -110,10 +112,15 @@ public class AddJGroupsFDSocketBindings<S> extends ManageableServerConfiguration
             this.name = builder.name;
             this.interfaceName = builder.interfaceName;
             this.port = builder.port;
+            this.requires = builder.requires;
         }
 
         public String getName() {
             return name;
+        }
+
+        public String getRequires() {
+            return requires;
         }
 
         public String getInterfaceName() {
@@ -135,11 +142,17 @@ public class AddJGroupsFDSocketBindings<S> extends ManageableServerConfiguration
 
         public static class Builder {
             private String name;
+            private String requires;
             private String interfaceName;
             private int port;
 
             public Builder name(String name) {
                 this.name = name;
+                return this;
+            }
+
+            public Builder requires(String requires) {
+                this.requires = requires;
                 return this;
             }
 
