@@ -26,6 +26,9 @@ import java.util.Set;
 
 public class LegacySecurityConfiguration {
 
+    public static final String DEFAULT_ELYTRON_APPLICATION_DOMAIN_NAME = "migration-defaultApplicationDomain";
+    public static final String DEFAULT_ELYTRON_APPLICATION_HTTP_AUTHENTICATION_FACTORY_NAME = "migration-defaultApplicationHttpAuthenticationFactory";
+
     private final JBossServerConfiguration targetConfiguration;
     private final Map<String, LegacySecurityRealm> legacySecurityRealms = new HashMap<>();
     private final Set<LegacySecuredManagementInterface> securedManagementInterfaces = new HashSet<>();
@@ -73,7 +76,7 @@ public class LegacySecurityConfiguration {
     }
 
     public String getDefaultElytronApplicationDomainName() {
-        return "migration-defaultApplicationDomain";
+        return DEFAULT_ELYTRON_APPLICATION_DOMAIN_NAME;
     }
 
     public String getDefaultElytronManagementDomainName() {
@@ -81,7 +84,7 @@ public class LegacySecurityConfiguration {
     }
 
     public String getDefaultElytronApplicationHttpAuthenticationFactoryName() {
-        return "migration-defaultApplicationHttpAuthenticationFactory";
+        return DEFAULT_ELYTRON_APPLICATION_HTTP_AUTHENTICATION_FACTORY_NAME;
     }
 
     public String getDefaultElytronManagementHttpAuthenticationFactoryName() {
