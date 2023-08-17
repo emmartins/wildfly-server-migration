@@ -31,7 +31,8 @@ Run the Server Migration Tool (Standalone Build)
     Replace `SOURCE_SERVER_PATH` with the path to previous version of the server installation that you want to migrate from, for example:  `${user.home}/wildfly-11.0.0.Final/`
 
     Replace `TARGET_SERVER_PATH` with the path to current version of the server installation that you want the old configuration migrated to, for example:  `${user.home}/wildfly-24.0.0.Final/`
-3. When you execute the command, the tool identifies the source and target servers from provided paths, and starts the server migration.
+4. When you execute the command, the tool identifies the source and target servers from provided paths, and starts the server migration.
+
         ----------------------------------------------------------
         ----  JBoss Server Migration Tool  -----------------------
         ----------------------------------------------------------
@@ -44,7 +45,8 @@ Run the Server Migration Tool (Standalone Build)
         ----------------------------------------------------------
         
         Server migration starting...
-4. Each server migration consists of several migration tasks, which may require or not user interaction.
+5. Each server migration consists of several migration tasks, which may require or not user interaction.
+
         INFO  --- Migrating modules requested by environment...
         
         INFO  Module cmtool.module1:main migrated.
@@ -78,7 +80,7 @@ Run the Server Migration Tool (Standalone Build)
         INFO  Migrating host configuration host.xml...
         INFO  Migrating host master...
         INFO  Security realms migrated.
-8. Once the server migration is done a `Task Summary` report will be shown, that summarizes the results of migration tasks.
+6. Once the server migration is done a `Task Summary` report will be shown, that summarizes the results of migration tasks.
         Server migration done.
         
          INFO  
@@ -97,7 +99,8 @@ Run the Server Migration Tool (Standalone Build)
            domain-configuration(source=domain.xml) .......................................... SUCCESS
           host-configurations ............................................................... SUCCESS
            host-configuration(source=host.xml) .............................................. SUCCESS
-9. You should see the following message when it completes.
+7. You should see the following message when it completes.
+
         ----------------------------------------------------------------------------------------------
          Migration Result: SUCCESS
         ----------------------------------------------------------------------------------------------
@@ -114,3 +117,17 @@ Development
 ------------
 
 * [Issue Tracker](https://issues.redhat.com/browse/CMTOOL)
+
+
+Contributions
+------------
+
+All new features and enhancements should be submitted to _master_ branch.
+Our [contribution guide](CONTRIBUTING.md) will guide you through the steps for getting started on the project and will go through how to format and submit your first PR.
+
+
+Get Help
+------------
+
+If you would like to ask us some question or you need some help, feel free to ask on the WildFly user [forum](https://groups.google.com/g/wildfly).
+
