@@ -98,8 +98,8 @@ public class MigrateLegacySecurityDomainsToElytron<S> extends ManageableServerCo
             if (iiopSubsystemResource != null) {
                 final String securityAttribute = iiopSubsystemResource.getResourceConfiguration().get(SECURITY).asStringOrNull();
                 if (CLIENT.equals(securityAttribute) || IDENTITY.equals(securityAttribute)) {
-                    subsystemResource.getServerConfiguration().executeManagementOperation(getUndefineAttributeOperation(iiopSubsystemResource.getResourcePathAddress(), SECURITY));
-                    taskContext.getLogger().warnf("Migrated iiop-openjdk subsystem resource using legacy security domain to Elytron defaults, which is no security. Please note that further manual Elytron configuration should be needed!");
+                    subsystemResource.getServerConfiguration().executeManagementOperation(getWriteAttributeOperation(iiopSubsystemResource.getResourcePathAddress(), SECURITY, ELYTRON));
+                    taskContext.getLogger().warnf("Migrated iiop-openjdk subsystem resource using legacy security domain to Elytron defaults. Please note that further manual Elytron configuration should be needed!");
                     return true;
                 }
             }
