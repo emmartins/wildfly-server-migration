@@ -43,6 +43,8 @@ include::{includesDir}/ServerMigration-StandaloneServer-StandaloneServerConfigur
 
 :leveloffset: +1
 
+include::{includesDir}/WFLY20.0toWFLY27.0-ServerMigration-ServerConfiguration-MigrateJBossDomainProperties.adoc[]
+
 include::{includesDir}/ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
@@ -73,6 +75,8 @@ include::{includesDir}/ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
 
 :leveloffset: +1
 
+include::{includesDir}/WFLY20.0toWFLY27.0-ServerMigration-ServerConfiguration-MigrateJBossDomainProperties.adoc[]
+
 include::{includesDir}/ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
@@ -88,6 +92,8 @@ include::{includesDir}/ServerMigration-ServerConfiguration-MigrateDeployments.ad
 include::{includesDir}/ServerMigration-ManagedDomain-HostConfiguration.adoc[]
 
 :leveloffset: +1
+
+include::{includesDir}/WFLY20.0toWFLY27.0-ServerMigration-ServerConfiguration-MigrateJBossDomainProperties.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 

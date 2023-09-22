@@ -25,14 +25,88 @@ The server migration from {server-source-productName} to {server-target-productN
  * Standalone Server Migration
  * Managed Domain Migration
 
-// include the docs for each task
 :leveloffset: +1
+
+// --- modules migration
 
 include::{includesDir}/ServerMigration-Modules.adoc[]
 
-include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-StandaloneServer.adoc[]
+// --- standalone server migration
 
-include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ManagedDomain.adoc[]
+include::{includesDir}/ServerMigration-StandaloneServer.adoc[]
+
+:leveloffset: +1
+
+// ------ standalone server configuration migration
+
+include::{includesDir}/ServerMigration-StandaloneServer-StandaloneServerConfiguration.adoc[]
+
+:leveloffset: +1
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-MigrateJBossDomainProperties.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-microprofile-jwt-smallrye.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 
 :leveloffset: -1
 
+:leveloffset: -1
+
+// --- managed domain migration
+
+include::{includesDir}/ServerMigration-ManagedDomain.adoc[]
+
+// ------ domain configuration
+
+:leveloffset: +1
+
+include::{includesDir}/ServerMigration-ManagedDomain-DomainConfiguration.adoc[]
+
+:leveloffset: +1
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-MigrateJBossDomainProperties.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-RemoveUnsupportedSubsystems.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
+
+include::{includesDir}/ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
+
+:leveloffset: -1
+
+// ------ host configuration
+
+include::{includesDir}/ServerMigration-ManagedDomain-HostConfiguration.adoc[]
+
+:leveloffset: +1
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-MigrateJBossDomainProperties.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
+
+include::{includesDir}/ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
+
+:leveloffset: -1
+
+:leveloffset: -1
+
+:leveloffset: -1
