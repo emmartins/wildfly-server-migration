@@ -20,6 +20,8 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
 include::EAP7.0toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityRealms.adoc[]
 
+include::EAP7.0toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityDomains.adoc[]
+
 include::EAP7.0toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-infinispan.adoc[]
 
 include::EAP7.0toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]

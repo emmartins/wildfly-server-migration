@@ -20,6 +20,8 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
 include::EAP7.3toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
 
+include::EAP7.3toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
+
 include::ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]

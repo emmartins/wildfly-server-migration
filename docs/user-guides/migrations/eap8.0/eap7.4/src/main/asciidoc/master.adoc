@@ -53,6 +53,8 @@ include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPath
 
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
 
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
+
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
@@ -86,6 +88,8 @@ include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModu
 include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityRealms.adoc[]
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityDomains.adoc[]
 
 include::{includesDir}/ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
 
