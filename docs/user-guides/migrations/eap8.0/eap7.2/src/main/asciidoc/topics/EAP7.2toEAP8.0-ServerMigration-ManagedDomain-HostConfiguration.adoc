@@ -16,6 +16,4 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
-include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
-
 :leveloffset: -1

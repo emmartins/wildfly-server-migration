@@ -20,8 +20,4 @@ include::ServerMigration-ServerConfiguration-Subsystem-Add-core-management.adoc[
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-elytron.adoc[]
 
-include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
-
-include::ServerMigration-ServerConfiguration-AddApplicationRealmSSLServerIdentity.adoc[]
-
 :leveloffset: -1

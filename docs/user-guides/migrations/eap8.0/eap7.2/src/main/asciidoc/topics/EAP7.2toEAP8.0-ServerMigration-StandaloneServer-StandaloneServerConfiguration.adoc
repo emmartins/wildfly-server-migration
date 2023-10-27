@@ -18,11 +18,19 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
+include::EAP7.2toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
+
+include::EAP7.2toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
+
+include::EAP7.2toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-keycloak.adoc[]
+
+include::EAP7.2toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-picketlink.adoc[]
+
+include::EAP7.2toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]
+
 include::ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
-
-include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 
