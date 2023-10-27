@@ -18,6 +18,8 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
+include::EAP7.3toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityRealms.adoc[]
+
 include::ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]

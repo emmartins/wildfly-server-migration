@@ -18,6 +18,8 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
+include::EAP7.0toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
+
 include::EAP7.0toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-infinispan.adoc[]
 
 include::EAP7.0toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]
@@ -37,10 +39,6 @@ include::ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 include::ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
 
 include::ServerMigration-ServerConfiguration-AddSocketBindingMulticastAddressExpressions.adoc[]
-
-include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
-
-include::ServerMigration-ServerConfiguration-AddApplicationRealmSSLServerIdentity.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 

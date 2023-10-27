@@ -18,11 +18,11 @@ include::ServerMigration-ServerConfiguration-MigrateReferencedModules.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
+include::EAP7.2toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
+
 include::ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
 include::ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
-
-include::ServerMigration-ServerConfiguration-MigrateCompatibleSecurityRealms.adoc[]
 
 include::ServerMigration-ServerConfiguration-MigrateDeployments.adoc[]
 
