@@ -59,6 +59,8 @@ include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsys
 
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-picketlink.adoc[]
 
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]
+
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
@@ -98,6 +100,8 @@ include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ManagedDomain-DomainConfig
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-keycloak.adoc[]
 
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-picketlink.adoc[]
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]
 
 include::{includesDir}/ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
 

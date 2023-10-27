@@ -1,14 +1,11 @@
-= Update the JGroups Subsystem
+= Update jgroups Subsystem Configuration
 
-The JBoss Server Migration Tool does the following updates to any *jgroups* subsystem configuration found while migrating a server configuration:
+The JBoss Server Migration Tool currently is not capable to automate the migration of the `jgroups` subsystem configuration, and thus reverts it to the default {server-target-productName} `jgroups` configuration.
 
-* Replaces protocol `FRAG2` with `FRAG3`.
+Please note that further manual `jgroups` subsystem configuration may be needed if the configuration being used was not the default {server-source-productName} `jgroups` subsystem configuration!
 
-If you prefer, you can set the `subsystem.jgroups.update.skip` environment property to `true` to skip automatic update of the *jgroups* subsystem configuration.
-
-Upon successful migration of the *jgroups* subsystem configuration, you should see the following message in the console:
-
+The console logs a message when it updates the  `jgroups` subsystem configuration.
 [source,options="nowrap"]
 ----
- INFO  Subsystem jgroups updated.
+ WARN  Configuration of JGroups protocols has been changed to match the default protocols of the target server. Please note that further manual configuration may be needed if the legacy configuration being used was not the source server's default configuration!
 ----
