@@ -22,6 +22,10 @@ include::EAP7.1toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfigu
 
 include::EAP7.1toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
 
+include::EAP7.1toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-keycloak.adoc[]
+
+include::EAP7.1toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-picketlink.adoc[]
+
 include::EAP7.1toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-infinispan.adoc[]
 
 include::EAP7.1toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Update-jgroups.adoc[]

@@ -55,6 +55,10 @@ include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-StandaloneServer-Standalon
 
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
 
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-keycloak.adoc[]
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-picketlink.adoc[]
+
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-metrics.adoc[]
@@ -90,6 +94,10 @@ include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPath
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityRealms.adoc[]
 
 include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ManagedDomain-DomainConfiguration-MigrateLegacySecurityDomains.adoc[]
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-keycloak.adoc[]
+
+include::{includesDir}/EAP7.4toEAP8.0-ServerMigration-ServerConfiguration-Subsystem-Migrate-picketlink.adoc[]
 
 include::{includesDir}/ServerMigration-ManagedDomain-AddHostExcludes.adoc[]
 
