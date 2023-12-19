@@ -36,15 +36,21 @@ public class EAPXPServer8_0 extends WildFlyServer10 {
 
     public static final Extensions EXTENSIONS = Extensions.builder()
             .extensions(EAPServer8_0.EXTENSIONS)
+            .extension(JBossExtensions.MICROMETER)
             .extension(JBossExtensions.MICROPROFILE_CONFIG_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_FAULT_TOLERANCE_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_HEALTH_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_JWT_SMALLRYE)
+            // workaround for issue with migrate ops
             .extension(JBossExtensions.MICROPROFILE_METRICS_SMALLRYE)
+            .extension(JBossExtensions.MICROPROFILE_LRA_COORDINATOR)
+            .extension(JBossExtensions.MICROPROFILE_LRA_PARTICIPANT)
             .extension(JBossExtensions.MICROPROFILE_OPENAPI_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_OPENTRACING_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE)
             .extension(JBossExtensions.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE)
+            .extension(JBossExtensions.MICROPROFILE_TELEMETRY)
+            .extension(JBossExtensions.OPENTELEMETRY)
             .build();
 
     public EAPXPServer8_0(String migrationName, ProductInfo productInfo, Path baseDir, MigrationEnvironment migrationEnvironment) {

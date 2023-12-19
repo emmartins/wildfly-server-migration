@@ -64,7 +64,7 @@ public class EAPServerProvider8_0 extends EAPServerProvider7_4 {
     }
 
     protected boolean isXp(Path baseDir) {
-        if (Files.exists(baseDir.resolve(".installation").resolve("jboss-eap-xp-4.0.conf"))) {
+        if (Files.exists(baseDir.resolve(".installation").resolve("jboss-eap-xp-5.0.conf"))) {
             return true;
         }
         // fallback for internal XP builds

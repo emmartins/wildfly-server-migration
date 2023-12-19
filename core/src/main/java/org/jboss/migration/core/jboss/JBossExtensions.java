@@ -203,6 +203,11 @@ public interface JBossExtensions {
             .subsystem(JBossSubsystemNames.MESSAGING_ACTIVEMQ)
             .build();
 
+    Extension MICROMETER = Extension.builder()
+            .module(JBossExtensionNames.MICROMETER)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROMETER).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROMETER))
+            .build();
+
     Extension MICROPROFILE_CONFIG_SMALLRYE = Extension.builder()
             .module(JBossExtensionNames.MICROPROFILE_CONFIG_SMALLRYE)
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_CONFIG_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_CONFIG_SMALLRYE))
@@ -221,6 +226,16 @@ public interface JBossExtensions {
     Extension MICROPROFILE_JWT_SMALLRYE = Extension.builder()
             .module(JBossExtensionNames.MICROPROFILE_JWT_SMALLRYE)
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_JWT_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_JWT_SMALLRYE))
+            .build();
+
+    Extension MICROPROFILE_LRA_COORDINATOR = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_LRA_COORDINATOR)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_LRA_COORDINATOR).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_LRA_COORDINATOR))
+            .build();
+
+    Extension MICROPROFILE_LRA_PARTICIPANT = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_LRA_PARTICIPANT)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_LRA_PARTICIPANT).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_LRA_PARTICIPANT))
             .build();
 
     Extension MICROPROFILE_METRICS_SMALLRYE = Extension.builder()
@@ -246,6 +261,11 @@ public interface JBossExtensions {
     Extension MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE = Extension.builder()
             .module(JBossExtensionNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE)
             .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE))
+            .build();
+
+    Extension MICROPROFILE_TELEMETRY = Extension.builder()
+            .module(JBossExtensionNames.MICROPROFILE_TELEMETRY)
+            .subsystem(Subsystem.builder().name(JBossSubsystemNames.MICROPROFILE_TELEMETRY).namespaceWithoutVersion("urn:wildfly:"+JBossSubsystemNames.MICROPROFILE_TELEMETRY))
             .build();
 
     Extension MODCLUSTER = Extension.builder()
