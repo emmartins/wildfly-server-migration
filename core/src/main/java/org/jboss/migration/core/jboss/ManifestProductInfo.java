@@ -34,18 +34,12 @@ public class ManifestProductInfo extends ProductInfo {
     }
 
     /**
-     * Retrieves the product info from the specified's manifest inputstream.
-     * @param inputStream the inputstream to read the manifest file
-     * @return the product info from the specified's manifest inputstream
+     * Retrieves the product info from the specified manifest.
+     * @param manifest the manifest file
+     * @return the product info from the specified manifest inputstream
      * @throws ServerMigrationFailureException if there is an error reading the manifest input stream
      */
-    public static ManifestProductInfo from(InputStream inputStream) throws ServerMigrationFailureException {
-        final Manifest manifest;
-        try {
-            manifest = new Manifest(inputStream);
-        } catch (IOException e) {
-            throw new ServerMigrationFailureException("MANIFEST load failure.", e);
-        }
+    public static ManifestProductInfo from(Manifest manifest) throws ServerMigrationFailureException {
         final String productName = manifest.getMainAttributes().getValue("JBoss-Product-Release-Name");
         if (productName == null) {
             throw new IllegalArgumentException();
@@ -55,6 +49,20 @@ public class ManifestProductInfo extends ProductInfo {
             throw new IllegalArgumentException();
         }
         return new ManifestProductInfo(productName.trim(), productVersion.trim());
+    }
+
+    /**
+     * Retrieves the product info from the specified's manifest inputstream.
+     * @param inputStream the inputstream to read the manifest file
+     * @return the product info from the specified's manifest inputstream
+     * @throws ServerMigrationFailureException if there is an error reading the manifest input stream
+     */
+    public static ManifestProductInfo from(InputStream inputStream) throws ServerMigrationFailureException {
+        try {
+            return from(new Manifest(inputStream));
+        } catch (IOException e) {
+            throw new ServerMigrationFailureException("MANIFEST stream load failure.", e);
+        }
     }
 
     /**
