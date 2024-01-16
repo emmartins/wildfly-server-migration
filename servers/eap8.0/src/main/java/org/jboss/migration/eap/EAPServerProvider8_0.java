@@ -22,8 +22,10 @@ import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.ManifestProductInfo;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.jar.JarInputStream;
 
 /**
  * The JBoss EAP 8.0 {@link org.jboss.migration.core.ServerProvider}.
@@ -37,9 +39,18 @@ public class EAPServerProvider8_0 extends EAPServerProvider7_4 {
         if (module == null) {
             return null;
         }
-        final Path manifestPath = module.getModuleDir().resolve("dir").resolve("META-INF").resolve("MANIFEST.MF");
-        final ManifestProductInfo productInfo = ManifestProductInfo.from(manifestPath);
-        return productInfo;
+        // Starting with EAP 8.0 GA, manifest is inside the module's jar
+        try {
+            Path moduleJar = Files.list(module.getModuleDir()).filter(path -> path.toString().endsWith(".jar")).findFirst().get();
+            if (moduleJar == null || !Files.isRegularFile(moduleJar)) {
+                return null;
+            }
+            try (JarInputStream jarStream = new JarInputStream(Files.newInputStream(moduleJar))) {
+                return ManifestProductInfo.from(jarStream.getManifest());
+            }
+        } catch (IOException e) {
+            throw new ServerMigrationFailureException(e);
+        }
     }
 
     @Override
