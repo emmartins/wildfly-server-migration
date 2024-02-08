@@ -58,15 +58,20 @@ public interface JBossSubsystemNames {
     String METRICS = "metrics";
     String MESSAGING = "messaging";
     String MESSAGING_ACTIVEMQ = "messaging-activemq";
+    String MICROMETER = "micrometer";
     String MICROPROFILE_CONFIG_SMALLRYE = "microprofile-config-smallrye";
     String MICROPROFILE_FAULT_TOLERANCE_SMALLRYE = "microprofile-fault-tolerance-smallrye";
     String MICROPROFILE_HEALTH_SMALLRYE = "microprofile-health-smallrye";
     String MICROPROFILE_JWT_SMALLRYE = "microprofile-jwt-smallrye";
+    String MICROPROFILE_LRA_COORDINATOR = "microprofile-lra-coordinator";
+    String MICROPROFILE_LRA_PARTICIPANT = "microprofile-lra-participant";
     String MICROPROFILE_METRICS_SMALLRYE = "microprofile-metrics-smallrye";
     String MICROPROFILE_OPENAPI_SMALLRYE = "microprofile-openapi-smallrye";
     String MICROPROFILE_OPENTRACING_SMALLRYE = "microprofile-opentracing-smallrye";
     String MICROPROFILE_REACTIVE_MESSAGING_SMALLRYE = "microprofile-reactive-messaging-smallrye";
     String MICROPROFILE_REACTIVE_STREAMS_OPERATORS_SMALLRYE = "microprofile-reactive-streams-operators-smallrye";
+    String MICROPROFILE_TELEMETRY = "microprofile-telemetry";
+
     String MODCLUSTER = "modcluster";
     String NAMING = "naming";
     String OPENTELEMETRY = "opentelemetry";
