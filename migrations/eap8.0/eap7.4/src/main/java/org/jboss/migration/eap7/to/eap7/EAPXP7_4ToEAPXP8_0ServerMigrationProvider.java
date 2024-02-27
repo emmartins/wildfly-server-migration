@@ -19,7 +19,7 @@ package org.jboss.migration.eap7.to.eap7;
 import org.jboss.migration.eap.EAPXPServer7_4;
 import org.jboss.migration.eap.EAPXPServerMigrationProvider8_0;
 import org.jboss.migration.eap.task.hostexclude.EAPXP8_0AddHostExcludes;
-import org.jboss.migration.eap.task.subsystem.jgroups.EAP7_2ToEAP8_0UpdateJGroupsSubsystem;
+import org.jboss.migration.eap.task.subsystem.jgroups.EAP8_0UpdateJGroupsSubsystem;
 import org.jboss.migration.eap.task.subsystem.metrics.MigrateMicroprofileMetricsSmallryeSubsystem;
 import org.jboss.migration.eap.task.subsystem.opentracing.MigrateMicroprofileOpentracingSmallryeSubsystem;
 import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
@@ -56,7 +56,7 @@ public class EAPXP7_4ToEAPXP8_0ServerMigrationProvider implements EAPXPServerMig
                         .subtask(new WildFly26_0MigrateReferencedPaths<>())
                         .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                         .subtask(new WildFly26_0MigrateVault<>())
-                        .subtask(new EAP7_2ToEAP8_0UpdateJGroupsSubsystem<>())
+                        .subtask(new EAP8_0UpdateJGroupsSubsystem<>())
                         .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                         .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
@@ -76,7 +76,7 @@ public class EAPXP7_4ToEAPXP8_0ServerMigrationProvider implements EAPXPServerMig
                                 .subtask(new WildFly26_0MigrateReferencedPaths<>())
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(new EAPXP8_0AddHostExcludes<>())
-                                .subtask(new EAP7_2ToEAP8_0UpdateJGroupsSubsystem<>())
+                                .subtask(new EAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())

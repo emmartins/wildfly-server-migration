@@ -19,7 +19,6 @@ package org.jboss.migration.eap7.to.eap8;
 import org.jboss.migration.eap.EAPServer7_2;
 import org.jboss.migration.eap.EAPServerMigrationProvider8_0;
 import org.jboss.migration.eap.task.hostexclude.EAP8_0AddHostExcludes;
-import org.jboss.migration.eap.task.subsystem.jgroups.EAP7_2ToEAP8_0UpdateJGroupsSubsystem;
 import org.jboss.migration.eap.task.subsystem.metrics.EAP8_0AddMetricsSubsystem;
 import org.jboss.migration.wfly.task.paths.WildFly26_0MigrateReferencedPaths;
 import org.jboss.migration.wfly.task.security.LegacySecurityConfigurationMigration;
@@ -61,7 +60,6 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new WildFly26_0MigrateVault<>())
                                 .subtask(new AddJGroupsFDSocketBindings<>())
-                                .subtask(new EAP7_2ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(legacySecurityConfigurationMigration.getEnsureBasicElytronSubsystem())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityRealmsToElytron())
                                 .subtask(legacySecurityConfigurationMigration.getMigrateLegacySecurityDomainsToElytron())
@@ -80,7 +78,6 @@ public class EAP7_2ToEAP8_0ServerMigrationProvider implements EAPServerMigration
                                 .subtask(new MigrateReferencedModules<>())
                                 .subtask(new WildFly26_0MigrateReferencedPaths<>())
                                 .subtask(new AddJGroupsFDSocketBindings<>())
-                                .subtask(new EAP7_2ToEAP8_0UpdateJGroupsSubsystem<>())
                                 .subtask(legacySecurityConfigurationMigration.getRemoveLegacySecurityRealms())
                                 .subtask(new WildFly22_0UpdateInfinispanSubsystem<>())
                                 .subtask(new EAP8_0AddHostExcludes<>())
