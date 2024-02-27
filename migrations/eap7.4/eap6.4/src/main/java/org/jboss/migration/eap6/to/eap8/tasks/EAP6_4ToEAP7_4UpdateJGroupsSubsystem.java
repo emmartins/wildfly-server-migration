@@ -17,6 +17,7 @@
 package org.jboss.migration.eap6.to.eap8.tasks;
 
 import org.jboss.migration.core.jboss.JBossSubsystemNames;
+import org.jboss.migration.eap.task.subsystem.jgroups.FixPortRange;
 import org.jboss.migration.wfly10.config.task.management.subsystem.UpdateSubsystemResources;
 import org.jboss.migration.wfly10.config.task.subsystem.jgroups.UpdateProtocols;
 
@@ -33,6 +34,8 @@ public class EAP6_4ToEAP7_4UpdateJGroupsSubsystem<S> extends UpdateSubsystemReso
                         .replace("UNICAST2", "UNICAST3")
                         .remove("RSVP")
                         .replace("FRAG2", "FRAG3")
-                ));
+                ),
+                new FixPortRange<>()
+        );
     }
 }
