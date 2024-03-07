@@ -51,9 +51,9 @@ include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedModu
 
 include::{includesDir}/ServerMigration-ServerConfiguration-MigrateReferencedPaths.adoc[]
 
-include::{includesDir}/WFLY21.0toWFLY31.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
+include::{includesDir}/WFLY21.0toWFLY31.0-ServerMigration-StandaloneServerConfiguration-MigrateLegacySecurityRealms.adoc[]
 
-include::{includesDir}/WFLY21.0toWFLY31.0-ServerMigration-StandaloneServer-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
+include::{includesDir}/WFLY21.0toWFLY31.0-ServerMigration-StandaloneServerConfiguration-MigrateLegacySecurityDomains.adoc[]
 
 include::{includesDir}/ServerMigration-ServerConfiguration-Subsystem-Add-health.adoc[]
 
