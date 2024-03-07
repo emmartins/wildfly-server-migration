@@ -18,7 +18,7 @@ jobs:
         jdk: [11, 17]
         os: [ubuntu-20.04, windows-latest]
     steps:
-    - uses: n1hility/cancel-previous-runs@v2
+    - uses: n1hility/cancel-previous-runs@v3
       with:
           token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/checkout@v4
