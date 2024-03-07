@@ -1,12 +1,13 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 name: WildFly Server Migration CI
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - master
+
+# Only run the latest job
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.ref || github.run_id }}'
+  cancel-in-progress: true
 
 jobs:
   Test-build-default-matrix:
@@ -16,19 +17,17 @@ jobs:
       fail-fast: false
       matrix:
         jdk: [11, 17]
-        os: [ubuntu-20.04, windows-latest]
+        os: [ubuntu-latest, windows-latest]
     steps:
-    - uses: n1hility/cancel-previous-runs@v3
-      with:
-          token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/checkout@v4
       with:
         path: wildfly-server-migration
-    - name: Set up JDK ${{ matrix.java }}
-      uses: AdoptOpenJDK/install-jdk@v1
+    - name: Set up JDK ${{ matrix.jdk }}
+      uses: actions/setup-java@v4
       with:
-        version: ${{ matrix.jdk }}
-        impl: hotspot
+        java-version: ${{ matrix.jdk }}
+        distribution: 'temurin'
+        cache: 'maven'
     - name: Build Server Migration Tool
       run: |
         cd wildfly-server-migration
