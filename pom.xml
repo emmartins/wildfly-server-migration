@@ -61,7 +61,7 @@
             versions, add the artifactId or other qualifier to the property name.
             For example: <version.org.jboss.as.console>
          -->
-        <version.server>28.0.1.Final</version.server>
+        <version.server>30.0.1.Final</version.server>
         <version.org.asciidoctor.asciidoctor-maven-plugin>1.5.6</version.org.asciidoctor.asciidoctor-maven-plugin>
 
         <!-- Surefire args -->
@@ -117,6 +117,19 @@
         <module>docs/user-guides/migrations/wildfly27.0/wildfly25.0</module>
         <module>docs/user-guides/migrations/wildfly27.0/wildfly26.0</module>
         <module>docs/user-guides/migrations/wildfly27.0/wildfly27.0</module>
+        <!-- disabled due to https://issues.redhat.com/browse/WFLY-19100
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly21.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly22.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly23.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly24.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly25.0</module>
+        -->
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly26.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly27.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly28.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly29.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly30.0</module>
+        <module>docs/user-guides/migrations/wildfly31.0/wildfly31.0</module>
         <module>docs/user-guides/tool/includes</module>
         <module>docs/user-guides/tool/standalone</module>
         <module>migrations/eap7.4/eap6.4</module>
@@ -154,6 +167,19 @@
         <module>migrations/wildfly27.0/wildfly25.0</module>
         <module>migrations/wildfly27.0/wildfly26.0</module>
         <module>migrations/wildfly27.0/wildfly27.0</module>
+        <!-- disabled due to https://issues.redhat.com/browse/WFLY-19100
+        <module>migrations/wildfly31.0/wildfly21.0</module>
+        <module>migrations/wildfly31.0/wildfly22.0</module>
+        <module>migrations/wildfly31.0/wildfly23.0</module>
+        <module>migrations/wildfly31.0/wildfly24.0</module>
+        <module>migrations/wildfly31.0/wildfly25.0</module>
+        -->
+        <module>migrations/wildfly31.0/wildfly26.0</module>
+        <module>migrations/wildfly31.0/wildfly27.0</module>
+        <module>migrations/wildfly31.0/wildfly28.0</module>
+        <module>migrations/wildfly31.0/wildfly29.0</module>
+        <module>migrations/wildfly31.0/wildfly30.0</module>
+        <module>migrations/wildfly31.0/wildfly31.0</module>
         <module>servers/eap6.4</module>
         <module>servers/eap7.0</module>
         <module>servers/eap7.1</module>
@@ -182,6 +208,10 @@
         <module>servers/wildfly25.0</module>
         <module>servers/wildfly26.0</module>
         <module>servers/wildfly27.0</module>
+        <module>servers/wildfly28.0</module>
+        <module>servers/wildfly29.0</module>
+        <module>servers/wildfly30.0</module>
+        <module>servers/wildfly31.0</module>
     </modules>
 
     <build>
@@ -944,6 +974,144 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jboss-server-migration-wildfly27.0-to-wildfly27.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- wfly 28.0 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly28.0-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- wfly 29.0 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly29.0-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- wfly 30.0 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly30.0-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- wfly 31.0 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly31.0-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly21.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly22.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly23.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly24.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly25.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly26.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly27.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly28.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly29.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly30.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly31.0-to-wildfly31.0</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly21.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly22.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly23.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly24.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly25.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly26.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly27.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly28.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly29.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly30.0-to-wildfly31.0-userguide</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jboss-server-migration-wildfly31.0-to-wildfly31.0-userguide</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
