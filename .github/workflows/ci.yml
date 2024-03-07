@@ -21,7 +21,7 @@ jobs:
     - uses: n1hility/cancel-previous-runs@v2
       with:
           token: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         path: wildfly-server-migration
     - name: Set up JDK ${{ matrix.java }}
