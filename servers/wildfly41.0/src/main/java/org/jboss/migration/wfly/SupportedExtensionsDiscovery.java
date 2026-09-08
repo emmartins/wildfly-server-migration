@@ -17,6 +17,7 @@ import org.jboss.migration.core.ServerMigrationFailureException;
 import org.jboss.migration.core.env.MigrationEnvironment;
 import org.jboss.migration.core.jboss.Extension;
 import org.jboss.migration.core.jboss.ExtensionsDiscovery;
+import org.jboss.migration.core.jboss.JBossExtensionNames;
 import org.jboss.migration.core.jboss.JBossServer;
 import org.jboss.migration.core.jboss.Subsystem;
 import org.jboss.migration.core.logger.ServerMigrationLogger;
@@ -48,6 +49,8 @@ public class SupportedExtensionsDiscovery {
 
     public static final String PROPERTY_CONFIG_FILE = "discovery.extensions.configFile";
     public static final String DEFAULT_CONFIG_FILE = "standalone.xml";
+
+    public static final Set<String> LEGACY_EXTENSIONS_WITH_MIGRATE_OP = Set.of(JBossExtensionNames.KEYCLOAK, JBossExtensionNames.PICKETLINK);
 
     /**
      * Discovers extensions module names and validates which are supported by checking which ones exist as resources
@@ -101,18 +104,21 @@ public class SupportedExtensionsDiscovery {
                 final ModelControllerClient client = standaloneServer.getModelControllerClient();
                 // Check which candidate extensions are supported and populate their subsystems
                 for (String candidateExtension : candidateExtensions) {
-                    // unsupported Extensions extend AbstractLegacyExtension
-                    Module module = moduleLoader.loadModule(candidateExtension);
                     boolean unsupported = false;
-                    Class<?> extensionClass = module.getClassLoader().loadClass("org.jboss.as.controller.Extension");
-                    Class<?> abstractLegacyExtensionClass = module.getClassLoader().loadClass("org.jboss.as.controller.extension.AbstractLegacyExtension");
-                    Iterator<?> iterator = module.loadService(extensionClass).iterator();
-                    while (iterator.hasNext()) {
-                        Object extension = iterator.next();
-                        if (abstractLegacyExtensionClass.isAssignableFrom(extension.getClass())) {
-                            ServerMigrationLogger.ROOT_LOGGER.debugf("Extension class %s is legacy.", extension.getClass().getName());
-                            unsupported = true;
-                            break;
+                    // extensions extending AbstractLegacyExtension are by default unsupported, but there are
+                    // exceptions, which should only be removed after invoking its migrate() op
+                    if (!LEGACY_EXTENSIONS_WITH_MIGRATE_OP.contains(candidateExtension)) {
+                        Module module = moduleLoader.loadModule(candidateExtension);
+                        Class<?> extensionClass = module.getClassLoader().loadClass("org.jboss.as.controller.Extension");
+                        Class<?> abstractLegacyExtensionClass = module.getClassLoader().loadClass("org.jboss.as.controller.extension.AbstractLegacyExtension");
+                        Iterator<?> iterator = module.loadService(extensionClass).iterator();
+                        while (iterator.hasNext()) {
+                            Object extension = iterator.next();
+                            if (abstractLegacyExtensionClass.isAssignableFrom(extension.getClass())) {
+                                ServerMigrationLogger.ROOT_LOGGER.debugf("Extension class %s is legacy.", extension.getClass().getName());
+                                unsupported = true;
+                                break;
+                            }
                         }
                     }
                     if (!unsupported) {
